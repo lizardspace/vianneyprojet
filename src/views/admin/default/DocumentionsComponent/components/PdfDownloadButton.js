@@ -20,7 +20,7 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
 
     useEffect(() => {
         const fetchDocuments = async () => {
-            const { data, error } = await supabase.from("pdf_documents").select();
+            const { data, error } = await supabase.from("vianney_pdf_documents").select();
             if (error) {
                 console.error("Error fetching documents:", error);
             } else {

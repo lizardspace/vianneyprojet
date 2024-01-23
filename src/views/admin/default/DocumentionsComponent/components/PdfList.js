@@ -24,7 +24,7 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
   const fetchPdfDocuments = async () => {
     try {
       const { data: pdfDocumentsData, error } = await supabase
-        .from("pdf_documents")
+        .from("vianney_pdf_documents")
         .select("*");
 
       if (error) {
