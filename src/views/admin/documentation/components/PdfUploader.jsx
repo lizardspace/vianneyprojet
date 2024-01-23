@@ -28,7 +28,7 @@ const PdfUploader = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [ setSuccessAlert] = useState(false);
-  const [errorAlert, setErrorAlert] = useState(false);
+  const [errorAlert] = useState(false);
   const [formErrors, setFormErrors] = useState({
     file: false,
     title: false,
@@ -43,19 +43,19 @@ const PdfUploader = () => {
 
   const handleUpload = async () => {
     if (!file) {
-      setErrorAlert(true);
+
       setFormErrors({ ...formErrors, file: true });
       return;
     }
 
     if (!title) {
-      setErrorAlert(true);
+
       setFormErrors({ ...formErrors, title: true });
       return;
     }
 
     if (!description) {
-      setErrorAlert(true);
+
       setFormErrors({ ...formErrors, description: true });
       return;
     }
@@ -65,7 +65,7 @@ const PdfUploader = () => {
         .from("pdfs")
         .upload(fileName, file);
       if (error) {
-        setErrorAlert(true);
+
         return;
       }
 
@@ -82,14 +82,13 @@ const PdfUploader = () => {
         });
 
       if (insertError) {
-        setErrorAlert(true);
         return;
       }
 
       setFileUrl(publicURL);
       setSuccessAlert(true);
     } catch (error) {
-      setErrorAlert(true);
+
     }
   };
 
