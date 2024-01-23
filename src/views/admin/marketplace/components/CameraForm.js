@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useEvent } from './../../../../EventContext'; // Import useEvent hook
 
 // Initialize Supabase client
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
@@ -9,12 +10,13 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const CameraForm = () => {
+  const { selectedEventId } = useEvent(); // Get the selected event ID from the useEvent hook
   const [cameraName, setCameraName] = useState('');
   const [location, setLocation] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [lat, setLat] = useState(45.75799485263588);
   const [lng, setLng] = useState(4.825754111294844);
-  const handleFileChange = (e) => {
+const handleFileChange = (e) => {
     setImageFile(e.target.files[0]);
   };
 
@@ -54,15 +56,18 @@ const CameraForm = () => {
     // Insert camera data along with the image URL, latitude, and longitude into the database
     const { error: insertError } = await supabase
       .from('vianney_cameras')
-      .insert([{
-        name: cameraName,
-        location, // This might now be redundant or used for descriptive location
-        latitude: lat,
-        longitude: lng,
-        status: true,
-        image_url: publicURL,
-        image_timestamp: new Date().toISOString() // Assuming you want to record the current timestamp
-      }]);
+      .insert([
+        {
+          event_id: selectedEventId, // Include the selectedEventId in the database
+          name: cameraName,
+          location,
+          latitude: lat,
+          longitude: lng,
+          status: true,
+          image_url: publicURL,
+          image_timestamp: new Date().toISOString(),
+        },
+      ]);
 
     if (insertError) {
       console.error('Error inserting data:', insertError);
@@ -71,7 +76,6 @@ const CameraForm = () => {
 
     alert('Camera data added successfully');
   };
-
 
   return (
     <form onSubmit={handleSubmit}>
