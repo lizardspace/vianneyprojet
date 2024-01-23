@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import supabase from './../../../../supabaseClient';
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import "dayjs/locale/fr";
 import { Scheduler } from "@spacemen1000/react-scheduler";
-import { Button, Text, Flex, Switch, Box, Badge, Heading, Avatar, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import { Button, Text, Flex, Box, Badge, Heading, Avatar, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, Input, Switch } from "@chakra-ui/react";
 dayjs.extend(isBetween);
 
 export default function Component() {
@@ -24,12 +24,11 @@ export default function Component() {
         photo_profile_url: ""
     });
 
-
     useEffect(() => {
         setLoading(true);
         const fetchData = async () => {
             let { data: vianneyActions, error } = await supabase
-                .from('vianney_actions')
+                .from('vianney_actions') // Update the table name for actions
                 .select('*');
 
             if (error) {
@@ -41,8 +40,8 @@ export default function Component() {
                             id: action.team_to_which_its_attached,
                             label: {
                                 icon: action.photo_profile_url,
-                                title: action.nom,
-                                subtitle: action.statut_dans_la_boite,
+                                title: action.action_name, // Update this to match the new table structure
+                                subtitle: action.action_comment, // Update this to match the new table structure
                             },
                             data: [],
                         };
@@ -96,7 +95,7 @@ export default function Component() {
         try {
             // Fetch additional action details using the action id
             let { data: additionalActionData, error } = await supabase
-                .from('vianney_actions') // Replace with your actual table name
+                .from('vianney_actions') // Update the table name for actions
                 .select('discounted, percentage_of_discount, reserved_action')
                 .eq('id', action.id);
 
@@ -116,7 +115,7 @@ export default function Component() {
         }
     };
 
-
+    
     // Update your openActionModal function to fetch additional data for the selected action
     const openActionModal = async () => {
         setIsActionModalOpen(true);
