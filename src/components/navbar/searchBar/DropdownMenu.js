@@ -7,6 +7,7 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  Text, // Import Text component from Chakra UI
 } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
 import { FcExpand, FcCollapse } from 'react-icons/fc';
@@ -21,7 +22,7 @@ const DropdownMenu = () => {
   const [eventList, setEventList] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  const { setEventId } = useEvent(); // Access the setEventId function from the context
+  const { setEventId, selectedEventId } = useEvent(); // Access the setEventId and selectedEventId from the context
 
   useEffect(() => {
     // Fetch data from the vianney_event table
@@ -57,7 +58,7 @@ const DropdownMenu = () => {
           rightIcon={isOpen ? <FcCollapse /> : <FcExpand />}
           onClick={toggleMenu}
         >
-          Choisissez l'évênement
+          Choisissez l'évênement {selectedEventId && <Text ml={2}>ID: {selectedEventId}</Text>}
         </MenuButton>
         <MenuList>
           {eventList.map((event) => (
