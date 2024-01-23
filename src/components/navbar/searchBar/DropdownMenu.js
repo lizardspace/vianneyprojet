@@ -7,8 +7,8 @@ import {
   MenuList,
   MenuItem,
   Text,
-  Alert, // Import Alert component from Chakra UI
-  AlertIcon, // Import AlertIcon component from Chakra UI
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
 import { FcExpand, FcCollapse } from 'react-icons/fc';
@@ -23,7 +23,7 @@ const DropdownMenu = () => {
   const [selectedEventName, setSelectedEventName] = useState(null);
   const [eventList, setEventList] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [isEventSelected, setIsEventSelected] = useState(false); // Added state to track if an event is selected
+  const [isEventSelected, setIsEventSelected] = useState(false);
 
   const { setEventId, selectedEventId } = useEvent();
 
@@ -47,7 +47,7 @@ const DropdownMenu = () => {
     setSelectedItem(event.event_name);
     setSelectedEventName(event.event_name);
     setEventId(event.event_id);
-    setIsEventSelected(true); // Event is selected, enable clicking
+    setIsEventSelected(true);
   };
 
   const toggleMenu = () => {
@@ -69,7 +69,7 @@ const DropdownMenu = () => {
             <MenuItem
               key={event.event_id}
               onClick={() => handleSelect(event)}
-              >
+            >
               {event.event_name}
             </MenuItem>
           ))}
@@ -80,8 +80,8 @@ const DropdownMenu = () => {
           <AlertIcon />
           Merci de sélectionner un évênement.
         </Alert>
-      )}      
-    </Box>
+      )}
+          </Box>
   );
 };
 
