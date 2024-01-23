@@ -5,8 +5,14 @@ import {
   FormLabel,
   Input,
   Button,
-  Textarea, // Import Textarea for event_description
+  Textarea,
   useToast,
+  Modal, // Import Modal component
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
 import { createClient } from '@supabase/supabase-js'
@@ -18,22 +24,23 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export default function AddEventForm() {
   const [eventName, setEventName] = useState('');
   const [eventDate, setEventDate] = useState('');
-  const [eventLocation, setEventLocation] = useState(''); // Added eventLocation state
-  const [eventDescription, setEventDescription] = useState(''); // Added eventDescription state
+  const [eventLocation, setEventLocation] = useState('');
+  const [eventDescription, setEventDescription] = useState('');
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // State for success modal
   const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    const eventId = uuidv4(); // Generate a new UUID
-  
+
+    const eventId = uuidv4();
+
     const { error } = await supabase.from('vianney_event').insert([
       {
-        event_id: eventId, // Use the generated UUID here
+        event_id: eventId,
         event_name: eventName,
         event_date: new Date(eventDate).toISOString(),
-        event_location: eventLocation, // Add event_location
-        event_description: eventDescription, // Add event_description
+        event_location: eventLocation,
+        event_description: eventDescription,
       },
     ]);
 
@@ -46,6 +53,8 @@ export default function AddEventForm() {
         isClosable: true,
       });
     } else {
+      // Show the success modal
+      setIsSuccessModalOpen(true);
       toast({
         title: 'Événement ajouté avec succès',
         status: 'success',
@@ -55,9 +64,14 @@ export default function AddEventForm() {
       // Clear the form fields
       setEventName('');
       setEventDate('');
-      setEventLocation(''); // Clear event_location
-      setEventDescription(''); // Clear event_description
+      setEventLocation('');
+      setEventDescription('');
     }
+  };
+
+  // Function to close the success modal
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
   };
 
   return (
@@ -98,10 +112,27 @@ export default function AddEventForm() {
           mt={4}
           colorScheme='blue'
           type='submit'
-          isDisabled={!eventName || !eventDate || !eventLocation}>
+          isDisabled={!eventName || !eventDate || !eventLocation}
+        >
           Ajouter l'événement
         </Button>
       </form>
+
+      {/* Success Modal */}
+      <Modal isOpen={isSuccessModalOpen} onClose={handleCloseSuccessModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Événement ajouté avec succès</ModalHeader>
+          <ModalBody>
+          ⚠️ Pensez à changer d'évênement dans le menu ↗️
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={handleCloseSuccessModal}>
+              Fermer
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }
