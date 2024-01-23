@@ -1,83 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
-import { supabase } from './supabaseClient'; 
 import 'assets/css/App.css';
 import { HashRouter, Route, Switch, Redirect } from 'react-router-dom';
+import AuthLayout from 'layouts/auth';
 import AdminLayout from 'layouts/admin';
+import RtlLayout from 'layouts/rtl';
 import { ChakraProvider } from '@chakra-ui/react';
 import theme from 'theme/theme';
 import { ThemeEditorProvider } from '@hypertheme-editor/chakra-ui';
 
-function EventCard({ event, onSelectEvent }) {
-	return (
-	  <div onClick={() => onSelectEvent(event)}>
-		{/* Render event card details */}
-	  </div>
-	);
-  }
-  
-  function EventDetails({ event }) {
-	return (
-	  <div>
-		{/* Render event details */}
-	  </div>
-	);
-  }  
-
-  function App() {
-	const [selectedEvent, setSelectedEvent] = useState(null);
-	const [events, setEvents] = useState([]); // Assuming you fetch event data from Supabase
-  
-	// Fetch event data from Supabase and set it in the `events` state
-	useEffect(() => {
-	  async function fetchEvents() {
-		const { data, error } = await supabase
-		  .from('vianney_event')
-		  .select();
-  
-		if (error) {
-		  console.error('Error fetching events:', error);
-		  return;
-		}
-  
-		setEvents(data);
-	  }
-  
-	  fetchEvents();
-	}, []);
-  
-	return (
-	  <ChakraProvider theme={theme}>
+ReactDOM.render(
+	<ChakraProvider theme={theme}>
+	  <React.StrictMode>
 		<ThemeEditorProvider>
 		  <HashRouter>
 			<Switch>
-			  <Route path="/admin">
-				<div>
-				  {/* Render the list of event cards */}
-				  {events.map((event) => (
-					<EventCard
-					  key={event.id}
-					  event={event}
-					  onSelectEvent={setSelectedEvent}
-					/>
-				  ))}
-				</div>
-  
-				{/* Render event details when an event is selected */}
-				{selectedEvent && <EventDetails event={selectedEvent} />}
-			  </Route>
-			  <Redirect from="/" to="/admin" />
+			  <Route path={`/auth`} component={AuthLayout} />
+			  <Route path={`/admin`} component={AdminLayout} />
+			  <Route path={`/rtl`} component={RtlLayout} />
+			  <Redirect from='/' to='/admin' />
 			</Switch>
 		  </HashRouter>
 		</ThemeEditorProvider>
-	  </ChakraProvider>
-	);
-  }
-  
-  ReactDOM.render(
-	<React.StrictMode>
-	  <App />
-	</React.StrictMode>,
-	document.getElementById('root')
+	  </React.StrictMode>
+	</ChakraProvider>,
+	document.getElementById('root') // Make sure 'root' matches your actual root element ID
   );
+  
   
