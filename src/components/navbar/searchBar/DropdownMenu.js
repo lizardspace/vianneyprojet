@@ -1,3 +1,5 @@
+// DropdownMenu.js
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -14,8 +16,8 @@ const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const DropdownMenu = () => {
-  const [setSelectedItem] = useState(null);
+const DropdownMenu = ({ onSelectEvent }) => {
+  const [ setSelectedItem] = useState(null);
   const [eventList, setEventList] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,8 +38,9 @@ const DropdownMenu = () => {
     fetchData();
   }, []);
 
-  const handleSelect = (item) => {
-    setSelectedItem(item);
+  const handleSelect = (event) => {
+    setSelectedItem(event.event_name);
+    onSelectEvent(event.event_id); // Pass the selected event_id to the parent component
   };
 
   const toggleMenu = () => {
@@ -58,7 +61,7 @@ const DropdownMenu = () => {
           {eventList.map((event) => (
             <MenuItem
               key={event.event_id}
-              onClick={() => handleSelect(event.event_name)}
+              onClick={() => handleSelect(event)}
             >
               {event.event_name}
             </MenuItem>
