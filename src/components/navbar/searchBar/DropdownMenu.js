@@ -108,7 +108,7 @@ const DropdownMenu = () => {
         <ModalContent>
           <ModalHeader>Sélectionnez un évênement</ModalHeader>
           <ModalBody>
-            Veuillez sélectionner un événement pour continuer.
+            Veuillez sélectionner un événement pour continuer. ➡️
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={() => setIsModalOpen(false)}>
