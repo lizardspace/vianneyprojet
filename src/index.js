@@ -8,9 +8,11 @@ import RtlLayout from 'layouts/rtl';
 import { ChakraProvider } from '@chakra-ui/react';
 import theme from 'theme/theme';
 import { ThemeEditorProvider } from '@hypertheme-editor/chakra-ui';
+import { EventProvider } from './EventContext';
 
 ReactDOM.render(
 	<ChakraProvider theme={theme}>
+		<EventProvider>
 	  <React.StrictMode>
 		<ThemeEditorProvider>
 		  <HashRouter>
@@ -23,6 +25,7 @@ ReactDOM.render(
 		  </HashRouter>
 		</ThemeEditorProvider>
 	  </React.StrictMode>
+	  </EventProvider>
 	</ChakraProvider>,
 	document.getElementById('root') // Make sure 'root' matches your actual root element ID
   );

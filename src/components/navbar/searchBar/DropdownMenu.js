@@ -11,15 +11,18 @@ import {
 } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
 import { FcExpand, FcCollapse } from 'react-icons/fc';
+import { useEvent } from './../../../EventContext'; // Import useEvent hook
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const DropdownMenu = ({ onSelectEvent }) => {
-  const [ setSelectedItem] = useState(null);
+const DropdownMenu = () => {
+  const [selectedItem, setSelectedItem] = useState(null);
   const [eventList, setEventList] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+
+  const { setEventId } = useEvent(); // Access the setEventId function from the context
 
   useEffect(() => {
     // Fetch data from the vianney_event table
@@ -40,7 +43,7 @@ const DropdownMenu = ({ onSelectEvent }) => {
 
   const handleSelect = (event) => {
     setSelectedItem(event.event_name);
-    onSelectEvent(event.event_id); // Pass the selected event_id to the parent component
+    setEventId(event.event_id); // Update the selected event_id using setEventId
   };
 
   const toggleMenu = () => {
