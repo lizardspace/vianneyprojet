@@ -14,14 +14,14 @@ import {
 } from "@chakra-ui/react";
 import { createClient } from "@supabase/supabase-js";
 import { FcUpload } from "react-icons/fc";
+import { useEvent } from './../../../../EventContext'; 
 
-const supabaseUrl = "https://nhrsgicthwqsctwggxqz.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ocnNnaWN0aHdxc2N0d2dneHF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODkxNzMwODMsImV4cCI6MjAwNDc0OTA4M30.f1MhR4nYjFrCMjMnwjMUwlueADL8wZdPvu4MtrxPglk";
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const PdfUploader = () => {
+  const { selectedEventId } = useEvent(); 
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const [fileUrl, setFileUrl] = useState("");
@@ -72,8 +72,9 @@ const PdfUploader = () => {
       const publicURL = `${supabaseUrl}/storage/v1/object/public/pdfs/${fileName}`;
 
       const { error: insertError } = await supabase
-        .from("pdf_documents")
+        .from("vianney_pdf_documents")
         .insert({
+          event_id: selectedEventId, 
           file_name: fileName,
           title,
           description,
