@@ -15,12 +15,13 @@ import {
   HStack,
   Checkbox,
 } from '@chakra-ui/react';
-// Initialize Supabase client
+import { useEvent } from './../../../../EventContext'; 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const UserForm = () => {
+  const { selectedEventId } = useEvent(); 
   const [nameOfTheTeam, setNameOfTheTeam] = useState('');
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [lat, setLat] = useState(45.75799485263588);
@@ -86,11 +87,12 @@ const LocationMarker = () => {
   ) : null;
 };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const teamColor = generateRandomColor(); // Generate a random color for the team
-  const timestamp = new Date().toISOString(); // Generate a timestamp
+    const teamColor = generateRandomColor(); // Generate a random color for the team
+    const timestamp = new Date().toISOString(); // Generate a timestamp
+
     if (!profilePhoto) {
       console.error('No profile photo selected');
       return;
@@ -109,29 +111,32 @@ const handleSubmit = async (e) => {
 
     const publicURL = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/users_on_the_ground/${fileName}`;
 
-  // Insert user data into the database
-  const { error: insertError } = await supabase
-    .from('vianney_teams')
-    .insert([{
-      id: uuidv4(), // Generate a new UUID for each team
-      name_of_the_team: nameOfTheTeam,
-      latitude: lat,
-      longitude: lng,
-      photo_profile_url: publicURL,
-      last_active: new Date().toISOString(),
-      team_members: teamMembers,
-      color: teamColor,
-      creation_timestamp: timestamp,
-      mission: mission,
-        type_de_vehicule: typeDeVehicule,
-        immatriculation: immatriculation,
-        specialite: specialite,
-    }]);
+    // Insert user data into the database
+    const { error: insertError } = await supabase
+      .from('vianney_teams')
+      .insert([
+        {
+          id: uuidv4(), // Generate a new UUID for each team
+          name_of_the_team: nameOfTheTeam,
+          latitude: lat,
+          longitude: lng,
+          photo_profile_url: publicURL,
+          last_active: new Date().toISOString(),
+          team_members: teamMembers,
+          color: teamColor,
+          creation_timestamp: timestamp,
+          mission: mission,
+          type_de_vehicule: typeDeVehicule,
+          immatriculation: immatriculation,
+          specialite: specialite,
+          event_id: selectedEventId, // Include the selectedEventId in the database
+        },
+      ]);
 
-  if (insertError) {
-    console.error('Error inserting data:', insertError);
-    return;
-  }
+    if (insertError) {
+      console.error('Error inserting data:', insertError);
+      return;
+    }
 
     alert('User data added successfully');
   };
