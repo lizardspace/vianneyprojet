@@ -58,7 +58,6 @@ const handleFileChange = (e) => {
       .from('vianney_cameras')
       .insert([
         {
-          event_id: selectedEventId, // Include the selectedEventId in the database
           name: cameraName,
           location,
           latitude: lat,
@@ -66,6 +65,7 @@ const handleFileChange = (e) => {
           status: true,
           image_url: publicURL,
           image_timestamp: new Date().toISOString(),
+          event_id: selectedEventId, 
         },
       ]);
 
