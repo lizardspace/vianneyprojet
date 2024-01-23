@@ -1,4 +1,3 @@
-// DropdownMenu.js
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -7,11 +6,13 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  Text, // Import Text component from Chakra UI
+  Text,
+  Alert, // Import Alert component from Chakra UI
+  AlertIcon, // Import AlertIcon component from Chakra UI
 } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
 import { FcExpand, FcCollapse } from 'react-icons/fc';
-import { useEvent } from './../../../EventContext'; // Import useEvent hook
+import { useEvent } from './../../../EventContext';
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
@@ -19,14 +20,14 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const DropdownMenu = () => {
   const [selectedItem, setSelectedItem] = useState(null);
-  const [selectedEventName, setSelectedEventName] = useState(null); // Added state for selectedEventName
+  const [selectedEventName, setSelectedEventName] = useState(null);
   const [eventList, setEventList] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isEventSelected, setIsEventSelected] = useState(false); // Added state to track if an event is selected
 
-  const { setEventId, selectedEventId } = useEvent(); // Access the setEventId and selectedEventId from the context
+  const { setEventId, selectedEventId } = useEvent();
 
   useEffect(() => {
-    // Fetch data from the vianney_event table
     const fetchData = async () => {
       try {
         const { data, error } = await supabase.from('vianney_event').select('*');
@@ -44,8 +45,9 @@ const DropdownMenu = () => {
 
   const handleSelect = (event) => {
     setSelectedItem(event.event_name);
-    setSelectedEventName(event.event_name); // Update selectedEventName
-    setEventId(event.event_id); // Update the selected event_id using setEventId
+    setSelectedEventName(event.event_name);
+    setEventId(event.event_id);
+    setIsEventSelected(true); // Event is selected, enable clicking
   };
 
   const toggleMenu = () => {
@@ -67,12 +69,18 @@ const DropdownMenu = () => {
             <MenuItem
               key={event.event_id}
               onClick={() => handleSelect(event)}
-            >
+              >
               {event.event_name}
             </MenuItem>
           ))}
         </MenuList>
       </Menu>
+      {!isEventSelected && (
+        <Alert status="warning" mt={2}>
+          <AlertIcon />
+          Merci de sélectionner un évênement.
+        </Alert>
+      )}      
     </Box>
   );
 };
