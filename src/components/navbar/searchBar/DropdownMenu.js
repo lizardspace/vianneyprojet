@@ -17,7 +17,7 @@ import {
   ModalFooter,
 } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
-import { FcExpand, FcCollapse } from 'react-icons/fc';
+import { FcExpand, FcCollapse, FcAdvance } from 'react-icons/fc'; // Import FcAdvance icon
 import { useEvent } from './../../../EventContext';
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
@@ -108,7 +108,7 @@ const DropdownMenu = () => {
         <ModalContent>
           <ModalHeader>Sélectionnez un évênement</ModalHeader>
           <ModalBody>
-            Veuillez sélectionner un événement pour continuer. ➡️
+            Veuillez sélectionner un événement pour continuer. <FcAdvance /> {/* Use FcAdvance icon here */}
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={() => setIsModalOpen(false)}>
