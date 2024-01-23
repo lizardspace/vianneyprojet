@@ -11,12 +11,14 @@ import {
   Alert, AlertIcon,
 } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
+import { useEvent } from './../../../../EventContext'; 
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function CreateTeam() {
+  const { selectedEventId } = useEvent(); 
   const [teamName, setTeamName] = useState('');
   const [teamMembers, setTeamMembers] = useState('');
   const [teamCharacteristics, setTeamCharacteristics] = useState('');
@@ -39,6 +41,7 @@ function CreateTeam() {
         .from('vianney_teams')
         .upsert([
           {
+            event_id: selectedEventId, 
             id: uuidv4(),
             creation_timestamp: timestamp, // Include the timestamp here
             name_of_the_team: teamName,

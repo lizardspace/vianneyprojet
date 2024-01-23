@@ -4,7 +4,6 @@ import { createClient } from '@supabase/supabase-js';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-
 import {
   FormControl,
   FormLabel,
