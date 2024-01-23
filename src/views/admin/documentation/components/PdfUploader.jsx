@@ -105,12 +105,12 @@ const PdfUploader = () => {
       background="blue.70"
     >
       <Heading as="h2" size="md" mb="4">
-        Ajouter un fichier PDF
+        Ajouter un fichier
       </Heading>
       <VStack spacing={4} alignItems="stretch" width="100%">
         <FormControl pb={5} pt={5} isInvalid={formErrors.file}>
-          <FormLabel isRequired>Choisissez un fichier PDF</FormLabel>
-          <Input type="file" accept=".pdf" onChange={handleFileChange} />
+          <FormLabel isRequired>Selectionnez un fichier</FormLabel>
+          <Input type="file" onChange={handleFileChange} />
           {formErrors.file && (
             <FormErrorMessage>Ce champ est requis</FormErrorMessage>
           )}
@@ -149,19 +149,19 @@ const PdfUploader = () => {
           pb={5}
           pt={5}
         >
-          Cliquez pour ajouter un PDF
+          Cliquez pour ajouter le fichier
         </Button>
         {fileUrl && (
           <Alert status="success" width="100%" pb={5} pt={5}>
             <AlertIcon />
-            Le fichier PDF a été téléchargé avec succès!
+            Le fichier a été téléchargé avec succès!
           </Alert>
         )}
         {errorAlert && (
           <Alert status="error" width="100%" pb={5} pt={5}>
             <AlertIcon />
-            Erreur lors du téléchargement du PDF. Attention! Vous ne pouvez
-            télécharger 2 fois le même PDF.
+            Erreur lors du téléchargement. Attention! Vous ne pouvez
+            télécharger 2 fois le même fichier.
           </Alert>
         )}
       </VStack>
