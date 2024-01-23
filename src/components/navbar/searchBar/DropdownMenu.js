@@ -48,7 +48,11 @@ const DropdownMenu = () => {
   return (
     <Box>
       <Menu>
-        <MenuButton as={Button} rightIcon={isOpen ? <FcCollapse /> : <FcExpand />}>
+        <MenuButton
+          as={Button}
+          rightIcon={isOpen ? <FcCollapse /> : <FcExpand />}
+          onClick={toggleMenu}
+        >
           Choisissez l'évênement
         </MenuButton>
         <MenuList>
