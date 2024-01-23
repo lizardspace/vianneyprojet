@@ -5,6 +5,7 @@ import {
   FormLabel,
   Input,
   Button,
+  Textarea, // Import Textarea for event_description
   useToast,
 } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
@@ -17,6 +18,8 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export default function AddEventForm() {
   const [eventName, setEventName] = useState('');
   const [eventDate, setEventDate] = useState('');
+  const [eventLocation, setEventLocation] = useState(''); // Added eventLocation state
+  const [eventDescription, setEventDescription] = useState(''); // Added eventDescription state
   const toast = useToast();
 
   const handleSubmit = async (e) => {
@@ -26,9 +29,11 @@ export default function AddEventForm() {
   
     const { error } = await supabase.from('vianney_event').insert([
       {
-        id: eventId, // Use the generated UUID here
+        event_id: eventId, // Use the generated UUID here
         event_name: eventName,
-        date: new Date(eventDate).toISOString(),
+        event_date: new Date(eventDate).toISOString(),
+        event_location: eventLocation, // Add event_location
+        event_description: eventDescription, // Add event_description
       },
     ]);
 
@@ -50,6 +55,8 @@ export default function AddEventForm() {
       // Clear the form fields
       setEventName('');
       setEventDate('');
+      setEventLocation(''); // Clear event_location
+      setEventDescription(''); // Clear event_description
     }
   };
 
@@ -72,11 +79,26 @@ export default function AddEventForm() {
             onChange={(e) => setEventDate(e.target.value)}
           />
         </FormControl>
+        <FormControl id='event-location' mt={4} isRequired> {/* Add event-location input */}
+          <FormLabel>Lieu de l'événement</FormLabel>
+          <Input
+            type='text'
+            value={eventLocation}
+            onChange={(e) => setEventLocation(e.target.value)}
+          />
+        </FormControl>
+        <FormControl id='event-description' mt={4}> {/* Add event-description input */}
+          <FormLabel>Description de l'événement</FormLabel>
+          <Textarea
+            value={eventDescription}
+            onChange={(e) => setEventDescription(e.target.value)}
+          />
+        </FormControl>
         <Button
           mt={4}
           colorScheme='blue'
           type='submit'
-          isDisabled={!eventName || !eventDate}>
+          isDisabled={!eventName || !eventDate || !eventLocation}>
           Ajouter l'événement
         </Button>
       </form>
