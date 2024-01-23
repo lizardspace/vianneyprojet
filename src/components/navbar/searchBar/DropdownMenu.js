@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Text,
   Button,
   Menu,
   MenuButton,
@@ -16,7 +15,7 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const DropdownMenu = () => {
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [setSelectedItem] = useState(null);
   const [eventList, setEventList] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
