@@ -9,19 +9,19 @@ import {
   Text,
   Alert,
   AlertIcon,
-  Modal, // Import Modal component from Chakra UI
-  ModalOverlay, // Import ModalOverlay component from Chakra UI
-  ModalContent, // Import ModalContent component from Chakra UI
-  ModalHeader, // Import ModalHeader component from Chakra UI
-  ModalBody, // Import ModalBody component from Chakra UI
-  ModalFooter, // Import ModalFooter component from Chakra UI
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
 import { FcExpand, FcCollapse } from 'react-icons/fc';
 import { useEvent } from './../../../EventContext';
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
-const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY'; // Replace with your Supabase anonymous key
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const DropdownMenu = () => {
@@ -30,7 +30,7 @@ const DropdownMenu = () => {
   const [eventList, setEventList] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isEventSelected, setIsEventSelected] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(true); // State to control the modal
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   const { setEventId, selectedEventId } = useEvent();
 
@@ -55,12 +55,25 @@ const DropdownMenu = () => {
     setSelectedEventName(event.event_name);
     setEventId(event.event_id);
     setIsEventSelected(true);
-    setIsModalOpen(false); // Close the modal when an event is selected
+    setIsModalOpen(false);
   };
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
+  useEffect(() => {
+    // Check if an event is selected every 10 seconds
+    const intervalId = setInterval(() => {
+      if (!isEventSelected) {
+        // Reload the page if no event is selected
+        window.location.reload();
+      }
+    }, 15000); // 10 seconds in milliseconds
+
+    // Clear the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, [isEventSelected]);
 
   return (
     <Box>
@@ -90,13 +103,12 @@ const DropdownMenu = () => {
         </Alert>
       )}
 
-      {/* Modal for event selection */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Sélectionnez un évênement</ModalHeader>
           <ModalBody>
-            Veuillez sélectionner un évênement pour continuer.
+            Veuillez sélectionner un événement pour continuer.
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={() => setIsModalOpen(false)}>
