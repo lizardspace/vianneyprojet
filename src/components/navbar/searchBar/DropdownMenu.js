@@ -19,6 +19,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const DropdownMenu = () => {
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedEventName, setSelectedEventName] = useState(null); // Added state for selectedEventName
   const [eventList, setEventList] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -43,6 +44,7 @@ const DropdownMenu = () => {
 
   const handleSelect = (event) => {
     setSelectedItem(event.event_name);
+    setSelectedEventName(event.event_name); // Update selectedEventName
     setEventId(event.event_id); // Update the selected event_id using setEventId
   };
 
@@ -58,7 +60,7 @@ const DropdownMenu = () => {
           rightIcon={isOpen ? <FcCollapse /> : <FcExpand />}
           onClick={toggleMenu}
         >
-          Choisissez l'évênement {selectedEventId && <Text ml={2}>ID: {selectedEventId}</Text>}
+          {selectedItem || 'Choisissez l\'évênement'} {selectedEventId && <Text ml={2}>ID: {selectedEventId} {selectedEventName && `Nom: ${selectedEventName}`}</Text>}
         </MenuButton>
         <MenuList>
           {eventList.map((event) => (
