@@ -82,8 +82,8 @@ const DropdownMenu = () => {
           as={Button}
           rightIcon={isOpen ? <FcCollapse /> : <FcExpand />}
           onClick={toggleMenu}
-        >
-          {selectedItem || 'Choisissez l\'évênement'} {selectedEventId && <Text ml={2}>ID: {selectedEventId} {selectedEventName && `Nom: ${selectedEventName}`}</Text>}
+          >
+            {selectedItem || 'Choisissez l\'évênement'} {selectedEventId && <Text ml={2}>ID: {selectedEventId} {selectedEventName && `Nom: ${selectedEventName}`}</Text>}
         </MenuButton>
         <MenuList>
           {eventList.map((event) => (
@@ -108,7 +108,9 @@ const DropdownMenu = () => {
         <ModalContent>
           <ModalHeader>Sélectionnez un évênement</ModalHeader>
           <ModalBody>
-            Veuillez sélectionner un événement pour continuer. <FcAdvance /> {/* Use FcAdvance icon here */}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              Veuillez sélectionner un événement pour continuer.&nbsp;   <FcAdvance /> {/* Use FcAdvance icon here */}
+            </div>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={() => setIsModalOpen(false)}>
