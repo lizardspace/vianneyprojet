@@ -54,7 +54,7 @@ export default function UserReports() {
         gap='20px'
         mb='20px'>
         {events.map((event, index) => (
-          <MiniStatistics key={index} event_name={event.event_name} date={event.date} />
+          <MiniStatistics key={index} event_name={event.event_name} date={event.event_date} />
         ))}
         <Button
           mt="30px"

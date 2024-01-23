@@ -70,7 +70,7 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
                                     {data.title}
                                 </StatNumber>
                                 <StatLabel color={textColor} fontSize="md">
-                                    {formatDate(data.description)}
+                                    {formatDate(data.uploaded_at)}
                                 </StatLabel>
                             </Stat>
                         </Flex>
