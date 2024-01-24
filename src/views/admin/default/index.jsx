@@ -1,4 +1,4 @@
-// Chakra imports
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -6,14 +6,19 @@ import {
   Icon,
   Heading,
   useColorModeValue,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from "@chakra-ui/react";
-// Custom components
 import MiniCalendar from "components/calendar/MiniCalendar";
+import { FcPlus, FcLeft } from "react-icons/fc";
 import MiniStatistics from "components/card/MiniStatistics";
-import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js'
 import AddEventForm from "./components/AddEventForm";
-import { FcPlus, FcLeft } from "react-icons/fc";
 import DocumentationsComponent from "./DocumentionsComponent/DocumentationsComponent";
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
@@ -22,6 +27,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function UserReports() {
   const [showAddEventForm, setShowAddEventForm] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null); // State to store selected event
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [events, setEvents] = useState([]);
 
@@ -39,6 +45,13 @@ export default function UserReports() {
   }, []);
 
   const toggleAddEventForm = () => setShowAddEventForm(!showAddEventForm);
+
+  // Function to handle clicking on a MiniStatistics component
+  const handleMiniStatisticsClick = (event) => {
+    setSelectedEvent(event);
+    setShowAddEventForm(true);
+  };
+
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <Heading me='auto'
@@ -54,7 +67,12 @@ export default function UserReports() {
         gap='20px'
         mb='20px'>
         {events.map((event, index) => (
-          <MiniStatistics key={index} event_name={event.event_name} date={event.event_date} />
+          <MiniStatistics
+            key={index}
+            event_name={event.event_name}
+            date={event.event_date}
+            onClick={() => handleMiniStatisticsClick(event)} // Add click handler
+          />
         ))}
         <Button
           mt="30px"
@@ -69,9 +87,17 @@ export default function UserReports() {
           {showAddEventForm ? "Masquer" : "Ajouter un évènement"}
         </Button>
       </SimpleGrid>
-      {showAddEventForm && <AddEventForm />}
+      {showAddEventForm && (
+        <AddEventForm
+          preFilledEvent={selectedEvent} // Pass the selected event to the form
+          onClose={() => {
+            setSelectedEvent(null);
+            setShowAddEventForm(false);
+          }}
+        />
+      )}
       <DocumentationsComponent />
-      <Heading me='auto'
+<Heading me='auto'
         color={textColor}
         fontSize='2xl'
         fontWeight='700'
