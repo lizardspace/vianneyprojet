@@ -15,7 +15,7 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 import MiniCalendar from "components/calendar/MiniCalendar";
-import { FcPlus, FcLeft } from "react-icons/fc";
+import { FcPlus } from "react-icons/fc";
 import MiniStatistics from "components/card/MiniStatistics";
 import { createClient } from '@supabase/supabase-js'
 import AddEventForm from "./components/AddEventForm";
@@ -77,14 +77,14 @@ export default function UserReports() {
         <Button
           mt="30px"
           onClick={toggleAddEventForm}
-          leftIcon={<Icon as={showAddEventForm ? FcLeft : FcPlus} />}
+          leftIcon={<Icon as={ FcPlus} />}
           colorScheme='blue'
           variant='solid'
           size='md'
           boxShadow='sm'
           _hover={{ boxShadow: 'md' }}
           _active={{ boxShadow: 'lg' }}>
-          {showAddEventForm ? "Masquer" : "Ajouter un évènement"}
+          Ajouter un évènement
         </Button>
       </SimpleGrid>
       {showAddEventForm && (
