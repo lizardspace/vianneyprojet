@@ -235,7 +235,7 @@ export default function Component() {
                         setFilterButtonState(0);
                     }}
                     config={{
-                        zoom: 1,
+                        zoom: 2,
                         maxRecordsPerPage: 5,
                         filterButtonState: -1,
                         includeTakenHoursOnWeekendsInDayView: false,
