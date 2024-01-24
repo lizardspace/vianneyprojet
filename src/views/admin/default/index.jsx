@@ -88,16 +88,22 @@ export default function UserReports() {
         </Button>
       </SimpleGrid>
       {showAddEventForm && (
-        <AddEventForm
-          preFilledEvent={selectedEvent} // Pass the selected event to the form
-          onClose={() => {
-            setSelectedEvent(null);
-            setShowAddEventForm(false);
-          }}
-        />
+        <Modal isOpen={showAddEventForm} onClose={() => setShowAddEventForm(false)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Ajouter un événement</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <AddEventForm preFilledEvent={selectedEvent} />
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" onClick={() => setShowAddEventForm(false)}>Fermer</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
       <DocumentationsComponent />
-<Heading me='auto'
+      <Heading me='auto'
         color={textColor}
         fontSize='2xl'
         fontWeight='700'
