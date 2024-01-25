@@ -22,6 +22,9 @@ import AddEventForm from "./components/AddEventForm";
 import EditEventForm from "./components/EditEventForm";
 import DocumentationsComponent from "./DocumentionsComponent/DocumentationsComponent";
 
+// Import the Userform component
+import Userform from '../marketplace/components/UserForm.js';
+
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -29,6 +32,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export default function UserReports() {
   const [showAddEventForm, setShowAddEventForm] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showUserform, setShowUserform] = useState(false); // State for showing Userform component
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [events, setEvents] = useState([]);
   const [showEditEventModal, setShowEditEventModal] = useState(false);
@@ -53,6 +57,8 @@ export default function UserReports() {
     setSelectedEvent(event);
     setShowEditEventModal(true);
   };
+
+  const toggleUserform = () => setShowUserform(!showUserform); // Function to toggle Userform component visibility
 
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
@@ -86,7 +92,22 @@ export default function UserReports() {
           _active={{ boxShadow: 'lg' }}>
           Ajouter un évènement
         </Button>
+        
+        {/* Button to toggle Userform component */}
+        <Button
+          mt="30px"
+          onClick={toggleUserform}
+          colorScheme='green' // You can choose an appropriate color
+          variant='solid'
+          size='md'
+          boxShadow='sm'
+          _hover={{ boxShadow: 'md' }}
+          _active={{ boxShadow: 'lg' }}>
+          Créer une équipe
+        </Button>
       </SimpleGrid>
+      
+      {/* Modal for adding/editing events */}
       {showAddEventForm && (
         <Modal isOpen={showAddEventForm} onClose={() => setShowAddEventForm(false)}>
           <ModalOverlay />
@@ -102,6 +123,8 @@ export default function UserReports() {
           </ModalContent>
         </Modal>
       )}
+
+      {/* Modal for editing events */}
       {showEditEventModal && (
         <Modal isOpen={showEditEventModal} onClose={() => setShowEditEventModal(false)}>
           <ModalOverlay />
@@ -114,6 +137,11 @@ export default function UserReports() {
             {/* ... */}
           </ModalContent>
         </Modal>
+      )}
+
+      {/* Show the Userform component when showUserform is true */}
+      {showUserform && (
+        <Userform />
       )}
 
       <DocumentationsComponent />
