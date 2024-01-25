@@ -19,6 +19,7 @@ import { FcPlus } from "react-icons/fc";
 import MiniStatistics from "components/card/MiniStatistics";
 import { createClient } from '@supabase/supabase-js'
 import AddEventForm from "./components/AddEventForm";
+import EditEventForm from "./components/EditEventForm";
 import DocumentationsComponent from "./DocumentionsComponent/DocumentationsComponent";
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
@@ -47,9 +48,12 @@ export default function UserReports() {
 
   const toggleAddEventForm = () => setShowAddEventForm(!showAddEventForm);
   const handleMiniStatisticsClick = (event) => {
+    console.log('Event selected:', event); // Debugging line
     setSelectedEvent(event);
     setShowEditEventModal(true);
+    console.log('Show Edit Modal:', showEditEventModal); // Debugging line
   };
+
 
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
