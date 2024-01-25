@@ -28,21 +28,23 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function UserReports() {
   const [showAddEventForm, setShowAddEventForm] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState(null); // State to store selected event
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [events, setEvents] = useState([]);
   const [showEditEventModal, setShowEditEventModal] = useState(false);
 
+  // Define fetchEvents function at the component level
+  const fetchEvents = async () => {
+    let { data: vianney_event, error } = await supabase
+      .from('vianney_event')
+      .select('*');
+
+    if (error) console.log('error', error);
+    else setEvents(vianney_event);
+  };
+
   useEffect(() => {
-    async function fetchEvents() {
-      let { data: vianney_event, error } = await supabase
-        .from('vianney_event')
-        .select('*');
-
-      if (error) console.log('error', error);
-      else setEvents(vianney_event);
-    }
-
+    // Call fetchEvents when the component mounts
     fetchEvents();
   }, []);
 
