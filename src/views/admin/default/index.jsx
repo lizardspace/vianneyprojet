@@ -103,18 +103,18 @@ export default function UserReports() {
         </Modal>
       )}
       {showEditEventModal && (
-  <Modal isOpen={showEditEventModal} onClose={() => setShowEditEventModal(false)}>
-    <ModalOverlay />
-    <ModalContent>
-    <ModalHeader>Edit from ministatistic</ModalHeader>
+        <Modal isOpen={showEditEventModal} onClose={() => setShowEditEventModal(false)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Edit from ministatistic</ModalHeader>
             <ModalCloseButton />
-      <ModalBody>
-        <EditEventForm event={selectedEvent} refreshEvents={fetchEvents} />
-      </ModalBody>
-      {/* ... */}
-    </ModalContent>
-  </Modal>
-)}
+            <ModalBody>
+              <EditEventForm event={selectedEvent} refreshEvents={fetchEvents} />
+            </ModalBody>
+            {/* ... */}
+          </ModalContent>
+        </Modal>
+      )}
 
       <DocumentationsComponent />
       <Heading me='auto'
