@@ -30,6 +30,7 @@ export default function UserReports() {
   const [selectedEvent, setSelectedEvent] = useState(null); // State to store selected event
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [events, setEvents] = useState([]);
+  const [showEditEventModal, setShowEditEventModal] = useState(false);
 
   useEffect(() => {
     async function fetchEvents() {
@@ -45,11 +46,9 @@ export default function UserReports() {
   }, []);
 
   const toggleAddEventForm = () => setShowAddEventForm(!showAddEventForm);
-
-  // Function to handle clicking on a MiniStatistics component
   const handleMiniStatisticsClick = (event) => {
     setSelectedEvent(event);
-    setShowAddEventForm(true);
+    setShowEditEventModal(true);
   };
 
   return (
@@ -77,7 +76,7 @@ export default function UserReports() {
         <Button
           mt="30px"
           onClick={toggleAddEventForm}
-          leftIcon={<Icon as={ FcPlus} />}
+          leftIcon={<Icon as={FcPlus} />}
           colorScheme='blue'
           variant='solid'
           size='md'
@@ -98,6 +97,21 @@ export default function UserReports() {
             </ModalBody>
             <ModalFooter>
               <Button colorScheme="blue" onClick={() => setShowAddEventForm(false)}>Fermer</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+      {showEditEventModal && (
+        <Modal isOpen={showEditEventModal} onClose={() => setShowEditEventModal(false)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Modifier ou supprimer un événement</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <EditEventForm event={selectedEvent} refreshEvents={() => fetchEvents()} />
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" onClick={() => setShowEditEventModal(false)}>Fermer</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
