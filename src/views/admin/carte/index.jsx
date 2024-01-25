@@ -8,13 +8,13 @@ import {
   useColorModeValue,
   SimpleGrid,
 } from "@chakra-ui/react";
-import MapComponent from "views/admin/marketplace/components/MapComponent";
-import TableTopCreators from "views/admin/marketplace/components/TableTopCreators";
+import MapComponent from "views/admin/carte/components/MapComponent";
+import TableTopCreators from "views/admin/carte/components/TableTopCreators";
 import NFT from "components/card/NFT";
 import Card from "components/card/Card.js";
 
-import tableDataTopCreators from "views/admin/marketplace/variables/tableDataTopCreators.json";
-import { tableColumnsTopCreators } from "views/admin/marketplace/variables/tableColumnsTopCreators";
+import tableDataTopCreators from "views/admin/carte/variables/tableDataTopCreators.json";
+import { tableColumnsTopCreators } from "views/admin/carte/variables/tableColumnsTopCreators";
 import CameraForm from "./components/CameraForm";
 import { createClient } from '@supabase/supabase-js';
 import UserForm from './components/UserForm';

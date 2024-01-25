@@ -12,7 +12,7 @@ import {
 import VideoChatRoom from "views/admin/videoChatRoom";
 // Admin Imports
 import MainDashboard from "views/admin/default";
-import NFTMarketplace from "views/admin/marketplace";
+import NFTMarketplace from "views/admin/carte";
 import Profile from "views/admin/profile";
 import TableauDeBord from "views/admin/TableauDeBord";
 import RTL from "views/admin/rtl";
