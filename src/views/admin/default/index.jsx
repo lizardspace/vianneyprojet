@@ -48,34 +48,29 @@ export default function UserReports() {
 
   const toggleAddEventForm = () => setShowAddEventForm(!showAddEventForm);
   const handleMiniStatisticsClick = (event) => {
-    console.log('Clicked event:', event); // Check if this logs correctly when you click on a MiniStatistics
     setSelectedEvent(event);
     setShowEditEventModal(true);
   };
-  
-
 
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-      <Heading me='auto'
-        color={textColor}
-        fontSize='2xl'
-        fontWeight='700'
-        lineHeight='100%'
-        mb="20px">
+      <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
         Evènements
       </Heading>
-      <SimpleGrid
-        columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}
-        gap='20px'
-        mb='20px'>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }} gap='20px' mb='20px'>
         {events.map((event, index) => (
-          <MiniStatistics
+          <Box
             key={index}
-            event_name={event.event_name}
-            date={event.event_date}
+            cursor="pointer" // Add cursor pointer style
+            transition="background-color 0.2s" // Add transition for hover effect
+            _hover={{ backgroundColor: "gray.100" }} // Define hover effect style
             onClick={() => handleMiniStatisticsClick(event)} // Add click handler
-          />
+          >
+            <MiniStatistics
+              event_name={event.event_name}
+              date={event.event_date}
+            />
+          </Box>
         ))}
         <Button
           mt="30px"
