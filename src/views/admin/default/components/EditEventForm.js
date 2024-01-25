@@ -112,12 +112,14 @@ export default function EditEventForm({ event, refreshEvents }) {
                     onChange={(e) => setEventDescription(e.target.value)}
                 />
             </FormControl>
+            <Box pt="10px">
             <Button colorScheme='blue' onClick={handleUpdate} isLoading={isLoading}>
                 Modifier
             </Button>
             <Button colorScheme='red' onClick={handleDelete} isLoading={isLoading} ml={3}>
                 Supprimer
             </Button>
+            </Box>
         </Box>
     );
 }
