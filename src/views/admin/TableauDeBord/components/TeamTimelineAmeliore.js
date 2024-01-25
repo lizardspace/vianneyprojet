@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import supabase from './../../../../supabaseClient';
+import supabase from '../../../../supabaseClient';
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import "dayjs/locale/fr";

@@ -2,7 +2,7 @@
 import { Box, SimpleGrid } from "@chakra-ui/react";
 import React from "react";
 import VianneyAlertChat from "./components/VianneyAlertChat";
-import CreateTeam from "./components/CreateTeam";
+import UserForm from "../marketplace/components/UserForm";
 import TeamScheduleMadeMySelf from "./components/TeamScheduleMadeMySelf";
 import AddActionForm from "./components/AddActionForm";
 import TeamTimeline from "./components/TeamTimeline";
@@ -21,7 +21,7 @@ export default function Settings() {
         <TeamTimelineAmeliore/>
         <VianneyAlertChat />
       </SimpleGrid>
-      <CreateTeam />
+      <UserForm />
       <AddActionForm />
     </Box>
   );

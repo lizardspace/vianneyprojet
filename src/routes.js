@@ -14,7 +14,7 @@ import VideoChatRoom from "views/admin/videoChatRoom";
 import MainDashboard from "views/admin/default";
 import NFTMarketplace from "views/admin/marketplace";
 import Profile from "views/admin/profile";
-import DataTables from "views/admin/dataTables";
+import TableauDeBord from "views/admin/TableauDeBord";
 import RTL from "views/admin/rtl";
 import Documentation from "views/admin/documentation"; 
 
@@ -43,7 +43,7 @@ const routes = [
     layout: "/admin",
     path: "/data-tables",
     icon: <Icon as={FcSerialTasks} width='20px' height='20px' color='inherit' />,
-    component: DataTables,
+    component: TableauDeBord,
   },
   {
     name: "Profile des utilisateur",
