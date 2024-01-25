@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     FormControl,
@@ -21,7 +21,7 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function EditEventForm({ event, refreshEvents }) {
-    const [eventName, setEventName] = useState(event.event_name);
+    const [eventName, setEventName] = useState(event?.event_name || '');
     const [eventDate, setEventDate] = useState(event.event_date);
     const [eventLocation, setEventLocation] = useState(event.event_location);
     const [eventDescription, setEventDescription] = useState(event.event_description);
@@ -84,6 +84,16 @@ export default function EditEventForm({ event, refreshEvents }) {
             refreshEvents(); // Refresh the events list
         }
     };
+
+    useEffect(() => {
+        if (event) {
+            setEventName(event.event_name);
+            setEventDate(event.event_date);
+            setEventLocation(event.event_location);
+            setEventDescription(event.event_description);
+        }
+    }, [event]);
+
 
     return (
         <Box p={5}>

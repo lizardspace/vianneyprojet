@@ -48,11 +48,11 @@ export default function UserReports() {
 
   const toggleAddEventForm = () => setShowAddEventForm(!showAddEventForm);
   const handleMiniStatisticsClick = (event) => {
-    console.log('Event selected:', event); // Debugging line
+    console.log('Clicked event:', event); // Check if this logs correctly when you click on a MiniStatistics
     setSelectedEvent(event);
     setShowEditEventModal(true);
-    console.log('Show Edit Modal:', showEditEventModal); // Debugging line
   };
+  
 
 
   return (
@@ -106,20 +106,18 @@ export default function UserReports() {
         </Modal>
       )}
       {showEditEventModal && (
-        <Modal isOpen={showEditEventModal} onClose={() => setShowEditEventModal(false)}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Modifier ou supprimer un événement</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <EditEventForm event={selectedEvent} refreshEvents={() => fetchEvents()} />
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="blue" onClick={() => setShowEditEventModal(false)}>Fermer</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
+  <Modal isOpen={showEditEventModal} onClose={() => setShowEditEventModal(false)}>
+    <ModalOverlay />
+    <ModalContent>
+      {/* ... */}
+      <ModalBody>
+        <EditEventForm event={selectedEvent} refreshEvents={fetchEvents} />
+      </ModalBody>
+      {/* ... */}
+    </ModalContent>
+  </Modal>
+)}
+
       <DocumentationsComponent />
       <Heading me='auto'
         color={textColor}
