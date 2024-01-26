@@ -102,8 +102,6 @@ export default function UserReports() {
           Créer une équipe
         </Button>
       </SimpleGrid>
-
-      {/* Modal for adding/editing events */}
       {showAddEventForm && (
         <Modal isOpen={showAddEventForm} onClose={() => setShowAddEventForm(false)}>
           <ModalOverlay />
