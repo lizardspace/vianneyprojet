@@ -14,6 +14,7 @@ import {
   ModalBody,
   ModalCloseButton,
 } from "@chakra-ui/react";
+import EditUserForm from './components/EditUserForm';
 import MiniCalendar from "components/calendar/MiniCalendar";
 import { FcPlus } from "react-icons/fc";
 import MiniStatistics from "components/card/MiniStatistics";
@@ -39,6 +40,17 @@ export default function UserReports() {
   const [teams, setTeams] = useState([]); // Define teams state
   const [showEditEventModal, setShowEditEventModal] = useState(false);
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
+  const [editingTeam, setEditingTeam] = useState(null);
+  const handleEditTeam = (team) => {
+    setEditingTeam(team);
+    // Open the edit modal here
+  };
+  const handleSaveTeam = (updatedTeamData) => {
+    // Perform the update operation with updatedTeamData
+    // Close the edit modal
+    // Refresh teams data, if necessary
+    setEditingTeam(null);
+  };
 
   const toggleCreateTeamModal = () => setShowCreateTeamModal(!showCreateTeamModal);
 
@@ -181,6 +193,19 @@ export default function UserReports() {
             <ModalFooter>
               <Button colorScheme="blue" onClick={() => setShowCreateTeamModal(false)}>Fermer</Button>
             </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+      {editingTeam && (
+        <Modal isOpen={editingTeam !== null} onClose={() => setEditingTeam(null)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Edit Team</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} />
+            </ModalBody>
+            {/* ... */}
           </ModalContent>
         </Modal>
       )}
