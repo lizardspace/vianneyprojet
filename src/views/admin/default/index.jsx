@@ -41,10 +41,11 @@ export default function UserReports() {
   const [showEditEventModal, setShowEditEventModal] = useState(false);
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
   const [editingTeam, setEditingTeam] = useState(null);
-  const handleEditTeam = (team) => {
-    setEditingTeam(team);
-    // Open the edit modal here
-  };
+  const [showEditUserFormModal, setShowEditUserFormModal] = useState(false);
+const handleEditTeam = (team) => {
+  setEditingTeam(team);
+  setShowEditUserFormModal(true); // Open the edit modal here
+};
   const handleSaveTeam = (updatedTeamData) => {
     // Perform the update operation with updatedTeamData
     // Close the edit modal
@@ -197,18 +198,18 @@ export default function UserReports() {
         </Modal>
       )}
       {editingTeam && (
-        <Modal isOpen={editingTeam !== null} onClose={() => setEditingTeam(null)}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Edit Team</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} />
-            </ModalBody>
-            {/* ... */}
-          </ModalContent>
-        </Modal>
-      )}
+  <Modal isOpen={showEditUserFormModal} onClose={() => setShowEditUserFormModal(false)}>
+    <ModalOverlay />
+    <ModalContent>
+      <ModalHeader>Edit Team</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>
+        <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} />
+      </ModalBody>
+      {/* ... */}
+    </ModalContent>
+  </Modal>
+)}
       <DocumentationsComponent />
       <Heading me='auto'
         color={textColor}
