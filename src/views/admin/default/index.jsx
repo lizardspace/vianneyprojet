@@ -17,7 +17,7 @@ import {
 import MiniCalendar from "components/calendar/MiniCalendar";
 import { FcPlus } from "react-icons/fc";
 import MiniStatistics from "components/card/MiniStatistics";
-import TeamStatistics from "components/card/TeamStatistics";
+import TeamStatistics from "components/card/TeamStatistics"; // Import the TeamStatistics component
 import { createClient } from '@supabase/supabase-js'
 import AddEventForm from "./components/AddEventForm";
 import EditEventForm from "./components/EditEventForm";
@@ -36,21 +36,35 @@ export default function UserReports() {
   const [showUserform] = useState(false); // State for showing Userform component
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [events, setEvents] = useState([]);
+  const [teams, setTeams] = useState([]); // Define teams state
   const [showEditEventModal, setShowEditEventModal] = useState(false);
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
+  
   const toggleCreateTeamModal = () => setShowCreateTeamModal(!showCreateTeamModal);
+  
   const fetchEvents = async () => {
     let { data: vianney_event, error } = await supabase
       .from('vianney_event')
       .select('*');
-
+  
     if (error) console.log('error', error);
     else setEvents(vianney_event);
   };
 
+  const fetchTeams = async () => {
+    let { data: vianney_teams, error } = await supabase
+      .from('vianney_teams')
+      .select('*');
+  
+    if (error) console.log('error', error);
+    else setTeams(vianney_teams);
+  };
+  
   useEffect(() => {
     // Call fetchEvents when the component mounts
     fetchEvents();
+    // Call fetchTeams when the component mounts
+    fetchTeams();
   }, []);
 
   const toggleAddEventForm = () => setShowAddEventForm(!showAddEventForm);
