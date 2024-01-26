@@ -91,8 +91,8 @@ const UserForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const teamColor = generateRandomColor(); // Generate a random color for the team
-    const timestamp = new Date().toISOString(); // Generate a timestamp
+    const teamColor = generateRandomColor();
+    const timestamp = new Date().toISOString();
 
     if (!profilePhoto) {
       console.error('No profile photo selected');
@@ -112,12 +112,11 @@ const UserForm = () => {
 
     const publicURL = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/users_on_the_ground/${fileName}`;
 
-    // Insert user data into the database
     const { error: insertError } = await supabase
       .from('vianney_teams')
       .insert([
         {
-          id: uuidv4(), // Generate a new UUID for each team
+          id: uuidv4(),
           name_of_the_team: nameOfTheTeam,
           latitude: lat,
           longitude: lng,
@@ -130,7 +129,7 @@ const UserForm = () => {
           type_de_vehicule: typeDeVehicule,
           immatriculation: immatriculation,
           specialite: specialite,
-          event_id: selectedEventId, // Include the selectedEventId in the database
+          event_id: selectedEventId,
         },
       ]);
 
@@ -139,7 +138,8 @@ const UserForm = () => {
       return;
     }
 
-    alert('User data added successfully');
+    // Show the success alert
+    setShowSuccessAlert(true);
   };
 
   return (
