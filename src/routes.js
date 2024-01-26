@@ -4,7 +4,6 @@ import {
   FcBusinessman,
   FcLock,
   FcMindMap,
-  FcFinePrint,
   FcSerialTasks,
   FcSurvey,
   FcSettings,
@@ -15,7 +14,6 @@ import MainDashboard from "views/admin/default";
 import NFTMarketplace from "views/admin/carte";
 import Profile from "views/admin/profile";
 import TableauDeBord from "views/admin/TableauDeBord";
-import RTL from "views/admin/rtl";
 import Documentation from "views/admin/documentation"; 
 
 // Auth Imports
@@ -65,13 +63,6 @@ const routes = [
     path: "/parameters",
     icon: <Icon as={FcSettings} width='20px' height='20px' color='inherit' />,
     component: Parameters, 
-  },
-  {
-    name: "Vue d'ensemble administrateur",
-    layout: "/admin",
-    path: "/overview",
-    icon: <Icon as={FcFinePrint} width='20px' height='20px' color='inherit' />,
-    component: RTL,
   },
   {
     name: "Ajouter Documentation",
