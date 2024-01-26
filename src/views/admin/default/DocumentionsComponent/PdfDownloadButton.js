@@ -4,7 +4,7 @@ import { FcDocument } from "react-icons/fc";
 import { createClient } from "@supabase/supabase-js";
 import Card from "components/card/Card.js"; // Import Card
 import IconBox from "components/icons/IconBox"; // Import IconBox
-import PdfUploader from "views/admin/documentation/components/PdfUploader";
+import PdfUploader from "./PdfUploader";
 import { FcPlus, FcLeft } from "react-icons/fc";
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';

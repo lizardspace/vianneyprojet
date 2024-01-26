@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Box } from "@chakra-ui/react";
 
-import PdfDownloadButton from "./components/PdfDownloadButton";
-import PdfList from "./components/PdfList";
+import PdfDownloadButton from "./PdfDownloadButton";
+import PdfList from "./PdfList";
 
 const DocumentationsComponent = () => {
   const [selectedPdf, setSelectedPdf] = useState(null);

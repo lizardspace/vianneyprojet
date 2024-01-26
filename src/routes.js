@@ -14,7 +14,6 @@ import MainDashboard from "views/admin/default";
 import NFTMarketplace from "views/admin/carte";
 import Profile from "views/admin/profile";
 import TableauDeBord from "views/admin/TableauDeBord";
-import Documentation from "views/admin/documentation"; 
 
 // Auth Imports
 import SignInCentered from "views/auth/signIn";
@@ -63,13 +62,6 @@ const routes = [
     path: "/parameters",
     icon: <Icon as={FcSettings} width='20px' height='20px' color='inherit' />,
     component: Parameters, 
-  },
-  {
-    name: "Ajouter Documentation",
-    layout: "/admin",
-    path: "/documentation",
-    icon: <Icon as={FcLock} width='20px' height='20px' color='inherit' />, // Replace with appropriate icon
-    component: Documentation, // Replace with your Documentation component
   },
   {
     name: "Salle de chat vidéo",
