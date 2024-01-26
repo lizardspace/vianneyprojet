@@ -32,12 +32,12 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export default function UserReports() {
   const [showAddEventForm, setShowAddEventForm] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [showUserform, setShowUserform] = useState(false); // State for showing Userform component
+  const [showUserform] = useState(false); // State for showing Userform component
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [events, setEvents] = useState([]);
   const [showEditEventModal, setShowEditEventModal] = useState(false);
-
-  // Define fetchEvents function at the component level
+  const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
+  const toggleCreateTeamModal = () => setShowCreateTeamModal(!showCreateTeamModal);
   const fetchEvents = async () => {
     let { data: vianney_event, error } = await supabase
       .from('vianney_event')
@@ -57,9 +57,6 @@ export default function UserReports() {
     setSelectedEvent(event);
     setShowEditEventModal(true);
   };
-
-  const toggleUserform = () => setShowUserform(!showUserform); // Function to toggle Userform component visibility
-
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
@@ -92,11 +89,9 @@ export default function UserReports() {
           _active={{ boxShadow: 'lg' }}>
           Ajouter un évènement
         </Button>
-        
-        {/* Button to toggle Userform component */}
         <Button
           mt="30px"
-          onClick={toggleUserform}
+          onClick={toggleCreateTeamModal}
           leftIcon={<Icon as={FcPlus} />}
           colorScheme='blue'
           variant='solid'
@@ -107,7 +102,7 @@ export default function UserReports() {
           Créer une équipe
         </Button>
       </SimpleGrid>
-      
+
       {/* Modal for adding/editing events */}
       {showAddEventForm && (
         <Modal isOpen={showAddEventForm} onClose={() => setShowAddEventForm(false)}>
@@ -139,10 +134,23 @@ export default function UserReports() {
           </ModalContent>
         </Modal>
       )}
-
-      {/* Show the Userform component when showUserform is true */}
       {showUserform && (
         <Userform />
+      )}
+      {showCreateTeamModal && (
+        <Modal isOpen={showCreateTeamModal} onClose={() => setShowCreateTeamModal(false)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Créer une équipe</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Userform/>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" onClick={() => setShowCreateTeamModal(false)}>Fermer</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
 
       <DocumentationsComponent />
