@@ -17,6 +17,7 @@ import {
 import MiniCalendar from "components/calendar/MiniCalendar";
 import { FcPlus } from "react-icons/fc";
 import MiniStatistics from "components/card/MiniStatistics";
+import TeamStatistics from "components/card/TeamStatistics";
 import { createClient } from '@supabase/supabase-js'
 import AddEventForm from "./components/AddEventForm";
 import EditEventForm from "./components/EditEventForm";
@@ -89,6 +90,22 @@ export default function UserReports() {
           _active={{ boxShadow: 'lg' }}>
           Ajouter un évènement
         </Button>
+        {teams.map((team, index) => (
+          <Box
+            key={index}
+            cursor="pointer"
+            transition="background-color 0.2s"
+            _hover={{ backgroundColor: "gray.100" }}
+          >
+            <TeamStatistics
+              teamName={team.name_of_the_team}
+              teamColor={team.color}
+              teamSpeciality={team.specialite}
+              teamLeader={team.leader_name} // Replace with the actual leader name
+              teamMembersCount={team.team_members.length}
+            />
+          </Box>
+        ))}
         <Button
           mt="30px"
           onClick={toggleCreateTeamModal}
@@ -117,8 +134,6 @@ export default function UserReports() {
           </ModalContent>
         </Modal>
       )}
-
-      {/* Modal for editing events */}
       {showEditEventModal && (
         <Modal isOpen={showEditEventModal} onClose={() => setShowEditEventModal(false)}>
           <ModalOverlay />
@@ -142,7 +157,7 @@ export default function UserReports() {
             <ModalHeader>Créer une équipe</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Userform/>
+              <Userform />
             </ModalBody>
             <ModalFooter>
               <Button colorScheme="blue" onClick={() => setShowCreateTeamModal(false)}>Fermer</Button>
@@ -150,7 +165,6 @@ export default function UserReports() {
           </ModalContent>
         </Modal>
       )}
-
       <DocumentationsComponent />
       <Heading me='auto'
         color={textColor}
