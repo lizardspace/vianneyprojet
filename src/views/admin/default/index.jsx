@@ -39,14 +39,14 @@ export default function UserReports() {
   const [teams, setTeams] = useState([]); // Define teams state
   const [showEditEventModal, setShowEditEventModal] = useState(false);
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
-  
+
   const toggleCreateTeamModal = () => setShowCreateTeamModal(!showCreateTeamModal);
-  
+
   const fetchEvents = async () => {
     let { data: vianney_event, error } = await supabase
       .from('vianney_event')
       .select('*');
-  
+
     if (error) console.log('error', error);
     else setEvents(vianney_event);
   };
@@ -55,11 +55,11 @@ export default function UserReports() {
     let { data: vianney_teams, error } = await supabase
       .from('vianney_teams')
       .select('*');
-  
+
     if (error) console.log('error', error);
     else setTeams(vianney_teams);
   };
-  
+
   useEffect(() => {
     // Call fetchEvents when the component mounts
     fetchEvents();
@@ -104,6 +104,11 @@ export default function UserReports() {
           _active={{ boxShadow: 'lg' }}>
           Ajouter un évènement
         </Button>
+        </SimpleGrid>
+        <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
+          Equipes
+        </Heading>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }} gap='20px' mb='20px'>
         {teams.map((team, index) => (
           <Box
             key={index}
