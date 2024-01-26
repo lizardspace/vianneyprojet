@@ -90,19 +90,22 @@ const EditUserForm = ({ teamData, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-// Perform the update operation and call onSave with updated data
+    
+    // Perform the update operation and call onSave with updated data
     const updatedTeamData = {
-      name_of_the_team,
-          latitude: lat,
-          longitude: lng,
-          mission,
-      type_de_vehicule,
-      immatriculation,
-      specialite,
-          team_members: teamMembers,
-          };
+      name_of_the_team: nameOfTheTeam, // Use state variable
+      latitude: lat,
+      longitude: lng,
+      mission: mission,
+      type_de_vehicule: typeDeVehicule, // Use state variable
+      immatriculation: immatriculation,
+      specialite: specialite,
+      team_members: teamMembers,
+    };
+    
     onSave(updatedTeamData);
   };
+  
 
   return (
     <form onSubmit={handleSubmit}>
