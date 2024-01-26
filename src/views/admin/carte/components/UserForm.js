@@ -245,10 +245,10 @@ const UserForm = () => {
           <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mt={4}>
             <AlertIcon boxSize="40px" mr={0} />
             <AlertTitle mt={4} mb={1} fontSize="lg">
-              User data added successfully
+              Equipe créée avec succès
             </AlertTitle>
             <AlertDescription maxWidth="sm">
-              Your user data has been added successfully.
+              Les données ont été ajouté avec succès.
             </AlertDescription>
             <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowSuccessAlert(false)} />
           </Alert>
