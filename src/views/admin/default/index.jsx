@@ -97,7 +97,8 @@ export default function UserReports() {
         <Button
           mt="30px"
           onClick={toggleUserform}
-          colorScheme='green' // You can choose an appropriate color
+          leftIcon={<Icon as={FcPlus} />}
+          colorScheme='blue'
           variant='solid'
           size='md'
           boxShadow='sm'
