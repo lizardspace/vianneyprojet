@@ -138,25 +138,43 @@ const EditUserForm = ({ teamData, onSave }) => {
       if (profilePhoto) {
         const formData = new FormData();
         formData.append('file', profilePhoto);
+        const fileName = `${teamData.id}-${profilePhoto.name}`;
+        const { data, error: uploadError } = await supabase.storage
+          .from('users_on_the_ground')
+          .upload(`profile-photos/${fileName}`, profilePhoto);
 
-        const { data, error } = await supabase.storage
-          .from('users_on_the_ground') // Replace with your actual storage bucket name
-          .upload(`profile-photos/${teamData.id}`, formData);
-
-        if (error) {
-          console.error('Error uploading profile photo:', error);
-        } else {
-          console.log('Profile photo uploaded successfully:', data);
-
-          // Update the profile photo URL in the state and reset the editing mode
-          setProfilePhotoUrl(data.Key);
-          setIsEditingProfilePhoto(false);
+        if (uploadError) {
+          throw uploadError;
         }
+
+        // Retrieve the URL of the uploaded file
+        const { publicURL, error: urlError } = supabase.storage
+          .from('users_on_the_ground')
+          .getPublicUrl(`profile-photos/${fileName}`);
+
+        if (urlError) {
+          throw urlError;
+        }
+
+        // Update the profile photo URL in the database
+        const { error: updateError } = await supabase
+          .from('vianney_teams')
+          .update({ photo_profile_url: publicURL })
+          .eq('id', teamData.id);
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        // Update the profile photo URL in the state
+        setProfilePhotoUrl(publicURL);
+        setIsEditingProfilePhoto(false);
       }
     } catch (error) {
-      console.error('Error uploading profile photo:', error);
+      console.error('Error handling profile photo:', error);
     }
   };
+
 
   useEffect(() => {
     if (teamData) {
@@ -190,8 +208,7 @@ const EditUserForm = ({ teamData, onSave }) => {
         </FormControl>
 
         <FormControl>
-          <FormLabel htmlFor='profile-photo'>Photo de profil</FormLabel>
-          <Input id='profile-photo' type="file" onChange={handleFileChange} />
+
           {isEditingProfilePhoto ? (
             <FormControl>
               <FormLabel htmlFor='profile-photo'>Modifier la photo de profil</FormLabel>
