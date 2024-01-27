@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { createClient } from '@supabase/supabase-js';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Avatar } from '@chakra-ui/react';
+
 
 import {
   FormControl,
@@ -21,7 +23,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const EditUserForm = ({ teamData, onSave }) => {
   const [nameOfTheTeam, setNameOfTheTeam] = useState('');
-  const [setProfilePhoto] = useState(null);
+  const [profilePhoto, setProfilePhoto] = useState(null);
   const [lat, setLat] = useState(45.75799485263588);
   const [lng, setLng] = useState(4.825754111294844);
   const [mission, setMission] = useState('');
@@ -29,6 +31,8 @@ const EditUserForm = ({ teamData, onSave }) => {
   const [immatriculation, setImmatriculation] = useState('');
   const [specialite, setSpecialite] = useState('');
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
+  const [isEditingProfilePhoto, setIsEditingProfilePhoto] = useState(false);
   const [teamMembers, setTeamMembers] = useState([{
     id: uuidv4(), // Generate unique ID for the first team member
     familyname: '',
@@ -67,14 +71,14 @@ const EditUserForm = ({ teamData, onSave }) => {
       specialite: specialite,
       team_members: teamMembers,
     };
-  
+
     try {
       // Use Supabase client to update the data in the table
       const { data, error } = await supabase
         .from('vianney_teams')
         .update(updatedTeamData)
         .eq('id', teamData.id); // Replace 'id' with the actual identifier for your team data
-  
+
       if (error) {
         console.error('Error updating data:', error);
       } else {
@@ -85,7 +89,7 @@ const EditUserForm = ({ teamData, onSave }) => {
     } catch (error) {
       console.error('Error updating data:', error);
     }
-  };  
+  };
 
   const handleAddTeamMember = () => {
     setTeamMembers([...teamMembers, {
@@ -114,8 +118,7 @@ const EditUserForm = ({ teamData, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Perform the update operation and call onSave with updated data
+
     const updatedTeamData = {
       name_of_the_team: nameOfTheTeam, // Use state variable
       latitude: lat,
@@ -126,23 +129,48 @@ const EditUserForm = ({ teamData, onSave }) => {
       specialite: specialite,
       team_members: teamMembers,
     };
-    
+
     onSave(updatedTeamData);
+  };
+
+  const handleSaveProfilePhoto = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('file', profilePhoto);
+
+      const { data, error } = await supabase.storage
+        .from('your_storage_bucket_name') // Replace with your actual storage bucket name
+        .upload(`profile-photos/${teamData.id}`, formData);
+
+      if (error) {
+        console.error('Error uploading profile photo:', error);
+      } else {
+        console.log('Profile photo uploaded successfully:', data);
+
+        // Update the profile photo URL in the state and reset the editing mode
+        setProfilePhotoUrl(data.Key);
+        setIsEditingProfilePhoto(false);
+      }
+    } catch (error) {
+      console.error('Error uploading profile photo:', error);
+    }
   };
 
   useEffect(() => {
     if (teamData) {
-      setNameOfTheTeam(teamData.name_of_the_team || ''); // Use the correct property name
+      setNameOfTheTeam(teamData.name_of_the_team || '');
       setLat(teamData.latitude || 0);
       setLng(teamData.longitude || 0);
       setMission(teamData.mission || '');
-      setTypeDeVehicule(teamData.type_de_vehicule || ''); // Use the correct property name
+      setTypeDeVehicule(teamData.type_de_vehicule || '');
       setImmatriculation(teamData.immatriculation || '');
       setSpecialite(teamData.specialite || '');
+      setProfilePhotoUrl(teamData.photo_profile_url || ''); 
       setTeamMembers(teamData.team_members || []);
     }
   }, [teamData]);
-  
+
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -164,6 +192,15 @@ const EditUserForm = ({ teamData, onSave }) => {
         <FormControl>
           <FormLabel htmlFor='profile-photo'>Photo de profil</FormLabel>
           <Input id='profile-photo' type="file" onChange={handleFileChange} />
+          {isEditingProfilePhoto ? (
+            <FormControl>
+              <FormLabel htmlFor='profile-photo'>Modifier la photo de profil</FormLabel>
+              <Input id='profile-photo' type="file" onChange={handleFileChange} />
+              <Button colorScheme="blue" onClick={handleSaveProfilePhoto}>Enregistrer la photo</Button>
+            </FormControl>
+          ) : (
+            <Avatar src={profilePhotoUrl} size="xl" />
+          )}
         </FormControl>
         <FormControl>
           <FormLabel htmlFor='mission'>Mission</FormLabel>
