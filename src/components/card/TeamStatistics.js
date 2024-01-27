@@ -20,7 +20,6 @@ export default function TeamStatistics(props) {
     teamMembersCount,
   } = props;
 
-  const brandColor = useColorModeValue("brand.500", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
   const textColor = useColorModeValue("secondaryGray.900", "white");
 

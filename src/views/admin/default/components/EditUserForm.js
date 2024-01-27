@@ -15,15 +15,13 @@ import {
   Checkbox,
   Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton,
 } from '@chakra-ui/react';
-import { useEvent } from '../../../../EventContext';
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const EditUserForm = ({ teamData, onSave }) => {
-  const { selectedEventId } = useEvent();
   const [nameOfTheTeam, setNameOfTheTeam] = useState('');
-  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [setProfilePhoto] = useState(null);
   const [lat, setLat] = useState(45.75799485263588);
   const [lng, setLng] = useState(4.825754111294844);
   const [mission, setMission] = useState('');
@@ -39,10 +37,6 @@ const EditUserForm = ({ teamData, onSave }) => {
     phone: '',
     isLeader: false, // Added isLeader property
   }]);
-  const generateRandomColor = () => {
-    const randomColor = Math.floor(Math.random() * 16777215).toString(16);
-    return `#${randomColor}`;
-  };
   const handleFileChange = (e) => {
     setProfilePhoto(e.target.files[0]);
   };
@@ -61,7 +55,37 @@ const EditUserForm = ({ teamData, onSave }) => {
 
     setTeamMembers(values);
   };
-
+  const handleModifyAndPushData = async () => {
+    // Prepare the updated data
+    const updatedTeamData = {
+      name_of_the_team: nameOfTheTeam,
+      latitude: lat,
+      longitude: lng,
+      mission: mission,
+      type_de_vehicule: typeDeVehicule,
+      immatriculation: immatriculation,
+      specialite: specialite,
+      team_members: teamMembers,
+    };
+  
+    try {
+      // Use Supabase client to update the data in the table
+      const { data, error } = await supabase
+        .from('vianney_teams')
+        .update(updatedTeamData)
+        .eq('id', teamData.id); // Replace 'id' with the actual identifier for your team data
+  
+      if (error) {
+        console.error('Error updating data:', error);
+      } else {
+        console.log('Data updated successfully:', data);
+        // Show a success alert or perform any other actions if needed
+        setShowSuccessAlert(true);
+      }
+    } catch (error) {
+      console.error('Error updating data:', error);
+    }
+  };  
 
   const handleAddTeamMember = () => {
     setTeamMembers([...teamMembers, {
@@ -223,17 +247,17 @@ const EditUserForm = ({ teamData, onSave }) => {
           <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mt={4}>
             <AlertIcon boxSize="40px" mr={0} />
             <AlertTitle mt={4} mb={1} fontSize="lg">
-              Equipe créée avec succès
+              Equipe modifiée avec succès
             </AlertTitle>
             <AlertDescription maxWidth="sm">
-              Les données ont été ajouté avec succès.
+              Les données ont été modifiée avec succès.
             </AlertDescription>
             <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowSuccessAlert(false)} />
           </Alert>
         )}
         <Button colorScheme="blue" onClick={handleAddTeamMember}>Ajouter un membre de l'équipe</Button>
       </VStack>
-      <Button mt={4} colorScheme="green" type="submit">Ajouter l'utilisateur</Button>
+      <Button colorScheme="blue" onClick={handleModifyAndPushData}>Modify and Push Data</Button>
     </form>
   );
 };
