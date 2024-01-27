@@ -42,10 +42,10 @@ export default function UserReports() {
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
   const [editingTeam, setEditingTeam] = useState(null);
   const [showEditUserFormModal, setShowEditUserFormModal] = useState(false);
-const handleEditTeam = (team) => {
-  setEditingTeam(team);
-  setShowEditUserFormModal(true); // Open the edit modal here
-};
+  const handleEditTeam = (team) => {
+    setEditingTeam(team);
+    setShowEditUserFormModal(true); // Open the edit modal here
+  };
   const handleSaveTeam = (updatedTeamData) => {
     // Perform the update operation with updatedTeamData
     // Close the edit modal
@@ -117,23 +117,24 @@ const handleEditTeam = (team) => {
           _active={{ boxShadow: 'lg' }}>
           Ajouter un évènement
         </Button>
-        </SimpleGrid>
-        <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
-          Equipes
-        </Heading>
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }} gap='20px' mb='20px'>
+      </SimpleGrid>
+      <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
+        Equipes
+      </Heading>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }} gap='20px' mb='20px'>
         {teams.map((team, index) => (
           <Box
             key={index}
             cursor="pointer"
             transition="background-color 0.2s"
             _hover={{ backgroundColor: "gray.100" }}
+            onClick={() => handleEditTeam(team)} // Add this line
           >
             <TeamStatistics
               teamName={team.name_of_the_team}
               teamColor={team.color}
               teamSpeciality={team.specialite}
-              teamLeader={team.leader_name} // Replace with the actual leader name
+              teamLeader={team.leader_name}
               teamMembersCount={team.team_members.length}
             />
           </Box>
@@ -198,18 +199,18 @@ const handleEditTeam = (team) => {
         </Modal>
       )}
       {editingTeam && (
-  <Modal isOpen={showEditUserFormModal} onClose={() => setShowEditUserFormModal(false)}>
-    <ModalOverlay />
-    <ModalContent>
-      <ModalHeader>Edit Team</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} />
-      </ModalBody>
-      {/* ... */}
-    </ModalContent>
-  </Modal>
-)}
+        <Modal isOpen={showEditUserFormModal} onClose={() => setShowEditUserFormModal(false)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Edit Team</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} />
+            </ModalBody>
+            {/* ... */}
+          </ModalContent>
+        </Modal>
+      )}
       <DocumentationsComponent />
       <Heading me='auto'
         color={textColor}
