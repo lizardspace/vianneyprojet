@@ -65,12 +65,19 @@ export default function UserReports() {
   };
 
   const fetchTeams = async () => {
-    let { data: vianney_teams, error } = await supabase
-      .from('vianney_teams')
-      .select('*');
-
-    if (error) console.log('error', error);
-    else setTeams(vianney_teams);
+    try {
+      const { data: vianney_teams, error } = await supabase
+        .from('vianney_teams')
+        .select('*');
+  
+      if (error) {
+        console.log('Error fetching teams:', error);
+      } else {
+        setTeams(vianney_teams);
+      }
+    } catch (error) {
+      console.error('Error fetching teams:', error);
+    }
   };
 
   useEffect(() => {

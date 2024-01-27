@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { createClient } from '@supabase/supabase-js';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
@@ -105,6 +105,19 @@ const EditUserForm = ({ teamData, onSave }) => {
     
     onSave(updatedTeamData);
   };
+
+  useEffect(() => {
+    if (teamData) {
+      setNameOfTheTeam(teamData.name_of_the_team || ''); // Use the correct property name
+      setLat(teamData.latitude || 0);
+      setLng(teamData.longitude || 0);
+      setMission(teamData.mission || '');
+      setTypeDeVehicule(teamData.type_de_vehicule || ''); // Use the correct property name
+      setImmatriculation(teamData.immatriculation || '');
+      setSpecialite(teamData.specialite || '');
+      setTeamMembers(teamData.team_members || []);
+    }
+  }, [teamData]);
   
 
   return (
