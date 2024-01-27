@@ -139,41 +139,38 @@ const EditUserForm = ({ teamData, onSave }) => {
         const formData = new FormData();
         formData.append('file', profilePhoto);
         const fileName = `${teamData.id}-${profilePhoto.name}`;
-        const { data, error: uploadError } = await supabase.storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('users_on_the_ground')
           .upload(`profile-photos/${fileName}`, profilePhoto);
-
+  
         if (uploadError) {
           throw uploadError;
         }
-
-        // Retrieve the URL of the uploaded file
-        const { publicURL, error: urlError } = supabase.storage
-          .from('users_on_the_ground')
-          .getPublicUrl(`profile-photos/${fileName}`);
-
-        if (urlError) {
-          throw urlError;
-        }
-
+  
+        const publicURL = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/users_on_the_ground/${fileName}`;
+  
         // Update the profile photo URL in the database
-        const { error: updateError } = await supabase
+        const { data: updateData, error: updateError } = await supabase
           .from('vianney_teams')
           .update({ photo_profile_url: publicURL })
           .eq('id', teamData.id);
-
+  
         if (updateError) {
           throw updateError;
         }
-
+  
         // Update the profile photo URL in the state
         setProfilePhotoUrl(publicURL);
         setIsEditingProfilePhoto(false);
+        // Optionally, show a success message to the user
+        setShowSuccessAlert(true);
       }
     } catch (error) {
       console.error('Error handling profile photo:', error);
+      // Optionally, show an error message to the user
     }
   };
+  
 
 
   useEffect(() => {
