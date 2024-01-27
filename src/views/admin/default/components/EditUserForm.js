@@ -170,8 +170,6 @@ const EditUserForm = ({ teamData, onSave }) => {
     }
   }, [teamData]);
 
-
-
   return (
     <form onSubmit={handleSubmit}>
       <Box id="mapId" h="400px" w="100%">
