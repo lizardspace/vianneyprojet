@@ -135,21 +135,23 @@ const EditUserForm = ({ teamData, onSave }) => {
 
   const handleSaveProfilePhoto = async () => {
     try {
-      const formData = new FormData();
-      formData.append('file', profilePhoto);
+      if (profilePhoto) {
+        const formData = new FormData();
+        formData.append('file', profilePhoto);
 
-      const { data, error } = await supabase.storage
-        .from('your_storage_bucket_name') // Replace with your actual storage bucket name
-        .upload(`profile-photos/${teamData.id}`, formData);
+        const { data, error } = await supabase.storage
+          .from('users_on_the_ground') // Replace with your actual storage bucket name
+          .upload(`profile-photos/${teamData.id}`, formData);
 
-      if (error) {
-        console.error('Error uploading profile photo:', error);
-      } else {
-        console.log('Profile photo uploaded successfully:', data);
+        if (error) {
+          console.error('Error uploading profile photo:', error);
+        } else {
+          console.log('Profile photo uploaded successfully:', data);
 
-        // Update the profile photo URL in the state and reset the editing mode
-        setProfilePhotoUrl(data.Key);
-        setIsEditingProfilePhoto(false);
+          // Update the profile photo URL in the state and reset the editing mode
+          setProfilePhotoUrl(data.Key);
+          setIsEditingProfilePhoto(false);
+        }
       }
     } catch (error) {
       console.error('Error uploading profile photo:', error);
@@ -165,7 +167,7 @@ const EditUserForm = ({ teamData, onSave }) => {
       setTypeDeVehicule(teamData.type_de_vehicule || '');
       setImmatriculation(teamData.immatriculation || '');
       setSpecialite(teamData.specialite || '');
-      setProfilePhotoUrl(teamData.photo_profile_url || ''); 
+      setProfilePhotoUrl(teamData.photo_profile_url || '');
       setTeamMembers(teamData.team_members || []);
     }
   }, [teamData]);
@@ -197,7 +199,10 @@ const EditUserForm = ({ teamData, onSave }) => {
               <Button colorScheme="blue" onClick={handleSaveProfilePhoto}>Enregistrer la photo</Button>
             </FormControl>
           ) : (
-            <Avatar src={profilePhotoUrl} size="xl" />
+            <Box>
+              <Avatar src={profilePhotoUrl} size="xl" />
+              <Button colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>Changer la photo</Button>
+            </Box>
           )}
         </FormControl>
         <FormControl>
