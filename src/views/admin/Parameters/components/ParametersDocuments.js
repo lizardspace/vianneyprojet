@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import { Box, Text, Button, useColorModeValue, ModalCloseButton, ModalHeader, Modal, ModalBody, ModalOverlay, ModalContent, } from '@chakra-ui/react';
 import { FcAdvertising, FcGlobe, FcBusinessman, FcDepartment, FcCalendar } from "react-icons/fc";
 import MapComponent from "views/admin/carte/components/MapComponent";
+import EquipiersTable from 'views/admin/carte/components/EquipiersTable';
 
 const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
   const brandColor = useColorModeValue("brand.500", "white");
@@ -97,13 +98,13 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
         </ModalContent>
       </Modal>
 
-      <Modal isOpen={showPersonnelModal} onClose={closePersonnelModal}>
+      <Modal isOpen={showPersonnelModal} onClose={closePersonnelModal} size="full">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Personnels Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* Add your content for the Personnels modal here */}
+            <EquipiersTable/>
           </ModalBody>
         </ModalContent>
       </Modal>
