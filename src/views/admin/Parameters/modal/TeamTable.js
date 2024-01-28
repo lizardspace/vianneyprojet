@@ -20,21 +20,21 @@ import { useEvent } from './../../../../EventContext'; // Import the useEvent ho
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 
 const TeamTable = () => {
-  const { selectedEventId } = useEvent(); // Get the selected event_id from the context
+  const { selectedEventId } = useEvent(); // Obtenir l'event_id sélectionné depuis le contexte
   const [teamsData, setTeamsData] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
   const [emailList, setEmailList] = useState('');
-  const [isCopied, setIsCopied] = useState(false); // State for tracking if emails are copied
+  const [isCopied, setIsCopied] = useState(false); // État pour suivre si les e-mails sont copiés
 
   useEffect(() => {
     async function fetchTeamsData() {
       const { data, error } = await supabase
         .from('vianney_teams')
         .select('*')
-        .eq('event_id', selectedEventId); // Filter teams by event_id
+        .eq('event_id', selectedEventId); // Filtrer les équipes par event_id
 
       if (error) {
-        console.error('Error fetching data:', error.message);
+        console.error('Erreur lors de la récupération des données :', error.message);
       } else {
         setTeamsData(data);
       }
@@ -54,23 +54,23 @@ const TeamTable = () => {
   };
 
   useEffect(() => {
-    // Generate the email list based on the data in teamsData
+    // Générer la liste des e-mails en fonction des données dans teamsData
     const emails = teamsData.reduce((acc, team) => {
       const teamEmails = team.team_members.map((member) => member.mail);
       return acc.concat(teamEmails);
     }, []);
 
-    setEmailList(emails.join('; ')); // Join emails with semicolon and space
+    setEmailList(emails.join('; ')); // Joindre les e-mails avec un point-virgule et un espace
   }, [teamsData]);
 
   const copyEmailList = () => {
-    // Implement your logic to copy the email list here
+    // Implémentez votre logique pour copier la liste des e-mails ici
     navigator.clipboard.writeText(emailList);
-    setIsCopied(true); // Set the copied state to true
-    // Reset the copied state after a few seconds
+    setIsCopied(true); // Définir l'état de copie à true
+    // Réinitialisez l'état de copie après quelques secondes
     setTimeout(() => {
       setIsCopied(false);
-    }, 5000); // 5 seconds
+    }, 5000); // 5 secondes
   };
 
   return (
@@ -78,8 +78,8 @@ const TeamTable = () => {
       <Table variant="simple">
         <Thead>
           <Tr>
-            <Th>Team Name</Th>
-            <Th>Members</Th>
+            <Th>Nom de l'équipe</Th>
+            <Th>Membres</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -90,7 +90,7 @@ const TeamTable = () => {
                 <Td>
                   <IconButton
                     aria-label={
-                      expandedRow === team.id ? 'Collapse' : 'Expand'
+                      expandedRow === team.id ? 'Réduire' : 'Développer'
                     }
                     icon={
                       expandedRow === team.id ? (
@@ -109,11 +109,11 @@ const TeamTable = () => {
                 <Table variant="simple" size="sm">
                   <Thead>
                     <Tr>
-                      <Th>Mail</Th>
-                      <Th>Phone</Th>
-                      <Th>Is Leader</Th>
-                      <Th>Firstname</Th>
-                      <Th>Familyname</Th>
+                      <Th>E-mail</Th>
+                      <Th>Téléphone</Th>
+                      <Th>Est Leader</Th>
+                      <Th>Prénom</Th>
+                      <Th>Nom de famille</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -121,7 +121,7 @@ const TeamTable = () => {
                       <Tr key={index}>
                         <Td>{member.mail}</Td>
                         <Td>{member.phone}</Td>
-                        <Td>{member.isLeader ? 'Yes' : 'No'}</Td>
+                        <Td>{member.isLeader ? 'Oui' : 'Non'}</Td>
                         <Td>{member.firstname}</Td>
                         <Td>{member.familyname}</Td>
                       </Tr>
@@ -137,7 +137,7 @@ const TeamTable = () => {
         value={emailList}
         readOnly
         mt={4}
-        placeholder="Email List"
+        placeholder="Liste des e-mails"
         size="sm"
         rows={4}
       />
@@ -145,14 +145,14 @@ const TeamTable = () => {
         mt={2}
         colorScheme="teal"
         onClick={copyEmailList}
-        isDisabled={isCopied} // Disable the button when emails are copied
+        isDisabled={isCopied} // Désactiver le bouton lorsque les e-mails sont copiés
       >
-        Copy Email List
+        Copier la liste des e-mails
       </Button>
       {isCopied && (
         <Alert status="success" mt={2}>
           <AlertIcon />
-          Mails bien copiés dans le presse-papier
+          E-mails bien copiés dans le presse-papier
           <CloseButton
             onClick={() => setIsCopied(false)}
             position="absolute"
