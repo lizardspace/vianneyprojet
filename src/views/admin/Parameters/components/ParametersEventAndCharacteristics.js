@@ -5,6 +5,7 @@ import EventDateComponent from '../modal/EventDateComponent';
 import EventLocationComponent from '../modal/EventLocationComponent';
 import EventNameComponent from '../modal/EventNameComponent';
 import NotepadComponent from '../modal/NotepadComponent';
+import TeamTable from '../modal/TeamTable';
 
 
 const ParametersEventAndCharacteristics = () => {
@@ -144,7 +145,7 @@ const ParametersEventAndCharacteristics = () => {
           <ModalHeader>Mailing Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* Add your content for the Mailing modal here */}
+            <TeamTable/>
           </ModalBody>
         </ModalContent>
       </Modal>
