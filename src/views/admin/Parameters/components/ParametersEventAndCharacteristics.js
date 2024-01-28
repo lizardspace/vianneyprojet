@@ -3,6 +3,8 @@ import { Box, Text, Button, useColorModeValue, ModalCloseButton, ModalHeader, Mo
 import { FcBusiness, FcCalendar, FcHome, FcList, FcVoicePresentation } from "react-icons/fc";
 import EventDateComponent from '../modal/EventDateComponent';
 import EventLocationComponent from '../modal/EventLocationComponent';
+import EventNameComponent from '../modal/EventNameComponent';
+
 
 
 const ParametersEventAndCharacteristics = () => {
@@ -98,7 +100,7 @@ const ParametersEventAndCharacteristics = () => {
           <ModalHeader>Nom de l'événement Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* Add your content for the Nom de l'événement modal here */}
+            <EventNameComponent/>
           </ModalBody>
         </ModalContent>
       </Modal>
