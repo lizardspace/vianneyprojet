@@ -4,7 +4,7 @@ import { Box, Text, Button, useColorModeValue, ModalCloseButton, ModalHeader, Mo
 import { FcAdvertising, FcGlobe, FcBusinessman, FcDepartment, FcCalendar } from "react-icons/fc";
 import MapComponent from "views/admin/carte/components/MapComponent";
 import EquipiersTable from 'views/admin/carte/components/EquipiersTable';
-import TeamScheduleByMySelf from 'views/admin/TableauDeBord/components/TeamScheduleByMySelf'
+import TeamScheduleByMySelf from '../../TableauDeBord/components/TeamScheduleMadeMySelf'
 
 const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
   const brandColor = useColorModeValue("brand.500", "white");
@@ -119,7 +119,7 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
         </ModalContent>
       </Modal>
 
-      <Modal isOpen={showScheduleModal} onClose={closeScheduleModal}>
+      <Modal isOpen={showScheduleModal} onClose={closeScheduleModal} size="full">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Emploi du temps Modal</ModalHeader>
