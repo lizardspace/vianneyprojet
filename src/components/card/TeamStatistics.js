@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import IconBox from "components/icons/IconBox";
 import Card from "components/card/Card.js";
-import { FcAdvertising } from "react-icons/fc";
+import { FcManager } from "react-icons/fc";
 
 export default function TeamStatistics(props) {
   const {
@@ -36,7 +36,7 @@ export default function TeamStatistics(props) {
           h="56px"
           bg={boxBg}
           icon={
-            <Icon w="32px" h="32px" as={FcAdvertising} color={teamColor} /> // Use an appropriate team icon
+            <Icon w="32px" h="32px" as={FcManager} color={teamColor} /> // Use an appropriate team icon
           }
         />
         <Stat my="auto" ms="10px">
