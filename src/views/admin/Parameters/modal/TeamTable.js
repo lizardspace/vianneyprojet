@@ -18,6 +18,7 @@ import {
 import { supabase } from '../../../../supabaseClient'; // Import your Supabase configuration here
 import { useEvent } from './../../../../EventContext'; // Import the useEvent hook
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
+import { FcCheckmark, FcCancel } from "react-icons/fc"; // Import icons
 
 const TeamTable = () => {
   const { selectedEventId } = useEvent(); // Obtenir l'event_id sélectionné depuis le contexte
@@ -121,7 +122,9 @@ const TeamTable = () => {
                       <Tr key={index}>
                         <Td>{member.mail}</Td>
                         <Td>{member.phone}</Td>
-                        <Td>{member.isLeader ? 'Oui' : 'Non'}</Td>
+                        <Td>
+                          {member.isLeader ? <FcCheckmark /> : <FcCancel />}
+                        </Td>
                         <Td>{member.firstname}</Td>
                         <Td>{member.familyname}</Td>
                       </Tr>
