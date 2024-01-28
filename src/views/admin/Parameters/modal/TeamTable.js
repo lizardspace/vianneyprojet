@@ -11,6 +11,9 @@ import {
   IconButton,
   Textarea,
   Button,
+  Alert,
+  AlertIcon,
+  CloseButton,
 } from '@chakra-ui/react';
 import { supabase } from '../../../../supabaseClient'; // Import your Supabase configuration here
 import { useEvent } from './../../../../EventContext'; // Import the useEvent hook
@@ -21,6 +24,7 @@ const TeamTable = () => {
   const [teamsData, setTeamsData] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
   const [emailList, setEmailList] = useState('');
+  const [isCopied, setIsCopied] = useState(false); // State for tracking if emails are copied
 
   useEffect(() => {
     async function fetchTeamsData() {
@@ -56,8 +60,18 @@ const TeamTable = () => {
       return acc.concat(teamEmails);
     }, []);
 
-    setEmailList(emails.join('\n')); // Join emails with newline character
+    setEmailList(emails.join('; ')); // Join emails with semicolon and space
   }, [teamsData]);
+
+  const copyEmailList = () => {
+    // Implement your logic to copy the email list here
+    navigator.clipboard.writeText(emailList);
+    setIsCopied(true); // Set the copied state to true
+    // Reset the copied state after a few seconds
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 5000); // 5 seconds
+  };
 
   return (
     <Box p={4}>
@@ -130,13 +144,23 @@ const TeamTable = () => {
       <Button
         mt={2}
         colorScheme="teal"
-        onClick={() => {
-          // Implement your logic to copy the email list here
-          navigator.clipboard.writeText(emailList);
-        }}
+        onClick={copyEmailList}
+        isDisabled={isCopied} // Disable the button when emails are copied
       >
         Copy Email List
       </Button>
+      {isCopied && (
+        <Alert status="success" mt={2}>
+          <AlertIcon />
+          Mails bien copiés dans le presse-papier
+          <CloseButton
+            onClick={() => setIsCopied(false)}
+            position="absolute"
+            right="8px"
+            top="8px"
+          />
+        </Alert>
+      )}
     </Box>
   );
 };
