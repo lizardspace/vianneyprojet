@@ -214,7 +214,7 @@ const EditUserForm = ({ teamData, onSave }) => {
         {profilePhotoUrl && (
           <Box>
             <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />
-            <Button colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>Changer la photo</Button>
+            <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>Changer la photo</Button>
           </Box>
         )}
 
@@ -329,7 +329,9 @@ const EditUserForm = ({ teamData, onSave }) => {
         )}
         <Button colorScheme="blue" onClick={handleAddTeamMember}>Ajouter un membre de l'équipe</Button>
       </VStack>
-      <Button mt="10px" colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
+      <HStack justifyContent="flex-end">
+        <Button mt={2} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
+      </HStack>
     </form>
   );
 };
