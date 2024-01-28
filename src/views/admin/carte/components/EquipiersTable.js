@@ -27,6 +27,7 @@ import 'leaflet/dist/leaflet.css';
 import { createClient } from '@supabase/supabase-js';
 import { MdPlace } from "react-icons/md";
 import { renderToString } from "react-dom/server";
+
 // Initialize Supabase client
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
@@ -41,12 +42,13 @@ const EquipiersTable = ({ showAll }) => {
     setSelectedEquipier(equipier);
     setIsModalOpen(true);
   };
+
   const headerStyle = {
     fontSize: '16px',
     fontWeight: 'normal',
     color: useColorModeValue('gray.600', 'gray.200'),
   };
-  const headerGradientStyle = {
+const headerGradientStyle = {
     background: 'linear-gradient(to right, #6e8efb, #a777e3)',
     color: 'white',
     textTransform: 'none',
@@ -88,11 +90,11 @@ const EquipiersTable = ({ showAll }) => {
     }
   }, [selectedEquipier, isModalOpen, equipiers]);
 
-  // Style for hover state
   const hoverStyle = {
     bg: useColorModeValue('gray.100', 'gray.700'),
     cursor: 'pointer',
   };
+
   const TableRow = ({ equipier, onClick }) => (
     <Tr _hover={hoverStyle} onClick={() => onClick(equipier)} style={tableRowStyle}>
       <Td><Avatar size="md" src={equipier.photo_profile_url} style={avatarStyle} /></Td>
@@ -122,6 +124,7 @@ const EquipiersTable = ({ showAll }) => {
 
     fetchEquipiers();
   }, []);
+
   const getLeaderNameAndPhone = (teamMembers) => {
     const leader = teamMembers.find(member => member.isLeader);
     if (!leader) {
@@ -129,7 +132,6 @@ const EquipiersTable = ({ showAll }) => {
     }
     return `${leader.firstname} ${leader.familyname} - ${leader.phone}`;
   };
-
 
   const createCustomIcon = (color = 'red') => {
     const iconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color }} />);
@@ -141,6 +143,7 @@ const EquipiersTable = ({ showAll }) => {
       popupAnchor: [0, -30]
     });
   };
+
   const renderTeamDetails = () => {
     if (!selectedEquipier) return null;
 
@@ -200,7 +203,7 @@ const EquipiersTable = ({ showAll }) => {
     <>
       <TableContainer style={{ maxHeight: showAll ? '300px' : 'auto', overflowY: 'auto' }}>
         <Table variant='simple'>
-          <Thead style={headerGradientStyle}>
+          <Thead style={{ ...headerGradientStyle, position: 'sticky', top: 0, zIndex: 1 }}>
             <Tr>
               <Th><Text style={headerStyle}>photo</Text></Th>
               <Th><Text style={headerStyle}>nom de l'équipe</Text></Th>
