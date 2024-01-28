@@ -24,10 +24,10 @@ const NotepadComponent = () => {
   const toast = useToast();
 
   useEffect(() => {
-    // Fetch the saved note from the textarea table
+    // Fetch the saved note from the vianney_textarea table
     async function fetchSavedNote() {
       const { data, error } = await supabase
-        .from('textarea')
+        .from('vianney_textarea')
         .select('text')
         .eq('event_id', selectedEventId) // Fetch note based on event_id
         .single();
@@ -43,9 +43,9 @@ const NotepadComponent = () => {
   }, [selectedEventId]); // Re-fetch note when event_id changes
 
   const handleSaveNote = async () => {
-    // Update the note in the textarea table with the event_id
+    // Update the note in the vianney_textarea table with the event_id
     const { error } = await supabase
-      .from('textarea')
+      .from('vianney_textarea')
       .upsert([{ text: note, event_id: selectedEventId }], { onConflict: ['event_id'] });
 
     if (error) {
@@ -107,7 +107,7 @@ const NotepadComponent = () => {
               colorScheme="red"
               onClick={async () => {
                 const { error } = await supabase
-                  .from('textarea')
+                  .from('vianney_textarea')
                   .delete()
                   .eq('event_id', selectedEventId); // Delete note based on event_id
                 if (error) {
