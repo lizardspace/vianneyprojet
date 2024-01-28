@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Text, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack
+  Box, Text, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
 } from '@chakra-ui/react';
 import { FcPlus } from "react-icons/fc";
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
@@ -80,19 +80,6 @@ function TeamScheduleByMySelf() {
     }
     onClose();
   };
-
-  const handleAddActionClick = () => {
-    toast({
-      title: "Ajouter une action",
-      description: <AddActionForm />,
-      status: "info",
-      duration: null, // The toast will stay until manually closed
-      isClosable: true,
-      position: "top", // Center the toast at the top of the screen
-    });
-  };
-  
-
   const updateEvent = async () => {
     // Validation can be added here for updated event details
     const { error } = await supabase
@@ -129,24 +116,24 @@ function TeamScheduleByMySelf() {
     onClose();
   };
 
-// Fetching team data and setting teams state
-const fetchTeams = async () => {
-  const { data, error } = await supabase.from('vianney_teams').select('*');
-  if (error) {
-    console.error('Error fetching teams:', error);
-    return [];
-  }
-  return data.map(team => ({
-    id: team.id,
-    titel: team.name_of_the_team,
-    color: team.color // Assuming each team has a unique color
-  }));
-};
+  // Fetching team data and setting teams state
+  const fetchTeams = async () => {
+    const { data, error } = await supabase.from('vianney_teams').select('*');
+    if (error) {
+      console.error('Error fetching teams:', error);
+      return [];
+    }
+    return data.map(team => ({
+      id: team.id,
+      titel: team.name_of_the_team,
+      color: team.color // Assuming each team has a unique color
+    }));
+  };
 
-useEffect(() => {
-  const fetchData = async () => {
-    const teamsData = await fetchTeams();
-    setTeams(teamsData);
+  useEffect(() => {
+    const fetchData = async () => {
+      const teamsData = await fetchTeams();
+      setTeams(teamsData);
 
       const { data: eventsData, error } = await supabase
         .from('team_action_view_rendering')
@@ -258,6 +245,9 @@ useEffect(() => {
       </div>
     </Tooltip>
   );
+  const [isAddActionModalOpen, setIsAddActionModalOpen] = useState(false);
+  const onOpenAddActionModal = () => setIsAddActionModalOpen(true);
+  const onCloseAddActionModal = () => setIsAddActionModalOpen(false);
 
   return (
     <Card
@@ -279,11 +269,11 @@ useEffect(() => {
               <Menu />
               <Tooltip label="Cliquer pour ajouter une action" hasArrow>
                 <Box position='absolute' top='15px' right='15px' cursor='pointer'>
-                  <FcPlus size="24px" onClick={handleAddActionClick}/>
+                  <FcPlus size="24px" onClick={onOpenAddActionModal} />
                 </Box>
               </Tooltip>
             </Flex>
-          <Calendar
+            <Calendar
               localizer={localizer}
               events={events}
               resources={teams}
@@ -303,8 +293,18 @@ useEffect(() => {
               }}
             />
 
-        </Box>
-        <AlertDialog
+          </Box>
+          <Modal isOpen={isAddActionModalOpen} onClose={onCloseAddActionModal}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Ajouter une action</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <AddActionForm />
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+          <AlertDialog
             isOpen={isAlertOpen}
             leastDestructiveRef={cancelRef}
             onClose={onClose}
@@ -351,10 +351,10 @@ useEffect(() => {
               </AlertDialogContent>
             </AlertDialogOverlay>
           </AlertDialog>
-      </ChakraProvider>
-    </Box>
-  </Card>
-);
+        </ChakraProvider>
+      </Box>
+    </Card>
+  );
 }
 
 export default TeamScheduleByMySelf;
