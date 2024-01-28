@@ -128,7 +128,10 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
                             icon={<FaTrash />}
                             colorScheme="red"
                             size="sm"
-                            onClick={() => handleDeleteDocument(data.id)}
+                            onClick={(e) => {
+                                e.stopPropagation(); // Prevent card click event propagation
+                                handleDeleteDocument(data.id);
+                            }}
                         />
                     </Card>
                 ))}
