@@ -201,7 +201,7 @@ const headerGradientStyle = {
 
   return (
     <>
-      <TableContainer style={{ maxHeight: showAll ? '300px' : 'auto', overflowY: 'auto' }}>
+      <TableContainer style={{ maxHeight: showAll ? '300px' : 'auto', overflowY: 'auto', overflowX: 'hidden' }}>
         <Table variant='simple'>
           <Thead style={{ ...headerGradientStyle, position: 'sticky', top: 0, zIndex: 1 }}>
             <Tr>
