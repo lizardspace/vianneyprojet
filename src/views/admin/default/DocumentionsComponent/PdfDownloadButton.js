@@ -1,5 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Flex, Icon, SimpleGrid, Stat, StatNumber, StatLabel, useColorModeValue, Heading, IconButton } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Flex,
+    Icon,
+    SimpleGrid,
+    Stat,
+    StatNumber,
+    StatLabel,
+    useColorModeValue,
+    Heading,
+    IconButton,
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogContent,
+    AlertDialogOverlay,
+} from "@chakra-ui/react";
 import { FcDocument } from "react-icons/fc";
 import { FaTrash } from "react-icons/fa";
 import { createClient } from "@supabase/supabase-js";
@@ -15,9 +33,11 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const PdfDownloadButton = ({ handlePdfClick }) => {
     const [documents, setDocuments] = useState([]);
     const [showPdfUploader, setShowPdfUploader] = useState(false);
-    const brandColor = useColorModeValue("brand.500", "white");
-    const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-    const textColor = useColorModeValue("secondaryGray.900", "white");
+    const [brandColor] = useColorModeValue("brand.500", "white");
+    const [boxBg] = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
+    const [textColor] = useColorModeValue("secondaryGray.900", "white");
+    const [deleteDocumentId, setDeleteDocumentId] = useState(null);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     useEffect(() => {
         const fetchDocuments = async () => {
@@ -37,25 +57,40 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString(undefined, options);
     };
+
     const togglePdfUploader = () => setShowPdfUploader(!showPdfUploader);
+
     const handleDeleteDocument = async (documentId) => {
+        setIsDeleteDialogOpen(true);
+        setDeleteDocumentId(documentId);
+    };
+
+    const confirmDeleteDocument = async () => {
         try {
-            const { error } = await supabase.from("vianney_pdf_documents").delete().eq("id", documentId);
+            const { error } = await supabase.from("vianney_pdf_documents").delete().eq("id", deleteDocumentId);
             if (error) {
                 console.error("Error deleting document:", error);
             } else {
                 // If deletion is successful, you can update the documents state to remove the deleted document
-                setDocuments((prevDocuments) => prevDocuments.filter((doc) => doc.id !== documentId));
+                setDocuments((prevDocuments) => prevDocuments.filter((doc) => doc.id !== deleteDocumentId));
             }
         } catch (error) {
             console.error("Error deleting document:", error);
+        } finally {
+            setIsDeleteDialogOpen(false);
+            setDeleteDocumentId(null);
         }
     };
 
+    const cancelDeleteDocument = () => {
+        setIsDeleteDialogOpen(false);
+        setDeleteDocumentId(null);
+    };
 
     return (
         <Box>
-            <Heading me='auto'
+            <Heading
+                me='auto'
                 color={textColor}
                 fontSize='2xl'
                 fontWeight='700'
@@ -111,6 +146,31 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
                 </Button>
             </SimpleGrid>
             {showPdfUploader && <PdfUploader />}
+
+            {/* Delete Document Confirmation Dialog */}
+            <AlertDialog
+                isOpen={isDeleteDialogOpen}
+                leastDestructiveRef={undefined}
+                onClose={cancelDeleteDocument}>
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Confirmation de suppression
+                        </AlertDialogHeader>
+                        <AlertDialogBody>
+                            Êtes-vous sûr de vouloir supprimer ce document?
+                        </AlertDialogBody>
+                        <AlertDialogFooter>
+                            <Button colorScheme="red" onClick={confirmDeleteDocument}>
+                                Supprimer
+                            </Button>
+                            <Button onClick={cancelDeleteDocument} ml={3}>
+                                Annuler
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </Box>
     );
 };
