@@ -1,0 +1,62 @@
+import React, { useEffect, useState } from 'react';
+import { Alert, AlertIcon, Text, Spinner } from '@chakra-ui/react';
+import { supabase } from '../../../../supabaseClient';
+import { useEvent } from './../../../../EventContext';
+import { FcHome } from "react-icons/fc";
+
+const EventLocationComponent = () => {
+  const { selectedEventId } = useEvent();
+  const [eventLocation, setEventLocation] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (selectedEventId) {
+      setIsLoading(true);
+      setError(null);
+
+      // Fetch the specific event data from the Supabase table using the selected event ID
+      async function fetchEventLocation() {
+        try {
+          const { data, error } = await supabase
+            .from('vianney_event')
+            .select('event_location')
+            .eq('event_id', selectedEventId)
+            .single();
+
+          if (error) {
+            setError('Error fetching event location');
+          } else {
+            setEventLocation(data.event_location);
+          }
+        } catch (error) {
+          setError('Error fetching event location');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+
+      fetchEventLocation();
+    } else {
+      setEventLocation(null); // Clear the location if no event is selected
+    }
+  }, [selectedEventId]);
+
+  return (
+    <Alert status="info" variant="subtle" flexDirection="column" alignItems="center">
+      <AlertIcon as={FcHome} boxSize={8} />
+      <Text fontSize='xl' m={4}>
+        Lieu de l'événement :
+      </Text>
+      {isLoading ? (
+        <Spinner size="lg" />
+      ) : error ? (
+        <Text color="red.500">{error}</Text>
+      ) : (
+        <Text fontSize='lg'>{eventLocation}</Text>
+      )}
+    </Alert>
+  );
+};
+
+export default EventLocationComponent;
