@@ -32,7 +32,7 @@ function TopCreatorTable(props) {
       </Flex>
       <Flex
         direction='column'
-        overflowY={showAll ? 'scroll' : 'hidden'}
+
         maxH={showAll ? '300px' : 'auto'}>
         <EquipiersTable showAll={showAll} />
         <Button variant='action' onClick={handleToggleShowAll}>
