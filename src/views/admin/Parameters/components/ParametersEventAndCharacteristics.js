@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import { Box, Text, Button, useColorModeValue, ModalCloseButton, ModalHeader, ModalBody, ModalOverlay, Modal, ModalContent,} from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Box, Text, Button, useColorModeValue, ModalCloseButton, ModalHeader, ModalBody, ModalOverlay, Modal, ModalContent, } from '@chakra-ui/react';
 import { FcBusiness, FcCalendar, FcHome, FcList, FcVoicePresentation } from "react-icons/fc";
 import EventDateComponent from '../modal/EventDateComponent';
 import EventLocationComponent from '../modal/EventLocationComponent';
@@ -38,7 +38,7 @@ const ParametersEventAndCharacteristics = () => {
   return (
     <Box border='1px' borderColor='gray.200' p={5} m={5}>
       <Text fontSize='xl' m={4}>Caractéristiques de l'Événement</Text>
-      
+
       <Button
         leftIcon={<FcBusiness size='32px' color={brandColor} />}
         bg={buttonBg}
@@ -49,7 +49,7 @@ const ParametersEventAndCharacteristics = () => {
       >
         Nom de l'événement
       </Button>
-      
+
       <Button
         leftIcon={<FcCalendar size='32px' color={brandColor} />}
         bg={buttonBg}
@@ -101,7 +101,7 @@ const ParametersEventAndCharacteristics = () => {
           <ModalHeader>Nom de l'événement Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <EventNameComponent/>
+            <EventNameComponent />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -112,7 +112,7 @@ const ParametersEventAndCharacteristics = () => {
           <ModalHeader>Date de l'événement Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <EventDateComponent/>
+            <EventDateComponent />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -123,7 +123,7 @@ const ParametersEventAndCharacteristics = () => {
           <ModalHeader>Lieu de l'événement Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <EventLocationComponent/>
+            <EventLocationComponent />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -134,18 +134,17 @@ const ParametersEventAndCharacteristics = () => {
           <ModalHeader>Besoins Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <NotepadComponent/>
+            <NotepadComponent />
           </ModalBody>
         </ModalContent>
       </Modal>
-
-      <Modal isOpen={showEventMailingModal} onClose={closeEventMailingModal}>
+      <Modal isOpen={showEventMailingModal} onClose={closeEventMailingModal} size="full">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Mailing Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <TeamTable/>
+            <TeamTable />
           </ModalBody>
         </ModalContent>
       </Modal>
