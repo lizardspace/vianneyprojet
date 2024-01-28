@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Thead, Tbody, Tr, Th, Td, Box } from '@chakra-ui/react';
 import { supabase } from '../../../../supabaseClient'; // Import your Supabase configuration here
+import { useEvent } from './../../../../EventContext'; // Import the useEvent hook
 
 const TeamTable = () => {
+  const { selectedEventId } = useEvent(); // Get the selected event_id from the context
   const [teamsData, setTeamsData] = useState([]);
 
   useEffect(() => {
     async function fetchTeamsData() {
       const { data, error } = await supabase
         .from('vianney_teams')
-        .select('*'); // You can specify the columns you need here
+        .select('*')
+        .eq('event_id', selectedEventId); // Filter teams by event_id
 
       if (error) {
         console.error('Error fetching data:', error.message);
@@ -18,8 +21,10 @@ const TeamTable = () => {
       }
     }
 
-    fetchTeamsData();
-  }, []);
+    if (selectedEventId) {
+      fetchTeamsData();
+    }
+  }, [selectedEventId]);
 
   return (
     <Box p={4}>
