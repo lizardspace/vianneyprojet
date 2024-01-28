@@ -42,8 +42,14 @@ const EditUserForm = ({ teamData, onSave }) => {
     isLeader: false, // Added isLeader property
   }]);
   const handleFileChange = (e) => {
-    setProfilePhoto(e.target.files[0]);
+    const selectedFile = e.target.files[0];
+    console.log('Selected File:', selectedFile);
+  
+    if (selectedFile) {
+      setProfilePhoto(selectedFile);
+    }
   };
+  
 
   const handleTeamMemberChange = (index, event) => {
     let values = [...teamMembers];
@@ -132,7 +138,6 @@ const EditUserForm = ({ teamData, onSave }) => {
 
     onSave(updatedTeamData);
   };
-
   const handleSaveProfilePhoto = async () => {
     try {
       if (profilePhoto) {
@@ -144,7 +149,8 @@ const EditUserForm = ({ teamData, onSave }) => {
           .upload(`profile-photos/${fileName}`, profilePhoto);
   
         if (uploadError) {
-          throw uploadError;
+          console.error('Error uploading file:', uploadError);
+          // Handle the error appropriately (e.g., show an error message to the user)
         }
   
         const publicURL = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/users_on_the_ground/${fileName}`;
@@ -156,7 +162,8 @@ const EditUserForm = ({ teamData, onSave }) => {
           .eq('id', teamData.id);
   
         if (updateError) {
-          throw updateError;
+          console.error('Error updating profile photo URL in the database:', updateError);
+          // Handle the error appropriately (e.g., show an error message to the user)
         }
   
         // Update the profile photo URL in the state
@@ -167,12 +174,9 @@ const EditUserForm = ({ teamData, onSave }) => {
       }
     } catch (error) {
       console.error('Error handling profile photo:', error);
-      // Optionally, show an error message to the user
+      // Handle the error appropriately (e.g., show an error message to the user)
     }
   };
-  
-
-
   useEffect(() => {
     if (teamData) {
       setNameOfTheTeam(teamData.name_of_the_team || '');
