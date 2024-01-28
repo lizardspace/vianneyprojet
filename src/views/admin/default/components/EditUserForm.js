@@ -5,7 +5,6 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Avatar } from '@chakra-ui/react';
 
-
 import {
   FormControl,
   FormLabel,
@@ -15,7 +14,11 @@ import {
   VStack,
   HStack,
   Checkbox,
-  Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  CloseButton,
 } from '@chakra-ui/react';
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
@@ -23,7 +26,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const EditUserForm = ({ teamData, onSave }) => {
   const [nameOfTheTeam, setNameOfTheTeam] = useState('');
-  const [profilePhoto, setProfilePhoto] = useState(null);
+const [profilePhoto, setProfilePhoto] = useState(null);
   const [lat, setLat] = useState(45.75799485263588);
   const [lng, setLng] = useState(4.825754111294844);
   const [mission, setMission] = useState('');
@@ -34,12 +37,12 @@ const EditUserForm = ({ teamData, onSave }) => {
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
   const [isEditingProfilePhoto, setIsEditingProfilePhoto] = useState(false);
   const [teamMembers, setTeamMembers] = useState([{
-    id: uuidv4(), // Generate unique ID for the first team member
-    familyname: '',
-    firstname: '',
-    mail: '',
-    phone: '',
-    isLeader: false, // Added isLeader property
+      id: uuidv4(), // Generate unique ID for the first team member
+      familyname: '',
+      firstname: '',
+      mail: '',
+      phone: '',
+      isLeader: false, // Added isLeader property
   }]);
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -55,9 +58,7 @@ const EditUserForm = ({ teamData, onSave }) => {
     let values = [...teamMembers];
 
     if (event.target.name === 'isLeader') {
-      // Set all isLeader properties to false
-      values = values.map(member => ({ ...member, isLeader: false }));
-      // Set isLeader to true for the selected member
+      values = values.map((member) => ({ ...member, isLeader: false }));
       values[index][event.target.name] = event.target.checked;
     } else {
       values[index][event.target.name] = event.target.value;
@@ -65,8 +66,8 @@ const EditUserForm = ({ teamData, onSave }) => {
 
     setTeamMembers(values);
   };
+
   const handleModifyAndPushData = async () => {
-    // Prepare the updated data
     const updatedTeamData = {
       name_of_the_team: nameOfTheTeam,
       latitude: lat,
@@ -76,20 +77,19 @@ const EditUserForm = ({ teamData, onSave }) => {
       immatriculation: immatriculation,
       specialite: specialite,
       team_members: teamMembers,
+      photo_profile_url: profilePhotoUrl, // Include the profile photo URL here
     };
 
     try {
-      // Use Supabase client to update the data in the table
       const { data, error } = await supabase
         .from('vianney_teams')
         .update(updatedTeamData)
-        .eq('id', teamData.id); // Replace 'id' with the actual identifier for your team data
+        .eq('id', teamData.id);
 
       if (error) {
         console.error('Error updating data:', error);
       } else {
         console.log('Data updated successfully:', data);
-        // Show a success alert or perform any other actions if needed
         setShowSuccessAlert(true);
       }
     } catch (error) {
@@ -97,7 +97,7 @@ const EditUserForm = ({ teamData, onSave }) => {
     }
   };
 
-  const handleAddTeamMember = () => {
+const handleAddTeamMember = () => {
     setTeamMembers([...teamMembers, {
       id: uuidv4(), // Generate unique ID for new team member
       familyname: '',
@@ -195,33 +195,20 @@ const EditUserForm = ({ teamData, onSave }) => {
     <form onSubmit={handleSubmit}>
       <Box id="mapId" h="400px" w="100%">
         <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <LocationMarker />
         </MapContainer>
       </Box>
 
       <VStack spacing={4} align="stretch">
         <FormControl>
-          <FormLabel htmlFor='team-name'>Nom de l'équipe</FormLabel>
-          <Input id='team-name' type="text" placeholder="Nom de l'équipe" value={nameOfTheTeam} onChange={(e) => setNameOfTheTeam(e.target.value)} />
+          <FormLabel htmlFor="team-name">Nom de l'équipe</FormLabel>
+          <Input id="team-name" type="text" placeholder="Nom de l'équipe" value={nameOfTheTeam} onChange={(e) => setNameOfTheTeam(e.target.value)} />
         </FormControl>
 
         <FormControl>
-
-          {isEditingProfilePhoto ? (
-            <FormControl>
-              <FormLabel htmlFor='profile-photo'>Modifier la photo de profil</FormLabel>
-              <Input id='profile-photo' type="file" onChange={handleFileChange} />
-              <Button colorScheme="blue" onClick={handleSaveProfilePhoto}>Enregistrer la photo</Button>
-            </FormControl>
-          ) : (
-            <Box>
-              <Avatar src={profilePhotoUrl} size="xl" />
-              <Button colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>Changer la photo</Button>
-            </Box>
-          )}
+          <FormLabel htmlFor="photo-profile-url">Photo Profile URL</FormLabel>
+          <Input id="photo-profile-url" type="text" placeholder="Photo Profile URL" value={profilePhotoUrl} onChange={(e) => setProfilePhotoUrl(e.target.value)} />
         </FormControl>
         <FormControl>
           <FormLabel htmlFor='mission'>Mission</FormLabel>
@@ -251,7 +238,7 @@ const EditUserForm = ({ teamData, onSave }) => {
             onChange={(e) => setImmatriculation(e.target.value)}
           />
         </FormControl>
-
+                
         <FormControl>
           <FormLabel htmlFor='specialite'>Spécialité</FormLabel>
           <Input
@@ -301,6 +288,7 @@ const EditUserForm = ({ teamData, onSave }) => {
             </Checkbox>
           </HStack>
         ))}
+
         {showSuccessAlert && (
           <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mt={4}>
             <AlertIcon boxSize="40px" mr={0} />
@@ -308,7 +296,7 @@ const EditUserForm = ({ teamData, onSave }) => {
               Equipe modifiée avec succès
             </AlertTitle>
             <AlertDescription maxWidth="sm">
-              Les données ont été modifiée avec succès.
+              Les données ont été modifiées avec succès.
             </AlertDescription>
             <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowSuccessAlert(false)} />
           </Alert>
