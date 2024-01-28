@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Table,
+  Flex,
   Thead,
   Tbody,
   Tr,
@@ -49,7 +50,7 @@ const EquipiersTable = ({ showAll }) => {
     fontWeight: 'normal',
     color: useColorModeValue('gray.600', 'gray.200'),
   };
-const headerGradientStyle = {
+  const headerGradientStyle = {
     background: 'linear-gradient(to right, #6e8efb, #a777e3)',
     color: 'white',
     textTransform: 'none',
@@ -131,7 +132,19 @@ const headerGradientStyle = {
     if (!leader) {
       return 'No Leader';
     }
-    return `${leader.firstname} ${leader.familyname} - ${leader.phone}`;
+    return (
+      <Flex align="center">
+        {`${leader.firstname} ${leader.familyname}`}
+        {leader.phone && (
+          <Flex align="center" ml={2}>
+            <FcPhone />
+            <Text as="span" fontWeight="bold" ml={1}>
+              {leader.phone}
+            </Text>
+          </Flex>
+        )}
+      </Flex>
+    );
   };
 
   const createCustomIcon = (color = 'red') => {
@@ -168,17 +181,21 @@ const headerGradientStyle = {
 
     const teamMembersList = team_members?.map(member => (
       <li key={member.id}>
-        {`${member.firstname} ${member.familyname}`}
-        {member.phone ? (
-          <Text as="span" fontWeight="bold">
-            {" - "}
-            <FcPhone />
-            {` ${member.phone}`}
-          </Text>
-        ) : ''}
+        <Flex align="center">
+          {`${member.firstname} ${member.familyname}`}
+          {member.phone && (
+            <Flex align="center" ml={2}>
+              <FcPhone />
+              <Text as="span" fontWeight="bold" ml={1}>
+                {member.phone}
+              </Text>
+            </Flex>
+          )}
+        </Flex>
       </li>
     ));
-    
+
+
 
     return (
       <Stack spacing={4} p={5} align="start">
