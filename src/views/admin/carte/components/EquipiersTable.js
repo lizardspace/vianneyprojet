@@ -22,6 +22,7 @@ import {
   Image,
   Badge,
 } from '@chakra-ui/react';
+import { FcPhone } from "react-icons/fc";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { createClient } from '@supabase/supabase-js';
@@ -167,9 +168,17 @@ const headerGradientStyle = {
 
     const teamMembersList = team_members?.map(member => (
       <li key={member.id}>
-        {`${member.firstname} ${member.familyname}`} {member.phone ? ` - ${member.phone}` : ''}
+        {`${member.firstname} ${member.familyname}`}
+        {member.phone ? (
+          <Text as="span" fontWeight="bold">
+            {" - "}
+            <FcPhone />
+            {` ${member.phone}`}
+          </Text>
+        ) : ''}
       </li>
     ));
+    
 
     return (
       <Stack spacing={4} p={5} align="start">
