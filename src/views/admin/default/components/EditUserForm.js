@@ -144,7 +144,7 @@ const EditUserForm = ({ teamData, onSave }) => {
         const formData = new FormData();
         formData.append('file', profilePhoto);
         const fileName = `${teamData.id}-${profilePhoto.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('users_on_the_ground')
           .upload(fileName, profilePhoto); // Remove 'profile-photos/' from the path
   
@@ -156,7 +156,7 @@ const EditUserForm = ({ teamData, onSave }) => {
         const publicURL = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/users_on_the_ground/${fileName}`;
   
         // Update the profile photo URL in the database
-        const { data: updateData, error: updateError } = await supabase
+        const { error: updateError } = await supabase
           .from('vianney_teams')
           .update({ photo_profile_url: publicURL })
           .eq('id', teamData.id);
@@ -329,7 +329,7 @@ const EditUserForm = ({ teamData, onSave }) => {
         )}
         <Button colorScheme="blue" onClick={handleAddTeamMember}>Ajouter un membre de l'équipe</Button>
       </VStack>
-      <Button colorScheme="blue" onClick={handleModifyAndPushData}>Modify and Push Data</Button>
+      <Button mt="10px" colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
     </form>
   );
 };
