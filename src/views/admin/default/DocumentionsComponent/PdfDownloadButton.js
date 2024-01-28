@@ -132,6 +132,8 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
                                 e.stopPropagation(); // Prevent card click event propagation
                                 handleDeleteDocument(data.id);
                             }}
+                            borderRadius="full" // Make the button circular
+                            boxSize="30px" // Set the button size
                         />
                     </Card>
                 ))}
