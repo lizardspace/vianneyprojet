@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
   Box, Text, Flex, Card, useColorModeValue, Select, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack
 } from '@chakra-ui/react';
 import { FcPlus } from "react-icons/fc";
@@ -13,7 +14,6 @@ import './CalendarStyles.css';
 import Menu from "components/menu/MainMenuTeamTimeline";
 import AddActionForm from './AddActionForm';
 import Timeline from 'react-calendar-timeline';
-
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
@@ -39,6 +39,9 @@ function TeamTimeline() {
   const [timelineView, setTimelineView] = useState('day');
   const timelineMaxWidth = '800px';
   const [enableScroll, setEnableScroll] = useState(false);
+  const [isAddActionModalOpen, setIsAddActionModalOpen] = useState(false);
+  const onOpenAddActionModal = () => setIsAddActionModalOpen(true);
+  const onCloseAddActionModal = () => setIsAddActionModalOpen(false);
   const handleMoveBackward = () => {
     const moveBy = visibleTimeEnd - visibleTimeStart;
     setVisibleTimeStart(visibleTimeStart - moveBy);
@@ -111,13 +114,13 @@ function TeamTimeline() {
         if (teamsError) throw teamsError;
 
         let { data: eventsData, error: eventsError } = await supabase.from('vianney_actions').select(`
-          id,
-          team_to_which_its_attached,
-          starting_date,
-          ending_date,
-          action_name,
-          color: team_to_which_its_attached (color)
-        `);
+        id,
+        team_to_which_its_attached,
+        starting_date,
+        ending_date,
+        action_name,
+        color: team_to_which_its_attached (color)
+      `);
         if (eventsError) throw eventsError;
 
         setTeams(teamsData);
@@ -206,18 +209,6 @@ function TeamTimeline() {
     }
     onClose();
   };
-
-  const handleAddActionClick = () => {
-    toast({
-      title: "Ajouter une action",
-      description: <AddActionForm />,
-      status: "info",
-      duration: null, // The toast will stay until manually closed
-      isClosable: true,
-      position: "top", // Center the toast at the top of the screen
-    });
-  };
-
   const updateEvent = async () => {
     // Validation can be added here for updated event details
     const { error } = await supabase
@@ -294,6 +285,7 @@ function TeamTimeline() {
     fetchData();
   }, []);
 
+
   return (
     <Card
       direction='column'
@@ -314,7 +306,7 @@ function TeamTimeline() {
               <Menu onAllowScrollingToggle={() => setEnableScroll(!enableScroll)} />
               <Tooltip label="Cliquer pour ajouter une action" hasArrow>
                 <Box position='absolute' top='15px' right='15px' cursor='pointer'>
-                  <FcPlus size="24px" onClick={handleAddActionClick} />
+                  <FcPlus size="24px" onClick={onOpenAddActionModal} />
                 </Box>
               </Tooltip>
             </Flex>
@@ -370,6 +362,18 @@ function TeamTimeline() {
               />
             </Box>
           </Box>
+          {/* Add Action Modal */}
+          <Modal isOpen={isAddActionModalOpen} onClose={onCloseAddActionModal}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Ajouter une action</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <AddActionForm />
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+
           <AlertDialog
             isOpen={isAlertOpen}
             leastDestructiveRef={cancelRef}
