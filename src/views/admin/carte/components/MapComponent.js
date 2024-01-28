@@ -60,8 +60,8 @@ const MapComponent = () => {
           // Updated HTML content for the popup
           const popupContent = `
             <div>
-              <strong>${user.first_name} ${user.family_name}</strong>
-              ${user.photo_profile_url ? `<br/><img src="${user.photo_profile_url}" alt="${user.first_name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-top: 5px;"/>` : ''}
+              <strong>${user.name_of_the_team}</strong>
+              ${user.photo_profile_url ? `<br/><img src="${user.photo_profile_url}" alt="${user.name_of_the_team}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-top: 5px;"/>` : ''}
             </div>
           `;
 
