@@ -28,7 +28,7 @@ const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const EditUserForm = ({ teamData, onSave, onClose }) => {
+const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
   const [nameOfTheTeam, setNameOfTheTeam] = useState('');
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [lat, setLat] = useState(45.75799485263588);
@@ -40,6 +40,7 @@ const EditUserForm = ({ teamData, onSave, onClose }) => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
   const [isEditingProfilePhoto, setIsEditingProfilePhoto] = useState(false);
+  const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false);
   const [teamMembers, setTeamMembers] = useState([{
     id: uuidv4(), // Generate unique ID for the first team member
     familyname: '',
@@ -190,6 +191,24 @@ const EditUserForm = ({ teamData, onSave, onClose }) => {
       setTeamMembers(teamData.team_members || []);
     }
   }, [teamData]);
+  const handleDeleteTeam = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('vianney_teams')
+        .delete()
+        .eq('id', teamData.id);
+
+      if (error) {
+        console.error('Error deleting team:', error);
+      } else {
+        console.log('Team deleted successfully:', data);
+        setShowDeleteSuccessAlert(true); // Show the success alert
+        onDelete(); // Trigger the onDelete callback to handle closing the modal and other actions
+      }
+    } catch (error) {
+      console.error('Error deleting team:', error);
+    }
+  };
 
   return (
     <ModalContent>
@@ -334,10 +353,17 @@ const EditUserForm = ({ teamData, onSave, onClose }) => {
           </VStack>
           
         </form>
+        {showDeleteSuccessAlert && (
+          <Alert status="success" mt={4}>
+            <AlertIcon />
+            Equipe supprimée avec succès
+          </Alert>
+        )}
       </ModalBody>
       <ModalFooter>
-        <Button colorScheme="blue" onClick={onClose}>Fermer</Button>
-        <Button colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
+      <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
+        <Button mr={1} colorScheme="blue" onClick={onClose}>Fermer</Button>
+        <Button mr={1} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
       </ModalFooter>
     </ModalContent>
   );
