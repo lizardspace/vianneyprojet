@@ -17,6 +17,7 @@ import {
     AlertDialogHeader,
     AlertDialogContent,
     AlertDialogOverlay,
+    Tooltip,
 } from "@chakra-ui/react";
 import { FcDocument } from "react-icons/fc";
 import { FaTrash } from "react-icons/fa";
@@ -124,17 +125,19 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
                                 </StatLabel>
                             </Stat>
                         </Flex>
-                        <IconButton
-                            icon={<FaTrash />}
-                            colorScheme="red"
-                            size="sm"
-                            onClick={(e) => {
-                                e.stopPropagation(); // Prevent card click event propagation
-                                handleDeleteDocument(data.id);
-                            }}
-                            borderRadius="full" // Make the button circular
-                            boxSize="30px" // Set the button size
-                        />
+                        <Tooltip label="Supprimer" hasArrow placement="top">
+                            <IconButton
+                                icon={<FaTrash />}
+                                colorScheme="red"
+                                size="sm"
+                                onClick={(e) => {
+                                    e.stopPropagation(); // Prevent card click event propagation
+                                    handleDeleteDocument(data.id);
+                                }}
+                                borderRadius="full" // Make the button circular
+                                boxSize="30px" // Set the button size
+                            />
+                        </Tooltip>
                     </Card>
                 ))}
                 <Button
