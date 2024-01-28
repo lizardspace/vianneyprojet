@@ -96,7 +96,10 @@ const NotepadComponent = () => {
               <IconButton
                 icon={<AddIcon />}
                 variant="outline"
-                onClick={() => setIsEditing(true)}
+                onClick={() => {
+                  setNote(savedNote); // Set the note to the savedNote when entering edit mode
+                  setIsEditing(true);
+                }}
               />
             </Tooltip>
           )}
