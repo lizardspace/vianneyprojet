@@ -18,12 +18,17 @@ import {
   AlertDescription,
   CloseButton,
   Avatar,
+  ModalFooter,
+  ModalContent,
+  ModalBody,
+  ModalHeader,
+  ModalCloseButton,
 } from '@chakra-ui/react';
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const EditUserForm = ({ teamData, onSave }) => {
+const EditUserForm = ({ teamData, onSave, onClose }) => {
   const [nameOfTheTeam, setNameOfTheTeam] = useState('');
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [lat, setLat] = useState(45.75799485263588);
@@ -35,7 +40,6 @@ const EditUserForm = ({ teamData, onSave }) => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
   const [isEditingProfilePhoto, setIsEditingProfilePhoto] = useState(false);
-const [ setIsModalOpen] = useState(true);
   const [teamMembers, setTeamMembers] = useState([{
     id: uuidv4(), // Generate unique ID for the first team member
     familyname: '',
@@ -188,9 +192,11 @@ const [ setIsModalOpen] = useState(true);
   }, [teamData]);
 
   return (
-
-
-        <form onSubmit={handleSubmit}>
+    <ModalContent>
+      <ModalHeader>Modifier l'équipe</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>
+      <form onSubmit={handleSubmit}>
           <Box id="mapId" h="400px" w="100%">
             <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -326,11 +332,15 @@ const [ setIsModalOpen] = useState(true);
             )}
             <Button colorScheme="blue" onClick={handleAddTeamMember}>Ajouter un membre de l'équipe</Button>
           </VStack>
-          <HStack justifyContent="flex-end">
-            <Button mt={4} colorScheme="red" onClick={() => setIsModalOpen(false)}>Fermer</Button>
-            <Button mt={2} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
-          </HStack>
+          
         </form>
+      </ModalBody>
+      <ModalFooter>
+        <Button colorScheme="blue" onClick={onClose}>Fermer</Button>
+        <Button colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
+      </ModalFooter>
+    </ModalContent>
   );
-}
+};
+
 export default EditUserForm;

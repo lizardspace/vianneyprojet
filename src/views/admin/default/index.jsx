@@ -206,18 +206,11 @@ export default function UserReports() {
         </Modal>
       )}
       {editingTeam && (
-        <Modal isOpen={showEditUserFormModal} onClose={() => setShowEditUserFormModal(false)}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Modifier l'équipe</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} />
-            </ModalBody>
-            {/* ... */}
-          </ModalContent>
-        </Modal>
-      )}
+  <Modal isOpen={showEditUserFormModal} onClose={() => setShowEditUserFormModal(false)}>
+    <ModalOverlay />
+    <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} onClose={() => setShowEditUserFormModal(false)} />
+  </Modal>
+)}
       <DocumentationsComponent />
       <Heading me='auto'
         color={textColor}
