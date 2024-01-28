@@ -5,6 +5,7 @@ import { FcAdvertising, FcGlobe, FcBusinessman, FcDepartment, FcCalendar } from 
 import MapComponent from "views/admin/carte/components/MapComponent";
 import EquipiersTable from 'views/admin/carte/components/EquipiersTable';
 import TeamScheduleByMySelf from '../../TableauDeBord/components/TeamScheduleMadeMySelf'
+import SalleDeCrise from '../modal/SalleDeCrise';
 
 const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
   const brandColor = useColorModeValue("brand.500", "white");
@@ -114,7 +115,7 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
           <ModalHeader>Salle de crise Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* Add your content for the Salle de crise modal here */}
+            <SalleDeCrise/>
           </ModalBody>
         </ModalContent>
       </Modal>
