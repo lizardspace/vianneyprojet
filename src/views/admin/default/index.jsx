@@ -209,7 +209,7 @@ export default function UserReports() {
         <Modal isOpen={showEditUserFormModal} onClose={() => setShowEditUserFormModal(false)}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Edit Team</ModalHeader>
+            <ModalHeader>Modifier l'équipe</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} />
