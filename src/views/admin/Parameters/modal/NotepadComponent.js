@@ -33,9 +33,9 @@ const NotepadComponent = () => {
         .single();
 
       if (error) {
-        console.error('Error fetching saved note:', error.message);
+        console.error('Erreur lors de la récupération de la note enregistrée :', error.message);
       } else {
-        setSavedNote(data ? data.text : ''); // Set savedNote with existing note or empty string
+        setSavedNote(data ? data.text : ''); // Définir savedNote avec la note existante ou une chaîne vide
       }
     }
 
@@ -43,16 +43,16 @@ const NotepadComponent = () => {
   }, [selectedEventId]); // Re-fetch note when event_id changes
 
   const handleSaveNote = async () => {
-    // Update the note in the vianney_textarea table with the event_id
+    // Mettre à jour la note dans la table vianney_textarea avec event_id
     const { error } = await supabase
       .from('vianney_textarea')
       .upsert([{ text: note, event_id: selectedEventId }], { onConflict: ['event_id'] });
 
     if (error) {
-      console.error('Error saving note:', error.message);
+      console.error('Erreur lors de l\'enregistrement de la note :', error.message);
       toast({
-        title: 'Error',
-        description: 'Failed to save the note.',
+        title: 'Erreur',
+        description: 'Échec de l\'enregistrement de la note.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -61,7 +61,7 @@ const NotepadComponent = () => {
       setSavedNote(note);
       setIsEditing(false);
       toast({
-        title: 'Note Saved',
+        title: 'Note enregistrée',
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -73,7 +73,7 @@ const NotepadComponent = () => {
     <Box p={4} borderWidth={1} borderRadius="md">
       <VStack align="stretch">
         <Textarea
-          value={isEditing ? note : savedNote} // Show note or savedNote based on editing mode
+          value={isEditing ? note : savedNote} // Afficher la note ou savedNote en fonction du mode édition
           onChange={(e) => setNote(e.target.value)}
           isReadOnly={!isEditing}
           resize="vertical"
@@ -87,23 +87,23 @@ const NotepadComponent = () => {
                 leftIcon={<DownloadIcon />}
                 onClick={handleSaveNote}
               >
-                Save
+                Enregistrer
               </Button>
               <Spacer />
             </>
           ) : (
-            <Tooltip label="Edit">
+            <Tooltip label="Éditer">
               <IconButton
                 icon={<AddIcon />}
                 variant="outline"
                 onClick={() => {
-                  setNote(savedNote); // Set the note to the savedNote when entering edit mode
+                  setNote(savedNote); // Définir la note à savedNote lorsque vous entrez en mode édition
                   setIsEditing(true);
                 }}
               />
             </Tooltip>
           )}
-          <Tooltip label="Delete Saved Note">
+          <Tooltip label="Supprimer la note enregistrée">
             <IconButton
               icon={<DeleteIcon />}
               variant="outline"
@@ -112,12 +112,12 @@ const NotepadComponent = () => {
                 const { error } = await supabase
                   .from('vianney_textarea')
                   .delete()
-                  .eq('event_id', selectedEventId); // Delete note based on event_id
+                  .eq('event_id', selectedEventId); // Supprimer la note en fonction de l'event_id
                 if (error) {
-                  console.error('Error deleting saved note:', error.message);
+                  console.error('Erreur lors de la suppression de la note enregistrée :', error.message);
                   toast({
-                    title: 'Error',
-                    description: 'Failed to delete the saved note.',
+                    title: 'Erreur',
+                    description: 'Échec de la suppression de la note enregistrée.',
                     status: 'error',
                     duration: 3000,
                     isClosable: true,
@@ -125,7 +125,7 @@ const NotepadComponent = () => {
                 } else {
                   setSavedNote('');
                   toast({
-                    title: 'Note Deleted',
+                    title: 'Note supprimée',
                     status: 'success',
                     duration: 3000,
                     isClosable: true,
@@ -138,11 +138,11 @@ const NotepadComponent = () => {
       </VStack>
       {isEditing ? (
         <Text fontSize="sm" mt={2} color="gray.500">
-          You are currently editing the note.
+          Vous êtes en train de modifier la note.
         </Text>
       ) : (
         <Text fontSize="sm" mt={2} color="gray.500">
-          Saved Note:
+          Note enregistrée :
         </Text>
       )}
       <Textarea
