@@ -319,10 +319,10 @@ const EditUserForm = ({ teamData, onSave }) => {
           <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mt={4}>
             <AlertIcon boxSize="40px" mr={0} />
             <AlertTitle mt={4} mb={1} fontSize="lg">
-              Equipe modifiée avec succès
+              Equipe modifiée avec succès. 
             </AlertTitle>
             <AlertDescription maxWidth="sm">
-              Les données ont été modifiées avec succès.
+            ⚠️ Penser à recharger la page
             </AlertDescription>
             <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowSuccessAlert(false)} />
           </Alert>
