@@ -26,7 +26,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const EditUserForm = ({ teamData, onSave }) => {
   const [nameOfTheTeam, setNameOfTheTeam] = useState('');
-const [profilePhoto, setProfilePhoto] = useState(null);
+  const [profilePhoto, setProfilePhoto] = useState(null);
   const [lat, setLat] = useState(45.75799485263588);
   const [lng, setLng] = useState(4.825754111294844);
   const [mission, setMission] = useState('');
@@ -37,22 +37,22 @@ const [profilePhoto, setProfilePhoto] = useState(null);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
   const [isEditingProfilePhoto, setIsEditingProfilePhoto] = useState(false);
   const [teamMembers, setTeamMembers] = useState([{
-      id: uuidv4(), // Generate unique ID for the first team member
-      familyname: '',
-      firstname: '',
-      mail: '',
-      phone: '',
-      isLeader: false, // Added isLeader property
+    id: uuidv4(), // Generate unique ID for the first team member
+    familyname: '',
+    firstname: '',
+    mail: '',
+    phone: '',
+    isLeader: false, // Added isLeader property
   }]);
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     console.log('Selected File:', selectedFile);
-  
+
     if (selectedFile) {
       setProfilePhoto(selectedFile);
     }
   };
-  
+
 
   const handleTeamMemberChange = (index, event) => {
     let values = [...teamMembers];
@@ -97,7 +97,7 @@ const [profilePhoto, setProfilePhoto] = useState(null);
     }
   };
 
-const handleAddTeamMember = () => {
+  const handleAddTeamMember = () => {
     setTeamMembers([...teamMembers, {
       id: uuidv4(), // Generate unique ID for new team member
       familyname: '',
@@ -147,25 +147,25 @@ const handleAddTeamMember = () => {
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('users_on_the_ground')
           .upload(`profile-photos/${fileName}`, profilePhoto);
-  
+
         if (uploadError) {
           console.error('Error uploading file:', uploadError);
           // Handle the error appropriately (e.g., show an error message to the user)
         }
-  
+
         const publicURL = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/users_on_the_ground/${fileName}`;
-  
+
         // Update the profile photo URL in the database
         const { data: updateData, error: updateError } = await supabase
           .from('vianney_teams')
           .update({ photo_profile_url: publicURL })
           .eq('id', teamData.id);
-  
+
         if (updateError) {
           console.error('Error updating profile photo URL in the database:', updateError);
           // Handle the error appropriately (e.g., show an error message to the user)
         }
-  
+
         // Update the profile photo URL in the state
         setProfilePhotoUrl(publicURL);
         setIsEditingProfilePhoto(false);
@@ -210,6 +210,21 @@ const handleAddTeamMember = () => {
           <FormLabel htmlFor="photo-profile-url">Photo Profile URL</FormLabel>
           <Input id="photo-profile-url" type="text" placeholder="Photo Profile URL" value={profilePhotoUrl} onChange={(e) => setProfilePhotoUrl(e.target.value)} />
         </FormControl>
+
+        {/* Display the Avatar with the profile photo URL */}
+        {profilePhotoUrl && (
+          <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />
+        )}
+
+        <FormControl>
+          <FormLabel htmlFor='mission'>Mission</FormLabel>
+          <Input
+            id='mission'
+            type="text"
+            value={mission}
+            onChange={(e) => setMission(e.target.value)}
+          />
+        </FormControl>
         <FormControl>
           <FormLabel htmlFor='mission'>Mission</FormLabel>
           <Input
@@ -238,7 +253,7 @@ const handleAddTeamMember = () => {
             onChange={(e) => setImmatriculation(e.target.value)}
           />
         </FormControl>
-                
+
         <FormControl>
           <FormLabel htmlFor='specialite'>Spécialité</FormLabel>
           <Input
