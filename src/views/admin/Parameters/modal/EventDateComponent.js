@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, AlertIcon, Box, Text, Spinner } from '@chakra-ui/react';
+import { Alert, AlertIcon, Text, Spinner } from '@chakra-ui/react';
 import { supabase } from '../../../../supabaseClient';
 import { useEvent } from './../../../../EventContext';
 import { FcCalendar } from "react-icons/fc";
