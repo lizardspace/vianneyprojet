@@ -9,6 +9,8 @@ import {
   Box,
   Collapse,
   IconButton,
+  Textarea,
+  Button,
 } from '@chakra-ui/react';
 import { supabase } from '../../../../supabaseClient'; // Import your Supabase configuration here
 import { useEvent } from './../../../../EventContext'; // Import the useEvent hook
@@ -18,6 +20,7 @@ const TeamTable = () => {
   const { selectedEventId } = useEvent(); // Get the selected event_id from the context
   const [teamsData, setTeamsData] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
+  const [emailList, setEmailList] = useState('');
 
   useEffect(() => {
     async function fetchTeamsData() {
@@ -45,6 +48,16 @@ const TeamTable = () => {
       setExpandedRow(rowId);
     }
   };
+
+  useEffect(() => {
+    // Generate the email list based on the data in teamsData
+    const emails = teamsData.reduce((acc, team) => {
+      const teamEmails = team.team_members.map((member) => member.mail);
+      return acc.concat(teamEmails);
+    }, []);
+
+    setEmailList(emails.join('\n')); // Join emails with newline character
+  }, [teamsData]);
 
   return (
     <Box p={4}>
@@ -106,6 +119,24 @@ const TeamTable = () => {
           ))}
         </Tbody>
       </Table>
+      <Textarea
+        value={emailList}
+        readOnly
+        mt={4}
+        placeholder="Email List"
+        size="sm"
+        rows={4}
+      />
+      <Button
+        mt={2}
+        colorScheme="teal"
+        onClick={() => {
+          // Implement your logic to copy the email list here
+          navigator.clipboard.writeText(emailList);
+        }}
+      >
+        Copy Email List
+      </Button>
     </Box>
   );
 };
