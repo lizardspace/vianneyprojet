@@ -146,26 +146,26 @@ const EditUserForm = ({ teamData, onSave }) => {
         const fileName = `${teamData.id}-${profilePhoto.name}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('users_on_the_ground')
-          .upload(`profile-photos/${fileName}`, profilePhoto);
-
+          .upload(fileName, profilePhoto); // Remove 'profile-photos/' from the path
+  
         if (uploadError) {
           console.error('Error uploading file:', uploadError);
           // Handle the error appropriately (e.g., show an error message to the user)
         }
-
+  
         const publicURL = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/users_on_the_ground/${fileName}`;
-
+  
         // Update the profile photo URL in the database
         const { data: updateData, error: updateError } = await supabase
           .from('vianney_teams')
           .update({ photo_profile_url: publicURL })
           .eq('id', teamData.id);
-
+  
         if (updateError) {
           console.error('Error updating profile photo URL in the database:', updateError);
           // Handle the error appropriately (e.g., show an error message to the user)
         }
-
+  
         // Update the profile photo URL in the state
         setProfilePhotoUrl(publicURL);
         setIsEditingProfilePhoto(false);
@@ -177,6 +177,7 @@ const EditUserForm = ({ teamData, onSave }) => {
       // Handle the error appropriately (e.g., show an error message to the user)
     }
   };
+  
   useEffect(() => {
     if (teamData) {
       setNameOfTheTeam(teamData.name_of_the_team || '');
@@ -210,10 +211,20 @@ const EditUserForm = ({ teamData, onSave }) => {
           <FormLabel htmlFor="photo-profile-url">Photo Profile URL</FormLabel>
           <Input id="photo-profile-url" type="text" placeholder="Photo Profile URL" value={profilePhotoUrl} onChange={(e) => setProfilePhotoUrl(e.target.value)} />
         </FormControl>
-
-        {/* Display the Avatar with the profile photo URL */}
         {profilePhotoUrl && (
-          <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />
+          <Box>
+            <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />
+            <Button colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>Changer la photo</Button>
+          </Box>
+        )}
+
+        {/* Input for selecting a new profile photo */}
+        {isEditingProfilePhoto && (
+          <FormControl>
+            <FormLabel htmlFor='new-profile-photo'>Nouvelle Photo de Profil</FormLabel>
+            <Input id='new-profile-photo' type="file" onChange={handleFileChange} />
+            <Button colorScheme="blue" onClick={handleSaveProfilePhoto}>Enregistrer la nouvelle photo</Button>
+          </FormControl>
         )}
 
         <FormControl>
