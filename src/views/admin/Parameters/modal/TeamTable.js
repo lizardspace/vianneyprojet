@@ -9,7 +9,6 @@ import {
   Box,
   Collapse,
   IconButton,
-  Text,
 } from '@chakra-ui/react';
 import { supabase } from '../../../../supabaseClient'; // Import your Supabase configuration here
 import { useEvent } from './../../../../EventContext'; // Import the useEvent hook
@@ -86,6 +85,8 @@ const TeamTable = () => {
                       <Th>Mail</Th>
                       <Th>Phone</Th>
                       <Th>Is Leader</Th>
+                      <Th>Firstname</Th>
+                      <Th>Familyname</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -94,6 +95,8 @@ const TeamTable = () => {
                         <Td>{member.mail}</Td>
                         <Td>{member.phone}</Td>
                         <Td>{member.isLeader ? 'Yes' : 'No'}</Td>
+                        <Td>{member.firstname}</Td>
+                        <Td>{member.familyname}</Td>
                       </Tr>
                     ))}
                   </Tbody>
