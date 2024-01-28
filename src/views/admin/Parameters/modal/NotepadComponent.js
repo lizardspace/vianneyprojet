@@ -35,7 +35,7 @@ const NotepadComponent = () => {
       if (error) {
         console.error('Error fetching saved note:', error.message);
       } else {
-        setSavedNote(data ? data.text : '');
+        setSavedNote(data ? data.text : ''); // Set savedNote with existing note or empty string
       }
     }
 
@@ -73,7 +73,7 @@ const NotepadComponent = () => {
     <Box p={4} borderWidth={1} borderRadius="md">
       <VStack align="stretch">
         <Textarea
-          value={note}
+          value={isEditing ? note : savedNote} // Show note or savedNote based on editing mode
           onChange={(e) => setNote(e.target.value)}
           isReadOnly={!isEditing}
           resize="vertical"
