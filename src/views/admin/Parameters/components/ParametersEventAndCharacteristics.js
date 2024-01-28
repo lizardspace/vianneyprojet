@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import { Box, Text, Button, useColorModeValue, ModalCloseButton, ModalHeader, ModalBody, ModalOverlay, Modal, ModalContent,} from '@chakra-ui/react';
 import { FcBusiness, FcCalendar, FcHome, FcList, FcVoicePresentation } from "react-icons/fc";
+import EventDateComponent from '../modal/EventDateComponent'
 
 const ParametersEventAndCharacteristics = () => {
   const brandColor = useColorModeValue("brand.500", "white");
@@ -106,7 +107,7 @@ const ParametersEventAndCharacteristics = () => {
           <ModalHeader>Date de l'événement Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* Add your content for the Date de l'événement modal here */}
+            <EventDateComponent/>
           </ModalBody>
         </ModalContent>
       </Modal>
