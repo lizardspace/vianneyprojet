@@ -38,6 +38,22 @@ const ContactInfoForm = () => {
           <FormLabel>Email Address</FormLabel>
           <Input type="email" placeholder="Your Email Address" />
         </FormControl>
+        <FormControl id="phone" isRequired>
+          <FormLabel>Phone Number</FormLabel>
+          <Input type="tel" placeholder="Your Phone Number" />
+        </FormControl>
+        <FormControl id="street" isRequired>
+          <FormLabel>Street</FormLabel>
+          <Input type="text" placeholder="Street Address" />
+        </FormControl>
+        <FormControl id="zip" isRequired>
+          <FormLabel>Zip Code</FormLabel>
+          <Input type="text" placeholder="Zip Code" />
+        </FormControl>
+        <FormControl id="city" isRequired>
+          <FormLabel>City</FormLabel>
+          <Input type="text" placeholder="City" />
+        </FormControl>
         <FormControl id="message" isRequired>
           <FormLabel>Message</FormLabel>
           <Textarea
