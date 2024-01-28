@@ -38,7 +38,7 @@ const TeamTable = () => {
                 <ul>
                   {team.team_members.map((member, index) => (
                     <li key={index}>
-                      {`${member.firstname} ${member.familyname}`}
+                      {`${member.firstname} ${member.familyname}, ${member.mail}, ${member.phone}, isLeader: ${member.isLeader ? 'Yes' : 'No'}`}
                     </li>
                   ))}
                 </ul>
