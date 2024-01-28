@@ -4,7 +4,7 @@ import { FcBusiness, FcCalendar, FcHome, FcList, FcVoicePresentation } from "rea
 import EventDateComponent from '../modal/EventDateComponent';
 import EventLocationComponent from '../modal/EventLocationComponent';
 import EventNameComponent from '../modal/EventNameComponent';
-
+import NotepadComponent from '../modal/NotepadComponent';
 
 
 const ParametersEventAndCharacteristics = () => {
@@ -133,7 +133,7 @@ const ParametersEventAndCharacteristics = () => {
           <ModalHeader>Besoins Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* Add your content for the Besoins modal here */}
+            <NotepadComponent/>
           </ModalBody>
         </ModalContent>
       </Modal>
