@@ -12,7 +12,6 @@ import MapComponent from "views/admin/carte/components/MapComponent";
 import TableTopCreators from "views/admin/carte/components/TableTopCreators";
 import NFT from "components/card/NFT";
 import Card from "components/card/Card.js";
-
 import tableDataTopCreators from "views/admin/carte/variables/tableDataTopCreators.json";
 import { tableColumnsTopCreators } from "views/admin/carte/variables/tableColumnsTopCreators";
 import CameraForm from "./components/CameraForm";
@@ -104,7 +103,6 @@ export default function Marketplace() {
                 Les vidéos en direct de l'évênement
               </Text>
             </Flex>
-
             <SimpleGrid columns={{ base: 1, md: 3 }} gap='20px'>
               {cameras?.map(camera => (
                 <NFT
@@ -115,9 +113,7 @@ export default function Marketplace() {
                   last_active={camera.last_active}
                   latitude={camera.latitude}
                   longitude={camera.longitude}
-                // include other properties from camera if your NFT component uses them
                 />
-
               ))}
             </SimpleGrid>
           </Flex>
@@ -152,10 +148,8 @@ export default function Marketplace() {
           <Box maxWidth={maxWidth}>
             <Card px='0px' mb='20px'>
               <TeamScheduleMadeMySelf />
-
             </Card>
           </Box>
-
         </Flex>
       </Grid>
     </Box >

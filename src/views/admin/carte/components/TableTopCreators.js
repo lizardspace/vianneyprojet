@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   Button,
   Flex,
-  Text,
+  Heading,
   useColorModeValue,
 } from "@chakra-ui/react";
 import EquipiersTable from "./EquipiersTable";
@@ -29,9 +29,14 @@ function TopCreatorTable(props) {
           pb='20px'
           mb='10px'
           boxShadow='0px 40px 58px -20px rgba(112, 144, 176, 0.26)'>
-          <Text color={textColor} fontSize='xl' fontWeight='600'>
-            Les équipiers en interventions
-          </Text>
+          <Heading me='auto'
+            color={textColor}
+            fontSize='2xl'
+            fontWeight='700'
+            lineHeight='100%'
+            mb="20px">
+            Les équipiers en intervention
+          </Heading>
           <Button variant='action' onClick={handleToggleShowAll}>
             {showAll ? 'Voir moins' : 'Les voir tous'}
           </Button>

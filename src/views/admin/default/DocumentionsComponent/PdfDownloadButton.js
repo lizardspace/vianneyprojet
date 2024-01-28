@@ -97,7 +97,7 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
                 fontWeight='700'
                 lineHeight='100%'
                 mb="20px">
-                Document de base
+                Documents
             </Heading>
             <SimpleGrid
                 columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}

@@ -23,6 +23,9 @@ import { createClient } from '@supabase/supabase-js'
 import AddEventForm from "./components/AddEventForm";
 import EditEventForm from "./components/EditEventForm";
 import DocumentationsComponent from "./DocumentionsComponent/DocumentationsComponent";
+import TableTopCreators from "../carte/components/TableTopCreators";
+import tableDataTopCreators from "views/admin/carte/variables/tableDataTopCreators.json";
+import { tableColumnsTopCreators } from "views/admin/carte/variables/tableColumnsTopCreators";
 
 // Import the Userform component
 import Userform from '../carte/components/UserForm.js';
@@ -69,7 +72,7 @@ export default function UserReports() {
       const { data: vianney_teams, error } = await supabase
         .from('vianney_teams')
         .select('*');
-  
+
       if (error) {
         console.log('Error fetching teams:', error);
       } else {
@@ -206,12 +209,16 @@ export default function UserReports() {
         </Modal>
       )}
       {editingTeam && (
-  <Modal isOpen={showEditUserFormModal} onClose={() => setShowEditUserFormModal(false)}>
-    <ModalOverlay />
-    <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} onClose={() => setShowEditUserFormModal(false)} />
-  </Modal>
-)}
+        <Modal isOpen={showEditUserFormModal} onClose={() => setShowEditUserFormModal(false)}>
+          <ModalOverlay />
+          <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} onClose={() => setShowEditUserFormModal(false)} />
+        </Modal>
+      )}
       <DocumentationsComponent />
+      <TableTopCreators
+        tableData={tableDataTopCreators}
+        columnsData={tableColumnsTopCreators}
+      />
       <Heading me='auto'
         color={textColor}
         fontSize='2xl'
