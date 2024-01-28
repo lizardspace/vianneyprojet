@@ -29,7 +29,7 @@ const Parameters = () => {
         {showEventAndCharacteristics &&
           <>
             <Button leftIcon={<IoIosArrowBack />} onClick={handleBackClick}>
-              Back
+              Retour
             </Button>
             <ParametersEventAndCharacteristics />
           </>

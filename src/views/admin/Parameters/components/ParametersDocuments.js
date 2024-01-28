@@ -2,6 +2,7 @@
 import React, {useState} from 'react';
 import { Box, Text, Button, useColorModeValue, ModalCloseButton, ModalHeader, Modal, ModalBody, ModalOverlay, ModalContent, } from '@chakra-ui/react';
 import { FcAdvertising, FcGlobe, FcBusinessman, FcDepartment, FcCalendar } from "react-icons/fc";
+import MapComponent from "views/admin/carte/components/MapComponent";
 
 const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
   const brandColor = useColorModeValue("brand.500", "white");
@@ -91,7 +92,7 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
           <ModalHeader>Géolocalisation Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* Add your content for the Géolocalisation modal here */}
+            <MapComponent/>
           </ModalBody>
         </ModalContent>
       </Modal>
