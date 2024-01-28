@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Flex, Icon, SimpleGrid, Stat, StatNumber, StatLabel, useColorModeValue, Heading } from "@chakra-ui/react";
+import { Box, Button, Flex, Icon, SimpleGrid, Stat, StatNumber, StatLabel, useColorModeValue, Heading, IconButton } from "@chakra-ui/react";
 import { FcDocument } from "react-icons/fc";
+import { FaTrash } from "react-icons/fa";
 import { createClient } from "@supabase/supabase-js";
 import Card from "components/card/Card.js"; // Import Card
 import IconBox from "components/icons/IconBox"; // Import IconBox
@@ -37,6 +38,20 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
         return new Date(dateString).toLocaleDateString(undefined, options);
     };
     const togglePdfUploader = () => setShowPdfUploader(!showPdfUploader);
+    const handleDeleteDocument = async (documentId) => {
+        try {
+            const { error } = await supabase.from("vianney_pdf_documents").delete().eq("id", documentId);
+            if (error) {
+                console.error("Error deleting document:", error);
+            } else {
+                // If deletion is successful, you can update the documents state to remove the deleted document
+                setDocuments((prevDocuments) => prevDocuments.filter((doc) => doc.id !== documentId));
+            }
+        } catch (error) {
+            console.error("Error deleting document:", error);
+        }
+    };
+
 
     return (
         <Box>
@@ -74,6 +89,12 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
                                 </StatLabel>
                             </Stat>
                         </Flex>
+                        <IconButton
+                            icon={<FaTrash />}
+                            colorScheme="red"
+                            size="sm"
+                            onClick={() => handleDeleteDocument(data.id)}
+                        />
                     </Card>
                 ))}
                 <Button

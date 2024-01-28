@@ -41,6 +41,27 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
   const handleReturnBack = () => {
     setSelectedPdf(null);
   };
+  const handleDeletePdf = async (pdfId) => {
+    try {
+      const { error } = await supabase
+        .from("vianney_pdf_documents")
+        .delete()
+        .eq("id", pdfId);
+
+      if (error) {
+        console.error("Error deleting PDF document:", error);
+        return;
+      }
+
+      // Remove the deleted document from the local state
+      setPdfDocuments((prevDocuments) =>
+        prevDocuments.filter((document) => document.id !== pdfId)
+      );
+    } catch (error) {
+      console.error("Error deleting PDF document:", error);
+    }
+  };
+
 
   return (
     <VStack spacing={4} alignItems="stretch">
@@ -99,8 +120,17 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
               >
                 Voir le PDF
               </Link>
+              <Button
+                colorScheme="red" // Set the color scheme to red for delete button
+                size="sm" // Adjust the size of the button as needed
+                mt={2}
+                onClick={() => handleDeletePdf(pdfDocument.id)} // Add delete handler
+              >
+                Supprimer
+              </Button>
             </Box>
           ))}
+
         </VStack>
       )}
     </VStack>

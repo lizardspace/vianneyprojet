@@ -178,7 +178,7 @@ export default function UserReports() {
         <Modal isOpen={showEditEventModal} onClose={() => setShowEditEventModal(false)}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Edit from ministatistic</ModalHeader>
+            <ModalHeader>Modifier l'évênement</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <EditEventForm event={selectedEvent} refreshEvents={fetchEvents} />
