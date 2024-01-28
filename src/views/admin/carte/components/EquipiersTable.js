@@ -134,9 +134,14 @@ const EquipiersTable = ({ showAll }) => {
     }
     return (
       <Flex align="center">
-        {`${leader.firstname} ${leader.familyname}`}
+        <Text color="blue.500" mr={1}>
+          {leader.firstname}
+        </Text>
+        <Text fontWeight="bold" color="blue.900" mr={2}>
+          {leader.familyname}
+        </Text>
         {leader.phone && (
-          <Flex align="center" ml={2}>
+          <Flex align="center">
             <FcPhone />
             <Text as="span" fontWeight="bold" ml={1}>
               {leader.phone}
