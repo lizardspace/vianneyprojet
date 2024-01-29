@@ -9,9 +9,14 @@ import {
   Textarea,
   useToast,
 } from '@chakra-ui/react';
+import {
+  useEvent,
+} from './../../../../../EventContext';
 
 const ContactInfoForm = () => {
   const toast = useToast();
+  const { selectedEventId } = useEvent(); // Get the selected event from EventContext
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -36,6 +41,7 @@ const ContactInfoForm = () => {
             zip,
             city,
             message,
+            event_id: selectedEventId, // Include the selected event_id
           },
         ]);
 
