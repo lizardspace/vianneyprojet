@@ -209,13 +209,22 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       console.error('Error deleting team:', error);
     }
   };
+  const handleDeleteTeamMember = (index) => {
+    // Create a copy of the teamMembers array
+    const updatedTeamMembers = [...teamMembers];
+    // Remove the team member at the specified index
+    updatedTeamMembers.splice(index, 1);
+    // Update the state with the updated team members
+    setTeamMembers(updatedTeamMembers);
+  };
+
 
   return (
     <ModalContent>
       <ModalHeader>Modifier l'équipe</ModalHeader>
       <ModalCloseButton />
       <ModalBody>
-      <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <Box id="mapId" h="400px" w="100%">
             <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -298,44 +307,48 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             </FormControl>
 
             {teamMembers.map((teamMember, index) => (
-              <HStack key={index} spacing={2}>
-                <Input
-                  type="text"
-                  name="familyname" // Add this line
-                  placeholder="Nom de famille"
-                  value={teamMember.familyname}
-                  onChange={(e) => handleTeamMemberChange(index, e)}
-                />
-                <Input
-                  type="text"
-                  name="firstname" // Add this line
-                  placeholder="Prénom"
-                  value={teamMember.firstname}
-                  onChange={(e) => handleTeamMemberChange(index, e)}
-                />
-                <Input
-                  type="text"
-                  name="mail" // Add this line
-                  placeholder="Email"
-                  value={teamMember.mail}
-                  onChange={(e) => handleTeamMemberChange(index, e)}
-                />
-                <Input
-                  type="text"
-                  name="phone" // Add this line
-                  placeholder="Téléphone"
-                  value={teamMember.phone}
-                  onChange={(e) => handleTeamMemberChange(index, e)}
-                />
-                <Checkbox
-                  name="isLeader"
-                  isChecked={teamMember.isLeader}
-                  onChange={(e) => handleTeamMemberChange(index, e)}
-                >
-                  Leader ?
-                </Checkbox>
-              </HStack>
+              <VStack key={teamMember.id} spacing={2}>
+                <HStack key={index} spacing={2}>
+                  <Input
+                    type="text"
+                    name="familyname" // Add this line
+                    placeholder="Nom de famille"
+                    value={teamMember.familyname}
+                    onChange={(e) => handleTeamMemberChange(index, e)}
+                  />
+                  <Input
+                    type="text"
+                    name="firstname" // Add this line
+                    placeholder="Prénom"
+                    value={teamMember.firstname}
+                    onChange={(e) => handleTeamMemberChange(index, e)}
+                  />
+                  <Input
+                    type="text"
+                    name="mail" // Add this line
+                    placeholder="Email"
+                    value={teamMember.mail}
+                    onChange={(e) => handleTeamMemberChange(index, e)}
+                  />
+                  <Input
+                    type="text"
+                    name="phone" // Add this line
+                    placeholder="Téléphone"
+                    value={teamMember.phone}
+                    onChange={(e) => handleTeamMemberChange(index, e)}
+                  />
+                  <Checkbox
+                    name="isLeader"
+                    isChecked={teamMember.isLeader}
+                    onChange={(e) => handleTeamMemberChange(index, e)}
+                  >
+                    Leader ?
+                  </Checkbox>
+                </HStack>
+                <Button colorScheme="red" onClick={() => handleDeleteTeamMember(index)}>Supprimer</Button>
+              </VStack>
             ))}
+
 
             {showSuccessAlert && (
               <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mt={4}>
@@ -351,7 +364,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             )}
             <Button colorScheme="blue" onClick={handleAddTeamMember}>Ajouter un membre de l'équipe</Button>
           </VStack>
-          
+
         </form>
         {showDeleteSuccessAlert && (
           <Alert status="success" mt={4}>
@@ -361,7 +374,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
         )}
       </ModalBody>
       <ModalFooter>
-      <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
+        <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
         <Button mr={1} colorScheme="blue" onClick={onClose}>Fermer</Button>
         <Button mr={1} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
       </ModalFooter>
