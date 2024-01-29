@@ -21,26 +21,28 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
   const { selectedEventId } = useEvent();
 
 
-  const fetchPdfDocuments = async () => {
-    try {
-      const { data: pdfDocumentsData, error } = await supabase
-        .from("vianney_pdf_documents_salle_de_crise")
-        .select("*")
-        .eq("event_id", selectedEventId); // Filter by selected event_id
-
-      if (error) {
-        console.error("Error fetching PDF documents:", error);
-        return;
-      }
-
-      setPdfDocuments(pdfDocumentsData);
-    } catch (error) {
-      console.error("Error fetching PDF documents:", error);
-    }
-  };
   React.useEffect(() => {
+    const fetchPdfDocuments = async () => {
+      try {
+        const { data: pdfDocumentsData, error } = await supabase
+          .from("vianney_pdf_documents_salle_de_crise")
+          .select("*")
+          .eq("event_id", selectedEventId); // Filter by selected event_id
+  
+        if (error) {
+          console.error("Error fetching PDF documents:", error);
+          return;
+        }
+  
+        setPdfDocuments(pdfDocumentsData);
+      } catch (error) {
+        console.error("Error fetching PDF documents:", error);
+      }
+    };
+  
     fetchPdfDocuments();
-  }, []); // Remove the dependency array 
+  }, [selectedEventId]); // include dependencies of fetchPdfDocuments here
+  
   
   const handleReturnBack = () => {
     setSelectedPdf(null);
