@@ -103,7 +103,7 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
       </Button>
 
       {/* Modals */}
-      <Modal isOpen={showGeoModal} onClose={closeGeoModal}>
+      <Modal isOpen={showGeoModal} onClose={closeGeoModal} size="full">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Géolocalisation Modal</ModalHeader>
