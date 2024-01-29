@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createClient } from '@supabase/supabase-js';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { FaTrash } from 'react-icons/fa';
 import {
   FormControl,
   FormLabel,
@@ -345,7 +346,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                     Leader ?
                   </Checkbox>
                 </HStack>
-                <Button colorScheme="red" onClick={() => handleDeleteTeamMember(index)}>Supprimer</Button>
+                <Button colorScheme="red" onClick={() => handleDeleteTeamMember(index)} leftIcon={<FaTrash />}></Button>
               </VStack>
             ))}
 
