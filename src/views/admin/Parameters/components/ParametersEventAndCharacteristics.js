@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Box, Text, Button, useColorModeValue, ModalCloseButton, ModalHeader, ModalBody, ModalOverlay, Modal, ModalContent, } from '@chakra-ui/react';
-import { FcBusiness, FcCalendar, FcHome, FcList, FcVoicePresentation } from "react-icons/fc";
+import { FcBusiness, FcCalendar, FcHome,  FcVoicePresentation } from "react-icons/fc";
 import EventDateComponent from '../modal/EventDateComponent';
 import EventLocationComponent from '../modal/EventLocationComponent';
 import EventNameComponent from '../modal/EventNameComponent';
-import NotepadComponent from '../modal/NotepadComponent';
 import TeamTable from '../modal/TeamTable';
 
 
@@ -17,7 +16,6 @@ const ParametersEventAndCharacteristics = () => {
   const [showEventNameModal, setShowEventNameModal] = useState(false);
   const [showEventDateModal, setShowEventDateModal] = useState(false);
   const [showEventLocationModal, setShowEventLocationModal] = useState(false);
-  const [showEventNeedsModal, setShowEventNeedsModal] = useState(false);
   const [showEventMailingModal, setShowEventMailingModal] = useState(false);
 
   const openEventNameModal = () => setShowEventNameModal(true);
@@ -28,9 +26,6 @@ const ParametersEventAndCharacteristics = () => {
 
   const openEventLocationModal = () => setShowEventLocationModal(true);
   const closeEventLocationModal = () => setShowEventLocationModal(false);
-
-  const openEventNeedsModal = () => setShowEventNeedsModal(true);
-  const closeEventNeedsModal = () => setShowEventNeedsModal(false);
 
   const openEventMailingModal = () => setShowEventMailingModal(true);
   const closeEventMailingModal = () => setShowEventMailingModal(false);
@@ -72,16 +67,7 @@ const ParametersEventAndCharacteristics = () => {
         Lieu de l'événement
       </Button>
 
-      <Button
-        leftIcon={<FcList size='32px' color={brandColor} />}
-        bg={buttonBg}
-        color={buttonTextColor}
-        h='100px'
-        m={4}
-        onClick={openEventNeedsModal}
-      >
-        Besoins
-      </Button>
+
 
       <Button
         leftIcon={<FcVoicePresentation size='32px' color={brandColor} />}
@@ -128,16 +114,7 @@ const ParametersEventAndCharacteristics = () => {
         </ModalContent>
       </Modal>
 
-      <Modal isOpen={showEventNeedsModal} onClose={closeEventNeedsModal}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Besoins Modal</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <NotepadComponent />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+
       <Modal isOpen={showEventMailingModal} onClose={closeEventMailingModal} size="full">
         <ModalOverlay />
         <ModalContent>

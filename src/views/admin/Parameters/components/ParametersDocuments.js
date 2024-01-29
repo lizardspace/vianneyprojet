@@ -1,11 +1,12 @@
 // src/views/admin/Parameters/components/ParametersDocuments.js
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { Box, Text, Button, useColorModeValue, ModalCloseButton, ModalHeader, Modal, ModalBody, ModalOverlay, ModalContent, } from '@chakra-ui/react';
-import { FcAdvertising, FcGlobe, FcBusinessman, FcDepartment, FcCalendar } from "react-icons/fc";
+import { FcAdvertising, FcGlobe, FcBusinessman, FcDepartment, FcCalendar, FcList } from "react-icons/fc";
 import MapComponent from "views/admin/carte/components/MapComponent";
 import EquipiersTable from 'views/admin/carte/components/EquipiersTable';
 import TeamScheduleByMySelf from '../../TableauDeBord/components/TeamScheduleMadeMySelf'
 import SalleDeCrise from '../modal/SalleDeCrise';
+import NotepadComponent from '../modal/NotepadComponent';
 
 const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
   const brandColor = useColorModeValue("brand.500", "white");
@@ -15,6 +16,7 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
   const [showPersonnelModal, setShowPersonnelModal] = useState(false);
   const [showCrisisModal, setShowCrisisModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showEventNeedsModal, setShowEventNeedsModal] = useState(false);
 
   const openGeoModal = () => setShowGeoModal(true);
   const closeGeoModal = () => setShowGeoModal(false);
@@ -27,6 +29,10 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
 
   const openScheduleModal = () => setShowScheduleModal(true);
   const closeScheduleModal = () => setShowScheduleModal(false);
+
+  const openEventNeedsModal = () => setShowEventNeedsModal(true);
+  const closeEventNeedsModal = () => setShowEventNeedsModal(false);
+
 
   return (
     <Box border='1px' borderColor='gray.200' p={5} m={5}>
@@ -85,6 +91,16 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
       >
         Emploi du temps
       </Button>
+      <Button
+        leftIcon={<FcList size='32px' color={brandColor} />}
+        bg={buttonBg}
+        color={buttonTextColor}
+        h='100px'
+        m={4}
+        onClick={openEventNeedsModal}
+      >
+        Besoins
+      </Button>
 
       {/* Modals */}
       <Modal isOpen={showGeoModal} onClose={closeGeoModal}>
@@ -93,7 +109,7 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
           <ModalHeader>Géolocalisation Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <MapComponent/>
+            <MapComponent />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -104,7 +120,7 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
           <ModalHeader>Personnels Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <EquipiersTable/>
+            <EquipiersTable />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -115,7 +131,7 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
           <ModalHeader>Salle de crise Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <SalleDeCrise/>
+            <SalleDeCrise />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -126,7 +142,17 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
           <ModalHeader>Emploi du temps Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <TeamScheduleByMySelf/>
+            <TeamScheduleByMySelf />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={showEventNeedsModal} onClose={closeEventNeedsModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Besoins Modal</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <NotepadComponent/>
           </ModalBody>
         </ModalContent>
       </Modal>
