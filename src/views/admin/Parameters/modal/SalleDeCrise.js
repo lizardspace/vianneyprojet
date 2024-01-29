@@ -1,4 +1,5 @@
 import ContactInfoForm from './salledecrise/ContactInfoForm';
+import Documents from './salledecrise/Documents';
 import NotepadComponentSalleDeCrise from './salledecrise/NotepadComponentSalleDeCrise';
 import {
     Heading
@@ -10,6 +11,8 @@ const SalleDeCrise = () => {
       <ContactInfoForm />
       <Heading>Bloc Note</Heading>
       <NotepadComponentSalleDeCrise/>
+      <Heading>Bloc Note</Heading>
+      <Documents/>
     </div>
   );
 };
