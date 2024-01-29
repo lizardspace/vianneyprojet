@@ -22,10 +22,11 @@ import {
 import { FcDocument } from "react-icons/fc";
 import { FaTrash } from "react-icons/fa";
 import { createClient } from "@supabase/supabase-js";
-import Card from "components/card/Card.js"; // Import Card
-import IconBox from "components/icons/IconBox"; // Import IconBox
+import Card from "components/card/Card.js"; 
+import IconBox from "components/icons/IconBox"; 
 import PdfUploader from "./PdfUploader";
 import { FcPlus, FcLeft } from "react-icons/fc";
+import { useEvent } from './../../../../../../EventContext';
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
@@ -39,19 +40,26 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
     const [textColor] = useColorModeValue("secondaryGray.900", "white");
     const [deleteDocumentId, setDeleteDocumentId] = useState(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const { selectedEventId } = useEvent(); // Use the selectedEventId from the EventContext
 
     useEffect(() => {
         const fetchDocuments = async () => {
-            const { data, error } = await supabase.from("vianney_pdf_documents_salle_de_crise").select();
-            if (error) {
-                console.error("Error fetching documents:", error);
-            } else {
-                setDocuments(data);
+            if (selectedEventId) { // Check if selectedEventId is available
+                const { data, error } = await supabase
+                    .from("vianney_pdf_documents_salle_de_crise")
+                    .select()
+                    .eq("event_id", selectedEventId); // Filter documents by selectedEventId
+
+                if (error) {
+                    console.error("Error fetching documents:", error);
+                } else {
+                    setDocuments(data);
+                }
             }
         };
 
         fetchDocuments();
-    }, []);
+    }, [selectedEventId]); // Add selectedEventId as a dependency
 
     // Function to format the date as desired
     const formatDate = (dateString) => {
