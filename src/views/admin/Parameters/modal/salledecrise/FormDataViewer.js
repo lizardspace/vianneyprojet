@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Thead, Tbody, Tr, Th, Td, Spinner, Text, Alert, AlertIcon } from '@chakra-ui/react';
 import { supabase } from './../../../../../supabaseClient';
+import { useEvent } from './../../../../../EventContext'; // Import the useEvent hook
+
 
 const FormDataViewer = () => {
   const [formData, setFormData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { selectedEventId } = useEvent(); // Get the selected event from EventContext
 
   useEffect(() => {
     async function fetchFormData() {
       try {
         const { data, error } = await supabase
           .from('vianney_form_utile_salle_de_crise')
-          .select('*'); // Retrieve all columns
+          .select('*')
+          .eq('event_id', selectedEventId); // Filter by selected event_id
 
         if (error) {
           setError('Error fetching data');
@@ -27,7 +31,8 @@ const FormDataViewer = () => {
     }
 
     fetchFormData();
-  }, []);
+  }, [selectedEventId]);
+
 
   if (isLoading) {
     return <Spinner size="lg" />;
