@@ -93,14 +93,14 @@ const EventLocationComponent = () => {
             mr={2}
           />
           <Button onClick={handleSaveClick} colorScheme="teal" size="lg">
-            Save
+            Enregistrer
           </Button>
         </div>
       ) : (
         <div>
           <Text fontSize='lg'>{eventLocation}</Text>
           <Button onClick={handleEditClick} colorScheme="teal" size="lg" mt={2}>
-            Edit
+            Editer
           </Button>
         </div>
       )}
