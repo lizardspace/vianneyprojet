@@ -44,6 +44,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
   const [isEditingProfilePhoto, setIsEditingProfilePhoto] = useState(false);
   const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false);
+  const [showDeleteWarningAlert, setShowDeleteWarningAlert] = useState(false);
   const [teamMembers, setTeamMembers] = useState([{
     id: uuidv4(), // Generate unique ID for the first team member
     familyname: '',
@@ -219,6 +220,9 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
     updatedTeamMembers.splice(index, 1);
     // Update the state with the updated team members
     setTeamMembers(updatedTeamMembers);
+
+    // Show the warning alert
+    setShowDeleteWarningAlert(true);
   };
 
 
@@ -359,6 +363,12 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                 </Flex>
               </HStack>
             ))}
+            {showDeleteWarningAlert && (
+              <Alert status="warning" mt={4}>
+                <AlertIcon />
+                Attention de bien cliquer sur "Modifier" pour enregistrer vos changements.
+              </Alert>
+            )}
             {showSuccessAlert && (
               <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mt={4}>
                 <AlertIcon boxSize="40px" mr={0} />
