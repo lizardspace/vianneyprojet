@@ -24,6 +24,8 @@ import {
   ModalBody,
   ModalHeader,
   ModalCloseButton,
+  Flex,
+  Center,
 } from '@chakra-ui/react';
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
@@ -308,49 +310,55 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             </FormControl>
 
             {teamMembers.map((teamMember, index) => (
-              <VStack key={teamMember.id} spacing={2}>
-                <HStack key={index} spacing={2}>
-                  <Input
-                    type="text"
-                    name="familyname" // Add this line
-                    placeholder="Nom de famille"
-                    value={teamMember.familyname}
-                    onChange={(e) => handleTeamMemberChange(index, e)}
-                  />
-                  <Input
-                    type="text"
-                    name="firstname" // Add this line
-                    placeholder="Prénom"
-                    value={teamMember.firstname}
-                    onChange={(e) => handleTeamMemberChange(index, e)}
-                  />
-                  <Input
-                    type="text"
-                    name="mail" // Add this line
-                    placeholder="Email"
-                    value={teamMember.mail}
-                    onChange={(e) => handleTeamMemberChange(index, e)}
-                  />
-                  <Input
-                    type="text"
-                    name="phone" // Add this line
-                    placeholder="Téléphone"
-                    value={teamMember.phone}
-                    onChange={(e) => handleTeamMemberChange(index, e)}
-                  />
-                  <Checkbox
-                    name="isLeader"
-                    isChecked={teamMember.isLeader}
-                    onChange={(e) => handleTeamMemberChange(index, e)}
+              <HStack key={teamMember.id} spacing={2}>
+                <Input
+                  type="text"
+                  name="familyname"
+                  placeholder="Nom de famille"
+                  value={teamMember.familyname}
+                  onChange={(e) => handleTeamMemberChange(index, e)}
+                />
+                <Input
+                  type="text"
+                  name="firstname"
+                  placeholder="Prénom"
+                  value={teamMember.firstname}
+                  onChange={(e) => handleTeamMemberChange(index, e)}
+                />
+                <Input
+                  type="text"
+                  name="mail"
+                  placeholder="Email"
+                  value={teamMember.mail}
+                  onChange={(e) => handleTeamMemberChange(index, e)}
+                />
+                <Input
+                  type="text"
+                  name="phone"
+                  placeholder="Téléphone"
+                  value={teamMember.phone}
+                  onChange={(e) => handleTeamMemberChange(index, e)}
+                />
+                <Checkbox
+                  name="isLeader"
+                  isChecked={teamMember.isLeader}
+                  onChange={(e) => handleTeamMemberChange(index, e)}
+                >
+                  Leader ?
+                </Checkbox>
+                <Flex align="center" justify="center">
+                  <Button
+                    size="sm"
+                    colorScheme="red"
+                    onClick={() => handleDeleteTeamMember(index)}
                   >
-                    Leader ?
-                  </Checkbox>
-                </HStack>
-                <Button colorScheme="red" onClick={() => handleDeleteTeamMember(index)} leftIcon={<FaTrash />}></Button>
-              </VStack>
+                    <Center>
+                      <FaTrash />
+                    </Center>
+                  </Button>
+                </Flex>
+              </HStack>
             ))}
-
-
             {showSuccessAlert && (
               <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mt={4}>
                 <AlertIcon boxSize="40px" mr={0} />
