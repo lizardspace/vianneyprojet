@@ -15,7 +15,7 @@ import {
 
 const ContactInfoForm = () => {
   const toast = useToast();
-  const { selectedEventId } = useEvent(); // Get the selected event from EventContext
+  const { selectedEventId } = useEvent();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,6 +34,7 @@ const ContactInfoForm = () => {
         .from('vianney_form_utile_salle_de_crise')
         .upsert([
           {
+            event_id: selectedEventId, 
             name,
             email,
             phone,
@@ -41,7 +42,6 @@ const ContactInfoForm = () => {
             zip,
             city,
             message,
-            event_id: selectedEventId, // Include the selected event_id
           },
         ]);
 
