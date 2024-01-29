@@ -125,7 +125,7 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
         </ModalContent>
       </Modal>
 
-      <Modal isOpen={showCrisisModal} onClose={closeCrisisModal}>
+      <Modal isOpen={showCrisisModal} onClose={closeCrisisModal} size="full">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Salle de crise Modal</ModalHeader>

@@ -11,7 +11,7 @@ const SalleDeCrise = () => {
       <ContactInfoForm />
       <Heading>Bloc Note</Heading>
       <NotepadComponentSalleDeCrise/>
-      <Heading>Bloc Note</Heading>
+      <Heading>Documents</Heading>
       <Documents/>
     </div>
   );
