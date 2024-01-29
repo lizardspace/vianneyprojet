@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { createClient } from "@supabase/supabase-js";
 import { ArrowBackIcon } from "@chakra-ui/icons";
+import { useEvent } from './../../../../../../EventContext'; 
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
@@ -17,15 +18,15 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const PdfList = ({ selectedPdf, setSelectedPdf }) => {
   const [pdfDocuments, setPdfDocuments] = React.useState([]);
-  React.useEffect(() => {
-    fetchPdfDocuments();
-  }, []);
+  const { selectedEventId } = useEvent();
+
 
   const fetchPdfDocuments = async () => {
     try {
       const { data: pdfDocumentsData, error } = await supabase
         .from("vianney_pdf_documents_salle_de_crise")
-        .select("*");
+        .select("*")
+        .eq("event_id", selectedEventId); // Filter by selected event_id
 
       if (error) {
         console.error("Error fetching PDF documents:", error);
@@ -37,7 +38,10 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
       console.error("Error fetching PDF documents:", error);
     }
   };
-
+  React.useEffect(() => {
+    fetchPdfDocuments();
+  }, []); // Remove the dependency array 
+  
   const handleReturnBack = () => {
     setSelectedPdf(null);
   };
