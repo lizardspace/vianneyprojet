@@ -8,6 +8,7 @@ import {
   Button,
   Textarea,
   useToast,
+  ChakraProvider,
 } from '@chakra-ui/react';
 import {
   useEvent,
@@ -63,8 +64,8 @@ const ContactInfoForm = () => {
   
       // Example toast message on successful submission
       toast({
-        title: 'Contact Information Submitted',
-        description: 'Your contact information has been successfully submitted.',
+        title: 'Informations de contact soumises',
+        description: 'Vos informations de contact ont été soumises avec succès.',
         status: 'success',
         duration: 5000,
         isClosable: true,
@@ -76,8 +77,8 @@ const ContactInfoForm = () => {
       // Handle error submission
       console.error('Error:', error);
       toast({
-        title: 'Error',
-        description: 'There was an error submitting the form.',
+        title: 'Erreur',
+        description: "Une erreur s'est produite lors de la soumission du formulaire.",
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -86,52 +87,54 @@ const ContactInfoForm = () => {
   };  
 
   return (
-    <Box>
-      <form onSubmit={handleSubmit}>
-      <FormControl id="name" isRequired>
-  <FormLabel>Name</FormLabel>
-  <Input type="text" name="name" placeholder="Your Name" />
-</FormControl>
-<FormControl id="email" isRequired>
-  <FormLabel>Email Address</FormLabel>
-  <Input type="email" name="email" placeholder="Your Email Address" />
-</FormControl>
-<FormControl id="phone" isRequired>
-  <FormLabel>Phone Number</FormLabel>
-  <Input type="tel" name="phone" placeholder="Your Phone Number" />
-</FormControl>
-<FormControl id="street" isRequired>
-  <FormLabel>Street</FormLabel>
-  <Input type="text" name="street" placeholder="Street Address" />
-</FormControl>
-<FormControl id="zip" isRequired>
-  <FormLabel>Zip Code</FormLabel>
-  <Input type="text" name="zip" placeholder="Zip Code" />
-</FormControl>
-<FormControl id="city" isRequired>
-  <FormLabel>City</FormLabel>
-  <Input type="text" name="city" placeholder="City" />
-</FormControl>
-<FormControl id="message" isRequired>
-  <FormLabel>Message</FormLabel>
-  <Textarea
-    name="message"
-    placeholder="Write your message here..."
-    resize="vertical"
-    minH="120px"
-  />
-</FormControl>
-        <Button
-          type="submit"
-          colorScheme="teal"
-          mt={4}
-          width="100%"
-          isLoading={false} // Set to true when form is submitting
-        >
-          Submit
-        </Button>
-      </form>
-    </Box>
+    <ChakraProvider>
+      <Box>
+        <form onSubmit={handleSubmit}>
+          <FormControl id="name" isRequired>
+            <FormLabel>Nom</FormLabel>
+            <Input type="text" name="name" placeholder="Votre nom" />
+          </FormControl>
+          <FormControl id="email" isRequired>
+            <FormLabel>Adresse e-mail</FormLabel>
+            <Input type="email" name="email" placeholder="Votre adresse e-mail" />
+          </FormControl>
+          <FormControl id="phone" isRequired>
+            <FormLabel>Numéro de téléphone</FormLabel>
+            <Input type="tel" name="phone" placeholder="Votre numéro de téléphone" />
+          </FormControl>
+          <FormControl id="street" isRequired>
+            <FormLabel>Rue</FormLabel>
+            <Input type="text" name="street" placeholder="Adresse de rue" />
+          </FormControl>
+          <FormControl id="zip" isRequired>
+            <FormLabel>Code postal</FormLabel>
+            <Input type="text" name="zip" placeholder="Code postal" />
+          </FormControl>
+          <FormControl id="city" isRequired>
+            <FormLabel>Ville</FormLabel>
+            <Input type="text" name="city" placeholder="Ville" />
+          </FormControl>
+          <FormControl id="message" isRequired>
+            <FormLabel>Message</FormLabel>
+            <Textarea
+              name="message"
+              placeholder="Écrivez votre message ici..."
+              resize="vertical"
+              minH="120px"
+            />
+          </FormControl>
+          <Button
+            type="submit"
+            colorScheme="teal"
+            mt={4}
+            width="100%"
+            isLoading={false} // Set to true when form is submitting
+          >
+            Soumettre
+          </Button>
+        </form>
+      </Box>
+    </ChakraProvider>
   );
 };
 
