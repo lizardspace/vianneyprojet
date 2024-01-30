@@ -92,31 +92,12 @@ const EquipiersTable = ({ showAll }) => {
     }
   }, [selectedEquipier, isModalOpen, equipiers]);
 
-  const hoverStyle = {
-    bg: useColorModeValue('gray.100', 'gray.700'),
-    cursor: 'pointer',
-  };
-
-  const TableRow = ({ equipier, onClick }) => (
-    <Tr _hover={hoverStyle} onClick={() => onClick(equipier)} style={tableRowStyle}>
-      <Td><Avatar size="md" src={equipier.photo_profile_url} style={avatarStyle} /></Td>
-      <Td>{equipier.name_of_the_team}</Td>
-      {/* Display leader's name and phone number */}
-      <Td>
-        {/* Use getLeaderNameAndPhone function */}
-        <Text>
-          {getLeaderNameAndPhone(equipier.team_members)}
-        </Text>
-      </Td>
-      <Td>{equipier.mission}</Td>
-    </Tr>
-  );
-
   useEffect(() => {
     const fetchEquipiers = async () => {
       const { data, error } = await supabase
         .from('vianney_teams')
-        .select('*');
+        .select('*')
+        .order('name_of_the_team', { ascending: true }); // Order by team name in ascending order
       if (error) {
         console.log('Error fetching data:', error);
       } else {
@@ -200,8 +181,6 @@ const EquipiersTable = ({ showAll }) => {
       </li>
     ));
 
-
-
     return (
       <Stack spacing={4} p={5} align="start">
         {photo_profile_url && (
@@ -229,6 +208,26 @@ const EquipiersTable = ({ showAll }) => {
       </Stack>
     );
   };
+
+  const hoverStyle = {
+    bg: useColorModeValue('gray.100', 'gray.700'),
+    cursor: 'pointer',
+  };
+
+  const TableRow = ({ equipier, onClick }) => (
+    <Tr _hover={hoverStyle} onClick={() => onClick(equipier)} style={tableRowStyle}>
+      <Td><Avatar size="md" src={equipier.photo_profile_url} style={avatarStyle} /></Td>
+      <Td>{equipier.name_of_the_team}</Td>
+      {/* Display leader's name and phone number */}
+      <Td>
+        {/* Use getLeaderNameAndPhone function */}
+        <Text>
+          {getLeaderNameAndPhone(equipier.team_members)}
+        </Text>
+      </Td>
+      <Td>{equipier.mission}</Td>
+    </Tr>
+  );
 
   return (
     <>
