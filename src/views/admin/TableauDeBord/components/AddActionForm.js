@@ -2,20 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Box, Button, FormControl, FormLabel, Input, Select, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
-import { useEvent } from '../../../../EventContext'; 
+import { useEvent } from '../../../../EventContext';
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const AddActionForm = () => {
-  const { selectedEventId } = useEvent(); 
+  const { selectedEventId } = useEvent();
   const [teams, setTeams] = useState([]);
   const [action, setAction] = useState({
     teamId: '',
     actionName: '',
     startingDateTime: '',
-    endingDateTime: '',
+    endingDateTime: '', // We'll calculate this
     comment: ''
   });
   const [alert, setAlert] = useState({ status: '', message: '', isVisible: false });
@@ -35,9 +35,9 @@ const AddActionForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const newAction = {
-      event_id: selectedEventId, 
+      event_id: selectedEventId,
       id: uuidv4(),
       team_to_which_its_attached: action.teamId,
       action_name: action.actionName,
@@ -45,11 +45,11 @@ const AddActionForm = () => {
       ending_date: action.endingDateTime,
       action_comment: action.comment
     };
-  
+
     const { error } = await supabase
       .from('vianney_actions')
       .insert([newAction]);
-  
+
     if (error) {
       console.error('Erreur lors de l insertion des données: ', error);
       setAlert({
@@ -73,6 +73,15 @@ const AddActionForm = () => {
     }
   };
 
+  const handleStartingDateTimeChange = (e) => {
+    const startingDateTime = e.target.value;
+    const endDate = new Date(startingDateTime);
+    endDate.setHours(endDate.getHours() + 1); // Add 1 hour
+    const endingDateTime = endDate.toISOString().slice(0, 16); // Format to 'YYYY-MM-DDTHH:mm'
+
+    setAction({ ...action, startingDateTime, endingDateTime });
+  };
+
   const closeAlert = () => {
     setAlert({ ...alert, isVisible: false });
   };
@@ -93,8 +102,10 @@ const AddActionForm = () => {
         <FormControl isRequired>
           <FormLabel>Équipe</FormLabel>
           <Select placeholder="Sélectionner une équipe" onChange={(e) => setAction({ ...action, teamId: e.target.value })}>
-            {teams.map(team => (
-              <option key={team.id} value={team.id}>{team.name_of_the_team}</option>
+            {teams.map((team) => (
+              <option key={team.id} value={team.id}>
+                {team.name_of_the_team}
+              </option>
             ))}
           </Select>
         </FormControl>
@@ -104,17 +115,27 @@ const AddActionForm = () => {
         </FormControl>
         <FormControl mt={4}>
           <FormLabel>Date de début</FormLabel>
-          <Input type="datetime-local" onChange={(e) => setAction({ ...action, startingDateTime: e.target.value })} />
+          <Input
+            type="datetime-local"
+            onChange={handleStartingDateTimeChange} // Call the function when the starting date changes
+            value={action.startingDateTime} // Bind the value to state
+          />
         </FormControl>
         <FormControl mt={4}>
           <FormLabel>Date de fin</FormLabel>
-          <Input type="datetime-local" onChange={(e) => setAction({ ...action, endingDateTime: e.target.value })} />
+          <Input type="datetime-local" value={action.endingDateTime} readOnly />
+          {/* Display the calculated endingDateTime */}
         </FormControl>
         <FormControl mt={4}>
           <FormLabel>Commentaire</FormLabel>
-          <Input placeholder="Commentaire" onChange={(e) => setAction({ ...action, comment: e.target.value })} />
+          <Input
+            placeholder="Commentaire"
+            onChange={(e) => setAction({ ...action, comment: e.target.value })}
+          />
         </FormControl>
-        <Button mt={4} colorScheme="blue" type="submit">Ajouter l'action</Button>
+        <Button mt={4} colorScheme="blue" type="submit">
+          Ajouter l'action
+        </Button>
       </form>
     </Box>
   );
