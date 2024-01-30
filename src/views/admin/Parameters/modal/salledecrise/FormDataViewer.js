@@ -287,7 +287,45 @@ const FormDataViewer = () => {
                 onChange={(e) => setEditedData({ ...editedData, email: e.target.value })}
               />
             </FormControl>
-            {/* Add other fields here for editing */}
+            <FormControl>
+              <FormLabel>Téléphone</FormLabel>
+              <Input
+                type="text"
+                value={editedData.phone}
+                onChange={(e) => setEditedData({ ...editedData, phone: e.target.value })}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Adresse</FormLabel>
+              <Input
+                type="text"
+                value={editedData.street}
+                onChange={(e) => setEditedData({ ...editedData, street: e.target.value })}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Code Postal</FormLabel>
+              <Input
+                type="text"
+                value={editedData.zip}
+                onChange={(e) => setEditedData({ ...editedData, zip: e.target.value })}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Ville</FormLabel>
+              <Input
+                type="text"
+                value={editedData.city}
+                onChange={(e) => setEditedData({ ...editedData, city: e.target.value })}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Message</FormLabel>
+              <Textarea
+                value={editedData.message}
+                onChange={(e) => setEditedData({ ...editedData, message: e.target.value })}
+              />
+            </FormControl>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={handleEditRow}>
