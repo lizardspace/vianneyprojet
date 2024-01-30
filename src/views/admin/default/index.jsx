@@ -72,11 +72,13 @@ export default function UserReports() {
       const { data: vianney_teams, error } = await supabase
         .from('vianney_teams')
         .select('*');
-
+  
       if (error) {
         console.log('Error fetching teams:', error);
       } else {
-        setTeams(vianney_teams);
+        // Sort teams by name in alphabetical order
+        const sortedTeams = vianney_teams.sort((a, b) => a.name_of_the_team.localeCompare(b.name_of_the_team));
+        setTeams(sortedTeams);
       }
     } catch (error) {
       console.error('Error fetching teams:', error);
