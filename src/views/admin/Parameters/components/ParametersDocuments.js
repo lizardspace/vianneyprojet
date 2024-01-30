@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Box, Text, Button, useColorModeValue, ModalCloseButton, ModalHeader, Modal, ModalBody, ModalOverlay, ModalContent, } from '@chakra-ui/react';
 import { FcAdvertising, FcGlobe, FcBusinessman, FcDepartment, FcCalendar, FcList } from "react-icons/fc";
 import MapComponent from "views/admin/carte/components/MapComponent";
-import EquipiersTable from 'views/admin/carte/components/EquipiersTable';
+import TableTopCreators from 'views/admin/carte/components/TableTopCreators';
 import TeamScheduleByMySelf from '../../TableauDeBord/components/TeamScheduleMadeMySelf'
 import SalleDeCrise from '../modal/SalleDeCrise';
 import NotepadComponent from '../modal/NotepadComponent';
@@ -120,7 +120,7 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
           <ModalHeader>Personnels Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <EquipiersTable />
+            <TableTopCreators />
           </ModalBody>
         </ModalContent>
       </Modal>
