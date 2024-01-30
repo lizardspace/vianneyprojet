@@ -20,7 +20,7 @@ const ContactInfoForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const formData = new FormData(e.target);
     const name = formData.get('name');
     const email = formData.get('email');
@@ -29,7 +29,7 @@ const ContactInfoForm = () => {
     const zip = formData.get('zip');
     const city = formData.get('city');
     const message = formData.get('message');
-  
+
     console.log('Form Data:', {
       event_id: selectedEventId,
       name,
@@ -40,7 +40,7 @@ const ContactInfoForm = () => {
       city,
       message,
     });
-  
+
     try {
       const { error } = await supabase
         .from('vianney_form_utile_salle_de_crise')
@@ -56,12 +56,12 @@ const ContactInfoForm = () => {
             message,
           },
         ]);
-  
+
       if (error) {
         console.error('Error submitting form data:', error);
         throw new Error('Error submitting form data');
       }
-  
+
       // Example toast message on successful submission
       toast({
         title: 'Informations de contact soumises',
@@ -70,7 +70,7 @@ const ContactInfoForm = () => {
         duration: 5000,
         isClosable: true,
       });
-  
+
       // Clear the form after successful submission
       e.target.reset();
     } catch (error) {
@@ -84,7 +84,7 @@ const ContactInfoForm = () => {
         isClosable: true,
       });
     }
-  };  
+  };
 
   return (
     <ChakraProvider>
@@ -127,8 +127,8 @@ const ContactInfoForm = () => {
             type="submit"
             colorScheme="teal"
             mt={4}
-            width="100%"
-            isLoading={false} // Set to true when form is submitting
+            minWidth={`${toast('Soumettre').length * 10}px`} 
+            isLoading={false} 
           >
             Soumettre
           </Button>
