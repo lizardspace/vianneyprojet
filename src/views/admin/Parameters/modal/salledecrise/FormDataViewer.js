@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Thead, Tbody, Tr, Th, Td, Spinner, Text, Alert, AlertIcon } from '@chakra-ui/react';
+import { Table, Thead, Tbody, Tr, Th, Td, Spinner, Text, Alert, AlertIcon, Box } from '@chakra-ui/react';
 import { supabase } from './../../../../../supabaseClient';
-import { useEvent } from './../../../../../EventContext'; // Import the useEvent hook
-
+import { useEvent } from './../../../../../EventContext';
 
 const FormDataViewer = () => {
   const [formData, setFormData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { selectedEventId } = useEvent(); // Get the selected event from EventContext
+  const { selectedEventId } = useEvent();
 
   useEffect(() => {
     async function fetchFormData() {
@@ -16,7 +15,7 @@ const FormDataViewer = () => {
         const { data, error } = await supabase
           .from('vianney_form_utile_salle_de_crise')
           .select('*')
-          .eq('event_id', selectedEventId); // Filter by selected event_id
+          .eq('event_id', selectedEventId);
 
         if (error) {
           setError('Error fetching data');
@@ -32,7 +31,6 @@ const FormDataViewer = () => {
 
     fetchFormData();
   }, [selectedEventId]);
-
 
   if (isLoading) {
     return <Spinner size="lg" />;
@@ -61,32 +59,48 @@ const FormDataViewer = () => {
   }
 
   return (
-    <Table variant="simple">
-      <Thead>
-        <Tr>
-          <Th>Name</Th>
-          <Th>Email</Th>
-          <Th>Phone</Th>
-          <Th>Street</Th>
-          <Th>Zip</Th>
-          <Th>City</Th>
-          <Th>Message</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {formData.map((entry) => (
-          <Tr key={entry.id}>
-            <Td>{entry.name}</Td>
-            <Td>{entry.email}</Td>
-            <Td>{entry.phone}</Td>
-            <Td>{entry.street}</Td>
-            <Td>{entry.zip}</Td>
-            <Td>{entry.city}</Td>
-            <Td>{entry.message}</Td>
+    <Box p={4} background="linear-gradient(to bottom, #ffffff, #f0f0f0)">
+      <Table variant="simple" boxShadow="md" borderRadius="md">
+        <Thead>
+          <Tr>
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+              Name
+            </Th>
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+              Email
+            </Th>
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+              Phone
+            </Th>
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+              Street
+            </Th>
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+              Zip
+            </Th>
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+              City
+            </Th>
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+              Message
+            </Th>
           </Tr>
-        ))}
-      </Tbody>
-    </Table>
+        </Thead>
+        <Tbody>
+          {formData.map((entry) => (
+            <Tr key={entry.id}>
+              <Td>{entry.name}</Td>
+              <Td>{entry.email}</Td>
+              <Td>{entry.phone}</Td>
+              <Td>{entry.street}</Td>
+              <Td>{entry.zip}</Td>
+              <Td>{entry.city}</Td>
+              <Td>{entry.message}</Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+    </Box>
   );
 };
 
