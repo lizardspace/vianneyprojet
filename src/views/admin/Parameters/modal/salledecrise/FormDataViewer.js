@@ -19,10 +19,21 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   Button,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
 } from '@chakra-ui/react';
 import { supabase } from './../../../../../supabaseClient';
 import { useEvent } from './../../../../../EventContext';
-import { FcFullTrash } from 'react-icons/fc';
+import { FcFullTrash, FcEditImage } from 'react-icons/fc';
 
 const FormDataViewer = () => {
   const [formData, setFormData] = useState([]);
@@ -33,6 +44,19 @@ const FormDataViewer = () => {
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     isOpen: false,
     rowIdToDelete: null,
+  });
+  const [editModal, setEditModal] = useState({
+    isOpen: false,
+    rowIdToEdit: null,
+  });
+  const [editedData, setEditedData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    street: '',
+    zip: '',
+    city: '',
+    message: '',
   });
 
   const handleDeleteRow = async (rowId) => {
@@ -60,6 +84,48 @@ const FormDataViewer = () => {
       console.error('Error deleting row:', error);
     } finally {
       setDeleteConfirmation({ isOpen: false, rowIdToDelete: null });
+    }
+  };
+
+  const handleEditRow = async () => {
+    try {
+      const { error } = await supabase
+        .from('vianney_form_utile_salle_de_crise')
+        .update({
+          name: editedData.name,
+          email: editedData.email,
+          phone: editedData.phone,
+          street: editedData.street,
+          zip: editedData.zip,
+          city: editedData.city,
+          message: editedData.message,
+        })
+        .eq('id', editModal.rowIdToEdit);
+
+      if (error) {
+        console.error('Error updating row:', error);
+      } else {
+        // Close the edit modal
+        setEditModal({ isOpen: false, rowIdToEdit: null });
+
+        // Show a success notification
+        toast({
+          title: 'Élément modifié',
+          status: 'success',
+          duration: 3000, // Duration in milliseconds (adjust as needed)
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating row:', error);
+    }
+  };
+
+  const openEditModal = (rowId) => {
+    const rowToEdit = formData.find((entry) => entry.id === rowId);
+    if (rowToEdit) {
+      setEditedData(rowToEdit);
+      setEditModal({ isOpen: true, rowIdToEdit: rowId });
     }
   };
 
@@ -138,6 +204,9 @@ const FormDataViewer = () => {
             <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white">
               Message
             </Th>
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white">
+              Actions
+            </Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -152,12 +221,16 @@ const FormDataViewer = () => {
               <Td>{entry.message}</Td>
               <Td>
                 <Box position="relative">
-                    <FcFullTrash
-                      style={{ cursor: 'pointer', color: 'red' }}
-                      onClick={() =>
-                        setDeleteConfirmation({ isOpen: true, rowIdToDelete: entry.id })
-                      }
-                    />
+                  <FcFullTrash
+                    style={{ cursor: 'pointer', color: 'red' }}
+                    onClick={() =>
+                      setDeleteConfirmation({ isOpen: true, rowIdToDelete: entry.id })
+                    }
+                  />
+                  <FcEditImage
+                    style={{ cursor: 'pointer', marginLeft: '8px', color: 'blue' }}
+                    onClick={() => openEditModal(entry.id)}
+                  />
                 </Box>
               </Td>
             </Tr>
@@ -174,11 +247,7 @@ const FormDataViewer = () => {
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
               Confirmation
             </AlertDialogHeader>
-
-            <AlertDialogBody>
-              Voulez-vous vraiment supprimer cette ligne ?
-            </AlertDialogBody>
-
+            <AlertDialogBody>Voulez-vous vraiment supprimer cette ligne ?</AlertDialogBody>
             <AlertDialogFooter>
               <Button
                 onClick={() => setDeleteConfirmation({ isOpen: false, rowIdToDelete: null })}
@@ -196,6 +265,40 @@ const FormDataViewer = () => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
+      <Modal isOpen={editModal.isOpen} onClose={() => setEditModal({ isOpen: false, rowIdToEdit: null })}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Modifier la ligne</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel>Nom</FormLabel>
+              <Input
+                type="text"
+                value={editedData.name}
+                onChange={(e) => setEditedData({ ...editedData, name: e.target.value })}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Email</FormLabel>
+              <Input
+                type="email"
+                value={editedData.email}
+                onChange={(e) => setEditedData({ ...editedData, email: e.target.value })}
+              />
+            </FormControl>
+            {/* Add other fields here for editing */}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={handleEditRow}>
+              Enregistrer
+            </Button>
+            <Button variant="ghost" onClick={() => setEditModal({ isOpen: false, rowIdToEdit: null })}>
+              Annuler
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };
