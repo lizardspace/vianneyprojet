@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import { Box, Text, Button, useColorModeValue, ModalOverlay, Modal, ModalCloseButton, ModalHeader, ModalBody, ModalContent,} from '@chakra-ui/react';
 import { FcDocument } from "react-icons/fc";
+import DocumentationsComponent from "./../../default/DocumentionsComponent/DocumentationsComponent";
 
 const ParametersEvents = () => {
   const brandColor = useColorModeValue("brand.500", "white");
@@ -27,14 +28,13 @@ const ParametersEvents = () => {
         Documents missions
       </Button>
 
-      {/* Modal */}
-      <Modal isOpen={showDocumentsModal} onClose={closeDocumentsModal}>
+      <Modal isOpen={showDocumentsModal} onClose={closeDocumentsModal} size="full">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Documents missions Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* Add your content for the Documents missions modal here */}
+          <DocumentationsComponent />
           </ModalBody>
         </ModalContent>
       </Modal>
