@@ -8,19 +8,24 @@ import ContactInfoForm from './salledecrise/ContactInfoForm';
 import FormDataViewer from './salledecrise/FormDataViewer';
 import NotepadComponentSalleDeCrise from './salledecrise/NotepadComponentSalleDeCrise';
 import Documents from './salledecrise/Documents';
+import { FcDataConfiguration } from "react-icons/fc";
 
 const SalleDeCrise = () => {
   const textColor = useColorModeValue("secondaryGray.900", "white");
-  const [showContactInfoForm, setShowContactInfoForm] = useState(false); // Initially set to true
+  const [showContactInfoForm, setShowContactInfoForm] = useState(false); // Initialisation à false
 
   const toggleContactInfoForm = () => {
-    setShowContactInfoForm(!showContactInfoForm); // Toggle the state
+    setShowContactInfoForm(!showContactInfoForm); // Inversion de l'état
   };
 
   return (
     <div>
-      <Button onClick={toggleContactInfoForm}>
-        {showContactInfoForm ? "Hide Contact Info Form" : "Show Contact Info Form"}
+      <Button
+        onClick={toggleContactInfoForm}
+        leftIcon={<FcDataConfiguration />} // Icône pour afficher/masquer le formulaire
+        colorScheme="teal"
+      >
+        {showContactInfoForm ? "Masquer le formulaire de contact" : "Afficher le formulaire de contact"}
       </Button>
       {showContactInfoForm && <ContactInfoForm />}      
       <FormDataViewer />
