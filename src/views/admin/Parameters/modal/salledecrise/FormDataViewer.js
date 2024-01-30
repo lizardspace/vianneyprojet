@@ -1,8 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Thead, Tbody, Tr, Th, Td, Spinner, Text, Alert, AlertIcon, Box, Tooltip, useToast,  } from '@chakra-ui/react';
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Spinner,
+  Text,
+  Alert,
+  AlertIcon,
+  Box,
+  useToast,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Button,
+} from '@chakra-ui/react';
 import { supabase } from './../../../../../supabaseClient';
 import { useEvent } from './../../../../../EventContext';
-import { FcFullTrash } from "react-icons/fc";
+import { FcFullTrash } from 'react-icons/fc';
 
 const FormDataViewer = () => {
   const [formData, setFormData] = useState([]);
@@ -10,6 +30,11 @@ const FormDataViewer = () => {
   const [error, setError] = useState(null);
   const { selectedEventId } = useEvent();
   const toast = useToast();
+  const [deleteConfirmation, setDeleteConfirmation] = useState({
+    isOpen: false,
+    rowIdToDelete: null,
+  });
+
   const handleDeleteRow = async (rowId) => {
     try {
       const { error } = await supabase
@@ -33,6 +58,8 @@ const FormDataViewer = () => {
       }
     } catch (error) {
       console.error('Error deleting row:', error);
+    } finally {
+      setDeleteConfirmation({ isOpen: false, rowIdToDelete: null });
     }
   };
 
@@ -67,7 +94,7 @@ const FormDataViewer = () => {
     return (
       <Alert status="error" variant="subtle" flexDirection="column" alignItems="center">
         <AlertIcon />
-        <Text fontSize='xl' m={4}>
+        <Text fontSize="xl" m={4}>
           {error}
         </Text>
       </Alert>
@@ -78,7 +105,7 @@ const FormDataViewer = () => {
     return (
       <Alert status="info" variant="subtle" flexDirection="column" alignItems="center">
         <AlertIcon />
-        <Text fontSize='xl' m={4}>
+        <Text fontSize="xl" m={4}>
           No data available.
         </Text>
       </Alert>
@@ -90,25 +117,25 @@ const FormDataViewer = () => {
       <Table variant="simple" boxShadow="md" borderRadius="md">
         <Thead>
           <Tr>
-            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white">
               Name
             </Th>
-            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white">
               Email
             </Th>
-            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white">
               Phone
             </Th>
-            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white">
               Street
             </Th>
-            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white">
               Zip
             </Th>
-            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white">
               City
             </Th>
-            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white"> {/* Add background gradient to header */}
+            <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white">
               Message
             </Th>
           </Tr>
@@ -124,17 +151,51 @@ const FormDataViewer = () => {
               <Td>{entry.city}</Td>
               <Td>{entry.message}</Td>
               <Td>
-                <Tooltip label="Supprimer">
-                  <FcFullTrash
-                    style={{ cursor: "pointer", color: "red" }}
-                    onClick={() => handleDeleteRow(entry.id)}
-                  />
-                </Tooltip>
+                <Box position="relative">
+                    <FcFullTrash
+                      style={{ cursor: 'pointer', color: 'red' }}
+                      onClick={() =>
+                        setDeleteConfirmation({ isOpen: true, rowIdToDelete: entry.id })
+                      }
+                    />
+                </Box>
               </Td>
             </Tr>
           ))}
         </Tbody>
       </Table>
+      <AlertDialog
+        isOpen={deleteConfirmation.isOpen}
+        onClose={() => setDeleteConfirmation({ isOpen: false, rowIdToDelete: null })}
+        isCentered
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Confirmation
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Voulez-vous vraiment supprimer cette ligne ?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button
+                onClick={() => setDeleteConfirmation({ isOpen: false, rowIdToDelete: null })}
+              >
+                Annuler
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={() => handleDeleteRow(deleteConfirmation.rowIdToDelete)}
+                ml={3}
+              >
+                Supprimer
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   );
 };
