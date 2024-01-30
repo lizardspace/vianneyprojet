@@ -133,12 +133,13 @@ function TeamScheduleByMySelf() {
   useEffect(() => {
     const fetchData = async () => {
       const teamsData = await fetchTeams();
-      setTeams(teamsData);
-
+      const sortedTeams = teamsData.sort((a, b) => a.titel.localeCompare(b.titel)); // Sort teams alphabetically
+      setTeams(sortedTeams);
+  
       const { data: eventsData, error } = await supabase
         .from('team_action_view_rendering')
         .select('*');
-
+  
       if (error) {
         console.error('Error fetching events:', error);
       } else {
@@ -148,12 +149,12 @@ function TeamScheduleByMySelf() {
           start: new Date(action.starting_date),
           end: new Date(action.ending_date),
           resourceId: action.team_id,
-          color: teamsData.find(t => t.id === action.team_id)?.color || 'lightgrey'
+          color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
         }));
         setEvents(formattedEvents);
       }
     };
-
+  
     fetchData();
   }, []);
 
