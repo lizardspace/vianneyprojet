@@ -213,7 +213,7 @@ const FormDataViewer = () => {
               Message
             </Th>
             <Th background="linear-gradient(to bottom, #007bff, #0056b3)" color="white">
-              Actions
+              Supprimer/Modifier
             </Th>
           </Tr>
         </Thead>
