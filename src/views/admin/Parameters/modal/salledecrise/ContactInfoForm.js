@@ -9,6 +9,7 @@ import {
   Textarea,
   useToast,
   ChakraProvider,
+  Flex, // Import Flex component
 } from '@chakra-ui/react';
 import {
   useEvent,
@@ -20,7 +21,7 @@ const ContactInfoForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const formData = new FormData(e.target);
     const name = formData.get('name');
     const email = formData.get('email');
@@ -84,13 +85,13 @@ const ContactInfoForm = () => {
         isClosable: true,
       });
     }
-  };
+  };  
 
   return (
     <ChakraProvider>
       <Box>
         <form onSubmit={handleSubmit}>
-          <FormControl id="name" isRequired>
+        <FormControl id="name" isRequired>
             <FormLabel>Nom</FormLabel>
             <Input type="text" name="name" placeholder="Votre nom" />
           </FormControl>
@@ -123,15 +124,17 @@ const ContactInfoForm = () => {
               minH="120px"
             />
           </FormControl>
-          <Button
-            type="submit"
-            colorScheme="teal"
-            mt={4}
-            minWidth={`${toast('Soumettre').length * 10}px`} 
-            isLoading={false} 
-          >
-            Soumettre
-          </Button>
+          <Flex justifyContent="flex-end"> 
+            <Button
+              type="submit"
+              colorScheme="teal"
+              mt={4}
+              minWidth={`${toast('Soumettre').length * 10}px`}
+              isLoading={false}
+            >
+              Soumettre
+            </Button>
+          </Flex>
         </form>
       </Box>
     </ChakraProvider>
