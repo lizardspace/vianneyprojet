@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Thead, Tbody, Tr, Th, Td, Spinner, Text, Alert, AlertIcon, Box } from '@chakra-ui/react';
+import { Table, Thead, Tbody, Tr, Th, Td, Spinner, Text, Alert, AlertIcon, Box, Tooltip, useToast,  } from '@chakra-ui/react';
 import { supabase } from './../../../../../supabaseClient';
 import { useEvent } from './../../../../../EventContext';
 import { FcFullTrash } from "react-icons/fc";
@@ -9,6 +9,7 @@ const FormDataViewer = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { selectedEventId } = useEvent();
+  const toast = useToast();
   const handleDeleteRow = async (rowId) => {
     try {
       const { error } = await supabase
@@ -21,6 +22,14 @@ const FormDataViewer = () => {
       } else {
         // Remove the deleted row from the local state (formData)
         setFormData((prevData) => prevData.filter((entry) => entry.id !== rowId));
+
+        // Show a success notification
+        toast({
+          title: 'Élément supprimé',
+          status: 'success',
+          duration: 3000, // Duration in milliseconds (adjust as needed)
+          isClosable: true,
+        });
       }
     } catch (error) {
       console.error('Error deleting row:', error);
@@ -115,10 +124,12 @@ const FormDataViewer = () => {
               <Td>{entry.city}</Td>
               <Td>{entry.message}</Td>
               <Td>
-                <FcFullTrash
-                  style={{ cursor: "pointer", color: "red" }}
-                  onClick={() => handleDeleteRow(entry.id)} // Replace handleDeleteRow with your delete row function
-                />
+                <Tooltip label="Supprimer">
+                  <FcFullTrash
+                    style={{ cursor: "pointer", color: "red" }}
+                    onClick={() => handleDeleteRow(entry.id)}
+                  />
+                </Tooltip>
               </Td>
             </Tr>
           ))}
