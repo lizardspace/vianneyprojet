@@ -8,8 +8,6 @@ import {
   Td,
   Spinner,
   Text,
-  Alert,
-  AlertIcon,
   Box,
   useToast,
   AlertDialog,
@@ -30,6 +28,8 @@ import {
   FormLabel,
   Input,
   Textarea,
+  Alert, // Added Alert
+  AlertIcon, // Added AlertIcon
 } from '@chakra-ui/react';
 import { supabase } from './../../../../../supabaseClient';
 import { useEvent } from './../../../../../EventContext';
@@ -38,7 +38,7 @@ import { FcFullTrash, FcEditImage } from 'react-icons/fc';
 const FormDataViewer = () => {
   const [formData, setFormData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [setError] = useState(null);
   const { selectedEventId } = useEvent();
   const toast = useToast();
   const [deleteConfirmation, setDeleteConfirmation] = useState({
@@ -58,6 +58,8 @@ const FormDataViewer = () => {
     city: '',
     message: '',
   });
+  const [successAlert, setSuccessAlert] = useState(false); // Added successAlert state
+  const [failureAlert, setFailureAlert] = useState(false); // Added failureAlert state
 
   const handleDeleteRow = async (rowId) => {
     try {
@@ -68,6 +70,7 @@ const FormDataViewer = () => {
 
       if (error) {
         console.error('Error deleting row:', error);
+        setFailureAlert(true); // Show failure alert
       } else {
         // Remove the deleted row from the local state (formData)
         setFormData((prevData) => prevData.filter((entry) => entry.id !== rowId));
@@ -79,9 +82,12 @@ const FormDataViewer = () => {
           duration: 3000, // Duration in milliseconds (adjust as needed)
           isClosable: true,
         });
+
+        setSuccessAlert(true); // Show success alert
       }
     } catch (error) {
       console.error('Error deleting row:', error);
+      setFailureAlert(true); // Show failure alert
     } finally {
       setDeleteConfirmation({ isOpen: false, rowIdToDelete: null });
     }
@@ -104,6 +110,7 @@ const FormDataViewer = () => {
 
       if (error) {
         console.error('Error updating row:', error);
+        setFailureAlert(true); // Show failure alert
       } else {
         // Close the edit modal
         setEditModal({ isOpen: false, rowIdToEdit: null });
@@ -115,9 +122,12 @@ const FormDataViewer = () => {
           duration: 3000, // Duration in milliseconds (adjust as needed)
           isClosable: true,
         });
+
+        setSuccessAlert(true); // Show success alert
       }
     } catch (error) {
       console.error('Error updating row:', error);
+      setFailureAlert(true); // Show failure alert
     }
   };
 
@@ -139,47 +149,45 @@ const FormDataViewer = () => {
 
         if (error) {
           setError('Error fetching data');
+          setFailureAlert(true); // Show failure alert
         } else {
           setFormData(data);
         }
       } catch (error) {
         setError('Error fetching data');
+        setFailureAlert(true); // Show failure alert
       } finally {
         setIsLoading(false);
       }
     }
 
     fetchFormData();
-  }, [selectedEventId]);
+  }, [selectedEventId, setError]);
 
   if (isLoading) {
     return <Spinner size="lg" />;
   }
 
-  if (error) {
-    return (
-      <Alert status="error" variant="subtle" flexDirection="column" alignItems="center">
-        <AlertIcon />
-        <Text fontSize="xl" m={4}>
-          {error}
-        </Text>
-      </Alert>
-    );
-  }
-
-  if (formData.length === 0) {
-    return (
-      <Alert status="info" variant="subtle" flexDirection="column" alignItems="center">
-        <AlertIcon />
-        <Text fontSize="xl" m={4}>
-          No data available.
-        </Text>
-      </Alert>
-    );
-  }
-
   return (
     <Box p={4} background="linear-gradient(to bottom, #ffffff, #f0f0f0)">
+      {successAlert && ( // Show success alert
+        <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" mb={4}>
+          <AlertIcon />
+          <Text fontSize="xl" m={4}>
+            Action réussie!
+          </Text>
+        </Alert>
+      )}
+      {failureAlert && ( // Show failure alert
+        <Alert status="error" variant="subtle" flexDirection="column" alignItems="center" mb={4}>
+          <AlertIcon />
+          <Text fontSize="xl" m={4}>
+            Action a échoué.
+          </Text>
+        </Alert>
+      )}
+
+
       <Table variant="simple" boxShadow="md" borderRadius="md">
         <Thead>
           <Tr>
