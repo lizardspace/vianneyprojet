@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Box, Button, FormControl, FormLabel, Input, Select, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  CloseButton,
+} from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
 import { useEvent } from '../../../../EventContext';
 
@@ -15,10 +27,14 @@ const AddActionForm = () => {
     teamId: '',
     actionName: '',
     startingDateTime: '',
-    endingDateTime: '', // We'll calculate this
-    comment: ''
+    endingDateTime: '',
+    comment: '',
   });
-  const [alert, setAlert] = useState({ status: '', message: '', isVisible: false });
+  const [alert, setAlert] = useState({
+    status: '',
+    message: '',
+    isVisible: false,
+  });
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -33,6 +49,15 @@ const AddActionForm = () => {
     fetchTeams();
   }, []);
 
+  const handleStartingDateTimeChange = (e) => {
+    const startingDateTime = e.target.value;
+    const endDate = new Date(startingDateTime);
+    endDate.setHours(endDate.getHours() + 1); // Add 1 hour
+    const endingDateTime = endDate.toISOString().slice(0, 16); // Format to 'YYYY-MM-DDTHH:mm'
+
+    setAction({ ...action, startingDateTime, endingDateTime });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -43,43 +68,32 @@ const AddActionForm = () => {
       action_name: action.actionName,
       starting_date: action.startingDateTime,
       ending_date: action.endingDateTime,
-      action_comment: action.comment
+      action_comment: action.comment,
     };
 
-    const { error } = await supabase
-      .from('vianney_actions')
-      .insert([newAction]);
+    const { error } = await supabase.from('vianney_actions').insert([newAction]);
 
     if (error) {
       console.error('Erreur lors de l insertion des données: ', error);
       setAlert({
         status: 'error',
         message: "Un problème est survenu lors de l'ajout de l'action.",
-        isVisible: true
+        isVisible: true,
       });
     } else {
       setAlert({
         status: 'success',
         message: "L'action a été ajoutée avec succès.",
-        isVisible: true
+        isVisible: true,
       });
       setAction({
         teamId: '',
         actionName: '',
         startingDateTime: '',
         endingDateTime: '',
-        comment: ''
+        comment: '',
       });
     }
-  };
-
-  const handleStartingDateTimeChange = (e) => {
-    const startingDateTime = e.target.value;
-    const endDate = new Date(startingDateTime);
-    endDate.setHours(endDate.getHours() + 1); // Add 1 hour
-    const endingDateTime = endDate.toISOString().slice(0, 16); // Format to 'YYYY-MM-DDTHH:mm'
-
-    setAction({ ...action, startingDateTime, endingDateTime });
   };
 
   const closeAlert = () => {
@@ -101,7 +115,10 @@ const AddActionForm = () => {
       <form onSubmit={handleSubmit}>
         <FormControl isRequired>
           <FormLabel>Équipe</FormLabel>
-          <Select placeholder="Sélectionner une équipe" onChange={(e) => setAction({ ...action, teamId: e.target.value })}>
+          <Select
+            placeholder="Sélectionner une équipe"
+            onChange={(e) => setAction({ ...action, teamId: e.target.value })}
+          >
             {teams.map((team) => (
               <option key={team.id} value={team.id}>
                 {team.name_of_the_team}
@@ -111,20 +128,26 @@ const AddActionForm = () => {
         </FormControl>
         <FormControl isRequired mt={4}>
           <FormLabel>Nom de l'action</FormLabel>
-          <Input placeholder="Nom de l'action" onChange={(e) => setAction({ ...action, actionName: e.target.value })} />
+          <Input
+            placeholder="Nom de l'action"
+            onChange={(e) => setAction({ ...action, actionName: e.target.value })}
+          />
         </FormControl>
         <FormControl mt={4}>
           <FormLabel>Date de début</FormLabel>
           <Input
             type="datetime-local"
-            onChange={handleStartingDateTimeChange} // Call the function when the starting date changes
-            value={action.startingDateTime} // Bind the value to state
+            onChange={handleStartingDateTimeChange}
+            value={action.startingDateTime}
           />
         </FormControl>
         <FormControl mt={4}>
           <FormLabel>Date de fin</FormLabel>
-          <Input type="datetime-local" value={action.endingDateTime} readOnly />
-          {/* Display the calculated endingDateTime */}
+          <Input
+            type="datetime-local"
+            onChange={(e) => setAction({ ...action, endingDateTime: e.target.value })}
+            value={action.endingDateTime}
+          />
         </FormControl>
         <FormControl mt={4}>
           <FormLabel>Commentaire</FormLabel>
