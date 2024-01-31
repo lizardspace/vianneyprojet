@@ -13,6 +13,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  Badge,
 } from "@chakra-ui/react";
 import EditUserForm from './components/EditUserForm';
 import MiniCalendar from "components/calendar/MiniCalendar";
@@ -149,7 +150,14 @@ export default function UserReports() {
       teamLeader={
         // Find the leader in the team members array and extract their info
         team.team_members.find((member) => member.isLeader)
-          ? `${team.team_members.find((member) => member.isLeader).firstname} ${team.team_members.find((member) => member.isLeader).familyname}`
+          ? (
+              <Badge
+                colorScheme="green" // You can customize the color scheme
+                variant="outline"
+              >
+                {`${team.team_members.find((member) => member.isLeader).firstname} ${team.team_members.find((member) => member.isLeader).familyname}`}
+              </Badge>
+            )
           : "N/A"
       }
       teamMembersCount={team.team_members.length}
