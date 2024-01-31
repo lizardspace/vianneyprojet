@@ -134,23 +134,27 @@ export default function UserReports() {
         Equipes
       </Heading>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }} gap='20px' mb='20px'>
-        {teams.map((team, index) => (
-          <Box
-            key={index}
-            cursor="pointer"
-            transition="background-color 0.2s"
-            _hover={{ backgroundColor: "gray.100" }}
-            onClick={() => handleEditTeam(team)} // Add this line
-          >
-            <TeamStatistics
-              teamName={team.name_of_the_team}
-              teamColor={team.color}
-              teamSpeciality={team.specialite}
-              teamLeader={team.leader_name}
-              teamMembersCount={team.team_members.length}
-            />
-          </Box>
-        ))}
+      {teams.map((team, index) => (
+  <Box
+    key={index}
+    cursor="pointer"
+    transition="background-color 0.2s"
+    _hover={{ backgroundColor: "gray.100" }}
+    onClick={() => handleEditTeam(team)}
+  >
+    <TeamStatistics
+      teamName={team.name_of_the_team}
+      teamColor={team.color}
+      teamSpeciality={team.specialite}
+      teamLeader={
+        // Find the leader in the team members array and extract their info
+        team.team_members.find((member) => member.isLeader)?.firstname || "N/A"
+      }
+      teamMembersCount={team.team_members.length}
+    />
+  </Box>
+))}
+
         <Button
           mt="30px"
           onClick={toggleCreateTeamModal}
