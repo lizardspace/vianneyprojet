@@ -148,13 +148,14 @@ export default function UserReports() {
       teamSpeciality={team.specialite}
       teamLeader={
         // Find the leader in the team members array and extract their info
-        team.team_members.find((member) => member.isLeader)?.firstname || "N/A"
+        team.team_members.find((member) => member.isLeader)
+          ? `${team.team_members.find((member) => member.isLeader).firstname} ${team.team_members.find((member) => member.isLeader).familyname}`
+          : "N/A"
       }
       teamMembersCount={team.team_members.length}
     />
   </Box>
 ))}
-
         <Button
           mt="30px"
           onClick={toggleCreateTeamModal}
