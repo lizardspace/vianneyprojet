@@ -1,19 +1,13 @@
 import React from "react";
 import { Icon } from "@chakra-ui/react";
-import {
-  FcBusinessman,
-  FcLock,
-  FcMindMap,
-  FcSerialTasks,
-  FcSurvey,
-  FcSettings,
-} from "react-icons/fc";
+import { FcBusinessman, FcLock, FcMindMap, FcSerialTasks, FcSurvey, FcSettings, FcSelfie } from "react-icons/fc";
 import VideoChatRoom from "views/admin/videoChatRoom";
 // Admin Imports
 import MainDashboard from "views/admin/default";
 import NFTMarketplace from "views/admin/carte";
 import Profile from "views/admin/profile";
 import TableauDeBord from "views/admin/TableauDeBord";
+import InterfaceEquipe from "views/admin/InterfaceEquipe";
 
 // Auth Imports
 import SignInCentered from "views/auth/signIn";
@@ -61,14 +55,21 @@ const routes = [
     layout: "/admin",
     path: "/parameters",
     icon: <Icon as={FcSettings} width='20px' height='20px' color='inherit' />,
-    component: Parameters, 
+    component: Parameters,
   },
   {
     name: "Salle de chat vidéo",
     layout: "/admin",
     path: "/video-chat",
-    icon: <Icon as={FcBusinessman} width='20px' height='20px' color='inherit' />, // Replace with a suitable icon
-    component: VideoChatRoom, // Your Video Chat Room component
+    icon: <Icon as={FcBusinessman} width='20px' height='20px' color='inherit' />,
+    component: VideoChatRoom,
+  },
+  {
+    name: "Interface Equipe",
+    layout: "/admin",
+    path: "/interface-equipe",
+    icon: <Icon as={FcSelfie} width='20px' height='20px' color='inherit' />,
+    component: InterfaceEquipe,
   },
 ];
 
