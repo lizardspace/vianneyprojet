@@ -52,7 +52,7 @@ export default function TeamStatistics(props) {
             Spécialité: {teamSpeciality}
           </StatLabel>
           <StatLabel color={textColor} fontSize="md">
-            Leader: {teamLeader}
+ {teamLeader}
           </StatLabel>
           <StatLabel color={textColor} fontSize="md">
             Membres: {teamMembersCount}
