@@ -146,7 +146,7 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
           </ModalBody>
         </ModalContent>
       </Modal>
-      <Modal isOpen={showEventNeedsModal} onClose={closeEventNeedsModal}>
+      <Modal isOpen={showEventNeedsModal} onClose={closeEventNeedsModal} size="full">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Besoins Modal</ModalHeader>
