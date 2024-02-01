@@ -75,6 +75,9 @@ export default function Marketplace() {
 
   return (
     <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
+      <Box mt="10px" borderRadius="lg" overflow="hidden">
+        <MapComponent />
+      </Box>
       <Grid
         mb='20px'
         gridTemplateColumns={{ xl: "repeat(3, 1fr)", "2xl": "1fr 0.46fr" }}
@@ -83,9 +86,7 @@ export default function Marketplace() {
         <Flex
           flexDirection='column'
           gridArea={{ xl: "1 / 1 / 2 / 3", "2xl": "1 / 1 / 2 / 2" }}>
-          <Box mt="10px" borderRadius="lg" overflow="hidden">
-            <MapComponent />
-          </Box>        
+
           <Flex direction='column'>
             <Flex
               mt='45px'
