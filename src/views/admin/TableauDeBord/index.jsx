@@ -17,9 +17,8 @@ export default function Settings() {
         columns={{ sm: 1, md: 2 }}
         spacing={{ base: "20px", xl: "20px" }}>
         <TeamScheduleMadeMySelf />
-        <TeamTimeline/>
-        <TeamTimelineAmeliore/>
         <VianneyAlertChat />
+        <TeamTimelineAmeliore/>
       </SimpleGrid>
       <UserForm />
       <AddActionForm />

@@ -86,12 +86,7 @@ export default function Marketplace() {
           gridArea={{ xl: "1 / 1 / 2 / 3", "2xl": "1 / 1 / 2 / 2" }}>
           <Box mt="10px" borderRadius="lg" overflow="hidden">
             <MapComponent />
-          </Box>
-          <Box maxWidth={maxWidth}>
-            <Card px='0px' mb='20px'>
-              <TeamTimeline />
-            </Card>
-          </Box>
+          </Box>        
           <Flex direction='column'>
             <Flex
               mt='45px'
