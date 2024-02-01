@@ -13,21 +13,21 @@ import { EventProvider } from './EventContext';
 ReactDOM.render(
 	<ChakraProvider theme={theme}>
 		<EventProvider>
-	  <React.StrictMode>
-		<ThemeEditorProvider>
-		  <HashRouter>
-			<Switch>
-			  <Route path={`/auth`} component={AuthLayout} />
-			  <Route path={`/admin`} component={AdminLayout} />
-			  <Route path={`/rtl`} component={RtlLayout} />
-			  <Redirect from='/' to='/admin' />
-			</Switch>
-		  </HashRouter>
-		</ThemeEditorProvider>
-	  </React.StrictMode>
-	  </EventProvider>
+			<React.StrictMode>
+				<ThemeEditorProvider>
+					<HashRouter>
+						<Switch>
+							<Route path={`/auth`} component={AuthLayout} />
+							<Route path={`/admin`} component={AdminLayout} />
+							<Route path={`/rtl`} component={RtlLayout} />
+							<Redirect from='/' to='/admin' />
+						</Switch>
+					</HashRouter>
+				</ThemeEditorProvider>
+			</React.StrictMode>
+		</EventProvider>
 	</ChakraProvider>,
-	document.getElementById('root') // Make sure 'root' matches your actual root element ID
-  );
-  
-  
+	document.getElementById('root') 
+);
+
+
