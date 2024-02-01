@@ -99,7 +99,21 @@ const AddActionForm = () => {
   const closeAlert = () => {
     setAlert({ ...alert, isVisible: false });
   };
-
+  const handleSetEventDate = () => {
+    if (selectedEventId && selectedEventId.event_date) {
+      const eventDate = new Date(selectedEventId.event_date);
+      const year = eventDate.getFullYear();
+      const month = String(eventDate.getMonth() + 1).padStart(2, '0');
+      const day = String(eventDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}T12:00`;
+  
+      // Use setTimeout to update the state after a small delay
+      setTimeout(() => {
+        setAction({ ...action, startingDateTime: formattedDate });
+      }, 10);
+    }
+  };
+     
   return (
     <Box p={4}>
       {alert.isVisible && (
@@ -141,6 +155,14 @@ const AddActionForm = () => {
             value={action.startingDateTime}
           />
         </FormControl>
+        <Button
+          mt={4}
+          colorScheme="blue"
+          type="button"
+          onClick={() => handleSetEventDate()}
+        >
+          Utiliser la date de l'événement
+        </Button>
         <FormControl mt={4}>
           <FormLabel>Date de fin</FormLabel>
           <Input
