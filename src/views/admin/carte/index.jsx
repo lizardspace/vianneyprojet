@@ -28,6 +28,7 @@ export default function Marketplace() {
   // Chakra Color Mode
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [cameras, setCameras] = useState([]);
+  const [showGrid, setShowGrid] = useState(true);
 
   useEffect(() => {
     const fetchCameras = async () => {
@@ -51,6 +52,9 @@ export default function Marketplace() {
   // Toggle function for the button
   const toggleForms = () => {
     setShowForms(!showForms);
+  };
+  const toggleGrid = () => {
+    setShowGrid(!showGrid); // Toggle the visibility of the grid
   };
 
   const [maxWidth, setMaxWidth] = useState(null);
@@ -78,75 +82,83 @@ export default function Marketplace() {
       <Box mt="10px" borderRadius="lg" overflow="hidden">
         <MapComponent />
       </Box>
-      <Grid
-        mb='20px'
-        gridTemplateColumns={{ xl: "repeat(3, 1fr)", "2xl": "1fr 0.46fr" }}
-        gap={{ base: "20px", xl: "20px" }}
-        display={{ base: "block", xl: "grid" }}>
-        <Flex
-          flexDirection='column'
-          gridArea={{ xl: "1 / 1 / 2 / 3", "2xl": "1 / 1 / 2 / 2" }}>
-            <Card p='0px'>
-            <VianneyAlertChat />
-          </Card>
-          <Flex direction='column'>
-            <Flex
-              mt='45px'
-              mb='20px'
-              justifyContent='space-between'
-              direction={{ base: "column", md: "row" }}
-              align={{ base: "start", md: "center" }}>
-              <Text color={textColor} fontSize='2xl' ms='24px' fontWeight='700'>
-                Les vidéos en direct de l'évênement
-              </Text>
-            </Flex>
-            <SimpleGrid columns={{ base: 1, md: 3 }} gap='20px'>
-              {cameras?.map(camera => (
-                <NFT
-                  key={camera.id}
-                  image_url={camera.image_url}
-                  name={camera.name}
-                  location={camera.location}
-                  last_active={camera.last_active}
-                  latitude={camera.latitude}
-                  longitude={camera.longitude}
-                />
-              ))}
-            </SimpleGrid>
+      <Box mt="10px" borderRadius="lg" overflow="hidden">
+        <TableTopCreators
+          tableData={tableDataTopCreators}
+          columnsData={tableColumnsTopCreators}
+        />
+      </Box>
+      <Box mt="10px" borderRadius="lg" overflow="hidden">
+        <Flex direction='column'>
+          <Flex
+            mt='45px'
+            mb='20px'
+            justifyContent='space-between'
+            direction={{ base: "column", md: "row" }}
+            align={{ base: "start", md: "center" }}>
+            <Text color={textColor} fontSize='2xl' ms='24px' fontWeight='700'>
+              Les vidéos en direct de l'évênement
+            </Text>
           </Flex>
-          <Button onClick={toggleForms} mt='4' mb='4'>
-            {showForms ? 'Cacher le formulaire' : 'Montrer le formulaire'}
-          </Button>
-          {showForms && (
-            <>
-              <Box>
-                <CameraForm />
-              </Box>
-              <Box>
-                <UserForm />
-              </Box>
-            </>
-          )}
-        </Flex>
-        <Flex
-          flexDirection='column'
-          gridArea={{ xl: "1 / 3 / 2 / 4", "2xl": "1 / 2 / 2 / 3" }}>
-          <Box maxWidth={maxWidth}>
-            <Card px='0px' mb='20px'>
-              <TableTopCreators
-                tableData={tableDataTopCreators}
-                columnsData={tableColumnsTopCreators}
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap='20px'>
+            {cameras?.map(camera => (
+              <NFT
+                key={camera.id}
+                image_url={camera.image_url}
+                name={camera.name}
+                location={camera.location}
+                last_active={camera.last_active}
+                latitude={camera.latitude}
+                longitude={camera.longitude}
               />
-            </Card>
-          </Box>
-          
-          <Box maxWidth={maxWidth}>
-            <Card px='0px' mb='20px'>
-              <TeamScheduleMadeMySelf />
-            </Card>
-          </Box>
+            ))}
+          </SimpleGrid>
         </Flex>
-      </Grid>
+      </Box>
+      <Button onClick={toggleGrid} mt='4' mb='4'>
+        {showGrid ? 'Hide Grid' : 'Show Grid'}
+      </Button>
+      {showGrid && (
+        <Box mt="10px" borderRadius="lg" overflow="hidden">
+          <Grid
+            mb='20px'
+            gridTemplateColumns={{ xl: "repeat(3, 1fr)", "2xl": "1fr 0.46fr" }}
+            gap={{ base: "20px", xl: "20px" }}
+            display={{ base: "block", xl: "grid" }}>
+            <Flex
+              flexDirection='column'
+              gridArea={{ xl: "1 / 1 / 2 / 3", "2xl": "1 / 1 / 2 / 2" }}>
+              <Card p='0px'>
+                <VianneyAlertChat />
+              </Card>
+              <Button onClick={toggleForms} mt='4' mb='4'>
+                {showForms ? 'Cacher le formulaire' : 'Montrer le formulaire'}
+              </Button>
+              {showForms && (
+                <>
+                  <Box>
+                    <CameraForm />
+                  </Box>
+                  <Box>
+                    <UserForm />
+                  </Box>
+                </>
+              )}
+            </Flex>
+            <Flex
+              flexDirection='column'
+              gridArea={{ xl: "1 / 3 / 2 / 4", "2xl": "1 / 2 / 2 / 3" }}>
+
+
+              <Box maxWidth={maxWidth}>
+                <Card px='0px' mb='20px'>
+                  <TeamScheduleMadeMySelf />
+                </Card>
+              </Box>
+            </Flex>
+          </Grid>
+        </Box>
+      )}
     </Box >
   );
 }
