@@ -28,7 +28,7 @@ export default function Marketplace() {
   // Chakra Color Mode
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [cameras, setCameras] = useState([]);
-  const [showGrid, setShowGrid] = useState(true);
+  const [showGrid, setShowGrid] = useState(false);
 
   useEffect(() => {
     const fetchCameras = async () => {
@@ -116,7 +116,7 @@ export default function Marketplace() {
         </Flex>
       </Box>
       <Button onClick={toggleGrid} mt='4' mb='4'>
-        {showGrid ? 'Hide Grid' : 'Show Grid'}
+        {showGrid ? 'Cacher' : 'Montrer'}
       </Button>
       {showGrid && (
         <Box mt="10px" borderRadius="lg" overflow="hidden">
