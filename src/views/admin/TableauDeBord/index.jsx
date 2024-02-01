@@ -5,7 +5,6 @@ import VianneyAlertChat from "./components/VianneyAlertChat";
 import UserForm from "../carte/components/UserForm";
 import TeamScheduleMadeMySelf from "./components/TeamScheduleMadeMySelf";
 import AddActionForm from "./components/AddActionForm";
-import TeamTimeline from "./components/TeamTimeline";
 import TeamTimelineAmeliore from "./components/TeamTimelineAmeliore";
 
 export default function Settings() {
