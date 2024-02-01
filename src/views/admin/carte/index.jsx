@@ -86,7 +86,9 @@ export default function Marketplace() {
         <Flex
           flexDirection='column'
           gridArea={{ xl: "1 / 1 / 2 / 3", "2xl": "1 / 1 / 2 / 2" }}>
-
+            <Card p='0px'>
+            <VianneyAlertChat />
+          </Card>
           <Flex direction='column'>
             <Flex
               mt='45px'
@@ -137,9 +139,7 @@ export default function Marketplace() {
               />
             </Card>
           </Box>
-          <Card p='0px'>
-            <VianneyAlertChat />
-          </Card>
+          
           <Box maxWidth={maxWidth}>
             <Card px='0px' mb='20px'>
               <TeamScheduleMadeMySelf />
