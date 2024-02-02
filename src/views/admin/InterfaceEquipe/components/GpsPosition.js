@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text, useToast, Alert, AlertIcon } from '@chakra-ui/react';
-import L from 'leaflet';
+import L, { zoomControl } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import { MdPlace } from 'react-icons/md';
@@ -49,14 +49,18 @@ const GpsPosition = () => {
       const { latitude, longitude } = newPosition.coords;
       setPosition({ latitude, longitude });
 
-      // Initialize the map if it hasn't been initialized yet
       if (!mapRef.current) {
-        mapRef.current = L.map('map').setView([latitude, longitude], 13);
+        mapRef.current = L.map('map', {
+          zoomControl: false, // Disable the default zoom control
+        }).setView([latitude, longitude], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
           attribution: '',
         }).addTo(mapRef.current);
-      }
+      
+        // Add a custom zoom control
+        L.control.zoom({ position: 'bottomright' }).addTo(mapRef.current);
+      }      
 
       // Create a custom icon using the MdPlace icon
       const customIcon = createCustomIcon();
