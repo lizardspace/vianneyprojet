@@ -78,8 +78,11 @@ const GpsPosition = () => {
           Merci d'autoriser la géolocalisation
         </Alert>
       )}
+      <Text fontSize="xl" fontWeight="bold">
+        Votre position:
+      </Text>
       {position.latitude && position.longitude && (
-        <Text mt={4}>
+        <Text mt={2}>
           Latitude: {position.latitude}, Longitude: {position.longitude}
         </Text>
       )}
