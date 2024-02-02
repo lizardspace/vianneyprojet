@@ -3,11 +3,28 @@ import { Box, Text, useToast, Alert, AlertIcon } from '@chakra-ui/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+// Import the MdPlace icon
+import { MdPlace } from 'react-icons/md';
+
 const GpsPosition = () => {
   const [position, setPosition] = useState({ latitude: null, longitude: null });
   const [showInfoMessage, setShowInfoMessage] = useState(false);
   const toast = useToast();
   const mapRef = React.useRef(null);
+
+  // Create a custom icon using the MdPlace icon
+  const createCustomIcon = () => {
+    const placeIconHtml = ReactDOMServer.renderToString(
+      <MdPlace style={{ fontSize: '24px', color: 'red' }} />
+    );
+    return L.divIcon({
+      html: placeIconHtml,
+      className: 'custom-leaflet-icon',
+      iconSize: L.point(30, 30),
+      iconAnchor: [15, 30],
+      popupAnchor: [0, -50],
+    });
+  };
 
   useEffect(() => {
     const watchLocation = () => {
@@ -35,13 +52,18 @@ const GpsPosition = () => {
         mapRef.current = L.map('map').setView([latitude, longitude], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
-          attribution: ''
+          attribution: '',
         }).addTo(mapRef.current);
       }
 
-      // Update the marker position
+      // Create a custom icon using the MdPlace icon
+      const customIcon = createCustomIcon();
+
+      // Update the marker position with the custom icon
       if (mapRef.current) {
-        const marker = L.marker([latitude, longitude]).addTo(mapRef.current);
+        const marker = L.marker([latitude, longitude], { icon: customIcon }).addTo(
+          mapRef.current
+        );
         mapRef.current.setView([latitude, longitude], 13);
       }
     };
