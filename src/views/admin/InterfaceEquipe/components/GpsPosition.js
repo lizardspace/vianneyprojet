@@ -30,18 +30,19 @@ const GpsPosition = () => {
       const { latitude, longitude } = newPosition.coords;
       setPosition({ latitude, longitude });
 
-      // Update the map position
+      // Initialize the map if it hasn't been initialized yet
+      if (!mapRef.current) {
+        mapRef.current = L.map('map').setView([latitude, longitude], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: ''
+        }).addTo(mapRef.current);
+      }
+
+      // Update the marker position
       if (mapRef.current) {
-        const map = mapRef.current;
-        map.setView([latitude, longitude], 13);
-
-        // Remove previous marker if it exists
-        if (map.hasLayer(marker)) {
-          map.removeLayer(marker);
-        }
-
-        // Create a new marker and add it to the map
-        const marker = L.marker([latitude, longitude]).addTo(map);
+        const marker = L.marker([latitude, longitude]).addTo(mapRef.current);
+        mapRef.current.setView([latitude, longitude], 13);
       }
     };
 
@@ -112,7 +113,6 @@ const GpsPosition = () => {
       <div
         id="map"
         style={{ height: '500px', width: '100%', zIndex: '-1' }}
-        ref={mapRef}
       ></div>
     </Box>
   );
