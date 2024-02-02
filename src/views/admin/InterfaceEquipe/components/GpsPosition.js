@@ -7,18 +7,26 @@ const GpsPosition = () => {
   const toast = useToast();
 
   useEffect(() => {
-    const getLocation = () => {
+    const watchLocation = () => {
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
+        const watchId = navigator.geolocation.watchPosition(
+          (newPosition) => {
+            showPosition(newPosition);
+          },
+          showError
+        );
+        return () => {
+          navigator.geolocation.clearWatch(watchId);
+        };
       } else {
         setShowInfoMessage(true); // Show info message when geolocation is not supported
       }
     };
 
-    const showPosition = (position) => {
+    const showPosition = (newPosition) => {
       setPosition({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
+        latitude: newPosition.coords.latitude,
+        longitude: newPosition.coords.longitude,
       });
     };
 
@@ -67,7 +75,12 @@ const GpsPosition = () => {
       }
     };
 
-    getLocation(); // Get location when the component mounts
+    watchLocation(); // Start watching for location updates when the component mounts
+
+    // Clean up the watch when the component unmounts
+    return () => {
+      navigator.geolocation.clearWatch();
+    };
   }, [toast]);
 
   return (
