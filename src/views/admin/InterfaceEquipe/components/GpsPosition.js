@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
-import { Button, Box, Text, useToast } from '@chakra-ui/react';
+import { Button, Box, Text, useToast, Alert, AlertIcon } from '@chakra-ui/react';
 
 const GpsPosition = () => {
   const [position, setPosition] = useState({ latitude: null, longitude: null });
+  const [showInfoMessage, setShowInfoMessage] = useState(false);
   const toast = useToast();
 
   const getLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(showPosition, showError);
     } else {
-      toast({
-        title: 'Geolocation is not supported by this browser.',
-        status: 'error',
-        duration: 9000,
-        isClosable: true,
-      });
+      setShowInfoMessage(true); // Show info message when geolocation is not supported
     }
   };
 
@@ -26,7 +22,7 @@ const GpsPosition = () => {
   };
 
   const showError = (error) => {
-    switch(error.code) {
+    switch (error.code) {
       case error.PERMISSION_DENIED:
         toast({
           title: 'User denied the request for Geolocation.',
@@ -68,13 +64,19 @@ const GpsPosition = () => {
         });
         break;
     }
-  };  
+  };
 
   return (
     <Box p={4}>
       <Button onClick={getLocation} colorScheme="teal">
         Get GPS Position
       </Button>
+      {showInfoMessage && (
+        <Alert status="info" mt={4}>
+          <AlertIcon />
+          Merci d'autoriser la géolocalisation
+        </Alert>
+      )}
       {position.latitude && position.longitude && (
         <Text mt={4}>
           Latitude: {position.latitude}, Longitude: {position.longitude}
