@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text, useToast, Alert, AlertIcon } from '@chakra-ui/react';
-import L, { zoomControl } from 'leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import { MdPlace } from 'react-icons/md';
-
-// Import ReactDOMServer from 'react-dom/server'
 import ReactDOMServer from 'react-dom/server';
 
 const GpsPosition = () => {
-  const [position, setPosition] = useState({ latitude: null, longitude: null });
+  const [setPosition] = useState({ latitude: null, longitude: null });
   const [showInfoMessage, setShowInfoMessage] = useState(false);
   const toast = useToast();
   const mapRef = React.useRef(null);
@@ -49,6 +47,7 @@ const GpsPosition = () => {
       const { latitude, longitude } = newPosition.coords;
       setPosition({ latitude, longitude });
 
+      // Initialize the map if it hasn't been initialized yet
       if (!mapRef.current) {
         mapRef.current = L.map('map', {
           zoomControl: false, // Disable the default zoom control
@@ -57,19 +56,19 @@ const GpsPosition = () => {
           maxZoom: 19,
           attribution: '',
         }).addTo(mapRef.current);
-      
+
         // Add a custom zoom control
         L.control.zoom({ position: 'bottomright' }).addTo(mapRef.current);
-      }      
+      }
 
       // Create a custom icon using the MdPlace icon
       const customIcon = createCustomIcon();
 
       // Update the marker position with the custom icon
       if (mapRef.current) {
-        const marker = L.marker([latitude, longitude], { icon: customIcon }).addTo(
-          mapRef.current
-        );
+        const marker = L.marker([latitude, longitude], {
+          icon: customIcon,
+        }).addTo(mapRef.current);
         mapRef.current.setView([latitude, longitude], 13);
       }
     };
@@ -140,7 +139,7 @@ const GpsPosition = () => {
       </Text>
       <div
         id="map"
-        style={{ height: '500px', width: '100%', zIndex: '-1' }}
+        style={{ height: '500px', width: '100%', zIndex: '0' }}
       ></div>
     </Box>
   );
