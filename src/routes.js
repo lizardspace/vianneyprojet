@@ -1,6 +1,6 @@
 import React from "react";
 import { Icon } from "@chakra-ui/react";
-import { FcBusinessman, FcLock, FcMindMap, FcSerialTasks, FcSurvey, FcSettings, FcSelfie } from "react-icons/fc";
+import { FcBusinessman, FcLock, FcMindMap, FcSerialTasks, FcSurvey, FcSettings, FcSelfie, FcGrid } from "react-icons/fc";
 import VideoChatRoom from "views/admin/videoChatRoom";
 // Admin Imports
 import MainDashboard from "views/admin/default";
@@ -8,6 +8,7 @@ import NFTMarketplace from "views/admin/carte";
 import Profile from "views/admin/profile";
 import TableauDeBord from "views/admin/TableauDeBord";
 import InterfaceEquipe from "views/admin/InterfaceEquipe";
+import TableauExcel from "views/admin/TableauExcel";
 
 // Auth Imports
 import SignInCentered from "views/auth/signIn";
@@ -70,6 +71,13 @@ const routes = [
     path: "/interface-equipe",
     icon: <Icon as={FcSelfie} width='20px' height='20px' color='inherit' />,
     component: InterfaceEquipe,
+  },
+  {
+    name: "Tableau Excel",
+    layout: "/admin",
+    path: "/tableau-excel",
+    icon: <Icon as={FcGrid} width='20px' height='20px' color='inherit' />,
+    component: TableauExcel,
   },
 ];
 
