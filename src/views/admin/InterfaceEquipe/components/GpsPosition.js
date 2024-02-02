@@ -59,8 +59,16 @@ const GpsPosition = () => {
           isClosable: true,
         });
         break;
+      default:
+        toast({
+          title: 'An unexpected error occurred.',
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+        });
+        break;
     }
-  };
+  };  
 
   return (
     <Box p={4}>
