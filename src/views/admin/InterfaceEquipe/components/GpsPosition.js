@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text, useToast, Alert, AlertIcon } from '@chakra-ui/react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const GpsPosition = () => {
   const [position, setPosition] = useState({ latitude: null, longitude: null });
   const [showInfoMessage, setShowInfoMessage] = useState(false);
   const toast = useToast();
+  const mapRef = React.useRef(null);
 
   useEffect(() => {
     const watchLocation = () => {
@@ -24,10 +27,22 @@ const GpsPosition = () => {
     };
 
     const showPosition = (newPosition) => {
-      setPosition({
-        latitude: newPosition.coords.latitude,
-        longitude: newPosition.coords.longitude,
-      });
+      const { latitude, longitude } = newPosition.coords;
+      setPosition({ latitude, longitude });
+
+      // Update the map position
+      if (mapRef.current) {
+        const map = mapRef.current;
+        map.setView([latitude, longitude], 13);
+
+        // Remove previous marker if it exists
+        if (map.hasLayer(marker)) {
+          map.removeLayer(marker);
+        }
+
+        // Create a new marker and add it to the map
+        const marker = L.marker([latitude, longitude]).addTo(map);
+      }
     };
 
     const showError = (error) => {
@@ -94,11 +109,11 @@ const GpsPosition = () => {
       <Text fontSize="xl" fontWeight="bold">
         Votre position:
       </Text>
-      {position.latitude && position.longitude && (
-        <Text mt={2}>
-          Latitude: {position.latitude}, Longitude: {position.longitude}
-        </Text>
-      )}
+      <div
+        id="map"
+        style={{ height: '500px', width: '100%', zIndex: '-1' }}
+        ref={mapRef}
+      ></div>
     </Box>
   );
 };
