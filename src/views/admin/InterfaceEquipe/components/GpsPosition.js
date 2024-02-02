@@ -7,7 +7,6 @@ import { MdPlace } from 'react-icons/md';
 import ReactDOMServer from 'react-dom/server';
 
 const GpsPosition = () => {
-  const [setPosition] = useState({ latitude: null, longitude: null });
   const [showInfoMessage, setShowInfoMessage] = useState(false);
   const toast = useToast();
   const mapRef = React.useRef(null);
@@ -45,7 +44,6 @@ const GpsPosition = () => {
 
     const showPosition = (newPosition) => {
       const { latitude, longitude } = newPosition.coords;
-      setPosition({ latitude, longitude });
 
       // Initialize the map if it hasn't been initialized yet
       if (!mapRef.current) {
@@ -66,7 +64,7 @@ const GpsPosition = () => {
 
       // Update the marker position with the custom icon
       if (mapRef.current) {
-        const marker = L.marker([latitude, longitude], {
+        L.marker([latitude, longitude], {
           icon: customIcon,
         }).addTo(mapRef.current);
         mapRef.current.setView([latitude, longitude], 13);
