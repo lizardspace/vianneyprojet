@@ -3,8 +3,10 @@ import { Box, Text, useToast, Alert, AlertIcon } from '@chakra-ui/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Import the MdPlace icon
 import { MdPlace } from 'react-icons/md';
+
+// Import ReactDOMServer from 'react-dom/server'
+import ReactDOMServer from 'react-dom/server';
 
 const GpsPosition = () => {
   const [position, setPosition] = useState({ latitude: null, longitude: null });
