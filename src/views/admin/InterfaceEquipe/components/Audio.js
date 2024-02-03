@@ -15,16 +15,16 @@ function AudioSpace() {
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then((userStream) => {
         setStream(userStream);
-
+  
         // Initialize WebRTC connections for each user
         peerRef.current = new Peer({ initiator: true, stream: userStream });
-
+  
         // Add code to handle signaling and other WebRTC logic
         peerRef.current.on('signal', (data) => {
           // Send the signaling data to other users
           // Example: socket.emit('signal', data);
         });
-
+  
         // Handle incoming streams from other users
         peerRef.current.on('stream', (remoteStream) => {
           // Create a new peer object for each user and add it to the state
@@ -34,7 +34,7 @@ function AudioSpace() {
       .catch((error) => {
         console.error('Error accessing microphone:', error);
       });
-
+  
     return () => {
       // Clean up resources when component unmounts
       peerRef.current.destroy();
@@ -43,7 +43,8 @@ function AudioSpace() {
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, []);
+  }, [stream]); 
+  
 
   const toggleMute = () => {
     // Toggle microphone mute/unmute
