@@ -1,6 +1,17 @@
-import React, { useEffect } from 'react';
-import { useTeam } from './TeamContext'; // Import the useTeam hook
-import { Box, Badge, Heading, useColorModeValue, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Select } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import { useTeam } from './TeamContext';
+import {
+  Box,
+  Badge,
+  Heading,
+  useColorModeValue,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  Select,
+  CloseButton,
+} from '@chakra-ui/react';
 import GpsPosition from './components/GpsPosition';
 import Audio from './components/Audio';
 import VianneyAlertChat from '../TableauDeBord/components/VianneyAlertChat';
@@ -14,12 +25,16 @@ const InterfaceEquipe = () => {
     teamData,
     setTeamData,
   } = useTeam();
-  const textColor = useColorModeValue("secondaryGray.900", "white");
+  const textColor = useColorModeValue('secondaryGray.900', 'white');
+
+  const [showAlert, setShowAlert] = useState(!selectedTeam);
 
   useEffect(() => {
     async function fetchTeamData() {
       try {
-        const { data, error } = await supabase.from('vianney_teams').select('id, name_of_the_team');
+        const { data, error } = await supabase
+          .from('vianney_teams')
+          .select('id, name_of_the_team');
         if (error) {
           throw error;
         }
@@ -34,19 +49,38 @@ const InterfaceEquipe = () => {
 
   const handleTeamSelection = (event) => {
     setSelectedTeam(event.target.value);
+    setShowAlert(false);
   };
 
-  const isModalOpen = !selectedTeam;
-
   return (
-    <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
-      {/* Display the selected team in a Badge if selectedTeam is not empty */}
+    <Box pt={{ base: '180px', md: '80px', xl: '80px' }}>
+      {showAlert && (
+        <Alert status="error" mb="4">
+          <AlertIcon />
+          <AlertTitle>Attention!</AlertTitle>
+          <AlertDescription>
+            You must select a team from the dropdown menu.
+          </AlertDescription>
+          <CloseButton onClick={() => setShowAlert(false)} position="absolute" right="8px" top="8px" />
+        </Alert>
+      )}
+      <Select
+        value={selectedTeam}
+        onChange={handleTeamSelection}
+        placeholder="Select a team"
+      >
+        {teamData.map((team) => (
+          <option key={team.id} value={team.name_of_the_team}>
+            {team.name_of_the_team}
+          </option>
+        ))}
+      </Select>
       {selectedTeam && (
         <Badge colorScheme="green" mb="4">
-          L'équipe que vous avez sélectionnez est : {selectedTeam}
+          L'équipe que vous avez sélectionnée est : {selectedTeam}
         </Badge>
       )}
-      <TeamMembersDisplay/>
+      <TeamMembersDisplay />
       <Heading
         me="auto"
         color={textColor}
@@ -82,28 +116,7 @@ const InterfaceEquipe = () => {
         Message
       </Heading>
       <VianneyAlertChat />
-
-      {/* Modal for selecting teams */}
-      <Modal isOpen={isModalOpen} onClose={() => {}}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Select Team</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Select
-              value={selectedTeam}
-              onChange={handleTeamSelection}
-              placeholder="Select a team"
-            >
-              {teamData.map((team) => (
-                <option key={team.id} value={team.name_of_the_team}>
-                  {team.name_of_the_team}
-                </option>
-              ))}
-            </Select>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      
     </Box>
   );
 };
