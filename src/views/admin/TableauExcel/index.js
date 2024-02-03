@@ -1,24 +1,33 @@
-// src/views/admin/Parameters/index.js
 import React from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box, Heading, SimpleGrid } from '@chakra-ui/react';
 import VianneyTeamsTable from './components/VianneyTeamsTable';
-import VianneyActionsTable from './components/VianneyActionsTable'; // Import the VianneyActionsTable component
-import VianneyFormUtileSalleDeCriseTable from './components/VianneyFormUtileSalleDeCriseTable'; // Import the VianneyFormUtileSalleDeCriseTable component
-import VianneyPdfDocumentsTable from './components/VianneyPdfDocumentsTable'; // Import the VianneyPdfDocumentsTable component
-import VianneyPdfDocumentsSalleDeCriseTable from './components/VianneyPdfDocumentsSalleDeCriseTable'; // Import the VianneyPdfDocumentsSalleDeCriseTable component
-import VianneyTextareaTable from './components/VianneyTextareaTable'; // Import the VianneyTextareaTable component
-import VianneyTextareaSalleDeCriseTable from './components/VianneyTextareaSalleDeCriseTable'; // Import the VianneyTextareaSalleDeCriseTable component
+import VianneyActionsTable from './components/VianneyActionsTable';
+import VianneyFormUtileSalleDeCriseTable from './components/VianneyFormUtileSalleDeCriseTable';
+import VianneyPdfDocumentsTable from './components/VianneyPdfDocumentsTable';
+import VianneyPdfDocumentsSalleDeCriseTable from './components/VianneyPdfDocumentsSalleDeCriseTable';
+import VianneyTextareaTable from './components/VianneyTextareaTable';
+import VianneyTextareaSalleDeCriseTable from './components/VianneyTextareaSalleDeCriseTable';
 
 const InterfaceEquipe = () => {
   return (
     <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
-      <VianneyTeamsTable />
-      <VianneyActionsTable /> {/* Include the VianneyActionsTable component */}
-      <VianneyFormUtileSalleDeCriseTable /> {/* Include the VianneyFormUtileSalleDeCriseTable component */}
-      <VianneyPdfDocumentsTable /> {/* Include the VianneyPdfDocumentsTable component */}
-      <VianneyPdfDocumentsSalleDeCriseTable /> {/* Include the VianneyPdfDocumentsSalleDeCriseTable component */}
-      <VianneyTextareaTable /> {/* Include the VianneyTextareaTable component */}
-      <VianneyTextareaSalleDeCriseTable /> {/* Include the VianneyTextareaSalleDeCriseTable component */}
+      <Box p={{ base: 4, md: 8, xl: 12 }}>
+        <Heading as="h1" size="lg" mb={4}>
+          Exportation brute des excels
+        </Heading>
+        <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4}>
+          <VianneyTeamsTable />
+          <VianneyActionsTable />
+          <VianneyFormUtileSalleDeCriseTable />
+          <VianneyPdfDocumentsTable />
+          <VianneyPdfDocumentsSalleDeCriseTable />
+          <VianneyTextareaTable />
+          <VianneyTextareaSalleDeCriseTable />
+        </SimpleGrid>
+        <Heading as="h1" size="lg" mb={4}>
+          On pourra faire des exportations excels plus complexes avec des views à ta demande
+        </Heading>
+      </Box>
     </Box>
   );
 };
