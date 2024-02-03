@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChakraProvider, Box, VStack, IconButton, Slider, SliderTrack, SliderFilledTrack, SliderThumb } from '@chakra-ui/react';
-import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
+import { FaMicrophone, FaMicrophoneSlash, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import Peer from 'simple-peer';
 
 function AudioSpace() {
@@ -74,18 +74,22 @@ function AudioSpace() {
           onClick={toggleMute}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
         />
-        <Slider
-          value={volume}
-          onChange={handleVolumeChange}
-          min={0}
-          max={100}
-          aria-label="Volume Control"
-        >
-          <SliderTrack>
-            <SliderFilledTrack />
-          </SliderTrack>
-          <SliderThumb />
-        </Slider>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <FaVolumeMute style={{ marginRight: '8px' }} />
+          <Slider
+            value={volume}
+            onChange={handleVolumeChange}
+            min={0}
+            max={100}
+            aria-label="Volume Control"
+          >
+            <SliderTrack>
+              <SliderFilledTrack />
+            </SliderTrack>
+            <SliderThumb />
+          </Slider>
+          <FaVolumeUp style={{ marginLeft: '8px' }} />
+        </div>
         {peers.map((peerData, index) => (
           <div key={index}>
             {/* Display audio stream for each user */}
