@@ -49,7 +49,7 @@ const VianneyTeamsTable = () => {
     <div>
       {error && <div>Erreur : {error}</div>} {/* Updated error message for French */}
       <Button colorScheme="teal" onClick={handleExport}>
-         Exporter vers Excel <FcAddDatabase style={{ marginLeft: '8px' }} />
+         Exporter vers Excel les équipes <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
     </div>
   );
