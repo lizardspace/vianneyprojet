@@ -6,7 +6,7 @@ import Peer from 'simple-peer';
 function AudioSpace() {
   const [peers, setPeers] = useState([]);
   const [stream, setStream] = useState(null);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(false); 
   const peerRef = useRef();
   const audioRef = useRef();
 
@@ -51,7 +51,7 @@ function AudioSpace() {
       const audioTracks = stream.getAudioTracks();
       if (audioTracks.length > 0) {
         audioTracks[0].enabled = !audioTracks[0].enabled;
-        setIsMuted(audioTracks[0].enabled); // Update state with the correct mute status
+        setIsMuted(!audioTracks[0].enabled);
       }
     }
   };
