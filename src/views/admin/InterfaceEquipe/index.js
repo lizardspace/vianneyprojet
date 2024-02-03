@@ -10,7 +10,9 @@ import {
   AlertTitle,
   AlertDescription,
   Select,
+  Button, 
   CloseButton,
+  Spacer,
 } from '@chakra-ui/react';
 import GpsPosition from './components/GpsPosition';
 import Audio from './components/Audio';
@@ -28,6 +30,7 @@ const InterfaceEquipe = () => {
   const textColor = useColorModeValue('secondaryGray.900', 'white');
 
   const [showAlert, setShowAlert] = useState(!selectedTeam);
+  const [showDropdown, setShowDropdown] = useState(true); // Initially show the dropdown
 
   useEffect(() => {
     async function fetchTeamData() {
@@ -50,6 +53,11 @@ const InterfaceEquipe = () => {
   const handleTeamSelection = (event) => {
     setSelectedTeam(event.target.value);
     setShowAlert(false);
+    setShowDropdown(false); // Hide the dropdown after selection
+  };
+
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
   };
 
   return (
@@ -59,27 +67,36 @@ const InterfaceEquipe = () => {
           <AlertIcon />
           <AlertTitle>Attention!</AlertTitle>
           <AlertDescription>
-          Sélectionnez une équipe est obligatoire
+            Sélectionnez une équipe est obligatoire
           </AlertDescription>
           <CloseButton onClick={() => setShowAlert(false)} position="absolute" right="8px" top="8px" />
         </Alert>
       )}
-      <Select
-        value={selectedTeam}
-        onChange={handleTeamSelection}
-        placeholder="Selectionnez une équipe"
-      >
-        {teamData.map((team) => (
-          <option key={team.id} value={team.name_of_the_team}>
-            {team.name_of_the_team}
-          </option>
-        ))}
-      </Select>
+      {showDropdown ? (
+        <>
+          <Select
+            value={selectedTeam}
+            onChange={handleTeamSelection}
+            placeholder="Selectionnez une équipe"
+          >
+            {teamData.map((team) => (
+              <option key={team.id} value={team.name_of_the_team}>
+                {team.name_of_the_team}
+              </option>
+            ))}
+          </Select>
+        </>
+      ) : (
+        <Button mt="2" onClick={toggleDropdown}>
+          Afficher le menu déroulant
+        </Button>
+      )}
       {selectedTeam && (
         <Badge colorScheme="green" mb="4">
           L'équipe que vous avez sélectionnée est : {selectedTeam}
         </Badge>
       )}
+      <Spacer/>
       <TeamMembersDisplay />
       <Heading
         me="auto"
@@ -116,7 +133,6 @@ const InterfaceEquipe = () => {
         Message
       </Heading>
       <VianneyAlertChat />
-      
     </Box>
   );
 };
