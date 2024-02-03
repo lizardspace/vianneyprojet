@@ -74,7 +74,7 @@ function AudioSpace() {
           onClick={toggleMute}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
         />
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', minWidth: '200px' }}>
           <FaVolumeMute style={{ marginRight: '8px' }} />
           <Slider
             value={volume}
