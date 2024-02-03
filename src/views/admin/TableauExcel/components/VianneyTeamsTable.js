@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@chakra-ui/react';
 import { utils, writeFile } from 'xlsx';
 import { supabase } from './../../../../supabaseClient';
+import { FcAddDatabase } from "react-icons/fc"; // Importing the icon
 
 const VianneyTeamsTable = () => {
   const [data, setData] = useState([]);
@@ -48,7 +49,7 @@ const VianneyTeamsTable = () => {
     <div>
       {error && <div>Erreur : {error}</div>} {/* Updated error message for French */}
       <Button colorScheme="teal" onClick={handleExport}>
-        Exporter vers Excel les équipes
+         Exporter vers Excel <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
     </div>
   );
