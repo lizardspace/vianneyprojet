@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Heading,
@@ -15,11 +15,13 @@ import {
 import GpsPosition from './components/GpsPosition';
 import Audio from './components/Audio';
 import VianneyAlertChat from '../TableauDeBord/components/VianneyAlertChat';
+import { supabase } from './../../../supabaseClient';
 
 const InterfaceEquipe = () => {
   const textColor = useColorModeValue("secondaryGray.900", "white"); // Define textColor based on the color mode
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState(""); // To store the selected team
+  const [teamData, setTeamData] = useState([]); // To store the fetched team data
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -29,13 +31,22 @@ const InterfaceEquipe = () => {
     setSelectedTeam(event.target.value);
   };
 
-  // Replace this with actual team data from your database
-  const teamData = [
-    { id: '1', name: 'Team 1' },
-    { id: '2', name: 'Team 2' },
-    { id: '3', name: 'Team 3' },
-    // Add more teams as needed
-  ];
+  useEffect(() => {
+    // Fetch team data from Supabase and populate the teamData array
+    async function fetchTeamData() {
+      try {
+        const { data, error } = await supabase.from('vianney_teams').select('id, name_of_the_team');
+        if (error) {
+          throw error;
+        }
+        setTeamData(data);
+      } catch (error) {
+        console.error('Error fetching team data:', error);
+      }
+    }
+
+    fetchTeamData();
+  }, []);
 
   return (
     <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
@@ -92,8 +103,8 @@ const InterfaceEquipe = () => {
               placeholder="Select a team"
             >
               {teamData.map((team) => (
-                <option key={team.id} value={team.name}>
-                  {team.name}
+                <option key={team.id} value={team.id}>
+                  {team.name_of_the_team}
                 </option>
               ))}
             </Select>
