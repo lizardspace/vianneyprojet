@@ -87,16 +87,16 @@ const InterfaceEquipe = () => {
           </Select>
         </>
       ) : (
-        <Button mt="2" onClick={toggleDropdown}>
+        <Button onClick={toggleDropdown} size="sm" fontSize="sm" >
           Afficher le menu déroulant
         </Button>
       )}
+            <Spacer/>
       {selectedTeam && (
         <Badge colorScheme="green" mb="4">
           L'équipe que vous avez sélectionnée est : {selectedTeam}
         </Badge>
       )}
-      <Spacer/>
       <TeamMembersDisplay />
       <Heading
         me="auto"
@@ -104,7 +104,8 @@ const InterfaceEquipe = () => {
         fontSize="2xl"
         fontWeight="700"
         lineHeight="100%"
-        mb="20px"
+        mb={4}
+        mt={4}
       >
         Radio CB
       </Heading>
@@ -115,7 +116,7 @@ const InterfaceEquipe = () => {
         fontSize="2xl"
         fontWeight="700"
         lineHeight="100%"
-        mb={10}
+        mb={1}
         mt={10}
       >
         La position que vous communiquez au PC sécurité
