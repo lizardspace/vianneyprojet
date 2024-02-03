@@ -29,26 +29,26 @@ const VianneyTeamsTable = () => {
 
   const handleExport = () => {
     if (data.length === 0) {
-      setError('No data to export.');
+      setError('Aucune donnée à exporter.'); // Updated error message for French
       return;
     }
 
     const ws = utils.json_to_sheet(data);
     const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, 'Vianney Teams');
+    utils.book_append_sheet(wb, ws, 'Équipes de Vianney'); // Updated sheet name for French
     
     try {
-      writeFile(wb, 'vianney_teams.xlsx');
+      writeFile(wb, 'equipes_vianney.xlsx'); // Updated file name for French
     } catch (error) {
-      setError('Error exporting to Excel: ' + error.message);
+      setError('Erreur lors de l\'exportation vers Excel : ' + error.message); // Updated error message for French
     }
   };
 
   return (
     <div>
-      {error && <div>Error: {error}</div>}
+      {error && <div>Erreur : {error}</div>} {/* Updated error message for French */}
       <Button colorScheme="teal" onClick={handleExport}>
-        Export to Excel
+        Exporter vers Excel les équipes
       </Button>
     </div>
   );
