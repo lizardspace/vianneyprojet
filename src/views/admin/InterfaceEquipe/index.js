@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useTeam } from './TeamContext'; // Import the useTeam hook
 import { Box, Badge, Heading, useColorModeValue, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Select } from '@chakra-ui/react';
 import GpsPosition from './components/GpsPosition';
@@ -12,18 +12,10 @@ const InterfaceEquipe = () => {
     setSelectedTeam,
     teamData,
     setTeamData,
-  } = useTeam(); 
-  const [displayedTeam] = useState(null); 
+  } = useTeam();
   const textColor = useColorModeValue("secondaryGray.900", "white");
 
-  const handleTeamSelection = (event) => {
-    setSelectedTeam(event.target.value);
-  };
-
-  // The modal is now controlled by whether a team has been selected
-  const isModalOpen = !selectedTeam;
   useEffect(() => {
-    // Fetch team data from Supabase and populate the teamData array
     async function fetchTeamData() {
       try {
         const { data, error } = await supabase.from('vianney_teams').select('id, name_of_the_team');
@@ -39,9 +31,20 @@ const InterfaceEquipe = () => {
     fetchTeamData();
   }, [setTeamData]);
 
+  const handleTeamSelection = (event) => {
+    setSelectedTeam(event.target.value);
+  };
+
+  const isModalOpen = !selectedTeam;
+
   return (
     <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
-      <Badge>L'équipe que vous avez sélectionnez est : </Badge>
+      {/* Display the selected team in a Badge if selectedTeam is not empty */}
+      {selectedTeam && (
+        <Badge colorScheme="green" mb="4">
+          L'équipe que vous avez sélectionnez est : {selectedTeam}
+        </Badge>
+      )}
       <Heading
         me="auto"
         color={textColor}
@@ -52,19 +55,6 @@ const InterfaceEquipe = () => {
       >
         Radio CB
       </Heading>
-      {displayedTeam && (
-        <Heading
-          me="auto"
-          color={textColor}
-          fontSize="2xl"
-          fontWeight="700"
-          lineHeight="100%"
-          mb={10}
-          mt={10}
-        >
-          Selected Team: {displayedTeam}
-        </Heading>
-      )}
       <Audio />
       <Heading
         me="auto"
