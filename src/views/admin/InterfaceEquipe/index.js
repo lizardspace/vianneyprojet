@@ -63,7 +63,7 @@ const InterfaceEquipe = () => {
   return (
     <Box pt={{ base: '180px', md: '80px', xl: '80px' }}>
       {showAlert && (
-        <Alert status="error" mb="4">
+        <Alert status="error" mb="4" minHeight="200px"> {/* Set minimum height */}
           <AlertIcon />
           <AlertTitle>Attention!</AlertTitle>
           <AlertDescription>
@@ -87,11 +87,11 @@ const InterfaceEquipe = () => {
           </Select>
         </>
       ) : (
-        <Button onClick={toggleDropdown} size="sm" fontSize="sm" >
+        <Button onClick={toggleDropdown} size="sm" fontSize="sm">
           Afficher le menu déroulant
         </Button>
       )}
-            <Spacer/>
+      <Spacer/>
       {selectedTeam && (
         <Badge colorScheme="green" mb="4">
           L'équipe que vous avez sélectionnée est : {selectedTeam}
