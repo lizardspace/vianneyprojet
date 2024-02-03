@@ -59,7 +59,7 @@ const InterfaceEquipe = () => {
           <AlertIcon />
           <AlertTitle>Attention!</AlertTitle>
           <AlertDescription>
-            You must select a team from the dropdown menu.
+          Sélectionnez une équipe est obligatoire
           </AlertDescription>
           <CloseButton onClick={() => setShowAlert(false)} position="absolute" right="8px" top="8px" />
         </Alert>
@@ -67,7 +67,7 @@ const InterfaceEquipe = () => {
       <Select
         value={selectedTeam}
         onChange={handleTeamSelection}
-        placeholder="Select a team"
+        placeholder="Selectionnez une équipe"
       >
         {teamData.map((team) => (
           <option key={team.id} value={team.name_of_the_team}>
