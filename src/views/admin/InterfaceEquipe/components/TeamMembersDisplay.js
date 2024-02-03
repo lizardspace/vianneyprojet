@@ -15,7 +15,7 @@ const TeamMembersDisplay = () => {
             <Text fontWeight="bold">{member.firstname} {member.familyname}</Text>
             <Text>Email: {member.mail}</Text>
             <Text>Phone: {member.phone}</Text>
-            {member.isLeader && <Text fontWeight="bold" color="green.500">Team Leader</Text>}
+            {member.isLeader && <Text fontWeight="bold" color="green.500">Chef d'équipe</Text>}
           </Box>
         ))}
       </VStack>
