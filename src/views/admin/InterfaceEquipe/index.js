@@ -22,6 +22,7 @@ const InterfaceEquipe = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState(""); // To store the selected team
   const [teamData, setTeamData] = useState([]); // To store the fetched team data
+  const [displayedTeam, setDisplayedTeam] = useState(null); // To store the selected team for display
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -29,6 +30,11 @@ const InterfaceEquipe = () => {
 
   const handleTeamSelection = (event) => {
     setSelectedTeam(event.target.value);
+  };
+
+  const handleConfirmSelection = () => {
+    setDisplayedTeam(selectedTeam);
+    setIsModalOpen(false); // Close the modal
   };
 
   useEffect(() => {
@@ -60,6 +66,19 @@ const InterfaceEquipe = () => {
       >
         Radio CB
       </Heading>
+      {displayedTeam && (
+        <Heading
+          me="auto"
+          color={textColor}
+          fontSize="2xl"
+          fontWeight="700"
+          lineHeight="100%"
+          mb={10}
+          mt={10}
+        >
+          Selected Team: {displayedTeam}
+        </Heading>
+      )}
       <Audio />
       <Heading
         me="auto"
@@ -103,11 +122,12 @@ const InterfaceEquipe = () => {
               placeholder="Select a team"
             >
               {teamData.map((team) => (
-                <option key={team.id} value={team.id}>
+                <option key={team.id} value={team.name_of_the_team}>
                   {team.name_of_the_team}
                 </option>
               ))}
             </Select>
+            <Button onClick={handleConfirmSelection}>Confirm</Button>
           </ModalBody>
         </ModalContent>
       </Modal>
