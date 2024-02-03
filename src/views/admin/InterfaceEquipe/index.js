@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Heading, useColorModeValue } from '@chakra-ui/react';
 import GpsPosition from './components/GpsPosition';
 import Audio from './components/Audio';
+import VianneyAlertChat from '../TableauDeBord/components/VianneyAlertChat';
 
 const InterfaceEquipe = () => {
   const textColor = useColorModeValue("secondaryGray.900", "white"); // Define textColor based on the color mode
@@ -31,6 +32,18 @@ const InterfaceEquipe = () => {
         La position que vous communiquez au PC sécurité
       </Heading>
       <GpsPosition />
+      <Heading
+        me="auto"
+        color={textColor}
+        fontSize="2xl"
+        fontWeight="700"
+        lineHeight="100%"
+        mb={10}
+        mt={10}
+      >
+        Message
+      </Heading>
+      <VianneyAlertChat/>
     </Box>
   );
 };
