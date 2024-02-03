@@ -1,26 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Textarea } from '@chakra-ui/react';
+import { Button } from '@chakra-ui/react';
+import { utils, writeFile } from 'xlsx';
 import { supabase } from './../../../../supabaseClient';
 import { FcAddDatabase } from "react-icons/fc"; // Importing the icon
 
 const VianneyTextareaTable = () => {
-  const [textData, setTextData] = useState('');
+  const [data, setData] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data, error } = await supabase
+        const { data: tableData, error } = await supabase
           .from('vianney_textarea') // Replace with your actual table name
-          .select('*') // Fetch the 'text_data' column
+          .select('*'); // Fetch all columns
 
         if (error) {
           setError(error.message);
         } else {
-          // Assuming the response is an array with a single object
-          if (data.length === 1 && data[0].text_data) {
-            setTextData(data[0].text_data);
-          }
+          setData(tableData);
         }
       } catch (error) {
         setError(error.message);
@@ -31,25 +29,31 @@ const VianneyTextareaTable = () => {
   }, []);
 
   const handleExport = () => {
-    if (!textData) {
-      setError('Aucun texte à exporter.'); // Updated error message for French
+    if (data.length === 0) {
+      setError('Aucune donnée à exporter.'); // Updated error message for French
       return;
     }
 
-    // You can export the 'textData' as needed here.
-    // For simplicity, we will log it to the console in this example.
-    console.log('Texte exporté :', textData);
+    const ws = utils.json_to_sheet(data);
+    const wb = utils.book_new();
+    utils.book_append_sheet(wb, ws, 'Aire de texte de Vianney'); // Updated sheet name for French
+    
+    try {
+      writeFile(wb, 'textarea_vianney.xlsx'); // Updated file name for French
+    } catch (error) {
+      setError('Erreur lors de l\'exportation vers Excel : ' + error.message); // Updated error message for French
+    }
   };
 
   return (
     <div>
       {error && <div>Erreur : {error}</div>} {/* Updated error message for French */}
-      <Textarea value={textData} readOnly />
       <Button colorScheme="teal" onClick={handleExport}>
-        Exporter le texte <FcAddDatabase style={{ marginLeft: '8px' }} />
+         Exporter vers Excel l'aire de texte <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
     </div>
   );
 };
 
 export default VianneyTextareaTable;
+
