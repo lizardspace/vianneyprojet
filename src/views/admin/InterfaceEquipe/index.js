@@ -5,6 +5,7 @@ import GpsPosition from './components/GpsPosition';
 import Audio from './components/Audio';
 import VianneyAlertChat from '../TableauDeBord/components/VianneyAlertChat';
 import { supabase } from './../../../supabaseClient';
+import TeamMembers from './components/TeamMembers';
 
 const InterfaceEquipe = () => {
   const {
@@ -45,6 +46,7 @@ const InterfaceEquipe = () => {
           L'équipe que vous avez sélectionnez est : {selectedTeam}
         </Badge>
       )}
+      <TeamMembers/>
       <Heading
         me="auto"
         color={textColor}
