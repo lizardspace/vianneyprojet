@@ -1,42 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Heading,
-  useColorModeValue,
-  Button,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  Select, // Import the Select component
-} from '@chakra-ui/react';
+import { useTeam } from './TeamContext'; // Import the useTeam hook
+import { Box, Badge, Heading, useColorModeValue, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Select } from '@chakra-ui/react';
 import GpsPosition from './components/GpsPosition';
 import Audio from './components/Audio';
 import VianneyAlertChat from '../TableauDeBord/components/VianneyAlertChat';
 import { supabase } from './../../../supabaseClient';
 
 const InterfaceEquipe = () => {
-  const textColor = useColorModeValue("secondaryGray.900", "white"); // Define textColor based on the color mode
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTeam, setSelectedTeam] = useState(""); // To store the selected team
-  const [teamData, setTeamData] = useState([]); // To store the fetched team data
-  const [displayedTeam, setDisplayedTeam] = useState(null); // To store the selected team for display
-
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
+  const {
+    selectedTeam,
+    setSelectedTeam,
+    teamData,
+    setTeamData,
+  } = useTeam(); 
+  const [displayedTeam] = useState(null); 
+  const textColor = useColorModeValue("secondaryGray.900", "white");
 
   const handleTeamSelection = (event) => {
     setSelectedTeam(event.target.value);
   };
 
-  const handleConfirmSelection = () => {
-    setDisplayedTeam(selectedTeam);
-    setIsModalOpen(false); // Close the modal
-  };
-
+  // The modal is now controlled by whether a team has been selected
+  const isModalOpen = !selectedTeam;
   useEffect(() => {
     // Fetch team data from Supabase and populate the teamData array
     async function fetchTeamData() {
@@ -52,10 +37,11 @@ const InterfaceEquipe = () => {
     }
 
     fetchTeamData();
-  }, []);
+  }, [setTeamData]);
 
   return (
     <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
+      <Badge>L'équipe que vous avez sélectionnez est : </Badge>
       <Heading
         me="auto"
         color={textColor}
@@ -105,17 +91,13 @@ const InterfaceEquipe = () => {
       </Heading>
       <VianneyAlertChat />
 
-      {/* Button to open the modal */}
-      <Button onClick={toggleModal}>Select Team</Button>
-
       {/* Modal for selecting teams */}
-      <Modal isOpen={isModalOpen} onClose={toggleModal}>
+      <Modal isOpen={isModalOpen} onClose={() => {}}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Select Team</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* Dropdown menu to select a team */}
             <Select
               value={selectedTeam}
               onChange={handleTeamSelection}
@@ -127,7 +109,6 @@ const InterfaceEquipe = () => {
                 </option>
               ))}
             </Select>
-            <Button onClick={handleConfirmSelection}>Confirm</Button>
           </ModalBody>
         </ModalContent>
       </Modal>

@@ -9,25 +9,28 @@ import { ChakraProvider } from '@chakra-ui/react';
 import theme from 'theme/theme';
 import { ThemeEditorProvider } from '@hypertheme-editor/chakra-ui';
 import { EventProvider } from './EventContext';
+import { TeamProvider } from './views/admin/InterfaceEquipe/TeamContext';
 
 ReactDOM.render(
 	<ChakraProvider theme={theme}>
 		<EventProvider>
-			<React.StrictMode>
-				<ThemeEditorProvider>
-					<HashRouter>
-						<Switch>
-							<Route path={`/auth`} component={AuthLayout} />
-							<Route path={`/admin`} component={AdminLayout} />
-							<Route path={`/rtl`} component={RtlLayout} />
-							<Redirect from='/' to='/admin' />
-						</Switch>
-					</HashRouter>
-				</ThemeEditorProvider>
-			</React.StrictMode>
+			<TeamProvider>
+				<React.StrictMode>
+					<ThemeEditorProvider>
+						<HashRouter>
+							<Switch>
+								<Route path={`/auth`} component={AuthLayout} />
+								<Route path={`/admin`} component={AdminLayout} />
+								<Route path={`/rtl`} component={RtlLayout} />
+								<Redirect from='/' to='/admin' />
+							</Switch>
+						</HashRouter>
+					</ThemeEditorProvider>
+				</React.StrictMode>
+			</TeamProvider>
 		</EventProvider>
 	</ChakraProvider>,
-	document.getElementById('root') 
+	document.getElementById('root')
 );
 
 
