@@ -24,7 +24,7 @@ const InterfaceEquipe = () => {
           <VianneyTextareaTable />
           <VianneyTextareaSalleDeCriseTable />
         </SimpleGrid>
-        <Heading as="h1" size="lg" mb={4}>
+        <Heading as="h1" size="lg" mb={4} mt={4}>
           On pourra faire des exportations excels plus complexes avec des views à ta demande
         </Heading>
       </Box>
