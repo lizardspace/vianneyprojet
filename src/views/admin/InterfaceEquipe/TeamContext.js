@@ -1,31 +1,50 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from './../../../supabaseClient';
 
-// Create a context
 const TeamContext = createContext();
 
 // Provider component that wraps your app and makes the team info available globally
 export const TeamProvider = ({ children }) => {
-  const [selectedTeam, setSelectedTeam] = useState(""); // The selected team
-  const [teamData, setTeamData] = useState([]); // To store fetched team data
+    const [selectedTeam, setSelectedTeam] = useState(""); // The selected team
+    const [teamData, setTeamData] = useState([]); // To store fetched team data
+    const [teamMembers, setTeamMembers] = useState([]);
+    // In TeamContext.js or wherever you have defined your context and provider
 
-  useEffect(() => {
-    // Suppose this function fetches team data
-    async function fetchTeamData() {
-      // Your fetching logic here...
-    }
+    useEffect(() => {
+        async function fetchSelectedTeamDetails() {
+            if (!selectedTeam) return; // Do not fetch if no team is selected
 
-    fetchTeamData();
-  }, []);
+            try {
+                const { data, error } = await supabase
+                    .from('vianney_teams')
+                    .select('team_members')
+                    .eq('name_of_the_team', selectedTeam) // Assuming 'name_of_the_team' is what you store in 'selectedTeam'
+                    .single(); // Assuming you want to fetch a single record
 
-  // Value provided to consumers
-  const value = {
-    selectedTeam,
-    setSelectedTeam,
-    teamData,
-    setTeamData,
-  };
+                if (error) throw error;
 
-  return <TeamContext.Provider value={value}>{children}</TeamContext.Provider>;
+                // Assume 'team_members' is stored directly as an array in the fetched data
+                if (data && data.team_members) {
+                    setTeamMembers(data.team_members);
+                }
+            } catch (error) {
+                console.error('Error fetching selected team details:', error);
+            }
+        }
+
+        fetchSelectedTeamDetails();
+    }, [selectedTeam, setTeamMembers]); // Add setTeamMembers to your context if it's not already there
+
+    const value = {
+        selectedTeam,
+        setSelectedTeam,
+        teamData,
+        setTeamData,
+        teamMembers, // Add this line
+        setTeamMembers, // And this
+      };
+
+    return <TeamContext.Provider value={value}>{children}</TeamContext.Provider>;
 };
 
 // Custom hook to use the team context
