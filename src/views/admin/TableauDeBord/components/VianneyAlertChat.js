@@ -164,6 +164,23 @@ function VianneyAlertChat() {
     setNewAlertText(event.target.value);
   };
 
+  const fetchAlerts = async () => {
+    const { data, error } = await supabase
+      .from('vianney_alert')
+      .select('*')
+      .order('timestamp', { ascending: true });
+
+    if (error) {
+      console.log('Erreur lors de la récupération des alertes:', error);
+    } else {
+      setAlerts(data);
+    }
+  };
+
+  useEffect(() => {
+    fetchAlerts();
+  }, []);
+
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
       const fakeUUID = uuidv4(); // Use UUID v4 to generate a unique user_id for the demo
@@ -208,26 +225,27 @@ function VianneyAlertChat() {
           }
 
           // Check if data is not null before accessing data[0]
-          if (data && data.length > 0) {
-            // Update local state to include the new alert
-            setAlerts([...alerts, { ...data[0], timestamp: new Date().toISOString() }]);
-          } else {
-            console.error('No data returned from the insert operation.');
-          }
+      if (data && data.length > 0) {
+        // Update local state to include the new alert
+        setAlerts([...alerts, { ...data[0], timestamp: new Date().toISOString() }]);
+      } else {
+        console.error('No data returned from the insert operation.');
+      }
 
-          setNewAlertText('');
+      setNewAlertText('');
           setDetails('');
           setImageUrl('');
           setSelectedFile(null);
+      fetchAlerts();
 
-          toast({
-            title: "Alerte ajoutée",
-            description: "Votre alerte a été ajoutée avec succès.",
-            status: "success",
-            duration: 5000,
-            isClosable: true,
-          });
-        } catch (error) {
+      toast({
+        title: "Alerte ajoutée",
+        description: "Votre alerte a été ajoutée avec succès.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+} catch (error) {
           console.error(error.message);
           toast({
             title: "Erreur",
@@ -237,12 +255,12 @@ function VianneyAlertChat() {
             isClosable: true,
           });
         }
-      } else {
-        console.error('No file selected.');
-      }
-    }
+    } else {
+      console.error('No file selected.');
+}
+}
   };
-
+  
 
 
   const textColor = useColorModeValue("secondaryGray.900", "white");
