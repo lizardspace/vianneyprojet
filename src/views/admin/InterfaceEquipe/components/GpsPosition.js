@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Text, useToast, Alert, AlertIcon } from '@chakra-ui/react';
+import { Box, Text, Alert, AlertIcon } from '@chakra-ui/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-
 import { MdPlace } from 'react-icons/md';
 import ReactDOMServer from 'react-dom/server';
+import { useGPSPosition } from './../../../../GPSPositionContext'; // Import the custom hook
 
 const GpsPosition = () => {
   const [showInfoMessage, setShowInfoMessage] = useState(false);
-  const toast = useToast();
   const mapRef = React.useRef(null);
-  const [watchId, setWatchId] = useState(null); // Store the watchId
   const [mapInitialized, setMapInitialized] = useState(false);
+
+  const gpsPosition = useGPSPosition(); // Access the GPS position using the hook
 
   // Create a custom icon using the MdPlace icon
   const createCustomIcon = () => {
@@ -28,123 +28,54 @@ const GpsPosition = () => {
   };
 
   useEffect(() => {
-    const watchLocation = () => {
-      if (navigator.geolocation) {
-        const id = navigator.geolocation.watchPosition(
-          (newPosition) => {
-            showPosition(newPosition);
-          },
-          showError
-        );
-        setWatchId(id); // Store the watchId
-        return () => {
-          if (navigator.geolocation && watchId) {
-            navigator.geolocation.clearWatch(watchId);
-          }
-        };
-      } else {
-        setShowInfoMessage(true); // Show info message when geolocation is not supported
-      }
-    };
+    if (!gpsPosition) {
+      // GPS position is not available, show an info message
+      setShowInfoMessage(true);
+      return;
+    }
 
-    const showPosition = (newPosition) => {
-      const { latitude, longitude } = newPosition.coords;
+    const { latitude, longitude } = gpsPosition;
 
-      // Check if mapRef.current exists and is not destroyed
-      if (mapRef.current && !mapRef.current._leaflet_id) {
-        // Re-create the map if it's destroyed
-        mapRef.current = L.map('map', {
-          zoomControl: false, // Disable the default zoom control
-        });
-        setMapInitialized(false);
-      } else if (!mapRef.current) {
-        // Create the map if it hasn't been initialized yet
-        mapRef.current = L.map('map', {
-          zoomControl: false, // Disable the default zoom control
-        });
-        setMapInitialized(false);
-      }
+    // Check if mapRef.current exists and is not destroyed
+    if (mapRef.current && !mapRef.current._leaflet_id) {
+      // Re-create the map if it's destroyed
+      mapRef.current = L.map('map', {
+        zoomControl: false, // Disable the default zoom control
+      });
+      setMapInitialized(false);
+    } else if (!mapRef.current) {
+      // Create the map if it hasn't been initialized yet
+      mapRef.current = L.map('map', {
+        zoomControl: false, // Disable the default zoom control
+      });
+      setMapInitialized(false);
+    }
 
-      // Set the view if the map exists
-      if (mapRef.current) {
-        if (!mapInitialized) {
-          // Initialize the map if it hasn't been initialized yet
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '',
-          }).addTo(mapRef.current);
-
-          // Add a custom zoom control
-          L.control.zoom({ position: 'bottomright' }).addTo(mapRef.current);
-          setMapInitialized(true);
-        }
-
-        // Create a custom icon using the MdPlace icon
-        const customIcon = createCustomIcon();
-
-        // Update the marker position with the custom icon
-        L.marker([latitude, longitude], {
-          icon: customIcon,
+    // Set the view if the map exists
+    if (mapRef.current) {
+      if (!mapInitialized) {
+        // Initialize the map if it hasn't been initialized yet
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '',
         }).addTo(mapRef.current);
 
-        mapRef.current.setView([latitude, longitude], 13);
+        // Add a custom zoom control
+        L.control.zoom({ position: 'bottomright' }).addTo(mapRef.current);
+        setMapInitialized(true);
       }
-    };
 
-    const showError = (error) => {
-      switch (error.code) {
-        case error.PERMISSION_DENIED:
-          toast({
-            title: 'User denied the request for Geolocation.',
-            status: 'warning',
-            duration: 9000,
-            isClosable: true,
-          });
-          break;
-        case error.POSITION_UNAVAILABLE:
-          toast({
-            title: 'Location information is unavailable.',
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-          });
-          break;
-        case error.TIMEOUT:
-          toast({
-            title: 'The request to get user location timed out.',
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-          });
-          break;
-        case error.UNKNOWN_ERROR:
-          toast({
-            title: 'An unknown error occurred.',
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-          });
-          break;
-        default:
-          toast({
-            title: 'An unexpected error occurred.',
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-          });
-          break;
-      }
-    };
+      // Create a custom icon using the MdPlace icon
+      const customIcon = createCustomIcon();
 
-    watchLocation(); // Start watching for location updates when the component mounts
+      // Update the marker position with the custom icon
+      L.marker([latitude, longitude], {
+        icon: customIcon,
+      }).addTo(mapRef.current);
 
-    // Clean up the watch when the component unmounts
-    return () => {
-      if (navigator.geolocation && watchId) {
-        navigator.geolocation.clearWatch(watchId);
-      }
-    };
-  }, [toast, watchId, mapInitialized]);
+      mapRef.current.setView([latitude, longitude], 13);
+    }
+  }, [gpsPosition, mapInitialized]);
 
   return (
     <Box p={4}>
