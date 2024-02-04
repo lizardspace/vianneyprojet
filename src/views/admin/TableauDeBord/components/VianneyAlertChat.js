@@ -1,22 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Tooltip, Modal, ModalOverlay, ModalContent, Textarea, Image, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useColorModeValue, useToast
-} from '@chakra-ui/react';
+import { Textarea, Tooltip, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useColorModeValue, useToast } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
 import Card from "components/card/Card";
 import Menu from "components/menu/MainMenuVianneyAlertChat";
-import { useEvent } from '../../../../EventContext';
+import { useEvent } from '../../../../EventContext'; 
 // Initialize Supabase client
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function VianneyAlertChat() {
-  const [selectedImageFile, setSelectedImageFile] = useState(null);
-  const [imageURL, setImageURL] = useState('');
-  const [editedImageFile, setEditedImageFile] = useState(null);
-  const { selectedEventId } = useEvent();
+  const { selectedEventId } = useEvent(); 
   const [alertStatus, setAlertStatus] = useState('info'); // New state for alert status
   const [alerts, setAlerts] = useState([]);
   const [newAlertText, setNewAlertText] = useState('');
@@ -30,7 +25,6 @@ function VianneyAlertChat() {
   const [filter, setFilter] = useState('all');
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
-  const [imageFile] = useState(null);
   const openConfirmModal = (alertId) => {
     setAlertToDelete(alertId);
     setIsConfirmOpen(true);
@@ -45,10 +39,9 @@ function VianneyAlertChat() {
   };
 
   const openEditModal = (alert) => {
-    setEditingAlert(alert); // Pass the alert object to setEditingAlert
+    setEditingAlert(alert);
     setIsEditOpen(true);
   };
-  
 
   const closeEditModal = () => {
     setIsEditOpen(false);
@@ -143,43 +136,6 @@ function VianneyAlertChat() {
   };
 
 
-  const uploadImage = async () => {
-    if (selectedImageFile) {
-      const { data, error } = await supabase
-        .from('alert_images')
-        .upsert([
-          {
-            alert_id: editingAlert.id, // Use the ID of the alert you're editing
-            image_url: '', // Initialize as an empty string
-          },
-        ]);
-  
-      if (!error) {
-        const imageId = data[0].id;
-        const imageStorage = supabase.storage.from('alert_images'); // Replace with your bucket name
-        const { error: uploadError } = await imageStorage.upload(
-          `${imageId}/${selectedImageFile.name}`,
-          selectedImageFile
-        );
-  
-        if (!uploadError) {
-          // Update the image URL in the database
-          await supabase
-            .from('alert_images')
-            .upsert([
-              {
-                id: imageId,
-                image_url: `${imageId}/${selectedImageFile.name}`, // Set the URL to the uploaded image
-              },
-            ]);
-  
-          // Update the imageURL state with the newly uploaded image URL
-          setImageURL(`${imageId}/${selectedImageFile.name}`);
-        }
-      }
-    }
-  };  
-
 
   useEffect(() => {
     // Function to fetch alerts from Supabase
@@ -208,36 +164,26 @@ function VianneyAlertChat() {
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
       const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
-  
+
       const { error } = await supabase
         .from('vianney_alert')
         .insert([
-          {
-            alert_text: newAlertText,
-            user_id: fakeUUID,
-            solved_or_not: alertStatus,
-            details: details,
-            event_id: selectedEventId,
-            image_url: imageURL, // Include the imageURL
-          },
+          { alert_text: newAlertText, user_id: fakeUUID, solved_or_not: alertStatus, details: details, event_id: selectedEventId,  } // Include details
         ]);
-  
+
       if (!error) {
         const newAlert = {
           alert_text: newAlertText,
           user_id: fakeUUID,
           solved_or_not: alertStatus,
-          timestamp: new Date().toISOString(),
-          image_url: imageURL, // Include the imageURL
+          timestamp: new Date().toISOString()
         };
         setAlerts([...alerts, newAlert]);
-        setImageURL(''); // Reset imageURL after submission
       }
-  
+
       setNewAlertText('');
     }
   };
-  
   const textColor = useColorModeValue("secondaryGray.900", "white");
 
 
@@ -314,37 +260,6 @@ function VianneyAlertChat() {
             <option value="info">Information</option>
           </Select>
           <Input
-            type="file"
-            accept="image/*"
-            onChange={(event) => setEditedImageFile(event.target.files[0])}
-            mt={2}
-          />
-          {editedImageFile && (
-            <Image
-              src={URL.createObjectURL(editedImageFile)}
-              alt="Edited Image"
-              maxH="200px"
-              mt={2}
-            />
-          )}
-          <Button
-            mt={2}
-            colorScheme="blue"
-            onClick={uploadImage}
-            disabled={!editedImageFile}
-          >
-            Charger l'image
-          </Button>
-          <Input
-            placeholder="URL de l'image"
-            value={imageURL}
-            onChange={(event) => setImageURL(event.target.value)}
-            mt={2}
-          />
-
-
-
-          <Input
             placeholder="Tapez votre alerte..."
             value={newAlertText}
             onChange={handleInputChange}
@@ -367,35 +282,25 @@ function VianneyAlertChat() {
             <ModalBody>
               <Input
                 name="alert_text"
-                value={editingAlert?.alert_text || ""}
+                value={editingAlert?.alert_text || ''}
                 onChange={handleEditChange}
                 placeholder="Texte de l'alerte"
                 mt={2}
               />
               <Textarea
                 name="details"
-                value={editingAlert?.details || ""}
+                value={editingAlert?.details || ''}
                 onChange={handleEditChange}
-                placeholder="Ajoutez des détails ici..."
+                placeholder="Détails de l'alerte"
                 mt={2}
               />
-              {/* Preview of the edited image */}
-              {editedImageFile && (
-                <Image
-                  src={URL.createObjectURL(editedImageFile)}
-                  alt="Edited Image Preview"
-                  maxH="200px"
-                  mt={2}
-                />
-              )}
+              {/* Add other fields as necessary */}
             </ModalBody>
             <ModalFooter>
               <Button colorScheme="blue" mr={3} onClick={handleSubmitEdit}>
                 Enregistrer les modifications
               </Button>
-              <Button variant="ghost" onClick={closeEditModal}>
-                Annuler
-              </Button>
+              <Button variant="ghost" onClick={closeEditModal}>Annuler</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
