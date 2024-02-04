@@ -11,6 +11,7 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function VianneyAlertChat() {
+  const [selectedFile, setSelectedFile] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const { selectedEventId } = useEvent();
   const [alertStatus, setAlertStatus] = useState('info'); // New state for alert status
@@ -165,38 +166,67 @@ function VianneyAlertChat() {
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
       const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
-
-      const { error } = await supabase
-        .from('vianney_alert')
-        .insert([
-          {
+  
+      // Check if a file is selected
+      if (selectedFile) {
+        // Create a FormData object to upload the file
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+  
+        // Use the Supabase Storage API to upload the file
+        const { data: fileData, error: fileError } = await supabase.storage
+          .from('alert-images')
+          .upload(`/${fakeUUID}/${selectedFile.name}`, formData, {
+            cacheControl: '3600', // Optional cache control
+            upsert: false, // Optional upsert flag
+          });
+  
+        if (fileError) {
+          console.error('Error uploading image:', fileError);
+          return;
+        }
+  
+        // Get the URL of the uploaded image from fileData
+        const imageUrl = fileData[0]?.url;
+  
+        const { error } = await supabase
+          .from('vianney_alert')
+          .insert([
+            {
+              alert_text: newAlertText,
+              user_id: fakeUUID,
+              solved_or_not: alertStatus,
+              details: details,
+              event_id: selectedEventId,
+              image_url: imageUrl, // Include image_url
+            }
+          ]);
+  
+        if (!error) {
+          const newAlert = {
             alert_text: newAlertText,
             user_id: fakeUUID,
             solved_or_not: alertStatus,
             details: details,
-            event_id: selectedEventId,
             image_url: imageUrl, // Include image_url
-          }
-        ]);
-
-      if (!error) {
-        const newAlert = {
-          alert_text: newAlertText,
-          user_id: fakeUUID,
-          solved_or_not: alertStatus,
-          details: details,
-          image_url: imageUrl, // Include image_url
-          timestamp: new Date().toISOString()
-        };
-        setAlerts([...alerts, newAlert]);
-        setNewAlertText('');
-        setDetails('');
-        setImageUrl(''); // Clear image_url input
+            timestamp: new Date().toISOString()
+          };
+          setAlerts([...alerts, newAlert]);
+          setNewAlertText('');
+          setDetails('');
+          setImageUrl('');
+          setSelectedFile(null); // Clear the selected file
+        } else {
+          console.error('Error inserting alert:', error);
+        }
       } else {
-        console.error('Error inserting alert:', error);
+        // Handle the case where no file is selected (optional)
+        console.error('No file selected.');
       }
     }
   };
+  
+  
 
   const textColor = useColorModeValue("secondaryGray.900", "white");
 
@@ -285,6 +315,12 @@ function VianneyAlertChat() {
             onChange={handleDetailsChange}
             mt={2}
           />
+          <Input
+  type="file"
+  accept="image/*"
+  onChange={(e) => setSelectedFile(e.target.files[0])}
+  mt={2}
+/>
           <Input
             placeholder="URL de l'image"
             value={imageUrl}
