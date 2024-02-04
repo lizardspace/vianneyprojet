@@ -192,10 +192,9 @@ function VianneyAlertChat() {
         imageUrl = fileData[0]?.url;
   
         // Construct the desired URL format
-        const publicUrl = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/alert-images/${fakeUUID}/${imageUrl.split('/').pop()}`;
-  
-        // Update the image_url state with the constructed URL
-        setImageUrl(publicUrl);
+        const publicUrl = imageUrl
+          ? `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/alert-images/${fakeUUID}/${imageUrl.split('/').pop()}`
+          : ''; // Only construct the URL if imageUrl has a value
       }
   
       // Continue with inserting the alert into the database
@@ -233,12 +232,7 @@ function VianneyAlertChat() {
       // Handle the case where no file is selected (optional)
       console.error('No file selected.');
     }
-  };
-  
-  
-  
-  
-
+  }; 
 
   const textColor = useColorModeValue("secondaryGray.900", "white");
 
@@ -255,6 +249,42 @@ function VianneyAlertChat() {
     return false;
   };
 
+  const updateImageUrl = (fileUrl) => {
+    const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
+    const publicUrl = fileUrl
+      ? `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/alert-images/${fakeUUID}/${fileUrl.split('/').pop()}`
+      : ''; // Construct the URL if fileUrl has a value
+    setImageUrl(publicUrl); // Fill the input field with the publicUrl
+  };
+  
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
+    if (file) {
+      // Create a FormData object to upload the file
+      const formData = new FormData();
+      formData.append('file', file);
+  
+      // Use the Supabase Storage API to upload the file
+      const { data: fileData, error: fileError } = await supabase.storage
+        .from('alert-images')
+        .upload(`/${fakeUUID}/${uuidv4()}.png`, formData, {
+          cacheControl: '3600', // Optional cache control
+          upsert: false, // Optional upsert flag
+        });
+  
+      if (fileError) {
+        console.error('Error uploading image:', fileError);
+        return;
+      }
+  
+      // Get the URL of the uploaded image from fileData
+      const imageUrl = fileData[0]?.url;
+  
+      // Update the image_url state and input field
+      updateImageUrl(imageUrl);
+    }
+  };
 
   return (
 
@@ -330,13 +360,7 @@ function VianneyAlertChat() {
           <Input
             type="file"
             accept="image/*"
-            onChange={(e) => setSelectedFile(e.target.files[0])}
-            mt={2}
-          />
-          <Input
-            placeholder="URL de l'image"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
+            onChange={(e) => setSelectedFile(e.target.files[0])} 
             mt={2}
           />
           <Button mt={2} colorScheme="blue" onClick={handleSubmit}>
