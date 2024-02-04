@@ -190,17 +190,16 @@ function VianneyAlertChat() {
           // Construct the URL for the uploaded image
           const imageUrl = `${supabaseUrl.replace('.co', '.in')}/storage/v1/object/public/alert-images/${filePath}`;
 
-          // Insert the alert into the database with the image URL
           const { data, error } = await supabase
             .from('vianney_alert')
             .insert([
               {
                 alert_text: newAlertText,
-                user_id: fakeUUID, // Assuming this is the correct user ID for the demo
+                user_id: fakeUUID,
                 solved_or_not: alertStatus,
                 details: details,
                 event_id: selectedEventId,
-                image_url: imageUrl, // Include the URL of the uploaded image
+                image_url: imageUrl,
               },
             ]);
 
@@ -208,12 +207,18 @@ function VianneyAlertChat() {
             throw new Error(`Failed to insert alert: ${error.message}`);
           }
 
-          // Update local state to include the new alert
-          setAlerts([...alerts, { ...data[0], timestamp: new Date().toISOString() }]);
+          // Check if data is not null before accessing data[0]
+          if (data && data.length > 0) {
+            // Update local state to include the new alert
+            setAlerts([...alerts, { ...data[0], timestamp: new Date().toISOString() }]);
+          } else {
+            console.error('No data returned from the insert operation.');
+          }
+
           setNewAlertText('');
           setDetails('');
           setImageUrl('');
-          setSelectedFile(null); // Clear the selected file after successful upload and insertion
+          setSelectedFile(null);
 
           toast({
             title: "Alerte ajoutée",
