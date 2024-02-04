@@ -13,7 +13,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function VianneyAlertChat() {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState('');
+  const [ setImageUrl] = useState('');
   const { selectedEventId } = useEvent();
   const [alertStatus, setAlertStatus] = useState('info'); // New state for alert status
   const [alerts, setAlerts] = useState([]);
@@ -191,10 +191,6 @@ function VianneyAlertChat() {
         // Get the URL of the uploaded image from fileData
         imageUrl = fileData[0]?.url;
   
-        // Construct the desired URL format
-        const publicUrl = imageUrl
-          ? `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/alert-images/${fakeUUID}/${imageUrl.split('/').pop()}`
-          : ''; // Only construct the URL if imageUrl has a value
       }
   
       // Continue with inserting the alert into the database
@@ -249,42 +245,9 @@ function VianneyAlertChat() {
     return false;
   };
 
-  const updateImageUrl = (fileUrl) => {
-    const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
-    const publicUrl = fileUrl
-      ? `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/alert-images/${fakeUUID}/${fileUrl.split('/').pop()}`
-      : ''; // Construct the URL if fileUrl has a value
-    setImageUrl(publicUrl); // Fill the input field with the publicUrl
-  };
+
   
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
-    if (file) {
-      // Create a FormData object to upload the file
-      const formData = new FormData();
-      formData.append('file', file);
   
-      // Use the Supabase Storage API to upload the file
-      const { data: fileData, error: fileError } = await supabase.storage
-        .from('alert-images')
-        .upload(`/${fakeUUID}/${uuidv4()}.png`, formData, {
-          cacheControl: '3600', // Optional cache control
-          upsert: false, // Optional upsert flag
-        });
-  
-      if (fileError) {
-        console.error('Error uploading image:', fileError);
-        return;
-      }
-  
-      // Get the URL of the uploaded image from fileData
-      const imageUrl = fileData[0]?.url;
-  
-      // Update the image_url state and input field
-      updateImageUrl(imageUrl);
-    }
-  };
 
   return (
 
