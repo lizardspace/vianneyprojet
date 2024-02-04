@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Textarea, Tooltip, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useColorModeValue, useToast } from '@chakra-ui/react';
+import { Textarea, Image, Tooltip, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useColorModeValue, useToast } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
 import Card from "components/card/Card";
@@ -403,12 +403,12 @@ function VianneyAlertChat() {
                 placeholder="Détails de l'alerte"
                 mt={2}
               />
-              <Input
-                placeholder="URL de l'image"
-                value={editingAlert?.image_url || ''}
-                onChange={(e) => setImageUrl(e.target.value)}
+              <Image
+                src={editingAlert?.image_url || ''}
+                alt="Image"
                 mt={2}
               />
+
             </ModalBody>
             <ModalFooter>
               <Button colorScheme="blue" mr={3} onClick={handleSubmitEdit}>
