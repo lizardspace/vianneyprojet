@@ -11,6 +11,7 @@ const GpsPosition = () => {
   const toast = useToast();
   const mapRef = React.useRef(null);
   const [watchId, setWatchId] = useState(null); // Store the watchId
+  const [mapInitialized, setMapInitialized] = useState(false);
 
   // Create a custom icon using the MdPlace icon
   const createCustomIcon = () => {
@@ -50,7 +51,7 @@ const GpsPosition = () => {
       const { latitude, longitude } = newPosition.coords;
 
       // Initialize the map if it hasn't been initialized yet
-      if (!mapRef.current) {
+      if (!mapInitialized) {
         mapRef.current = L.map('map', {
           zoomControl: false, // Disable the default zoom control
         }).setView([latitude, longitude], 13);
@@ -61,6 +62,9 @@ const GpsPosition = () => {
 
         // Add a custom zoom control
         L.control.zoom({ position: 'bottomright' }).addTo(mapRef.current);
+
+        // Set mapInitialized to true to prevent re-initialization
+        setMapInitialized(true);
       }
 
       // Create a custom icon using the MdPlace icon
@@ -128,7 +132,7 @@ const GpsPosition = () => {
         navigator.geolocation.clearWatch(watchId);
       }
     };
-  }, [toast, watchId]); // Include watchId as a dependency in the useEffect
+  }, [toast, watchId, mapInitialized]); // Include mapInitialized as a dependency in the useEffect
 
   return (
     <Box p={4}>
