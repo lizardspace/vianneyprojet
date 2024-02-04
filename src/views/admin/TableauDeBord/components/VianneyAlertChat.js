@@ -176,7 +176,7 @@ function VianneyAlertChat() {
 
         try {
           // Use Supabase Storage API to upload the file
-          let { error: uploadError, data: uploadData } = await supabase.storage
+          let { error: uploadError } = await supabase.storage
             .from('alert-images')
             .upload(filePath, selectedFile, {
               cacheControl: '3600',
@@ -330,8 +330,12 @@ function VianneyAlertChat() {
                   <Text fontSize="sm" color="gray.500">
                     {new Date(alert.timestamp).toLocaleString()}
                   </Text>
+                  {imageUrl && (
+                    <img src={imageUrl} alt="essai"/>
+                  )}
+
                   {alert.image_url && (
-                    <img src={alert.image_url} alt="Alert Image" />
+                    <img src={alert.image_url} alt="essai" />
                   )}
                 </Box>
                 <Tooltip label="Marqué comme résolue" hasArrow>
