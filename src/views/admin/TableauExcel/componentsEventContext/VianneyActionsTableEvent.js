@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Button, Alert, AlertIcon, AlertDescription, CloseButton } from '@chakra-ui/react';
 import { utils, writeFile } from 'xlsx';
 import { supabase } from './../../../../supabaseClient';
-import { FcAddDatabase } from "react-icons/fc"; 
+import { FcAddDatabase } from "react-icons/fc";
 import { useEvent } from './../../../../EventContext';
 
 const VianneyActionsTableEvent = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [isErrorVisible, setIsErrorVisible] = useState(false); // Track error visibility
-  const { selectedEventId } = useEvent(); 
+  const { selectedEventId } = useEvent();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,7 +17,7 @@ const VianneyActionsTableEvent = () => {
         const { data: tableData, error } = await supabase
           .from('vianney_actions')
           .select('*')
-          .eq('event_id', selectedEventId); 
+          .eq('event_id', selectedEventId);
 
         if (error) {
           setError(error.message);
@@ -48,7 +48,7 @@ const VianneyActionsTableEvent = () => {
     const ws = utils.json_to_sheet(data);
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, 'Actions de Vianney'); // Updated sheet name for French
-    
+
     try {
       await writeFile(wb, 'actions_vianney.xlsx'); // Updated file name for French
     } catch (error) {
@@ -61,7 +61,7 @@ const VianneyActionsTableEvent = () => {
   return (
     <div>
       <Button colorScheme="teal" onClick={handleExport}>
-         Exporter vers Excel les actions <FcAddDatabase style={{ marginLeft: '8px' }} />
+        Exporter vers Excel les actions <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
       {/* Display error alert */}
       {isErrorVisible && (
