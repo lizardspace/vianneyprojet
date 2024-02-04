@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Text, Alert, AlertIcon } from '@chakra-ui/react';
+import { Box, Alert, AlertIcon } from '@chakra-ui/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MdPlace } from 'react-icons/md';
@@ -83,9 +83,7 @@ const GpsPosition = () => {
           Merci d'autoriser la géolocalisation
         </Alert>
       )}
-      <Text fontSize="xl" fontWeight="bold">
-        Votre position:
-      </Text>
+
       <div
         id="map"
         style={{ height: '500px', width: '100%', zIndex: '0' }}
