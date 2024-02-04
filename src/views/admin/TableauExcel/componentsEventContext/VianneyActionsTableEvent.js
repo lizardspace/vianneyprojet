@@ -13,6 +13,11 @@ const VianneyActionsTableEvent = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!selectedEventId) {
+        // Do not fetch data if selectedEventId is null
+        return;
+      }
+
       try {
         const { data: tableData, error } = await supabase
           .from('vianney_actions')
@@ -27,34 +32,34 @@ const VianneyActionsTableEvent = () => {
         }
       } catch (error) {
         setError(error.message);
-        setIsErrorVisible(true); 
+        setIsErrorVisible(true);
       }
     };
 
     fetchData();
-  }, [selectedEventId]); 
+  }, [selectedEventId]);
 
   const handleCloseError = () => {
-    setIsErrorVisible(false); 
+    setIsErrorVisible(false);
   };
 
   const handleExport = async () => {
     if (data.length === 0) {
-      setError('Aucune donnée à exporter.'); 
-      setIsErrorVisible(true); 
+      setError('Aucune donnée à exporter.');
+      setIsErrorVisible(true);
       return;
     }
 
     const ws = utils.json_to_sheet(data);
     const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, 'Actions de Vianney'); 
+    utils.book_append_sheet(wb, ws, 'Actions de Vianney');
 
     try {
-      await writeFile(wb, 'actions_vianney.xlsx'); 
+      await writeFile(wb, 'actions_vianney.xlsx');
     } catch (error) {
-      setError('Erreur lors de l\'exportation vers Excel : ' + error.message); 
+      setError('Erreur lors de l\'exportation vers Excel : ' + error.message);
     } finally {
-      setIsErrorVisible(true); // Show the error alert after export
+      setIsErrorVisible(true);
     }
   };
 
