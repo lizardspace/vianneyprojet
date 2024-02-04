@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { Textarea, Tooltip, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useColorModeValue, useToast } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
@@ -176,7 +177,7 @@ function VianneyAlertChat() {
         // Use the Supabase Storage API to upload the file
         const { data: fileData, error: fileError } = await supabase.storage
           .from('alert-images')
-          .upload(`/${fakeUUID}/${selectedFile.name}`, formData, {
+          .upload(`/${fakeUUID}/${uuidv4()}.png`, formData, {
             cacheControl: '3600', // Optional cache control
             upsert: false, // Optional upsert flag
           });
@@ -191,11 +192,11 @@ function VianneyAlertChat() {
   
         // Update the image_url state with the uploaded image URL
         setImageUrl(imageUrl);
-  
-        // Update the image_url field in the database
+
+
         const { error } = await supabase
           .from('vianney_alert')
-          .update({ image_url: imageUrl }) // Update the image_url field
+          .update({ image_url: imageUrl }) 
           .match({ id: alertToDelete });
   
         if (error) {
@@ -240,6 +241,7 @@ function VianneyAlertChat() {
       console.error('No file selected.');
     }
   };
+  
   
 
 
