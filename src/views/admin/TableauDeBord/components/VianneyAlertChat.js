@@ -292,6 +292,7 @@ function VianneyAlertChat() {
     }
   };
 
+
   return (
 
     <Card
@@ -331,7 +332,7 @@ function VianneyAlertChat() {
                     {new Date(alert.timestamp).toLocaleString()}
                   </Text>
                   {imageUrl && (
-                    <img src={imageUrl} alt="essai"/>
+                    <img src={imageUrl} alt="essai" />
                   )}
 
                   {alert.image_url && (
@@ -373,7 +374,10 @@ function VianneyAlertChat() {
           <Input
             type="file"
             accept="image/*"
-            onChange={(e) => setSelectedFile(e.target.files[0])}
+            onChange={(e) => {
+              setSelectedFile(e.target.files[0]);
+              handleFileChange(e);
+            }}
             mt={2}
           />
           <Button mt={2} colorScheme="blue" onClick={handleSubmit}>
