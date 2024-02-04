@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
- Tooltip, Modal, ModalOverlay, ModalContent, Textarea, Image, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useColorModeValue, useToast
+  Tooltip, Modal, ModalOverlay, ModalContent, Textarea, Image, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useColorModeValue, useToast
 } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
@@ -13,7 +13,7 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function VianneyAlertChat() {
-  const { selectedEventId } = useEvent(); 
+  const { selectedEventId } = useEvent();
   const [alertStatus, setAlertStatus] = useState('info'); // New state for alert status
   const [alerts, setAlerts] = useState([]);
   const [newAlertText, setNewAlertText] = useState('');
@@ -215,16 +215,16 @@ function VianneyAlertChat() {
       const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
 
       const { error } = await supabase
-  .from('vianney_alert')
-  .insert([
-    { 
-      alert_text: newAlertText, 
-      user_id: fakeUUID, 
-      solved_or_not: alertStatus, 
-      details: details, // Include details here
-      event_id: selectedEventId,  
-    }
-  ]);
+        .from('vianney_alert')
+        .insert([
+          {
+            alert_text: newAlertText,
+            user_id: fakeUUID,
+            solved_or_not: alertStatus,
+            details: details, // Include details here
+            event_id: selectedEventId,
+          }
+        ]);
 
 
       if (!error) {
@@ -364,11 +364,11 @@ function VianneyAlertChat() {
               />
               <Textarea
                 name="details"
-                value={editingAlert?.details || ''}
+                value={editingAlert?.details !== undefined ? editingAlert.details : ''}
                 onChange={handleEditChange}
                 placeholder="Ajoutez des détails ici..."
                 mt={2}
-              />             
+              />
             </ModalBody>
             <ModalFooter>
               <Button colorScheme="blue" mr={3} onClick={handleSubmitEdit}>
