@@ -167,6 +167,7 @@ function VianneyAlertChat() {
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
       const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
+      let imageUrl = ''; // Initialize imageUrl as an empty string
   
       // Check if a file is selected
       if (selectedFile) {
@@ -188,21 +189,13 @@ function VianneyAlertChat() {
         }
   
         // Get the URL of the uploaded image from fileData
-        const imageUrl = fileData[0]?.url;
+        imageUrl = fileData[0]?.url;
   
-        // Update the image_url state with the uploaded image URL
-        setImageUrl(imageUrl);
-
-
-        const { error } = await supabase
-          .from('vianney_alert')
-          .update({ image_url: imageUrl }) 
-          .match({ id: alertToDelete });
+        // Construct the desired URL format
+        const publicUrl = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/alert-images/${fakeUUID}/${imageUrl.split('/').pop()}`;
   
-        if (error) {
-          console.error('Error updating image_url:', error);
-          return;
-        }
+        // Update the image_url state with the constructed URL
+        setImageUrl(publicUrl);
       }
   
       // Continue with inserting the alert into the database
@@ -241,6 +234,8 @@ function VianneyAlertChat() {
       console.error('No file selected.');
     }
   };
+  
+  
   
   
 
