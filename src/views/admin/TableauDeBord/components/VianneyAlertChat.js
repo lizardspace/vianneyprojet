@@ -13,6 +13,8 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function VianneyAlertChat() {
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
+  const [imageURL, setImageURL] = useState('');
   const [editedImageFile, setEditedImageFile] = useState(null);
   const { selectedEventId } = useEvent();
   const [alertStatus, setAlertStatus] = useState('info'); // New state for alert status
@@ -43,9 +45,10 @@ function VianneyAlertChat() {
   };
 
   const openEditModal = (alert) => {
-    setEditingAlert(alert);
+    setEditingAlert(alert); // Pass the alert object to setEditingAlert
     setIsEditOpen(true);
   };
+  
 
   const closeEditModal = () => {
     setIsEditOpen(false);
@@ -141,7 +144,7 @@ function VianneyAlertChat() {
 
 
   const uploadImage = async () => {
-    if (imageFile) {
+    if (selectedImageFile) {
       const { data, error } = await supabase
         .from('alert_images')
         .upsert([
@@ -154,8 +157,10 @@ function VianneyAlertChat() {
       if (!error) {
         const imageId = data[0].id;
         const imageStorage = supabase.storage.from('alert_images'); // Replace with your bucket name
-        const { error: uploadError } = await imageStorage
-          .upload(`${imageId}/${imageFile.name}`, imageFile);
+        const { error: uploadError } = await imageStorage.upload(
+          `${imageId}/${selectedImageFile.name}`,
+          selectedImageFile
+        );
   
         if (!uploadError) {
           // Update the image URL in the database
@@ -164,16 +169,17 @@ function VianneyAlertChat() {
             .upsert([
               {
                 id: imageId,
-                image_url: `${imageId}/${imageFile.name}`, // Set the URL to the uploaded image
+                image_url: `${imageId}/${selectedImageFile.name}`, // Set the URL to the uploaded image
               },
             ]);
   
-          // Now you can associate this image with the alert
-          setEditingAlert({ ...editingAlert, image_id: imageId });
+          // Update the imageURL state with the newly uploaded image URL
+          setImageURL(`${imageId}/${selectedImageFile.name}`);
         }
       }
     }
   };  
+
 
   useEffect(() => {
     // Function to fetch alerts from Supabase
@@ -202,7 +208,7 @@ function VianneyAlertChat() {
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
       const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
-
+  
       const { error } = await supabase
         .from('vianney_alert')
         .insert([
@@ -210,25 +216,28 @@ function VianneyAlertChat() {
             alert_text: newAlertText,
             user_id: fakeUUID,
             solved_or_not: alertStatus,
-            details: details, // Include details here
+            details: details,
             event_id: selectedEventId,
-          }
+            image_url: imageURL, // Include the imageURL
+          },
         ]);
-
-
+  
       if (!error) {
         const newAlert = {
           alert_text: newAlertText,
           user_id: fakeUUID,
           solved_or_not: alertStatus,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          image_url: imageURL, // Include the imageURL
         };
         setAlerts([...alerts, newAlert]);
+        setImageURL(''); // Reset imageURL after submission
       }
-
+  
       setNewAlertText('');
     }
   };
+  
   const textColor = useColorModeValue("secondaryGray.900", "white");
 
 
@@ -326,8 +335,15 @@ function VianneyAlertChat() {
           >
             Charger l'image
           </Button>
+          <Input
+            placeholder="URL de l'image"
+            value={imageURL}
+            onChange={(event) => setImageURL(event.target.value)}
+            mt={2}
+          />
 
-          
+
+
           <Input
             placeholder="Tapez votre alerte..."
             value={newAlertText}
@@ -380,7 +396,7 @@ function VianneyAlertChat() {
               <Button variant="ghost" onClick={closeEditModal}>
                 Annuler
               </Button>
-              </ModalFooter>
+            </ModalFooter>
           </ModalContent>
         </Modal>
         <Modal isOpen={isConfirmOpen} onClose={() => setIsConfirmOpen(false)}>
