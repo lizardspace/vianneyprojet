@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@chakra-ui/react';
 import { utils, writeFile } from 'xlsx';
-import { supabase } from './../../../../supabaseClient';
+import { supabase } from '../../../../supabaseClient';
 import { FcAddDatabase } from "react-icons/fc"; // Importing the icon
 
-const VianneyTextareaSalleDeCriseTable = () => {
+const VianneyCamerasTable = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
 
@@ -12,7 +12,7 @@ const VianneyTextareaSalleDeCriseTable = () => {
     const fetchData = async () => {
       try {
         const { data: tableData, error } = await supabase
-          .from('vianney_textarea_salle_de_crise') // Replace with your actual table name
+          .from('vianney_cameras') // Replace with your actual table name
           .select('*'); // Fetch all columns
 
         if (error) {
@@ -36,10 +36,10 @@ const VianneyTextareaSalleDeCriseTable = () => {
 
     const ws = utils.json_to_sheet(data);
     const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, 'Salle de crise de Vianney'); // Updated sheet name for French
+    utils.book_append_sheet(wb, ws, 'Cameras de Vianney'); // Updated sheet name for French
     
     try {
-      writeFile(wb, 'salle_de_crise_vianney.xlsx'); // Updated file name for French
+      writeFile(wb, 'cameras_vianney.xlsx'); // Updated file name for French
     } catch (error) {
       setError('Erreur lors de l\'exportation vers Excel : ' + error.message); // Updated error message for French
     }
@@ -49,11 +49,10 @@ const VianneyTextareaSalleDeCriseTable = () => {
     <div>
       {error && <div>Erreur : {error}</div>} {/* Updated error message for French */}
       <Button colorScheme="teal" onClick={handleExport}>
-         Exporter vers Excel la salle de crise <FcAddDatabase style={{ marginLeft: '8px' }} />
+         Exporter vers Excel les cameras <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
     </div>
   );
 };
 
-export default VianneyTextareaSalleDeCriseTable;
-
+export default VianneyCamerasTable;

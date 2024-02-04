@@ -8,6 +8,7 @@ import VianneyPdfDocumentsSalleDeCriseTable from './components/VianneyPdfDocumen
 import VianneyTextareaTable from './components/VianneyTextareaTable';
 import VianneyTextareaSalleDeCriseTable from './components/VianneyTextareaSalleDeCriseTable';
 import VianneyActionsTableEvent from './componentsEventContext/VianneyActionsTableEvent';
+import VianneyAlertTableEvent from './componentsEventContext/VianneyAlertTableEvent';
 
 const InterfaceEquipe = () => {
   return (
@@ -30,6 +31,7 @@ const InterfaceEquipe = () => {
         </Heading>
         <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4}>
           <VianneyActionsTableEvent />
+          <VianneyAlertTableEvent/>
         </SimpleGrid>
       </Box>
     </Box>
