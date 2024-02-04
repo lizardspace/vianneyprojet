@@ -38,7 +38,7 @@ const VianneyActionsTableEvent = () => {
     setIsErrorVisible(false); // Close the error alert
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (data.length === 0) {
       setError('Aucune donnée à exporter.'); // Updated error message for French
       setIsErrorVisible(true); // Show the error alert
@@ -50,10 +50,11 @@ const VianneyActionsTableEvent = () => {
     utils.book_append_sheet(wb, ws, 'Actions de Vianney'); // Updated sheet name for French
     
     try {
-      writeFile(wb, 'actions_vianney.xlsx'); // Updated file name for French
+      await writeFile(wb, 'actions_vianney.xlsx'); // Updated file name for French
     } catch (error) {
       setError('Erreur lors de l\'exportation vers Excel : ' + error.message); // Updated error message for French
-      setIsErrorVisible(true); // Show the error alert
+    } finally {
+      setIsErrorVisible(true); // Show the error alert after export
     }
   };
 
