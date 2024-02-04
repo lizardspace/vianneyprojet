@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Alert, AlertIcon, AlertDescription, CloseButton } from '@chakra-ui/react';
 import { utils, writeFile } from 'xlsx';
 import { supabase } from './../../../../supabaseClient';
-import { FcAddDatabase } from "react-icons/fc";
+import { FcAddDatabase, FcRightUp2 } from "react-icons/fc"; // Import the FcRightUp2 icon
 import { useEvent } from './../../../../EventContext';
 
 const VianneyActionsTableEvent = () => {
@@ -71,8 +71,8 @@ const VianneyActionsTableEvent = () => {
       {/* Display error alert only when there is no data or data is "Aucune donnée à afficher" */}
       {isErrorVisible && (data.length === 0) && (
         <Alert status="info" mt="2">
-          <AlertIcon />
           {error && <AlertDescription>{error}</AlertDescription>}
+          <AlertIcon as={FcRightUp2} ml={2} /> 
           <CloseButton onClick={handleCloseError} position="absolute" right="8px" top="8px" />
         </Alert>
       )}
