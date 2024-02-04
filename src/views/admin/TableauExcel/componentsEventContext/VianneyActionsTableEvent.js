@@ -2,18 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@chakra-ui/react';
 import { utils, writeFile } from 'xlsx';
 import { supabase } from './../../../../supabaseClient';
-import { FcAddDatabase } from "react-icons/fc"; // Importing the icon
+import { FcAddDatabase } from "react-icons/fc"; 
+import { useEvent } from './../../../../EventContext';
 
-const VianneyActionsTable = () => {
+const VianneyActionsTableEvent = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
+  const { selectedEventId } = useEvent(); 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const { data: tableData, error } = await supabase
-          .from('vianney_actions') // Replace with your actual table name
-          .select('*'); // Fetch all columns
+          .from('vianney_actions')
+          .select('*')
+          .eq('event_id', selectedEventId); 
 
         if (error) {
           setError(error.message);
@@ -26,7 +29,7 @@ const VianneyActionsTable = () => {
     };
 
     fetchData();
-  }, []);
+  }, [selectedEventId]); // Add selectedEventId as a dependency
 
   const handleExport = () => {
     if (data.length === 0) {
@@ -55,4 +58,4 @@ const VianneyActionsTable = () => {
   );
 };
 
-export default VianneyActionsTable;
+export default VianneyActionsTableEvent;

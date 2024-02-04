@@ -7,6 +7,7 @@ import VianneyPdfDocumentsTable from './components/VianneyPdfDocumentsTable';
 import VianneyPdfDocumentsSalleDeCriseTable from './components/VianneyPdfDocumentsSalleDeCriseTable';
 import VianneyTextareaTable from './components/VianneyTextareaTable';
 import VianneyTextareaSalleDeCriseTable from './components/VianneyTextareaSalleDeCriseTable';
+import VianneyActionsTableEvent from './componentsEventContext/VianneyActionsTableEvent';
 
 const InterfaceEquipe = () => {
   return (
@@ -27,6 +28,9 @@ const InterfaceEquipe = () => {
         <Heading as="h1" size="lg" mb={4} mt={4}>
           On pourra faire des exportations excels plus complexes avec des views à ta demande
         </Heading>
+        <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4}>
+          <VianneyActionsTableEvent />
+        </SimpleGrid>
       </Box>
     </Box>
   );
