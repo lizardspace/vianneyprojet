@@ -124,7 +124,9 @@ const GpsPosition = () => {
 
     // Clean up the watch when the component unmounts
     return () => {
-      navigator.geolocation.clearWatch();
+      if (navigator.geolocation && watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
     };
   }, [toast, watchId]); // Include watchId as a dependency in the useEffect
 
