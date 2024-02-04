@@ -358,11 +358,7 @@ function VianneyAlertChat() {
               />
               <Textarea
                 name="details"
-                value={
-                  editingAlert?.details !== undefined
-                    ? editingAlert.details
-                    : ""
-                }
+                value={editingAlert?.details || ""}
                 onChange={handleEditChange}
                 placeholder="Ajoutez des détails ici..."
                 mt={2}
