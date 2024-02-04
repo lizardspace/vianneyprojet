@@ -164,26 +164,38 @@ function VianneyAlertChat() {
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
       const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
-
+  
       const { error } = await supabase
         .from('vianney_alert')
         .insert([
-          { alert_text: newAlertText, user_id: fakeUUID, solved_or_not: alertStatus, details: details, event_id: selectedEventId,  } // Include details
+          {
+            alert_text: newAlertText,
+            user_id: fakeUUID,
+            solved_or_not: alertStatus,
+            details: details,
+            event_id: selectedEventId,
+          }
         ]);
-
+  
       if (!error) {
         const newAlert = {
           alert_text: newAlertText,
           user_id: fakeUUID,
           solved_or_not: alertStatus,
+          details: details, // Include details
           timestamp: new Date().toISOString()
         };
+        // Update the alerts state with the new alert
         setAlerts([...alerts, newAlert]);
+        // Clear input fields
+        setNewAlertText('');
+        setDetails('');
+      } else {
+        console.error('Error inserting alert:', error);
       }
-
-      setNewAlertText('');
     }
   };
+  
   const textColor = useColorModeValue("secondaryGray.900", "white");
 
 
