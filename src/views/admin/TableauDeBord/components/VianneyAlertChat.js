@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Textarea, Tooltip, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useColorModeValue, useToast } from '@chakra-ui/react';
+import {
+ Tooltip, Modal, ModalOverlay, ModalContent, Textarea, Image, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useColorModeValue, useToast
+} from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
 import Card from "components/card/Card";
 import Menu from "components/menu/MainMenuVianneyAlertChat";
-import { useEvent } from '../../../../EventContext'; 
+import { useEvent } from '../../../../EventContext';
 // Initialize Supabase client
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
@@ -25,6 +27,8 @@ function VianneyAlertChat() {
   const [filter, setFilter] = useState('all');
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
   const openConfirmModal = (alertId) => {
     setAlertToDelete(alertId);
     setIsConfirmOpen(true);
@@ -136,6 +140,51 @@ function VianneyAlertChat() {
   };
 
 
+  // Function to handle image file selection
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImageUrl(URL.createObjectURL(file));
+    }
+  };
+
+  // Function to upload the selected image
+  const uploadImage = async () => {
+    if (imageFile) {
+      const { data, error } = await supabase
+        .from('alert_images')
+        .upsert([
+          {
+            alert_id: editingAlert.id, // Use the ID of the alert you're editing
+            image_url: '', // Initialize as an empty string
+          },
+        ]);
+
+      if (!error) {
+        // Upload the image to the Supabase storage
+        const imageId = data[0].id;
+        const imageStorage = supabase.storage.from('alert_images');
+        const { error: uploadError } = await imageStorage
+          .upload(`${imageId}/${imageFile.name}`, imageFile);
+
+        if (!uploadError) {
+          // Update the image URL in the database
+          await supabase
+            .from('alert_images')
+            .upsert([
+              {
+                id: imageId,
+                image_url: `${imageId}/${imageFile.name}`, // Set the URL to the uploaded image
+              },
+            ]);
+
+          // Now you can associate this image with the alert
+          setEditingAlert({ ...editingAlert, image_id: imageId });
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     // Function to fetch alerts from Supabase
@@ -259,6 +308,25 @@ function VianneyAlertChat() {
             <option value="warning">Avertissement</option>
             <option value="info">Information</option>
           </Select>
+          <Input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            mt={2}
+          />
+          {imageUrl && (
+            <Image src={imageUrl} alt="Selected Image" maxH="200px" mt={2} />
+          )}
+          <Button
+            mt={2}
+            colorScheme="blue"
+            onClick={uploadImage}
+            disabled={!imageFile}
+          >
+            Charger l'image
+          </Button>
+
+
           <Input
             placeholder="Tapez votre alerte..."
             value={newAlertText}
