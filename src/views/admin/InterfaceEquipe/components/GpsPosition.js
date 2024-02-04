@@ -7,7 +7,6 @@ import ReactDOMServer from 'react-dom/server';
 import { useGPSPosition } from './../../../../GPSPositionContext'; // Import the custom hook
 
 const GpsPosition = () => {
-  const [showInfoMessage, setShowInfoMessage] = useState(false);
   const mapRef = React.useRef(null);
   const [mapInitialized, setMapInitialized] = useState(false);
 
@@ -30,7 +29,6 @@ const GpsPosition = () => {
   useEffect(() => {
     if (!gpsPosition) {
       // GPS position is not available, show an info message
-      setShowInfoMessage(true);
       return;
     }
 
@@ -79,7 +77,7 @@ const GpsPosition = () => {
 
   return (
     <Box p={4}>
-      {showInfoMessage && (
+      {gpsPosition ? null : (
         <Alert status="info" mt={4}>
           <AlertIcon />
           Merci d'autoriser la géolocalisation
