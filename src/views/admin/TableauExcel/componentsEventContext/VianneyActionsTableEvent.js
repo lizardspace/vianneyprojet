@@ -63,8 +63,8 @@ const VianneyActionsTableEvent = () => {
       <Button colorScheme="teal" onClick={handleExport}>
         Exporter vers Excel les actions <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
-      {/* Display error alert */}
-      {isErrorVisible && (
+      {/* Display error alert only when there is no data */}
+      {isErrorVisible && data.length === 0 && (
         <Alert status="info" mt="2">
           <AlertIcon />
           {error && <AlertDescription>{error}</AlertDescription>}
