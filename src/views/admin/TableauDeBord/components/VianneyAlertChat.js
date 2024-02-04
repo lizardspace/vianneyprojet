@@ -167,13 +167,13 @@ function VianneyAlertChat() {
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
       const fakeUUID = uuidv4(); // Use UUID v4 to generate a unique user_id for the demo
-  
+
       if (selectedFile) {
         // Prepare file for uploading
         const fileExtension = selectedFile.name.split('.').pop();
         const fileName = `${uuidv4()}.${fileExtension}`;
         const filePath = `${fakeUUID}/${fileName}`;
-  
+
         try {
           // Use Supabase Storage API to upload the file
           let { error: uploadError, data: uploadData } = await supabase.storage
@@ -182,14 +182,14 @@ function VianneyAlertChat() {
               cacheControl: '3600',
               upsert: false,
             });
-  
+
           if (uploadError) {
             throw new Error(`Failed to upload image: ${uploadError.message}`);
           }
-  
+
           // Construct the URL for the uploaded image
           const imageUrl = `${supabaseUrl.replace('.co', '.in')}/storage/v1/object/public/alert-images/${filePath}`;
-  
+
           // Insert the alert into the database with the image URL
           const { data, error } = await supabase
             .from('vianney_alert')
@@ -203,18 +203,18 @@ function VianneyAlertChat() {
                 image_url: imageUrl, // Include the URL of the uploaded image
               },
             ]);
-  
+
           if (error) {
             throw new Error(`Failed to insert alert: ${error.message}`);
           }
-  
+
           // Update local state to include the new alert
           setAlerts([...alerts, { ...data[0], timestamp: new Date().toISOString() }]);
           setNewAlertText('');
           setDetails('');
           setImageUrl('');
           setSelectedFile(null); // Clear the selected file after successful upload and insertion
-  
+
           toast({
             title: "Alerte ajoutée",
             description: "Votre alerte a été ajoutée avec succès.",
@@ -237,8 +237,8 @@ function VianneyAlertChat() {
       }
     }
   };
-  
-  
+
+
 
   const textColor = useColorModeValue("secondaryGray.900", "white");
 
@@ -262,7 +262,7 @@ function VianneyAlertChat() {
       : ''; // Construct the URL if fileUrl has a value
     setImageUrl(publicUrl); // Fill the input field with the publicUrl
   };
-  
+
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
@@ -270,7 +270,7 @@ function VianneyAlertChat() {
       // Create a FormData object to upload the file
       const formData = new FormData();
       formData.append('file', file);
-  
+
       // Use the Supabase Storage API to upload the file
       const { data: fileData, error: fileError } = await supabase.storage
         .from('alert-images')
@@ -278,15 +278,15 @@ function VianneyAlertChat() {
           cacheControl: '3600', // Optional cache control
           upsert: false, // Optional upsert flag
         });
-  
+
       if (fileError) {
         console.error('Error uploading image:', fileError);
         return;
       }
-  
+
       // Get the URL of the uploaded image from fileData
       const imageUrl = fileData[0]?.url;
-  
+
       // Update the image_url state and input field
       updateImageUrl(imageUrl);
     }
@@ -330,6 +330,9 @@ function VianneyAlertChat() {
                   <Text fontSize="sm" color="gray.500">
                     {new Date(alert.timestamp).toLocaleString()}
                   </Text>
+                  {alert.image_url && (
+                    <img src={alert.image_url} alt="Alert Image" />
+                  )}
                 </Box>
                 <Tooltip label="Marqué comme résolue" hasArrow>
                   <Button mr="2px" onClick={() => handleSolveAlert(alert.id)}><FcOk /></Button>
@@ -366,7 +369,7 @@ function VianneyAlertChat() {
           <Input
             type="file"
             accept="image/*"
-            onChange={(e) => setSelectedFile(e.target.files[0])} 
+            onChange={(e) => setSelectedFile(e.target.files[0])}
             mt={2}
           />
           <Button mt={2} colorScheme="blue" onClick={handleSubmit}>
