@@ -215,10 +215,17 @@ function VianneyAlertChat() {
       const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
 
       const { error } = await supabase
-        .from('vianney_alert')
-        .insert([
-          { alert_text: newAlertText, user_id: fakeUUID, solved_or_not: alertStatus, details: details, event_id: selectedEventId,  } // Include details
-        ]);
+  .from('vianney_alert')
+  .insert([
+    { 
+      alert_text: newAlertText, 
+      user_id: fakeUUID, 
+      solved_or_not: alertStatus, 
+      details: details, // Include details here
+      event_id: selectedEventId,  
+    }
+  ]);
+
 
       if (!error) {
         const newAlert = {
@@ -359,10 +366,9 @@ function VianneyAlertChat() {
                 name="details"
                 value={editingAlert?.details || ''}
                 onChange={handleEditChange}
-                placeholder="Détails de l'alerte"
+                placeholder="Ajoutez des détails ici..."
                 mt={2}
-              />
-              {/* Add other fields as necessary */}
+              />             
             </ModalBody>
             <ModalFooter>
               <Button colorScheme="blue" mr={3} onClick={handleSubmitEdit}>
