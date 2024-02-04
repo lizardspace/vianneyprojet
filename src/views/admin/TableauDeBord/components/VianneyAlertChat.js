@@ -4,14 +4,15 @@ import { createClient } from '@supabase/supabase-js';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
 import Card from "components/card/Card";
 import Menu from "components/menu/MainMenuVianneyAlertChat";
-import { useEvent } from '../../../../EventContext'; 
+import { useEvent } from '../../../../EventContext';
 // Initialize Supabase client
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function VianneyAlertChat() {
-  const { selectedEventId } = useEvent(); 
+  const [imageUrl, setImageUrl] = useState('');
+  const { selectedEventId } = useEvent();
   const [alertStatus, setAlertStatus] = useState('info'); // New state for alert status
   const [alerts, setAlerts] = useState([]);
   const [newAlertText, setNewAlertText] = useState('');
@@ -164,7 +165,7 @@ function VianneyAlertChat() {
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
       const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
-  
+
       const { error } = await supabase
         .from('vianney_alert')
         .insert([
@@ -174,28 +175,29 @@ function VianneyAlertChat() {
             solved_or_not: alertStatus,
             details: details,
             event_id: selectedEventId,
+            image_url: imageUrl, // Include image_url
           }
         ]);
-  
+
       if (!error) {
         const newAlert = {
           alert_text: newAlertText,
           user_id: fakeUUID,
           solved_or_not: alertStatus,
-          details: details, // Include details
+          details: details,
+          image_url: imageUrl, // Include image_url
           timestamp: new Date().toISOString()
         };
-        // Update the alerts state with the new alert
         setAlerts([...alerts, newAlert]);
-        // Clear input fields
         setNewAlertText('');
         setDetails('');
+        setImageUrl(''); // Clear image_url input
       } else {
         console.error('Error inserting alert:', error);
       }
     }
   };
-  
+
   const textColor = useColorModeValue("secondaryGray.900", "white");
 
 
@@ -283,6 +285,12 @@ function VianneyAlertChat() {
             onChange={handleDetailsChange}
             mt={2}
           />
+          <Input
+            placeholder="URL de l'image"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            mt={2}
+          />
           <Button mt={2} colorScheme="blue" onClick={handleSubmit}>
             Ajouter une alerte
           </Button>
@@ -306,7 +314,12 @@ function VianneyAlertChat() {
                 placeholder="Détails de l'alerte"
                 mt={2}
               />
-              {/* Add other fields as necessary */}
+              <Input
+                placeholder="URL de l'image"
+                value={editingAlert?.image_url || ''}
+                onChange={(e) => setImageUrl(e.target.value)}
+                mt={2}
+              />
             </ModalBody>
             <ModalFooter>
               <Button colorScheme="blue" mr={3} onClick={handleSubmitEdit}>
