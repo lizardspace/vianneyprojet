@@ -10,6 +10,7 @@ const GpsPosition = () => {
   const [showInfoMessage, setShowInfoMessage] = useState(false);
   const toast = useToast();
   const mapRef = React.useRef(null);
+  const [watchId, setWatchId] = useState(null); // Store the watchId
 
   // Create a custom icon using the MdPlace icon
   const createCustomIcon = () => {
@@ -28,23 +29,23 @@ const GpsPosition = () => {
   useEffect(() => {
     const watchLocation = () => {
       if (navigator.geolocation) {
-        const watchId = navigator.geolocation.watchPosition(
+        const id = navigator.geolocation.watchPosition(
           (newPosition) => {
             showPosition(newPosition);
           },
           showError
         );
+        setWatchId(id); // Store the watchId
         return () => {
-          if (navigator.geolocation) {
+          if (navigator.geolocation && watchId) {
             navigator.geolocation.clearWatch(watchId);
           }
         };
-        
       } else {
         setShowInfoMessage(true); // Show info message when geolocation is not supported
       }
     };
-  
+
     const showPosition = (newPosition) => {
       const { latitude, longitude } = newPosition.coords;
 
@@ -125,8 +126,7 @@ const GpsPosition = () => {
     return () => {
       navigator.geolocation.clearWatch();
     };
-  }, [toast]);
-  
+  }, [toast, watchId]); // Include watchId as a dependency in the useEffect
 
   return (
     <Box p={4}>
