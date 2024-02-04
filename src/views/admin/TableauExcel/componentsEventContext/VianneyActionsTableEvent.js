@@ -2,19 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { Button, Alert, AlertIcon, AlertDescription, CloseButton } from '@chakra-ui/react';
 import { utils, writeFile } from 'xlsx';
 import { supabase } from './../../../../supabaseClient';
-import { FcAddDatabase, FcRightUp2 } from "react-icons/fc"; // Import the FcRightUp2 icon
+import { FcAddDatabase, FcRightUp2 } from "react-icons/fc";
 import { useEvent } from './../../../../EventContext';
 
 const VianneyActionsTableEvent = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
-  const [isErrorVisible, setIsErrorVisible] = useState(false); // Track error visibility
+  const [isErrorVisible, setIsErrorVisible] = useState(false);
   const { selectedEventId } = useEvent();
 
   useEffect(() => {
     const fetchData = async () => {
       if (!selectedEventId) {
-        // Do not fetch data if selectedEventId is null
         return;
       }
 
@@ -26,7 +25,7 @@ const VianneyActionsTableEvent = () => {
 
         if (error) {
           setError(error.message);
-          setIsErrorVisible(true); // Show the error alert
+          setIsErrorVisible(true);
         } else {
           setData(tableData);
         }
@@ -68,11 +67,10 @@ const VianneyActionsTableEvent = () => {
       <Button colorScheme="teal" onClick={handleExport}>
         Exporter vers Excel les actions <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
-      {/* Display error alert only when there is no data or data is "Aucune donnée à afficher" */}
       {isErrorVisible && (data.length === 0) && (
-        <Alert status="info" mt="2">
+        <Alert status="info" mt="2" maxW="300px"> 
           {error && <AlertDescription>{error}</AlertDescription>}
-          <AlertIcon as={FcRightUp2} ml={2} /> 
+          <AlertIcon as={FcRightUp2} />
           <CloseButton onClick={handleCloseError} position="absolute" right="8px" top="8px" />
         </Alert>
       )}
