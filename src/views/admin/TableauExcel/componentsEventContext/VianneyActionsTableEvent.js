@@ -27,32 +27,32 @@ const VianneyActionsTableEvent = () => {
         }
       } catch (error) {
         setError(error.message);
-        setIsErrorVisible(true); // Show the error alert
+        setIsErrorVisible(true); 
       }
     };
 
     fetchData();
-  }, [selectedEventId]); // Add selectedEventId as a dependency
+  }, [selectedEventId]); 
 
   const handleCloseError = () => {
-    setIsErrorVisible(false); // Close the error alert
+    setIsErrorVisible(false); 
   };
 
   const handleExport = async () => {
     if (data.length === 0) {
-      setError('Aucune donnée à exporter.'); // Updated error message for French
-      setIsErrorVisible(true); // Show the error alert
+      setError('Aucune donnée à exporter.'); 
+      setIsErrorVisible(true); 
       return;
     }
 
     const ws = utils.json_to_sheet(data);
     const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, 'Actions de Vianney'); // Updated sheet name for French
+    utils.book_append_sheet(wb, ws, 'Actions de Vianney'); 
 
     try {
-      await writeFile(wb, 'actions_vianney.xlsx'); // Updated file name for French
+      await writeFile(wb, 'actions_vianney.xlsx'); 
     } catch (error) {
-      setError('Erreur lors de l\'exportation vers Excel : ' + error.message); // Updated error message for French
+      setError('Erreur lors de l\'exportation vers Excel : ' + error.message); 
     } finally {
       setIsErrorVisible(true); // Show the error alert after export
     }
@@ -63,8 +63,8 @@ const VianneyActionsTableEvent = () => {
       <Button colorScheme="teal" onClick={handleExport}>
         Exporter vers Excel les actions <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
-      {/* Display error alert only when there is no data */}
-      {isErrorVisible && data.length === 0 && (
+      {/* Display error alert only when there is no data or data is "Aucune donnée à afficher" */}
+      {isErrorVisible && (data.length === 0) && (
         <Alert status="info" mt="2">
           <AlertIcon />
           {error && <AlertDescription>{error}</AlertDescription>}
