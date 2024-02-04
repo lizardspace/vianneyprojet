@@ -35,13 +35,16 @@ const GpsPosition = () => {
           showError
         );
         return () => {
-          navigator.geolocation.clearWatch(watchId);
+          if (navigator.geolocation) {
+            navigator.geolocation.clearWatch(watchId);
+          }
         };
+        
       } else {
         setShowInfoMessage(true); // Show info message when geolocation is not supported
       }
     };
-
+  
     const showPosition = (newPosition) => {
       const { latitude, longitude } = newPosition.coords;
 
@@ -123,6 +126,7 @@ const GpsPosition = () => {
       navigator.geolocation.clearWatch();
     };
   }, [toast]);
+  
 
   return (
     <Box p={4}>

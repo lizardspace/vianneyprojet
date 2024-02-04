@@ -38,10 +38,15 @@ function AudioSpace() {
 
     return () => {
       // Clean up resources when component unmounts
-      peerRef.current.destroy();
+      if (peerRef.current) {
+        peerRef.current.destroy();
+      }
       setPeers([]);
       if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
+        const audioTracks = stream.getAudioTracks();
+        if (audioTracks.length > 0) {
+          audioTracks[0].stop();
+        }
       }
     };
   }, [stream]);
