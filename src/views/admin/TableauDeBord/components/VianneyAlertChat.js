@@ -13,7 +13,7 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function VianneyAlertChat() {
-  const [editedImageFile] = useState(null);
+  const [editedImageFile, setEditedImageFile] = useState(null);
   const { selectedEventId } = useEvent();
   const [alertStatus, setAlertStatus] = useState('info'); // New state for alert status
   const [alerts, setAlerts] = useState([]);
@@ -28,8 +28,7 @@ function VianneyAlertChat() {
   const [filter, setFilter] = useState('all');
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
-  const [imageFile, setImageFile] = useState(null);
-
+  const [imageFile] = useState(null);
   const openConfirmModal = (alertId) => {
     setAlertToDelete(alertId);
     setIsConfirmOpen(true);
@@ -102,9 +101,11 @@ function VianneyAlertChat() {
     }
   };
 
+
   const closeConfirmModal = () => {
     setIsConfirmOpen(false);
   };
+
 
   const handleDeleteAlert = async () => {
     const { error } = await supabase
@@ -116,7 +117,7 @@ function VianneyAlertChat() {
       console.error('Error deleting alert:', error);
       toast({
         title: "Erreur",
-        description: "Nous n'avons pas réussi à supprimer l'alerte.",
+        description: "Nous n'avons pass réussi à supprimer l'alerte.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -138,13 +139,6 @@ function VianneyAlertChat() {
     setDetails(event.target.value);
   };
 
-  // Function to handle image file selection
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImageFile(file);
-    }
-  };
 
   const uploadImage = async () => {
     if (imageFile) {
@@ -156,13 +150,13 @@ function VianneyAlertChat() {
             image_url: '', // Initialize as an empty string
           },
         ]);
-
+  
       if (!error) {
         const imageId = data[0].id;
         const imageStorage = supabase.storage.from('alert_images'); // Replace with your bucket name
         const { error: uploadError } = await imageStorage
           .upload(`${imageId}/${imageFile.name}`, imageFile);
-
+  
         if (!uploadError) {
           // Update the image URL in the database
           await supabase
@@ -173,13 +167,13 @@ function VianneyAlertChat() {
                 image_url: `${imageId}/${imageFile.name}`, // Set the URL to the uploaded image
               },
             ]);
-
+  
           // Now you can associate this image with the alert
           setEditingAlert({ ...editingAlert, image_id: imageId });
         }
       }
     }
-  };
+  };  
 
   useEffect(() => {
     // Function to fetch alerts from Supabase
@@ -195,6 +189,7 @@ function VianneyAlertChat() {
 
     fetchAlerts();
   }, []);
+
 
   const handleStatusChange = (event) => {
     setAlertStatus(event.target.value);
@@ -220,6 +215,7 @@ function VianneyAlertChat() {
           }
         ]);
 
+
       if (!error) {
         const newAlert = {
           alert_text: newAlertText,
@@ -235,6 +231,7 @@ function VianneyAlertChat() {
   };
   const textColor = useColorModeValue("secondaryGray.900", "white");
 
+
   const handleFilterSelect = (selectedFilter) => {
     setFilter(selectedFilter);
   };
@@ -246,6 +243,7 @@ function VianneyAlertChat() {
     if (filter === 'error' && alert.solved_or_not === 'error') return true;
     return false;
   };
+
 
   return (
 
@@ -264,7 +262,9 @@ function VianneyAlertChat() {
             Table des alertes
           </Text>
           <Menu onFilterSelect={handleFilterSelect} onAllowScrollingToggle={handleAllowScrollingToggle} />
+
         </Flex>
+
 
         <VStack
           spacing={4}
@@ -307,7 +307,7 @@ function VianneyAlertChat() {
           <Input
             type="file"
             accept="image/*"
-            onChange={handleImageChange}
+            onChange={(event) => setEditedImageFile(event.target.files[0])}
             mt={2}
           />
           {editedImageFile && (
@@ -326,6 +326,8 @@ function VianneyAlertChat() {
           >
             Charger l'image
           </Button>
+
+          
           <Input
             placeholder="Tapez votre alerte..."
             value={newAlertText}
@@ -382,7 +384,7 @@ function VianneyAlertChat() {
               <Button variant="ghost" onClick={closeEditModal}>
                 Annuler
               </Button>
-            </ModalFooter>
+              </ModalFooter>
           </ModalContent>
         </Modal>
         <Modal isOpen={isConfirmOpen} onClose={() => setIsConfirmOpen(false)}>
@@ -399,6 +401,7 @@ function VianneyAlertChat() {
                 type="password"
               />
             </ModalBody>
+
             <ModalFooter>
               <Button
                 colorScheme="red"
@@ -408,6 +411,7 @@ function VianneyAlertChat() {
               >
                 Supprimer
               </Button>
+
               <Button variant="ghost" onClick={() => setIsConfirmOpen(false)}>Annuler</Button>
             </ModalFooter>
           </ModalContent>
