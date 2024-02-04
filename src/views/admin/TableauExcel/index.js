@@ -11,6 +11,14 @@ import VianneyActionsTableEvent from './componentsEventContext/VianneyActionsTab
 import VianneyAlertTableEvent from './componentsEventContext/VianneyAlertTableEvent';
 import VianneyCamerasTableEvent from './componentsEventContext/VianneyCamerasTableEvent';
 
+// Import the missing event components here
+import VianneyTeamsTableEvent from './componentsEventContext/VianneyTeamsTableEvent'; // Replace with the actual import path
+import VianneyFormUtileSalleDeCriseTableEvent from './componentsEventContext/VianneyFormUtileSalleDeCriseTableEvent'; // Replace with the actual import path
+import VianneyPdfDocumentsTableEvent from './componentsEventContext/VianneyPdfDocumentsTableEvent'; // Replace with the actual import path
+import VianneyPdfDocumentsSalleDeCriseTableEvent from './componentsEventContext/VianneyPdfDocumentsSalleDeCriseTableEvent'; // Replace with the actual import path
+import VianneyTextareaTableEvent from './componentsEventContext/VianneyTextareaTableEvent'; // Replace with the actual import path
+import VianneyTextareaSalleDeCriseTableEvent from './componentsEventContext/VianneyTextareaSalleDeCriseTableEvent'; // Replace with the actual import path
+
 const InterfaceEquipe = () => {
   return (
     <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
@@ -32,8 +40,16 @@ const InterfaceEquipe = () => {
         </Heading>
         <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4}>
           <VianneyActionsTableEvent />
-          <VianneyAlertTableEvent/>
-          <VianneyCamerasTableEvent/>
+          <VianneyAlertTableEvent />
+          <VianneyCamerasTableEvent />
+          {/* Add the missing event components here */}
+          <VianneyTeamsTableEvent />
+          <VianneyActionsTableEvent />
+          <VianneyFormUtileSalleDeCriseTableEvent />
+          <VianneyPdfDocumentsTableEvent />
+          <VianneyPdfDocumentsSalleDeCriseTableEvent />
+          <VianneyTextareaTableEvent />
+          <VianneyTextareaSalleDeCriseTableEvent />
         </SimpleGrid>
       </Box>
     </Box>

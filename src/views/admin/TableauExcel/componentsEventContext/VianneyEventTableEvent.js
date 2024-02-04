@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@chakra-ui/react';
 import { utils, writeFile } from 'xlsx';
 import { supabase } from '../../../../supabaseClient';
-import { FcAddDatabase } from "react-icons/fc"; // Importing the icon
+import { FcAddDatabase } from "react-icons/fc"; 
+import { useEvent } from './../../../../EventContext';
 
 const VianneyEventTable = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
+  const { selectedEventId } = useEvent();
 
   useEffect(() => {
     const fetchData = async () => {

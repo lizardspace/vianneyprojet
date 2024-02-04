@@ -3,11 +3,13 @@ import { Button, Alert, AlertIcon, AlertDescription, CloseButton } from '@chakra
 import { utils, writeFile } from 'xlsx';
 import { supabase } from '../../../../supabaseClient';
 import { FcAddDatabase, FcRightUp2 } from "react-icons/fc";
+import { useEvent } from './../../../../EventContext';
 
 const VianneyPdfDocumentsTableEvent = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
+  const { selectedEventId } = useEvent();
 
   useEffect(() => {
     const fetchData = async () => {
