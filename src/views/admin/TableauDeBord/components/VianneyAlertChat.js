@@ -166,13 +166,13 @@ function VianneyAlertChat() {
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
       const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
-  
+
       // Check if a file is selected
       if (selectedFile) {
         // Create a FormData object to upload the file
         const formData = new FormData();
         formData.append('file', selectedFile);
-  
+
         // Use the Supabase Storage API to upload the file
         const { data: fileData, error: fileError } = await supabase.storage
           .from('alert-images')
@@ -180,15 +180,18 @@ function VianneyAlertChat() {
             cacheControl: '3600', // Optional cache control
             upsert: false, // Optional upsert flag
           });
-  
+
         if (fileError) {
           console.error('Error uploading image:', fileError);
           return;
         }
-  
+
         // Get the URL of the uploaded image from fileData
         const imageUrl = fileData[0]?.url;
-  
+
+        // Update the image_url state with the uploaded image URL
+        setImageUrl(imageUrl);
+
         const { error } = await supabase
           .from('vianney_alert')
           .insert([
@@ -201,7 +204,7 @@ function VianneyAlertChat() {
               image_url: imageUrl, // Include image_url
             }
           ]);
-  
+
         if (!error) {
           const newAlert = {
             alert_text: newAlertText,
@@ -225,8 +228,8 @@ function VianneyAlertChat() {
       }
     }
   };
-  
-  
+
+
 
   const textColor = useColorModeValue("secondaryGray.900", "white");
 
@@ -316,11 +319,11 @@ function VianneyAlertChat() {
             mt={2}
           />
           <Input
-  type="file"
-  accept="image/*"
-  onChange={(e) => setSelectedFile(e.target.files[0])}
-  mt={2}
-/>
+            type="file"
+            accept="image/*"
+            onChange={(e) => setSelectedFile(e.target.files[0])}
+            mt={2}
+          />
           <Input
             placeholder="URL de l'image"
             value={imageUrl}
