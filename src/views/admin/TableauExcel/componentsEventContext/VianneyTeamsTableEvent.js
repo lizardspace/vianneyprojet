@@ -23,14 +23,12 @@ const VianneyTeamsTableEvent = () => {
           .eq('event_id', selectedEventId);
 
         if (error) {
-          setError(error.message);
-          setIsErrorVisible(true);
+          console.log(error.message); // Log to console instead of showing to the user
         } else {
           setData(tableData);
         }
       } catch (error) {
-        setError(error.message);
-        setIsErrorVisible(true);
+        console.log(error.message); // Log to console instead
       }
     };
 

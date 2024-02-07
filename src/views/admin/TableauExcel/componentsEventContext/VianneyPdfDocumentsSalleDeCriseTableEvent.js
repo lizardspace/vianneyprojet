@@ -24,14 +24,12 @@ const VianneyPdfDocumentsSalleDeCriseTableEvent = () => {
           .eq('event_id', selectedEventId); // Add this line if filtering by event_id is applicable
 
         if (error) {
-          setError(error.message);
-          setIsErrorVisible(true);
+          console.log(error.message); // Log to console instead of showing to the user
         } else {
           setData(tableData);
         }
       } catch (error) {
-        setError(error.message);
-        setIsErrorVisible(true);
+        console.log(error.message); // Log to console instead
       }
     };
 
