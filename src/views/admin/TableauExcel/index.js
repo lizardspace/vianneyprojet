@@ -9,7 +9,6 @@ import VianneyTextareaTable from './components/VianneyTextareaTable';
 import VianneyTextareaSalleDeCriseTable from './components/VianneyTextareaSalleDeCriseTable';
 import VianneyActionsTableEvent from './componentsEventContext/VianneyActionsTableEvent';
 import VianneyAlertTableEvent from './componentsEventContext/VianneyAlertTableEvent';
-import VianneyCamerasTableEvent from './componentsEventContext/VianneyCamerasTableEvent';
 
 // Import the missing event components here
 import VianneyTeamsTableEvent from './componentsEventContext/VianneyTeamsTableEvent'; // Replace with the actual import path

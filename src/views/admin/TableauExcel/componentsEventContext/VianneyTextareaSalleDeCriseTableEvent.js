@@ -64,8 +64,8 @@ const VianneyTextareaSalleDeCriseTableEvent = () => {
       </Button>
       {isErrorVisible && (
         <Alert status="info" mt="2" maxW="300px">
-          <AlertIcon as={FcRightUp2} />
           <AlertDescription>Erreur : {error}</AlertDescription>
+          <AlertIcon as={FcRightUp2} />
           <CloseButton onClick={handleCloseError} position="absolute" right="8px" top="8px" />
         </Alert>
       )}
