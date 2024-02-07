@@ -25,7 +25,7 @@ const InterfaceEquipe = () => {
         <Heading as="h1" size="lg" mb={4}>
           Exportation brute des excels
         </Heading>
-        <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 3 }} spacing={4}>
+        <SimpleGrid columns={{ base: 1, sm: 1, md: 2, lg: 2 }} spacing={4}>
           <VianneyTeamsTable />
           <VianneyActionsTable />
           <VianneyFormUtileSalleDeCriseTable />
@@ -37,7 +37,7 @@ const InterfaceEquipe = () => {
         <Heading as="h1" size="lg" mb={4} mt={4}>
           On pourra faire des exportations excels plus complexes avec des views à ta demande
         </Heading>
-        <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 3 }} spacing={4}>
+        <SimpleGrid columns={{ base: 1, sm: 1, md: 2, lg: 2 }} spacing={4}>
           <VianneyActionsTableEvent />
           <VianneyAlertTableEvent />
           <VianneyTeamsTableEvent />

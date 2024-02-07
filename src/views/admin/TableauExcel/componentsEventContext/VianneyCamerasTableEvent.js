@@ -69,7 +69,7 @@ const VianneyCamerasTableEvent = () => {
       {isErrorVisible && (
         <Alert status="info" mt="2" maxW="300px">
           <AlertIcon as={FcRightUp2} />
-          <AlertDescription>Erreur : {error}</AlertDescription>
+          <AlertDescription> {error}</AlertDescription>
           <CloseButton onClick={handleCloseError} position="absolute" right="8px" top="8px" />
         </Alert>
       )}
