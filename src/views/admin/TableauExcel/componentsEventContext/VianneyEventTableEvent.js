@@ -14,45 +14,39 @@ const VianneyEventTable = () => {
     const fetchData = async () => {
       try {
         const { data: tableData, error } = await supabase
-          .from('vianney_textarea') // Ensure this matches your actual table name
-          .select('*')
+          .from('vianney_event') // Replace with your actual table name
+          .select('*'); // Fetch all columns
           .eq('event_id', selectedEventId);
-  
+
         if (error) {
-          console.log(error.message); // Log to console instead of showing to the user
+          setError(error.message);
         } else {
           setData(tableData);
         }
       } catch (error) {
-        console.log(error.message); // Log to console instead
+        setError(error.message);
       }
     };
-  
+
     fetchData();
   }, [selectedEventId]);
 
-  const handleCloseError = () => {
-    setIsErrorVisible(false);
-  };
-  
-  const handleExport = async () => {
+  const handleExport = () => {
     if (data.length === 0) {
-      setError('Aucune donnée à exporter.');
-      setIsErrorVisible(true);
+      setError('Aucune donnée à exporter.'); // Updated error message for French
       return;
     }
-  
+
     const ws = utils.json_to_sheet(data);
     const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, 'Aire de texte de Vianney');
-  
+    utils.book_append_sheet(wb, ws, 'Evenements de Vianney'); // Updated sheet name for French
+    
     try {
-      await writeFile(wb, 'textarea_vianney.xlsx');
+      writeFile(wb, 'evenements_vianney.xlsx'); // Updated file name for French
     } catch (error) {
-      console.log(`Erreur lors de l'exportation vers Excel : ${error.message}`); // Log this error to console instead
+      setError('Erreur lors de l\'exportation vers Excel : ' + error.message); // Updated error message for French
     }
   };
- 
 
   return (
     <div>

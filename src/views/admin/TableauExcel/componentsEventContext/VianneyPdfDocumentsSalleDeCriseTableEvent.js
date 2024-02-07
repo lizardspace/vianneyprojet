@@ -13,44 +13,51 @@ const VianneyPdfDocumentsSalleDeCriseTableEvent = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!selectedEventId) {
+        return;
+      }
+
       try {
         const { data: tableData, error } = await supabase
-          .from('vianney_textarea') // Ensure this matches your actual table name
+          .from('vianney_pdf_documents_salle_de_crise') // Ensure this matches your actual table name
           .select('*')
-          .eq('event_id', selectedEventId);
-  
+          .eq('event_id', selectedEventId); // Add this line if filtering by event_id is applicable
+
         if (error) {
-          console.log(error.message); // Log to console instead of showing to the user
+          setError(error.message);
+          setIsErrorVisible(true);
         } else {
           setData(tableData);
         }
       } catch (error) {
-        console.log(error.message); // Log to console instead
+        setError(error.message);
+        setIsErrorVisible(true);
       }
     };
-  
+
     fetchData();
   }, [selectedEventId]);
 
   const handleCloseError = () => {
     setIsErrorVisible(false);
   };
-  
+
   const handleExport = async () => {
     if (data.length === 0) {
-      setError('Aucune donnée à exporter.');
+      setError('Aucun document PDF salle de crise à exporter.');
       setIsErrorVisible(true);
       return;
     }
-  
+
     const ws = utils.json_to_sheet(data);
     const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, 'Aire de texte de Vianney');
-  
+    utils.book_append_sheet(wb, ws, 'PDF_Salle_Crise_Vianney');
+
     try {
-      await writeFile(wb, 'textarea_vianney.xlsx');
+      await writeFile(wb, 'documents_pdf_salle_de_crise_vianney.xlsx');
     } catch (error) {
-      console.log(`Erreur lors de l'exportation vers Excel : ${error.message}`); // Log this error to console instead
+      setError(`Erreur lors de l'exportation vers Excel : ${error.message}`);
+      setIsErrorVisible(true);
     }
   };
 
