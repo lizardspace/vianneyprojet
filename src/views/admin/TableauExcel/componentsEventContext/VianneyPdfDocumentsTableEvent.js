@@ -14,9 +14,13 @@ const VianneyPdfDocumentsTableEvent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (!selectedEventId) {
+          return;
+        }
         const { data: tableData, error } = await supabase
           .from('vianney_pdf_documents') // Confirm this matches your actual table name
-          .select('*');
+          .select('*')
+          .eq('event_id', selectedEventId);
 
         if (error) {
           setError(error.message);
@@ -31,7 +35,7 @@ const VianneyPdfDocumentsTableEvent = () => {
     };
 
     fetchData();
-  }, []);
+  }, [selectedEventId]);
 
   const handleCloseError = () => {
     setIsErrorVisible(false);
@@ -52,6 +56,7 @@ const VianneyPdfDocumentsTableEvent = () => {
       await writeFile(wb, 'documents_pdf_vianney.xlsx');
     } catch (error) {
       setError(`Erreur lors de l'exportation vers Excel : ${error.message}`);
+    } finally {
       setIsErrorVisible(true);
     }
   };

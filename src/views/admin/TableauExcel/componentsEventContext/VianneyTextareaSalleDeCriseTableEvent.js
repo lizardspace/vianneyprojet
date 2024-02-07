@@ -16,7 +16,8 @@ const VianneyTextareaSalleDeCriseTableEvent = () => {
       try {
         const { data: tableData, error } = await supabase
           .from('vianney_textarea_salle_de_crise') // Confirm this matches your actual table name
-          .select('*');
+          .select('*')
+          .eq('event_id', selectedEventId);
 
         if (error) {
           setError(error.message);
@@ -31,7 +32,7 @@ const VianneyTextareaSalleDeCriseTableEvent = () => {
     };
 
     fetchData();
-  }, []);
+  }, [selectedEventId]);
 
   const handleCloseError = () => {
     setIsErrorVisible(false);

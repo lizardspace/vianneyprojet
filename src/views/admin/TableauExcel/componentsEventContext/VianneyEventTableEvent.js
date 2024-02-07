@@ -16,6 +16,7 @@ const VianneyEventTable = () => {
         const { data: tableData, error } = await supabase
           .from('vianney_event') // Replace with your actual table name
           .select('*'); // Fetch all columns
+          .eq('event_id', selectedEventId);
 
         if (error) {
           setError(error.message);
@@ -28,7 +29,7 @@ const VianneyEventTable = () => {
     };
 
     fetchData();
-  }, []);
+  }, [selectedEventId]);
 
   const handleExport = () => {
     if (data.length === 0) {
