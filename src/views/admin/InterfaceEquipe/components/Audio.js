@@ -9,7 +9,7 @@ const socket = io('your_signaling_server_url'); // Initialize Socket.IO connecti
 function AudioSpace() {
   const [peers, setPeers] = useState([]);
   const [stream, setStream] = useState(null);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(false); // State to track microphone mute/unmute
   const [volume, setVolume] = useState(100); // Initial volume
   const peerRef = useRef();
   const audioRef = useRef();
@@ -66,7 +66,7 @@ function AudioSpace() {
       const audioTracks = stream.getAudioTracks();
       if (audioTracks.length > 0) {
         audioTracks[0].enabled = !audioTracks[0].enabled;
-        setIsMuted(!audioTracks[0].enabled);
+        setIsMuted(!audioTracks[0].enabled); // Update mute state
       }
     }
   };
@@ -107,7 +107,7 @@ function AudioSpace() {
         {peers.map((peerData, index) => (
           <div key={index}>
             {/* Display audio stream for each user */}
-            <audio ref={audioRef} autoPlay></audio>
+            <audio ref={audioRef} autoPlay muted={isMuted}></audio> {/* Set muted attribute based on isMuted state */}
           </div>
         ))}
       </VStack>
