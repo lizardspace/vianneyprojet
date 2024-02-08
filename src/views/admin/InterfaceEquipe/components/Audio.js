@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChakraProvider, Box, VStack, IconButton, Slider, SliderTrack, SliderFilledTrack, SliderThumb } from '@chakra-ui/react';
 import { FaMicrophone, FaMicrophoneSlash, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import Peer from 'simple-peer';
+import io from 'socket.io-client'; // Import Socket.IO client library
+
+const socket = io('your_signaling_server_url'); // Initialize Socket.IO connection
 
 function AudioSpace() {
   const [peers, setPeers] = useState([]);
@@ -23,7 +26,7 @@ function AudioSpace() {
         // Add code to handle signaling and other WebRTC logic
         peerRef.current.on('signal', (data) => {
           // Send the signaling data to other users
-          // Example: socket.emit('signal', data);
+          socket.emit('signal', data); // Send signaling data to the server
         });
 
         // Handle incoming streams from other users
@@ -35,6 +38,12 @@ function AudioSpace() {
       .catch((error) => {
         console.error('Error accessing microphone:', error);
       });
+
+    // Handle signaling messages from the server
+    socket.on('signal', (data) => {
+      // Process signaling data and establish WebRTC connection with other users
+      peerRef.current.signal(data);
+    });
 
     return () => {
       // Clean up resources when component unmounts
