@@ -9,7 +9,7 @@ const socket = io('your_signaling_server_url'); // Initialize Socket.IO connecti
 function AudioSpace() {
   const [peers, setPeers] = useState([]);
   const [stream, setStream] = useState(null);
-  const [isMuted, setIsMuted] = useState(false); // State to track microphone mute/unmute
+  const [isMuted, setIsMuted] = useState(true); 
   const [volume, setVolume] = useState(100); // Initial volume
   const peerRef = useRef();
   const audioRef = useRef();
@@ -70,6 +70,7 @@ function AudioSpace() {
       }
     }
   };
+  
   
   
 
