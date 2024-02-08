@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Heading, SimpleGrid } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Box, Heading, SimpleGrid, Button } from '@chakra-ui/react';
 import VianneyTeamsTable from './components/VianneyTeamsTable';
 import VianneyActionsTable from './components/VianneyActionsTable';
 import VianneyFormUtileSalleDeCriseTable from './components/VianneyFormUtileSalleDeCriseTable';
@@ -19,35 +19,46 @@ import VianneyTextareaTableEvent from './componentsEventContext/VianneyTextareaT
 import VianneyTextareaSalleDeCriseTableEvent from './componentsEventContext/VianneyTextareaSalleDeCriseTableEvent'; // Replace with the actual import path
 
 const InterfaceEquipe = () => {
+  const [showRawData, setShowRawData] = useState(false);
+
+  const toggleRawDataVisibility = () => {
+    setShowRawData(!showRawData);
+  };
+
   return (
     <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
       <Box p={{ base: 4, md: 8, xl: 12 }}>
         <Heading as="h1" size="lg" mb={4}>
           Exportation brute des excels
         </Heading>
-        <SimpleGrid columns={{ base: 1, sm: 1, md: 2, lg: 2 }} spacing={4}>
-          <VianneyTeamsTable />
-          <VianneyActionsTable />
-          <VianneyFormUtileSalleDeCriseTable />
-          <VianneyPdfDocumentsTable />
-          <VianneyPdfDocumentsSalleDeCriseTable />
-          <VianneyTextareaTable />
-          <VianneyTextareaSalleDeCriseTable />
-        </SimpleGrid>
+        <Button onClick={toggleRawDataVisibility} mb={4}>
+          {showRawData ? 'Hide Raw Data' : 'Show Raw Data'}
+        </Button>
+        {showRawData && (
+          <SimpleGrid columns={{ base: 1, sm: 1, md: 2, lg: 2 }} spacing={4}>
+            <VianneyTeamsTable />
+            <VianneyActionsTable />
+            <VianneyFormUtileSalleDeCriseTable />
+            <VianneyPdfDocumentsTable />
+            <VianneyPdfDocumentsSalleDeCriseTable />
+            <VianneyTextareaTable />
+            <VianneyTextareaSalleDeCriseTable />
+          </SimpleGrid>
+        )}
         <Heading as="h1" size="lg" mb={4} mt={4}>
           On pourra faire des exportations excels plus complexes avec des views à ta demande
         </Heading>
-        <SimpleGrid columns={{ base: 1, sm: 1, md: 2, lg: 2 }} spacing={4}>
-          <VianneyActionsTableEvent />
-          <VianneyAlertTableEvent />
-          <VianneyTeamsTableEvent />
-          <VianneyFormUtileSalleDeCriseTableEvent />
-          <VianneyPdfDocumentsTableEvent />
-          <VianneyPdfDocumentsSalleDeCriseTableEvent />
-          <VianneyTextareaTableEvent />
-          <VianneyTextareaSalleDeCriseTableEvent />
-        </SimpleGrid>
-      </Box>
+                  <SimpleGrid columns={{ base: 1, sm: 1, md: 2, lg: 2 }} spacing={4}>
+            <VianneyActionsTableEvent />
+            <VianneyAlertTableEvent />
+            <VianneyTeamsTableEvent />
+            <VianneyFormUtileSalleDeCriseTableEvent />
+            <VianneyPdfDocumentsTableEvent />
+            <VianneyPdfDocumentsSalleDeCriseTableEvent />
+            <VianneyTextareaTableEvent />
+            <VianneyTextareaSalleDeCriseTableEvent />
+          </SimpleGrid>
+              </Box>
     </Box>
   );
 };
