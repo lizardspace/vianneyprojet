@@ -9,8 +9,8 @@ const socket = io('your_signaling_server_url'); // Initialize Socket.IO connecti
 function AudioSpace() {
   const [peers, setPeers] = useState([]);
   const [stream, setStream] = useState(null);
-  const [isMuted, setIsMuted] = useState(true); 
-  const [volume, setVolume] = useState(100); // Initial volume
+  const [isMuted, setIsMuted] = useState(true);
+  const [volume, setVolume] = useState(100);
   const peerRef = useRef();
   const audioRef = useRef();
 
@@ -60,6 +60,36 @@ function AudioSpace() {
     };
   }, [stream]);
 
+  useEffect(() => {
+    let timeoutId;
+
+    const handleInactivity = () => {
+      setIsMuted(true); // Mute the microphone
+    };
+
+    const resetInactivityTimer = () => {
+      clearTimeout(timeoutId); // Clear any existing timeout
+      timeoutId = setTimeout(handleInactivity, 60000); // Set a new timeout for one minute (60000 milliseconds)
+    };
+
+    // Reset the inactivity timer whenever there is user interaction (clicking the microphone icon)
+    const handleClick = () => {
+      setIsMuted((prevIsMuted) => !prevIsMuted);
+      resetInactivityTimer();
+    };
+
+    window.addEventListener('click', handleClick);
+
+    // Start the inactivity timer when the component mounts
+    resetInactivityTimer();
+
+    // Clean up event listener and timeout when the component unmounts or when the mute state changes
+    return () => {
+      window.removeEventListener('click', handleClick);
+      clearTimeout(timeoutId);
+    };
+  }, [isMuted]);
+
   const toggleMute = () => {
     setIsMuted((prevIsMuted) => !prevIsMuted); // Toggle the isMuted state
     if (stream) {
@@ -70,22 +100,17 @@ function AudioSpace() {
       }
     }
   };
-  
-  
-  
 
   const handleVolumeChange = (value) => {
-    // Adjust the volume of the audio element
     setVolume(value);
     if (audioRef.current) {
-      audioRef.current.volume = value / 100; // Convert volume to a value between 0 and 1
+      audioRef.current.volume = value / 100;
     }
   };
 
   return (
     <Box>
       <VStack spacing={4}>
-        {/* UI elements for audio space */}
         <IconButton
           icon={isMuted ? <FaMicrophoneSlash /> : <FaMicrophone />}
           onClick={toggleMute}
@@ -109,8 +134,7 @@ function AudioSpace() {
         </div>
         {peers.map((peerData, index) => (
           <div key={index}>
-            {/* Display audio stream for each user */}
-            <audio ref={audioRef} autoPlay muted={isMuted}></audio> {/* Set muted attribute based on isMuted state */}
+            <audio ref={audioRef} autoPlay muted={isMuted}></audio>
           </div>
         ))}
       </VStack>
