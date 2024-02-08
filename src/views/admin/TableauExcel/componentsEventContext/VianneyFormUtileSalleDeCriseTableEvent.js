@@ -64,7 +64,7 @@ const VianneyFormUtileSalleDeCriseTableEvent = () => {
       <Button colorScheme="teal" onClick={handleExport}>
         Exporter vers Excel le formulaire utile salle de crise <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
-      {isErrorVisible && (
+      {error && isErrorVisible && (
         <Alert status="info" mt="2" maxW="300px">
           <AlertDescription>{error}</AlertDescription>
           <AlertIcon as={FcRightUp2} />
@@ -72,7 +72,7 @@ const VianneyFormUtileSalleDeCriseTableEvent = () => {
         </Alert>
       )}
     </div>
-  );
+  );  
 };
 
 export default VianneyFormUtileSalleDeCriseTableEvent;

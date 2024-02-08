@@ -64,15 +64,15 @@ const VianneyCamerasTableEvent = () => {
       <Button colorScheme="teal" onClick={handleExport}>
         Exporter vers Excel les cameras <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
-      {isErrorVisible && (
+      {error && isErrorVisible && (
         <Alert status="info" mt="2" maxW="300px">
+          <AlertDescription>{error}</AlertDescription>
           <AlertIcon as={FcRightUp2} />
-          <AlertDescription> {error}</AlertDescription>
           <CloseButton onClick={handleCloseError} position="absolute" right="8px" top="8px" />
         </Alert>
       )}
     </div>
-  );
+  );  
 };
 
 export default VianneyCamerasTableEvent;
