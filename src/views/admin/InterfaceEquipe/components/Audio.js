@@ -65,11 +65,13 @@ function AudioSpace() {
     if (stream) {
       const audioTracks = stream.getAudioTracks();
       if (audioTracks.length > 0) {
-        audioTracks[0].enabled = !audioTracks[0].enabled;
-        setIsMuted(!audioTracks[0].enabled); // Update mute state
+        const track = audioTracks[0];
+        track.enabled = !track.enabled; // Toggle the enabled state of the track
+        setIsMuted(!track.enabled); // Update the isMuted state based on the track's enabled state
       }
     }
   };
+  
 
   const handleVolumeChange = (value) => {
     // Adjust the volume of the audio element
