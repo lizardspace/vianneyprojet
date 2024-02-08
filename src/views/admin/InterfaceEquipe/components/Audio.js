@@ -61,16 +61,16 @@ function AudioSpace() {
   }, [stream]);
 
   const toggleMute = () => {
-    // Toggle microphone mute/unmute
+    setIsMuted((prevIsMuted) => !prevIsMuted); // Toggle the isMuted state
     if (stream) {
       const audioTracks = stream.getAudioTracks();
       if (audioTracks.length > 0) {
         const track = audioTracks[0];
         track.enabled = !track.enabled; // Toggle the enabled state of the track
-        setIsMuted(!track.enabled); // Update the isMuted state based on the track's enabled state
       }
     }
   };
+  
   
 
   const handleVolumeChange = (value) => {
