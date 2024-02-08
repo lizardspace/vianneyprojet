@@ -43,7 +43,9 @@ const VianneyTextareaSalleDeCriseTableEvent = () => {
       return;
     }
 
-    const ws = utils.json_to_sheet(data);
+    // Remove unwanted columns (created_at and updated_at)
+    const filteredData = data.map(({created_at, updated_at, last_updated, event_id, id, image_url, ...rest }) => rest);
+    const ws = utils.json_to_sheet(filteredData);
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, 'Salle de crise de Vianney');
 
