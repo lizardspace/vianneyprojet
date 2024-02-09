@@ -19,23 +19,14 @@ function AudioSpace() {
   const mediaRecorder = useRef(null);
 
   useEffect(() => {
-    // Get the user's audio stream (you may need to request microphone access)
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then((userStream) => {
         setStream(userStream);
-
-        // Initialize WebRTC connections for each user
         peerRef.current = new Peer({ initiator: true, stream: userStream });
-
-        // Add code to handle signaling and other WebRTC logic
         peerRef.current.on('signal', (data) => {
-          // Send the signaling data to other users
-          socket.emit('signal', data); // Send signaling data to the server
+          socket.emit('signal', data);
         });
-
-        // Handle incoming streams from other users
         peerRef.current.on('stream', (remoteStream) => {
-          // Create a new peer object for each user and add it to the state
           setPeers((prevPeers) => [...prevPeers, { peer: peerRef.current, stream: remoteStream }]);
         });
       })
@@ -43,14 +34,11 @@ function AudioSpace() {
         console.error('Error accessing microphone:', error);
       });
 
-    // Handle signaling messages from the server
     socket.on('signal', (data) => {
-      // Process signaling data and establish WebRTC connection with other users
       peerRef.current.signal(data);
     });
 
     return () => {
-      // Clean up resources when component unmounts
       if (peerRef.current) {
         peerRef.current.destroy();
       }
@@ -68,15 +56,14 @@ function AudioSpace() {
     let timeoutId;
 
     const handleInactivity = () => {
-      setIsMuted(true); // Mute the microphone
+      setIsMuted(true);
     };
 
     const resetInactivityTimer = () => {
-      clearTimeout(timeoutId); // Clear any existing timeout
-      timeoutId = setTimeout(handleInactivity, 60000); // Set a new timeout for one minute (60000 milliseconds)
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleInactivity, 60000);
     };
 
-    // Reset the inactivity timer whenever there is user interaction (clicking the microphone icon)
     const handleClick = () => {
       setIsMuted((prevIsMuted) => !prevIsMuted);
       resetInactivityTimer();
@@ -84,10 +71,8 @@ function AudioSpace() {
 
     window.addEventListener('click', handleClick);
 
-    // Start the inactivity timer when the component mounts
     resetInactivityTimer();
 
-    // Clean up event listener and timeout when the component unmounts or when the mute state changes
     return () => {
       window.removeEventListener('click', handleClick);
       clearTimeout(timeoutId);
@@ -126,12 +111,12 @@ function AudioSpace() {
   }, [recording, stream]);
 
   const toggleMute = () => {
-    setIsMuted((prevIsMuted) => !prevIsMuted); // Toggle the isMuted state
+    setIsMuted((prevIsMuted) => !prevIsMuted);
     if (stream) {
       const audioTracks = stream.getAudioTracks();
       if (audioTracks.length > 0) {
         const track = audioTracks[0];
-        track.enabled = !track.enabled; // Toggle the enabled state of the track
+        track.enabled = !track.enabled;
       }
     }
   };
@@ -151,12 +136,11 @@ function AudioSpace() {
     setRecording(false);
     if (recordedChunks.length > 0) {
       const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-      const fileName = 'recorded_audio.webm'; // Adjust the file name if needed
+      const fileName = 'recorded_audio.webm';
       const file = new File([blob], fileName);
   
-      // Upload file to Supabase storage bucket
       supabase.storage
-        .from('your_recording') // Replace 'your_bucket_name' with your actual bucket name
+        .from('your_recording')
         .upload(fileName, file)
         .then((response) => {
           console.log('File uploaded:', response);
