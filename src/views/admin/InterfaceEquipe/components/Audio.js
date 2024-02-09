@@ -82,19 +82,21 @@ function AudioSpace() {
   useEffect(() => {
     if (recording && stream) {
       const chunks = [];
-      mediaRecorder.current = new MediaRecorder(stream);
+      mediaRecorder.current = new MediaRecorder(stream, {
+        mimeType: 'audio/mp3' // Set the MIME type to audio/mp3
+      });
       mediaRecorder.current.ondataavailable = (e) => {
         chunks.push(e.data);
       };
       mediaRecorder.current.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/webm' });
+        const blob = new Blob(chunks, { type: 'audio/mp3' }); // Change the blob type to audio/mp3
         setRecordedChunks(chunks);
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         document.body.appendChild(a);
         a.style = 'display: none';
         a.href = url;
-        a.download = 'recorded_audio.webm';
+        a.download = 'recorded_audio.mp3'; // Change the file extension to .mp3
         a.click();
         window.URL.revokeObjectURL(url);
       };
@@ -135,8 +137,8 @@ function AudioSpace() {
   const stopRecording = () => {
     setRecording(false);
     if (recordedChunks.length > 0) {
-      const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-      const fileName = 'recorded_audio.webm';
+      const blob = new Blob(recordedChunks, { type: 'audio/mp3' }); // Change the blob type to audio/mp3
+      const fileName = 'recorded_audio.mp3'; // Change the file name to .mp3
       const file = new File([blob], fileName);
   
       supabase.storage
