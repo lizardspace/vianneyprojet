@@ -1,67 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { HMSClient } from '@100mslive/hmsvideo-web';
+import React from 'react';
 
 const AudioChatRoom = () => {
-  const [room, setRoom] = useState(null);
-  const [localStream, setLocalStream] = useState(null);
-  const remoteStreamRef = useRef(null);
+    const subdomain = "hello-audioroom-1938"; // Your template subdomain
+    const roomCode = "AR-sparkling-lake-812677"; // Your room code
 
-  useEffect(() => {
-    const client = new HMSClient({
-      tokenEndpoint: 'https://prod-in2.100ms.live/hmsapi/hello-audioroom-1938.app.100ms.live/managementToken',
-      appAccessKey: '65ca65817a79cd025cf7d736',
-      appSecret: 'aAidTXnmT18Cz67FfOZ_9A_JzV43qfamlxCM0QPug6qf0Vo_kkXitP9fYWB8Nf9VBSMV6UFvUMB-QpMs_F_TaDcb3-50kobT_f_IDQaoBfFpGPv6TYPlJzZ2UpFIUgsfMSUWvLsfmants5us9WjEdE0RK7fxSKj7HGWPKYoBB5Y=',
-    });
-
-    const initializeRoom = async () => {
-      try {
-        const room = await client.createRoom({ type: 'group' });
-        setRoom(room);
-
-        const localStream = await client.getLocalStream({
-          audio: true,
-          video: false,
-        });
-        setLocalStream(localStream);
-
-        await client.joinRoom({
-          role: 'audience',
-          roomId: room.roomId,
-          userId: localStream.streamId,
-          userName: 'YourUserName',
-        });
-
-        client.on('stream-added', (stream) => {
-          remoteStreamRef.current = stream;
-          attachStreamToAudioElement(stream);
-        });
-      } catch (error) {
-        console.error('Error initializing room:', error);
-      }
-    };
-
-    initializeRoom();
-
-    return () => {
-      client.leaveRoom();
-    };
-  }, []);
-
-  const attachStreamToAudioElement = (stream) => {
-    const audioElement = document.createElement('audio');
-    audioElement.srcObject = stream.mediaStream;
-    audioElement.autoplay = true;
-    audioElement.controls = false;
-    document.body.appendChild(audioElement);
-  };
-
-  return (
-    <div>
-      <h1>Audio Chat Room</h1>
-      <p>You are in room: {room?.roomId}</p>
-      <p>Local User ID: {localStream?.streamId}</p>
-    </div>
-  );
+    return (
+        <div style={{ height: '100vh', width: '100%' }}>
+            <iframe
+                title="100ms-audio-room"
+                allow="camera; microphone; fullscreen; display-capture; autoplay"
+                src={`https://${subdomain}.app.100ms.live/meeting/${roomCode}`}
+                style={{ border: 'none', height: '100%', width: '100%' }}
+            />
+        </div>
+    );
 };
 
 export default AudioChatRoom;
