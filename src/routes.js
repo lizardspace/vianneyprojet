@@ -1,7 +1,6 @@
 import React from "react";
 import { Icon } from "@chakra-ui/react";
 import { FcBusinessman, FcLock, FcMindMap, FcSerialTasks, FcSurvey, FcSettings, FcSelfie, FcGrid } from "react-icons/fc";
-import VideoChatRoom from "views/admin/videoChatRoom";
 // Admin Imports
 import MainDashboard from "views/admin/default";
 import NFTMarketplace from "views/admin/carte";
@@ -57,13 +56,6 @@ const routes = [
     path: "/parameters",
     icon: <Icon as={FcSettings} width='20px' height='20px' color='inherit' />,
     component: Parameters,
-  },
-  {
-    name: "Salle de chat vidéo",
-    layout: "/admin",
-    path: "/video-chat",
-    icon: <Icon as={FcBusinessman} width='20px' height='20px' color='inherit' />,
-    component: VideoChatRoom,
   },
   {
     name: "Interface Equipe",
