@@ -5,10 +5,12 @@ import 'leaflet/dist/leaflet.css';
 import { MdPlace } from 'react-icons/md';
 import ReactDOMServer from 'react-dom/server';
 import { useGPSPosition } from './../../../../GPSPositionContext'; // Import the custom hook
+import { useTeam } from './../TeamContext'; // Import the useTeam hook
 
 const GpsPosition = () => {
   const mapRef = React.useRef(null);
   const [mapInitialized, setMapInitialized] = useState(false);
+  const { selectedTeam } = useTeam(); // Access the selected team using the hook
 
   const gpsPosition = useGPSPosition(); // Access the GPS position using the hook
 
@@ -83,6 +85,13 @@ const GpsPosition = () => {
           Merci d'autoriser la géolocalisation
         </Alert>
       )}
+
+      <Box mb={4}>
+        <Alert status="success">
+          <AlertIcon />
+          Équipe sélectionnée : {selectedTeam}
+        </Alert>
+      </Box>
 
       <div
         id="map"
