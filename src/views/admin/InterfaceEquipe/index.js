@@ -15,7 +15,6 @@ import {
   Spacer,
 } from '@chakra-ui/react';
 import GpsPosition from './components/GpsPosition';
-import Audio from './components/Audio';
 import VianneyAlertChat from '../TableauDeBord/components/VianneyAlertChat';
 import { supabase } from './../../../supabaseClient';
 import TeamMembersDisplay from './components/TeamMembersDisplay';
@@ -110,7 +109,6 @@ const InterfaceEquipe = () => {
       >
         Radio CB
       </Heading>
-      <Audio />
       <AudioChatRoom/>
       <Heading
         me="auto"
