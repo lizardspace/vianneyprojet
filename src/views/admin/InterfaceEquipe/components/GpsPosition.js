@@ -6,13 +6,29 @@ import { MdPlace } from 'react-icons/md';
 import ReactDOMServer from 'react-dom/server';
 import { useGPSPosition } from './../../../../GPSPositionContext'; // Import the custom hook
 import { useTeam } from './../TeamContext'; // Import the useTeam hook
+import { supabase } from './../../../../supabaseClient'; // Import Supabase client
 
 const GpsPosition = () => {
   const mapRef = React.useRef(null);
   const [mapInitialized, setMapInitialized] = useState(false);
   const { selectedTeam } = useTeam(); // Access the selected team using the hook
-
   const gpsPosition = useGPSPosition(); // Access the GPS position using the hook
+
+  // Function to update latitude and longitude coordinates in the database
+  const updateCoordinates = async (teamName, latitude, longitude) => {
+    try {
+      const { data, error } = await supabase
+        .from('vianney_teams')
+        .update({ latitude, longitude })
+        .eq('name_of_the_team', teamName);
+      if (error) {
+        throw error;
+      }
+      console.log('Coordinates updated successfully:', data);
+    } catch (error) {
+      console.error('Error updating coordinates:', error.message);
+    }
+  };
 
   // Create a custom icon using the MdPlace icon
   const createCustomIcon = () => {
@@ -35,6 +51,11 @@ const GpsPosition = () => {
     }
 
     const { latitude, longitude } = gpsPosition;
+
+    // Update coordinates in the database if a team is selected
+    if (selectedTeam) {
+      updateCoordinates(selectedTeam, latitude, longitude);
+    }
 
     // Check if mapRef.current exists and is not destroyed
     if (mapRef.current && !mapRef.current._leaflet_id) {
@@ -75,7 +96,7 @@ const GpsPosition = () => {
 
       mapRef.current.setView([latitude, longitude], 13);
     }
-  }, [gpsPosition, mapInitialized]);
+  }, [gpsPosition, mapInitialized, selectedTeam]);
 
   return (
     <Box p={4}>
