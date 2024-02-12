@@ -19,7 +19,7 @@ import Audio from './components/Audio';
 import VianneyAlertChat from '../TableauDeBord/components/VianneyAlertChat';
 import { supabase } from './../../../supabaseClient';
 import TeamMembersDisplay from './components/TeamMembersDisplay';
-import Audiocentms from './components/Audiocentms';
+import AudioChatRoom from './components/AudioChatRoom';
 
 const InterfaceEquipe = () => {
   const {
@@ -111,7 +111,7 @@ const InterfaceEquipe = () => {
         Radio CB
       </Heading>
       <Audio />
-      <Audiocentms/>
+      <AudioChatRoom/>
       <Heading
         me="auto"
         color={textColor}
