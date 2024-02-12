@@ -13,6 +13,7 @@ const GpsPosition = () => {
   const [mapInitialized, setMapInitialized] = useState(false);
   const { selectedTeam } = useTeam(); // Access the selected team using the hook
   const gpsPosition = useGPSPosition(); // Access the GPS position using the hook
+  const [lastUpdateTime, setLastUpdateTime] = useState(null); // Store the last update time
 
   // Function to update latitude and longitude coordinates in the database
   const updateCoordinates = async (teamName, latitude, longitude) => {
@@ -52,9 +53,10 @@ const GpsPosition = () => {
 
     const { latitude, longitude } = gpsPosition;
 
-    // Update coordinates in the database if a team is selected
-    if (selectedTeam) {
+    // Update coordinates in the database if a team is selected and 30 seconds have passed since the last update
+    if (selectedTeam && (!lastUpdateTime || (Date.now() - lastUpdateTime) >= 30000)) {
       updateCoordinates(selectedTeam, latitude, longitude);
+      setLastUpdateTime(Date.now());
     }
 
     // Check if mapRef.current exists and is not destroyed
@@ -96,7 +98,7 @@ const GpsPosition = () => {
 
       mapRef.current.setView([latitude, longitude], 13);
     }
-  }, [gpsPosition, mapInitialized, selectedTeam]);
+  }, [gpsPosition, mapInitialized, selectedTeam, lastUpdateTime]);
 
   return (
     <Box p={4}>
