@@ -109,7 +109,7 @@ const InterfaceEquipe = () => {
       >
         Radio CB
       </Heading>
-      <Box>
+      <Box >
       <App/>
       </Box>
       <Heading
