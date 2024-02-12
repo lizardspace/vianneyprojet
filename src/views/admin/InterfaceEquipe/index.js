@@ -18,7 +18,7 @@ import GpsPosition from './components/GpsPosition';
 import VianneyAlertChat from '../TableauDeBord/components/VianneyAlertChat';
 import { supabase } from './../../../supabaseClient';
 import TeamMembersDisplay from './components/TeamMembersDisplay';
-import AudioChatRoom from './components/AudioChatRoom';
+import App from '../videoChatRoom/App';
 
 const InterfaceEquipe = () => {
   const {
@@ -109,7 +109,9 @@ const InterfaceEquipe = () => {
       >
         Radio CB
       </Heading>
-      <AudioChatRoom/>
+      <Box>
+      <App/>
+      </Box>
       <Heading
         me="auto"
         color={textColor}
