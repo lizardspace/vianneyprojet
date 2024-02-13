@@ -31,6 +31,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-register": "^6.26.0",
     "framer-motion": "^10.16.5",
+    "i18n": "^0.15.1",
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
     "react-apexcharts": "1.4.0",
