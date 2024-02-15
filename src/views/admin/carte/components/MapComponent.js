@@ -76,7 +76,7 @@ const MapComponent = () => {
   }, [users]);
 
   return (
-    <div id="map" style={{ height: '500px', width: '100%', zIndex: '0' }}></div>
+    <div id="map" style={{ height: '800px', width: '100%', zIndex: '0' }}></div>
   );
 };
 

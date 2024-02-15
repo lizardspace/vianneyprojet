@@ -118,7 +118,7 @@ const GpsPosition = () => {
 
       <div
         id="map"
-        style={{ height: '500px', width: '100%', zIndex: '0' }}
+        style={{ height: '250px', width: '100%', zIndex: '0' }}
       ></div>
     </Box>
   );
