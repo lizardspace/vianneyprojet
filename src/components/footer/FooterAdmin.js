@@ -46,7 +46,7 @@ export default function Footer() {
           <Link
             fontWeight='500'
             color={textColor}
-            href='https://www.blog.simmmple.com/?ref=horizon-chakra-free'>
+            href='https://monpadessai.my.canva.site/instruction-pour-les-utilisateur'>
             Blog
           </Link>
         </ListItem>
