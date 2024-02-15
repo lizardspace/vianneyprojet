@@ -44,21 +44,28 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
 
     useEffect(() => {
         const fetchDocuments = async () => {
-            const { data, error } = await supabase
-                .from("vianney_pdf_documents")
-                .select('*')
-                .eq('event_id', selectedEventId); // Filter documents by eventId
-            if (error) {
-                console.error("Error fetching documents:", error);
-            } else {
+            try {
+                let query = supabase.from("vianney_pdf_documents").select('*');
+                
+                if (selectedEventId) {
+                    query = query.eq('event_id', selectedEventId);
+                }
+                
+                const { data, error } = await query;
+    
+                if (error) {
+                    console.error("Error fetching documents:", error);
+                    return;
+                }
+    
                 setDocuments(data);
+            } catch (error) {
+                console.error("Error fetching documents:", error);
             }
         };
-
-        if (selectedEventId) { // Fetch documents only if eventId is available
-            fetchDocuments();
-        }
-    }, [selectedEventId]);
+    
+        fetchDocuments();
+    }, [selectedEventId]);    
 
     // Function to format the date as desired
     const formatDate = (dateString) => {
