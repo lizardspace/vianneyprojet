@@ -19,6 +19,7 @@ import {
     AlertDialogOverlay,
     Tooltip,
 } from "@chakra-ui/react";
+import { useEvent } from '../../../../EventContext';
 import { FcDocument } from "react-icons/fc";
 import { FaTrash } from "react-icons/fa";
 import { createClient } from "@supabase/supabase-js";
@@ -39,10 +40,14 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
     const [textColor] = useColorModeValue("secondaryGray.900", "white");
     const [deleteDocumentId, setDeleteDocumentId] = useState(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const { selectedEventId } = useEvent();
 
     useEffect(() => {
         const fetchDocuments = async () => {
-            const { data, error } = await supabase.from("vianney_pdf_documents").select();
+            const { data, error } = await supabase
+                .from("vianney_pdf_documents")
+                .select('*')
+                .eq('event_id', selectedEventId); // Filter documents by eventId
             if (error) {
                 console.error("Error fetching documents:", error);
             } else {
@@ -50,8 +55,10 @@ const PdfDownloadButton = ({ handlePdfClick }) => {
             }
         };
 
-        fetchDocuments();
-    }, []);
+        if (selectedEventId) { // Fetch documents only if eventId is available
+            fetchDocuments();
+        }
+    }, [selectedEventId]);
 
     // Function to format the date as desired
     const formatDate = (dateString) => {

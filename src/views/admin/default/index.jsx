@@ -48,7 +48,7 @@ export default function UserReports() {
   const [editingTeam, setEditingTeam] = useState(null);
   const [showEditUserFormModal, setShowEditUserFormModal] = useState(false);
   const { selectedEventId } = useEvent(); // Access the selectedEventId from the EventContext
-
+ 
   const handleEditTeam = (team) => {
     setEditingTeam(team);
     setShowEditUserFormModal(true); // Open the edit modal here
@@ -259,7 +259,7 @@ export default function UserReports() {
           <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} onClose={() => setShowEditUserFormModal(false)} />
         </Modal>
       )}
-      <DocumentationsComponent />
+      <DocumentationsComponent eventId={selectedEventId} />
       <TableTopCreators
         tableData={tableDataTopCreators}
         columnsData={tableColumnsTopCreators}
