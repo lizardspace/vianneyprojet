@@ -366,12 +366,12 @@ function VianneyAlertChat() {
                     <img
                       src={imageUrl}
                       alt="essai"
-                      style={{ maxHeight: isImageEnlarged ? "auto" : "100px", cursor: "pointer" }} 
+                      style={{ maxHeight: isImageEnlarged ? "auto" : "120px", cursor: "pointer" }} 
                       onClick={toggleImageSize} 
                     />
                   )}
                   {alert.image_url && (
-                    <img src={alert.image_url} alt="essai" style={{ maxHeight: "100px" }} />
+                    <img src={alert.image_url} alt="essai" style={{ maxHeight: "120px" }} />
                   )}
                 </Box>
                 <Tooltip label="Marqué comme résolue" hasArrow>
