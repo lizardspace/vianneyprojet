@@ -365,7 +365,6 @@ function VianneyAlertChat() {
                   {imageUrl && (
                     <img src={imageUrl} alt="essai" />
                   )}
-
                   {alert.image_url && (
                     <img src={alert.image_url} alt="essai" />
                   )}

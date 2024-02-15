@@ -8,13 +8,9 @@ import TeamTimelineAmeliore from "./components/TeamTimelineAmeliore";
 
 export default function Settings() {
   const [showForms, setShowForms] = useState(false); 
-
-
   const toggleForms = () => {
     setShowForms(!showForms);
   };
-
-
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <SimpleGrid
