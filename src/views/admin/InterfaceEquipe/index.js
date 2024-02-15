@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTeam } from './TeamContext';
+import { useEvent } from '../../../EventContext'; // Import useEvent context
 import {
   Box,
   Badge,
@@ -21,23 +22,25 @@ import TeamMembersDisplay from './components/TeamMembersDisplay';
 import App from '../videoChatRoom/App';
 
 const InterfaceEquipe = () => {
-  const {
-    selectedTeam,
-    setSelectedTeam,
-    teamData,
-    setTeamData,
-  } = useTeam();
+  const { selectedTeam, setSelectedTeam, teamData, setTeamData } = useTeam();
+  const { selectedEventId } = useEvent(); // Get selected event ID from useEvent context
   const textColor = useColorModeValue('secondaryGray.900', 'white');
 
   const [showAlert, setShowAlert] = useState(!selectedTeam);
-  const [showDropdown, setShowDropdown] = useState(true); // Initially show the dropdown
+  const [showDropdown, setShowDropdown] = useState(true);
 
   useEffect(() => {
     async function fetchTeamData() {
       try {
-        const { data, error } = await supabase
-          .from('vianney_teams')
-          .select('id, name_of_the_team');
+        let query = supabase.from('vianney_teams').select('id, name_of_the_team');
+
+        // If selectedEventId is available, filter teams by event_id
+        if (selectedEventId) {
+          query = query.eq('event_id', selectedEventId);
+        }
+
+        const { data, error } = await query;
+
         if (error) {
           throw error;
         }
@@ -48,12 +51,12 @@ const InterfaceEquipe = () => {
     }
 
     fetchTeamData();
-  }, [setTeamData]);
+  }, [selectedEventId, setTeamData]);
 
   const handleTeamSelection = (event) => {
     setSelectedTeam(event.target.value);
     setShowAlert(false);
-    setShowDropdown(false); // Hide the dropdown after selection
+    setShowDropdown(false);
   };
 
   const toggleDropdown = () => {
@@ -63,7 +66,7 @@ const InterfaceEquipe = () => {
   return (
     <Box pt={{ base: '180px', md: '80px', xl: '80px' }}>
       {showAlert && (
-        <Alert status="error" mb="4" minHeight="200px"> {/* Set minimum height */}
+        <Alert status="error" mb="4" minHeight="200px">
           <AlertIcon />
           <AlertTitle>Attention!</AlertTitle>
           <AlertDescription>
