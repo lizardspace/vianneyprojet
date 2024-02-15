@@ -120,6 +120,18 @@ const InterfaceEquipe = () => {
         fontSize="2xl"
         fontWeight="700"
         lineHeight="100%"
+        mb={10}
+        mt={10}
+      >
+        Messages et alertes
+      </Heading>
+      <VianneyAlertChat />
+      <Heading
+        me="auto"
+        color={textColor}
+        fontSize="2xl"
+        fontWeight="700"
+        lineHeight="100%"
         mb={4}
         mt={4}
       >
@@ -128,18 +140,6 @@ const InterfaceEquipe = () => {
       <Box >
       <App/>
       </Box>
-      <Heading
-        me="auto"
-        color={textColor}
-        fontSize="2xl"
-        fontWeight="700"
-        lineHeight="100%"
-        mb={10}
-        mt={10}
-      >
-        Message
-      </Heading>
-      <VianneyAlertChat />
     </Box>
   );
 };
