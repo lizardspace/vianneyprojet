@@ -28,6 +28,8 @@ function VianneyAlertChat() {
   const [filter, setFilter] = useState('all');
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
+  const [isImageEnlarged, setIsImageEnlarged] = useState(false); // State to track whether the image is enlarged
+
   const openConfirmModal = (alertId) => {
     setAlertToDelete(alertId);
     setIsConfirmOpen(true);
@@ -298,16 +300,16 @@ function VianneyAlertChat() {
     const file = e.target.files[0];
     const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
     if (file) {
-      // Create a FormData object to upload the file
+
       const formData = new FormData();
       formData.append('file', file);
 
-      // Use the Supabase Storage API to upload the file
+
       const { data: fileData, error: fileError } = await supabase.storage
         .from('alert-images')
         .upload(`/${fakeUUID}/${uuidv4()}.png`, formData, {
-          cacheControl: '3600', // Optional cache control
-          upsert: false, // Optional upsert flag
+          cacheControl: '3600', 
+          upsert: false, 
         });
 
       if (fileError) {
@@ -315,17 +317,18 @@ function VianneyAlertChat() {
         return;
       }
 
-      // Get the URL of the uploaded image from fileData
       const imageUrl = fileData[0]?.url;
 
-      // Update the image_url state and input field
       updateImageUrl(imageUrl);
     }
   };
 
 
-  return (
+  const toggleImageSize = () => {
+    setIsImageEnlarged(!isImageEnlarged);
+  };
 
+  return (
     <Card
       direction='column'
       w='100%'
@@ -341,10 +344,7 @@ function VianneyAlertChat() {
             Table des alertes
           </Text>
           <Menu onFilterSelect={handleFilterSelect} onAllowScrollingToggle={handleAllowScrollingToggle} />
-
         </Flex>
-
-
         <VStack
           spacing={4}
           overflowY={allowScrolling ? "scroll" : "hidden"}
@@ -363,7 +363,12 @@ function VianneyAlertChat() {
                     {new Date(alert.timestamp).toLocaleString()}
                   </Text>
                   {imageUrl && (
-                    <img src={imageUrl} alt="essai" style={{ maxHeight: "100px" }} />
+                    <img
+                      src={imageUrl}
+                      alt="essai"
+                      style={{ maxHeight: isImageEnlarged ? "auto" : "100px", cursor: "pointer" }} 
+                      onClick={toggleImageSize} 
+                    />
                   )}
                   {alert.image_url && (
                     <img src={alert.image_url} alt="essai" style={{ maxHeight: "100px" }} />
@@ -482,4 +487,4 @@ function VianneyAlertChat() {
   );
 }
 
-export default VianneyAlertChat; 
+export default VianneyAlertChat;
