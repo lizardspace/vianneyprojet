@@ -141,17 +141,27 @@ function VianneyAlertChat() {
   useEffect(() => {
     // Function to fetch alerts from Supabase
     const fetchAlerts = async () => {
-      const { data, error } = await supabase
-        .from('vianney_alert')
-        .select('*')
-        .order('timestamp', { ascending: true }); // Changed to true for chronological order
-
-      if (error) console.log('Erreur lors de la récupération des alertes:', error);
-      else setAlerts(data);
+      try {
+        const { data, error } = await supabase
+          .from('vianney_alert')
+          .select('*')
+          .eq('event_id', selectedEventId) // Filter by selected event_id
+          .order('timestamp', { ascending: true }); // Changed to true for chronological order
+  
+        if (error) {
+          console.error('Error fetching alerts:', error);
+          return;
+        }
+  
+        setAlerts(data);
+      } catch (error) {
+        console.error('Error fetching alerts:', error);
+      }
     };
-
+  
     fetchAlerts();
-  }, []);
+  }, [selectedEventId]);
+  
 
 
   const handleStatusChange = (event) => {
