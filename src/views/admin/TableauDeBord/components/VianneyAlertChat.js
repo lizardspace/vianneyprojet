@@ -141,7 +141,7 @@ function VianneyAlertChat() {
 
 
   useEffect(() => {
-    // Function to fetch alerts from Supabase
+
     const fetchAlerts = async () => {
       try {
         const { data, error } = await supabase
@@ -196,13 +196,13 @@ function VianneyAlertChat() {
       const fakeUUID = uuidv4(); // Use UUID v4 to generate a unique user_id for the demo
 
       if (selectedFile) {
-        // Prepare file for uploading
+
         const fileExtension = selectedFile.name.split('.').pop();
         const fileName = `${uuidv4()}.${fileExtension}`;
         const filePath = `${fakeUUID}/${fileName}`;
 
         try {
-          // Use Supabase Storage API to upload the file
+
           let { error: uploadError } = await supabase.storage
             .from('alert-images')
             .upload(filePath, selectedFile, {
@@ -214,7 +214,7 @@ function VianneyAlertChat() {
             throw new Error(`Failed to upload image: ${uploadError.message}`);
           }
 
-          // Construct the URL for the uploaded image
+
           const imageUrl = `${supabaseUrl.replace('.co', '.in')}/storage/v1/object/public/alert-images/${filePath}`;
 
           const { data, error } = await supabase
@@ -234,9 +234,9 @@ function VianneyAlertChat() {
             throw new Error(`Failed to insert alert: ${error.message}`);
           }
 
-          // Check if data is not null before accessing data[0]
+
           if (data && data.length > 0) {
-            // Update local state to include the new alert
+
             setAlerts([...alerts, { ...data[0], timestamp: new Date().toISOString() }]);
           } else {
             console.error('No data returned from the insert operation.');
