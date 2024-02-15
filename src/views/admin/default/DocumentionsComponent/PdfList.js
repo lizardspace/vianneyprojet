@@ -10,7 +10,6 @@ import {
 } from "@chakra-ui/react";
 import { createClient } from "@supabase/supabase-js";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -37,7 +36,6 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
       console.error("Error fetching PDF documents:", error);
     }
   };
-
   const handleReturnBack = () => {
     setSelectedPdf(null);
   };
@@ -53,7 +51,6 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
         return;
       }
 
-      // Remove the deleted document from the local state
       setPdfDocuments((prevDocuments) =>
         prevDocuments.filter((document) => document.id !== pdfId)
       );
@@ -61,7 +58,6 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
       console.error("Error deleting PDF document:", error);
     }
   };
-
 
   return (
     <VStack spacing={4} alignItems="stretch">
@@ -121,16 +117,15 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
                 Voir le PDF
               </Link>
               <Button
-                colorScheme="red" // Set the color scheme to red for delete button
-                size="sm" // Adjust the size of the button as needed
+                colorScheme="red" 
+                size="sm" 
                 mt={2}
-                onClick={() => handleDeletePdf(pdfDocument.id)} // Add delete handler
+                onClick={() => handleDeletePdf(pdfDocument.id)} 
               >
                 Supprimer
               </Button>
             </Box>
           ))}
-
         </VStack>
       )}
     </VStack>
