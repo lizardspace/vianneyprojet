@@ -4,12 +4,10 @@ import {
   Button,
   Flex,
   Grid,
-  Text,
   useColorModeValue,
-  SimpleGrid,
 } from "@chakra-ui/react";
 import MapComponent from "views/admin/carte/components/MapComponent";
-import Camera from './components/Camera';
+import EventVideos from './components/EventVideos';
 import TableTopCreators from "views/admin/carte/components/TableTopCreators";
 import Card from "components/card/Card.js";
 import tableDataTopCreators from "views/admin/carte/variables/tableDataTopCreators.json";
@@ -29,6 +27,7 @@ export default function Marketplace() {
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [cameras, setCameras] = useState([]);
   const [showGrid, setShowGrid] = useState(false);
+  // Other state and useEffects...
 
   useEffect(() => {
     const fetchCameras = async () => {
@@ -88,25 +87,7 @@ export default function Marketplace() {
           columnsData={tableColumnsTopCreators}
         />
       </Box>
-      <Box mt="10px" borderRadius="lg" overflow="hidden">
-        <Flex direction='column'>
-          <Flex
-            mt='45px'
-            mb='20px'
-            justifyContent='space-between'
-            direction={{ base: "column", md: "row" }}
-            align={{ base: "start", md: "center" }}>
-            <Text color={textColor} fontSize='2xl' ms='24px' fontWeight='700'>
-              Les vidéos en direct de l'évênement
-            </Text>
-          </Flex>
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap='20px'>
-            {cameras?.map(camera => (
-              <Camera key={camera.id} camera={camera} /> // Use Camera component
-            ))}
-          </SimpleGrid>
-        </Flex>
-      </Box>
+      <EventVideos cameras={cameras} textColor={textColor} />
       <Button onClick={toggleGrid} mt='4' mb='4'>
         {showGrid ? 'Cacher' : 'Montrer'}
       </Button>
