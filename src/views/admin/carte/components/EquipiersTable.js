@@ -29,16 +29,18 @@ import 'leaflet/dist/leaflet.css';
 import { createClient } from '@supabase/supabase-js';
 import { MdPlace } from "react-icons/md";
 import { renderToString } from "react-dom/server";
+import { useEvent } from '../../../../EventContext';
 
 // Initialize Supabase client
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const EquipiersTable = ({ showAll }) => {
+const EquipiersTable = ({ showAll}) => {
   const [equipiers, setEquipiers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEquipier, setSelectedEquipier] = useState(null);
+  const { selectedEventId } = useEvent();
 
   const onRowClick = (equipier) => {
     setSelectedEquipier(equipier);
@@ -94,19 +96,28 @@ const EquipiersTable = ({ showAll }) => {
 
   useEffect(() => {
     const fetchEquipiers = async () => {
-      const { data, error } = await supabase
-        .from('vianney_teams')
-        .select('*')
-        .order('name_of_the_team', { ascending: true }); // Order by team name in ascending order
-      if (error) {
-        console.log('Error fetching data:', error);
-      } else {
+      try {
+        let query = supabase.from('vianney_teams').select('*').order('name_of_the_team', { ascending: true }); // Order by team name in ascending order
+
+        if (selectedEventId) {
+          query = query.eq('event_id', selectedEventId);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+          console.error('Error fetching equipiers:', error);
+          return;
+        }
+
         setEquipiers(data);
+      } catch (error) {
+        console.error('Error fetching equipiers:', error);
       }
     };
 
     fetchEquipiers();
-  }, []);
+  }, [selectedEventId]);
 
   const getLeaderNameAndPhone = (teamMembers) => {
     const leader = teamMembers.find(member => member.isLeader);
