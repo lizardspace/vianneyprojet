@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   VStack,
@@ -10,32 +10,16 @@ import {
 } from "@chakra-ui/react";
 import { createClient } from "@supabase/supabase-js";
 import { ArrowBackIcon } from "@chakra-ui/icons";
+import { useEvent } from '../../../../EventContext'; // Import the useEvent hook from the EventContext
+
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const PdfList = ({ selectedPdf, setSelectedPdf }) => {
+const PdfList = ({ selectedPdf, setSelectedPdf }) => { 
   const [pdfDocuments, setPdfDocuments] = React.useState([]);
-  React.useEffect(() => {
-    fetchPdfDocuments();
-  }, []);
+  const { eventId } = useEvent(); // Extract the eventId from the useEvent hook
 
-  const fetchPdfDocuments = async () => {
-    try {
-      const { data: pdfDocumentsData, error } = await supabase
-        .from("vianney_pdf_documents")
-        .select("*");
-
-      if (error) {
-        console.error("Error fetching PDF documents:", error);
-        return;
-      }
-
-      setPdfDocuments(pdfDocumentsData);
-    } catch (error) {
-      console.error("Error fetching PDF documents:", error);
-    }
-  };
   const handleReturnBack = () => {
     setSelectedPdf(null);
   };
@@ -58,6 +42,28 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
       console.error("Error deleting PDF document:", error);
     }
   };
+
+  useEffect(() => {
+    const fetchPdfDocuments = async () => {
+      try {
+        const { data: pdfDocumentsData, error } = await supabase
+          .from("vianney_pdf_documents")
+          .select("*")
+          .eq('event_id', eventId); // Filter by event_id obtained from useEvent
+
+        if (error) {
+          console.error("Error fetching PDF documents:", error);
+          return;
+        }
+
+        setPdfDocuments(pdfDocumentsData);
+      } catch (error) {
+        console.error("Error fetching PDF documents:", error);
+      }
+    };
+    
+    fetchPdfDocuments();
+  }, [eventId]); 
 
   return (
     <VStack spacing={4} alignItems="stretch">
