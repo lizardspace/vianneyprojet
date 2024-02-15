@@ -1,6 +1,4 @@
 import React from "react";
-
-// Chakra imports
 import {
   Icon,
   Flex,
@@ -12,14 +10,17 @@ import {
   useDisclosure,
   useColorModeValue,
 } from "@chakra-ui/react";
-// Assets
+import { MdOutlineMoreHoriz } from "react-icons/md";
 import { FcApproval, FcAdvertising, FcBookmark, FcAutomatic } from "react-icons/fc";
-import {
-  MdOutlineMoreHoriz,
-} from "react-icons/md";
+
 
 export default function Banner(props) {
-  const { onFilterSelect, onAllowScrollingToggle, ...rest } = props;
+  const {
+    onFilterSelect,
+    onAllowScrollingToggle,
+    onShowUnsolvedAlertsClick,
+    ...rest
+  } = props;
 
   const textColor = useColorModeValue("secondaryGray.500", "white");
   const textHover = useColorModeValue(
@@ -42,12 +43,7 @@ export default function Banner(props) {
     { bg: "whiteAlpha.100" }
   );
 
-  // Ellipsis modals
-  const {
-    isOpen: isOpen1,
-    onOpen: onOpen1,
-    onClose: onClose1,
-  } = useDisclosure();
+  const { isOpen: isOpen1, onOpen: onOpen1, onClose: onClose1 } = useDisclosure();
 
   const handleAllAlertsClick = () => {
     onFilterSelect('all');
@@ -59,6 +55,10 @@ export default function Banner(props) {
 
   const handleUrgentAlertsClick = () => {
     onFilterSelect('error');
+  };
+
+  const handleUnsolvedAlertsClick = () => {
+    onShowUnsolvedAlertsClick();
   };
 
   return (
@@ -146,6 +146,23 @@ export default function Banner(props) {
             <Icon as={FcBookmark} h='16px' w='16px' me='8px' />
             <Text fontSize='sm' fontWeight='400'>
               Alerte urgente
+            </Text>
+          </Flex>
+        </MenuItem>
+        <MenuItem
+          onClick={handleUnsolvedAlertsClick}
+          transition='0.2s linear'
+          p='0px'
+          borderRadius='8px'
+          color={textColor}
+          _hover={textHover}
+          _active={{ bg: "transparent" }}
+          _focus={{ bg: "transparent" }}
+          mb='10px'>
+          <Flex align='center'>
+            <Icon as={FcAutomatic} h='16px' w='16px' me='8px' />
+            <Text fontSize='sm' fontWeight='400'>
+              Afficher les alertes non résolues
             </Text>
           </Flex>
         </MenuItem>

@@ -28,7 +28,8 @@ function VianneyAlertChat() {
   const [filter, setFilter] = useState('all');
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
-  const [isImageEnlarged, setIsImageEnlarged] = useState(false); // State to track whether the image is enlarged
+  const [isImageEnlarged, setIsImageEnlarged] = useState(false); 
+  const [showUnsolvedAlerts, setShowUnsolvedAlerts] = useState(false);
 
   const openConfirmModal = (alertId) => {
     setAlertToDelete(alertId);
@@ -41,6 +42,10 @@ function VianneyAlertChat() {
   };
   const handleAllowScrollingToggle = () => {
     setAllowScrolling(!allowScrolling);
+  };
+
+  const handleShowUnsolvedAlertsClick = () => {
+    setShowUnsolvedAlerts(true);
   };
 
   const openEditModal = (alert) => {
@@ -280,11 +285,11 @@ function VianneyAlertChat() {
     setFilter(selectedFilter);
   };
 
-  // Function to determine if an alert should be shown based on the current filter
   const shouldShowAlert = (alert) => {
     if (filter === 'all') return true;
     if (filter === 'success' && alert.solved_or_not === 'success') return true;
     if (filter === 'error' && alert.solved_or_not === 'error') return true;
+    if (showUnsolvedAlerts && alert.solved_or_not !== 'success') return true; // New condition to show unsolved alerts
     return false;
   };
 
@@ -343,7 +348,11 @@ function VianneyAlertChat() {
             lineHeight='100%'>
             Table des alertes
           </Text>
-          <Menu onFilterSelect={handleFilterSelect} onAllowScrollingToggle={handleAllowScrollingToggle} />
+          <Menu 
+          onFilterSelect={handleFilterSelect} 
+          onAllowScrollingToggle={handleAllowScrollingToggle} 
+          onShowUnsolvedAlertsClick={handleShowUnsolvedAlertsClick} 
+          />
         </Flex>
         <VStack
           spacing={4}
