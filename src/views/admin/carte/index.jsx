@@ -87,7 +87,6 @@ export default function Marketplace() {
           columnsData={tableColumnsTopCreators}
         />
       </Box>
-      <EventVideos cameras={cameras} textColor={textColor} />
       <Button onClick={toggleGrid} mt='4' mb='4'>
         {showGrid ? 'Cacher' : 'Montrer'}
       </Button>
@@ -114,6 +113,9 @@ export default function Marketplace() {
                   </Box>
                   <Box>
                     <UserForm />
+                  </Box>
+                  <Box>
+                  <EventVideos cameras={cameras} textColor={textColor} />
                   </Box>
                 </>
               )}
