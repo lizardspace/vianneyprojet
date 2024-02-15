@@ -27,6 +27,7 @@ import DocumentationsComponent from "./DocumentionsComponent/DocumentationsCompo
 import TableTopCreators from "../carte/components/TableTopCreators";
 import tableDataTopCreators from "views/admin/carte/variables/tableDataTopCreators.json";
 import { tableColumnsTopCreators } from "views/admin/carte/variables/tableColumnsTopCreators";
+import { useEvent } from '../../../EventContext'; // Import the useEvent hook
 
 // Import the Userform component
 import Userform from '../carte/components/UserForm.js';
@@ -46,10 +47,13 @@ export default function UserReports() {
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
   const [editingTeam, setEditingTeam] = useState(null);
   const [showEditUserFormModal, setShowEditUserFormModal] = useState(false);
+  const { selectedEventId } = useEvent(); // Access the selectedEventId from the EventContext
+
   const handleEditTeam = (team) => {
     setEditingTeam(team);
     setShowEditUserFormModal(true); // Open the edit modal here
   };
+  
   const handleSaveTeam = (updatedTeamData) => {
     // Perform the update operation with updatedTeamData
     // Close the edit modal
@@ -73,7 +77,7 @@ export default function UserReports() {
       const { data: vianney_teams, error } = await supabase
         .from('vianney_teams')
         .select('*');
-  
+
       if (error) {
         console.log('Error fetching teams:', error);
       } else {
@@ -93,11 +97,37 @@ export default function UserReports() {
     fetchTeams();
   }, []);
 
+  useEffect(() => {
+    // Fetch teams related to the selected event
+    const fetchTeamsForEvent = async () => {
+      try {
+        const { data: teamsForEvent, error } = await supabase
+          .from('vianney_teams')
+          .select('*')
+          .eq('event_id', selectedEventId); // Filter teams by selected event_id
+
+        if (error) {
+          console.error('Error fetching teams for the event:', error);
+        } else {
+          setTeams(teamsForEvent);
+        }
+      } catch (error) {
+        console.error('Error fetching teams for the event:', error);
+      }
+    };
+
+    if (selectedEventId) {
+      fetchTeamsForEvent();
+    }
+  }, [selectedEventId]);
+
   const toggleAddEventForm = () => setShowAddEventForm(!showAddEventForm);
+
   const handleMiniStatisticsClick = (event) => {
     setSelectedEvent(event);
     setShowEditEventModal(true);
   };
+
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
@@ -135,35 +165,35 @@ export default function UserReports() {
         Equipes
       </Heading>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }} gap='20px' mb='20px'>
-      {teams.map((team, index) => (
-  <Box
-    key={index}
-    cursor="pointer"
-    transition="background-color 0.2s"
-    _hover={{ backgroundColor: "gray.100" }}
-    onClick={() => handleEditTeam(team)}
-  >
-    <TeamStatistics
-      teamName={team.name_of_the_team}
-      teamColor={team.color}
-      teamSpeciality={team.specialite}
-      teamLeader={
-        // Find the leader in the team members array and extract their info
-        team.team_members.find((member) => member.isLeader)
-          ? (
-              <Badge
-                colorScheme="green" // You can customize the color scheme
-                variant="outline"
-              >
-                {`${team.team_members.find((member) => member.isLeader).firstname} ${team.team_members.find((member) => member.isLeader).familyname}`}
-              </Badge>
-            )
-          : "N/A"
-      }
-      teamMembersCount={team.team_members.length}
-    />
-  </Box>
-))}
+        {teams.map((team, index) => (
+          <Box
+            key={index}
+            cursor="pointer"
+            transition="background-color 0.2s"
+            _hover={{ backgroundColor: "gray.100" }}
+            onClick={() => handleEditTeam(team)}
+          >
+            <TeamStatistics
+              teamName={team.name_of_the_team}
+              teamColor={team.color}
+              teamSpeciality={team.specialite}
+              teamLeader={
+                // Find the leader in the team members array and extract their info
+                team.team_members.find((member) => member.isLeader)
+                  ? (
+                    <Badge
+                      colorScheme="green" // You can customize the color scheme
+                      variant="outline"
+                    >
+                      {`${team.team_members.find((member) => member.isLeader).firstname} ${team.team_members.find((member) => member.isLeader).familyname}`}
+                    </Badge>
+                  )
+                  : "N/A"
+              }
+              teamMembersCount={team.team_members.length}
+            />
+          </Box>
+        ))}
         <Button
           mt="30px"
           onClick={toggleCreateTeamModal}
@@ -177,7 +207,7 @@ export default function UserReports() {
           Créer une équipe
         </Button>
       </SimpleGrid>
-      {showAddEventForm && (
+{showAddEventForm && (
         <Modal isOpen={showAddEventForm} onClose={() => setShowAddEventForm(false)}>
           <ModalOverlay />
           <ModalContent>
@@ -201,8 +231,8 @@ export default function UserReports() {
             <ModalBody>
               <EditEventForm event={selectedEvent} refreshEvents={fetchEvents} />
             </ModalBody>
-            {/* ... */}
-          </ModalContent>
+      {/* ... */}
+</ModalContent>
         </Modal>
       )}
       {showUserform && (
