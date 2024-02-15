@@ -9,8 +9,8 @@ import {
   SimpleGrid,
 } from "@chakra-ui/react";
 import MapComponent from "views/admin/carte/components/MapComponent";
+import Camera from './components/Camera'; 
 import TableTopCreators from "views/admin/carte/components/TableTopCreators";
-import NFT from "components/card/NFT";
 import Card from "components/card/Card.js";
 import tableDataTopCreators from "views/admin/carte/variables/tableDataTopCreators.json";
 import { tableColumnsTopCreators } from "views/admin/carte/variables/tableColumnsTopCreators";
@@ -100,20 +100,12 @@ export default function Marketplace() {
               Les vidéos en direct de l'évênement
             </Text>
           </Flex>
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap='20px'>
-            {cameras?.map(camera => (
-              <NFT
-                key={camera.id}
-                image_url={camera.image_url}
-                name={camera.name}
-                location={camera.location}
-                last_active={camera.last_active}
-                latitude={camera.latitude}
-                longitude={camera.longitude}
-              />
-            ))}
-          </SimpleGrid>
-        </Flex>
+<SimpleGrid columns={{ base: 1, md: 3 }} gap='20px'>
+  {cameras?.map(camera => (
+    <Camera key={camera.id} camera={camera} /> // Use Camera component
+  ))}
+</SimpleGrid>
+</Flex>
       </Box>
       <Button onClick={toggleGrid} mt='4' mb='4'>
         {showGrid ? 'Cacher' : 'Montrer'}
