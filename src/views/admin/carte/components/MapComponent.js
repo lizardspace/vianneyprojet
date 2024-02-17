@@ -29,22 +29,27 @@ const MapComponent = () => {
   const { selectedEventId } = useEvent(); // Get selectedEventId from context
 
   useEffect(() => {
-    // Fetch users from the database
-    const fetchUsers = async () => {
-      let { data: usersOnGround, error } = await supabase
-        .from('vianney_teams')
-        .select('*')
-        .eq('event_id', selectedEventId); // Filter by selected event_id
-
-      if (error) {
-        console.error('Error fetching users:', error);
-      } else {
-        setUsers(usersOnGround);
-      }
-    };
-
-    fetchUsers();
-  }, [selectedEventId]); // Update the useEffect dependency to include selectedEventId
+    const interval = setInterval(() => {
+      // Fetch users from the database
+      const fetchUsers = async () => {
+        let { data: usersOnGround, error } = await supabase
+          .from('vianney_teams')
+          .select('*')
+          .eq('event_id', selectedEventId); // Filter by selected event_id
+  
+        if (error) {
+          console.error('Error fetching users:', error);
+        } else {
+          setUsers(usersOnGround);
+        }
+      };
+  
+      fetchUsers();
+    }, 2000); // Fetch data every 2 seconds
+  
+    return () => clearInterval(interval); // Clear interval on component unmount
+  }, [selectedEventId]);
+  
 
   useEffect(() => {
     if (!mapRef.current) {

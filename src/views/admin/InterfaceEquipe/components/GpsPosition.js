@@ -54,7 +54,7 @@ const GpsPosition = () => {
     const { latitude, longitude } = gpsPosition;
 
     // Update coordinates in the database if a team is selected and 30 seconds have passed since the last update
-    if (selectedTeam && (!lastUpdateTime || (Date.now() - lastUpdateTime) >= 30000)) {
+    if (selectedTeam && (!lastUpdateTime || (Date.now() - lastUpdateTime) >= 2000)) {
       updateCoordinates(selectedTeam, latitude, longitude);
       setLastUpdateTime(Date.now());
     }
