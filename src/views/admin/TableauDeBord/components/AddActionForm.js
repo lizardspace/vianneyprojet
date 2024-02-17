@@ -38,7 +38,11 @@ const AddActionForm = () => {
 
   useEffect(() => {
     const fetchTeams = async () => {
-      const { data, error } = await supabase.from('vianney_teams').select('*');
+      if (!selectedEventId) return; // Return if selectedEventId is not set
+      const { data, error } = await supabase
+        .from('vianney_teams')
+        .select('*')
+        .eq('event_id', selectedEventId); // Filter teams by selectedEventId
       if (error) {
         console.error('Erreur lors de la récupération des équipes:', error);
       } else {
@@ -47,7 +51,7 @@ const AddActionForm = () => {
     };
 
     fetchTeams();
-  }, []);
+  }, [selectedEventId]); // Make sure to include selectedEventId in the dependency array
 
   const handleStartingDateTimeChange = (e) => {
     const startingDateTime = e.target.value;
