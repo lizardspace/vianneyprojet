@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box, Text, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
 } from '@chakra-ui/react';
@@ -21,7 +21,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 moment.locale('fr');
 const localizer = momentLocalizer(moment);
 
-function TeamScheduleByMySelf() {
+const TeamScheduleByMySelf = () => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -119,13 +119,11 @@ function TeamScheduleByMySelf() {
     }
     onClose();
   };
-
-  // Fetching team data and setting teams state
-  const fetchTeams = async () => {
+  const fetchTeams = useCallback(async () => {
     const { data, error } = await supabase
       .from('vianney_teams')
       .select('*')
-      .eq('event_id', selectedEventId); // Filter teams by selectedEventId
+      .eq('event_id', selectedEventId); // This assumes selectedEventId is a dependency that might change
     if (error) {
       console.error('Error fetching teams:', error);
       return [];
@@ -133,16 +131,16 @@ function TeamScheduleByMySelf() {
     return data.map(team => ({
       id: team.id,
       titel: team.name_of_the_team,
-      color: team.color 
+      color: team.color,
     }));
-  };
+  }, [selectedEventId]); // Add dependencies here, if any
 
   useEffect(() => {
     const fetchData = async () => {
       const teamsData = await fetchTeams();
-      const sortedTeams = teamsData.sort((a, b) => a.titel.localeCompare(b.titel)); // Sort teams alphabetically
+      const sortedTeams = teamsData.sort((a, b) => a.titel.localeCompare(b.titel));
       setTeams(sortedTeams);
-  
+      
       const { data: eventsData, error } = await supabase
         .from('team_action_view_rendering')
         .select('*');
@@ -161,9 +159,9 @@ function TeamScheduleByMySelf() {
         setEvents(formattedEvents);
       }
     };
-  
+
     fetchData();
-  }, [selectedEventId]); 
+  }, [fetchTeams]); // Now fetchTeams is a dependency
 
 
   function adjustBrightness(col, amount) {
