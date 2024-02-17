@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import { MdPlace } from "react-icons/md";
 import { renderToString } from "react-dom/server";
 import { createClient } from '@supabase/supabase-js';
+import { useEvent } from './../../../../EventContext'; // Update the path to your EventContext file
 
 // Initialize Supabase client
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
@@ -25,13 +26,15 @@ const createCustomIcon = () => {
 const MapComponent = () => {
   const mapRef = useRef(null);
   const [users, setUsers] = useState([]);
+  const { selectedEventId } = useEvent(); // Get selectedEventId from context
 
   useEffect(() => {
     // Fetch users from the database
     const fetchUsers = async () => {
       let { data: usersOnGround, error } = await supabase
         .from('vianney_teams')
-        .select('*');
+        .select('*')
+        .eq('event_id', selectedEventId); // Filter by selected event_id
 
       if (error) {
         console.error('Error fetching users:', error);
@@ -41,7 +44,7 @@ const MapComponent = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [selectedEventId]); // Update the useEffect dependency to include selectedEventId
 
   useEffect(() => {
     if (!mapRef.current) {
