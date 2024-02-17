@@ -132,7 +132,7 @@ const UrgentAlerts = () => {
   };
 
   return (
-    <Box >
+    <Box p={1} >
       {isLoading ? (
         <Spinner />
       ) : (
@@ -171,8 +171,8 @@ const UrgentAlerts = () => {
                     Non lu (cliquez pour faire disparaître)
                   </Button>
                   <Text fontSize="sm" color="gray.500">
-                    Créé le  {format(new Date(alert.created_at), "dd/MM/yyyy à HH:mm")}
-                  </Text>
+                  Créé le  {format(new Date(alert.created_at), "dd/MM/yyyy à HH:mm")} pour {alert.team_name}
+                </Text>
                 </Stack>
               </Alert>
             )
