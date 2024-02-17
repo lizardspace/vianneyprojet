@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { format } from 'date-fns';
 import {
   Alert,
   AlertIcon,
@@ -34,48 +35,48 @@ const UrgentAlerts = () => {
     async function fetchUrgentAlerts() {
       try {
         let query = supabase.from('vianney_alertes_specifiques').select("*").order('created_at', { ascending: false }).limit(5);
-        
+
         // Filter alerts based on the selected event ID
         if (selectedEventId) {
           query = query.eq('event_id', selectedEventId);
         }
-  
+
         const { data: alertsData, error: alertsError } = await query;
-  
+
         if (alertsError) {
           throw alertsError;
         }
-  
+
         // Fetch team names corresponding to teams_id
         const teamIds = alertsData.map(alert => alert.teams_id);
         const { data: teamsData, error: teamsError } = await supabase.from('vianney_teams').select('id, name_of_the_team').in('id', teamIds);
-  
+
         if (teamsError) {
           throw teamsError;
         }
-  
+
         // Create a map of team id to team name
         const teamNameMap = {};
         teamsData.forEach(team => {
           teamNameMap[team.id] = team.name_of_the_team;
         });
-  
+
         // Combine alert data with team names
         const enrichedAlertsData = alertsData.map(alert => ({
           ...alert,
           team_name: teamNameMap[alert.teams_id]
         }));
-  
+
         setUrgentAlerts(enrichedAlertsData);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching urgent alerts:", error.message);
       }
     }
-  
+
     fetchUrgentAlerts();
   }, [selectedEventId]); // Re-fetch alerts when selectedEventId changes
-  
+
 
   const handleToggleReadStatus = async (id, currentStatus) => {
     try {
@@ -150,14 +151,13 @@ const UrgentAlerts = () => {
               pr={14}
               rounded="md"
             >
-              <AlertIcon />
-              <Stack spacing={2}>
+              <Box display="flex" alignItems="center"> {/* Utilisez une boîte flex pour aligner les éléments sur la même ligne */}
+                <AlertIcon />
                 <Text fontWeight="bold" fontSize="lg">
                   {alert.text_alert}
                 </Text>
-                <Text fontSize="sm" color="gray.500">
-                  Équipe: {alert.team_name} {alert.teams_id}
-                </Text>
+              </Box>
+              <Stack spacing={2}>
                 <Button
                   onClick={() =>
                     handleToggleReadStatus(alert.id, alert.read_or_not)
@@ -168,14 +168,15 @@ const UrgentAlerts = () => {
                 >
                   {alert.read_or_not ? "Lu" : "Non lu"}
                 </Button>
-                <Text fontSize="sm" color="gray.500">
-                  Créé le: {new Date(alert.created_at).toLocaleString()}
-                </Text>
                 {alert.response && (
                   <Text fontWeight="bold" fontSize="lg">
-                    Réponse: {alert.response}
+                    Réponse de l'équipe {alert.team_name} : {alert.response}
                   </Text>
                 )}
+                <Text fontSize="sm" color="gray.500">
+                  Créé le  {format(new Date(alert.created_at), "dd/MM/yyyy à HH:mm")} pour {alert.team_name}
+                </Text>
+
               </Stack>
             </Alert>
           ))}
@@ -209,5 +210,5 @@ const UrgentAlerts = () => {
     </Box>
   );
 };
-  
+
 export default UrgentAlerts;

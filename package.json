@@ -30,6 +30,7 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "babel-register": "^6.26.0",
+    "date-fns": "^3.3.1",
     "framer-motion": "^10.16.5",
     "i18n": "^0.15.1",
     "leaflet": "^1.9.4",
