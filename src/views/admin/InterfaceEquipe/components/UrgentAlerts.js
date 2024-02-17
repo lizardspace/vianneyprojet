@@ -159,9 +159,6 @@ const UrgentAlerts = () => {
                     <Text fontWeight="bold" fontSize="lg">
                       {alert.text_alert}
                     </Text>
-                    <Text fontSize="sm" color="gray.500">
-                      Équipe : {alert.team_name} {alert.teams_id} {/* Translate UI elements to French */}
-                    </Text>
                     <Button
                       onClick={() =>
                         handleToggleReadStatus(alert.id, alert.read_or_not)
@@ -170,7 +167,7 @@ const UrgentAlerts = () => {
                       variant="outline"
                       colorScheme="red"
                     >
-                      Non lu
+                      Non lu (cliquez pour faire disparaître)
                     </Button>
                     <Text fontSize="sm" color="gray.500">
                       Créé à : {new Date(alert.created_at).toLocaleString()}
