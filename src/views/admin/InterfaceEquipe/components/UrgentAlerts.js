@@ -21,7 +21,7 @@ import {
   FormControl,
   FormLabel,
   FormHelperText,
-} from "@chakra-ui/react";
+  } from "@chakra-ui/react";
 import { supabase } from './../../../../supabaseClient';
 import { useEvent } from '../../../../EventContext'; 
 import { useTeam } from './../TeamContext'; 
@@ -134,83 +134,83 @@ const UrgentAlerts = () => {
   };
 
   return (
-    <Box >
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <Stack spacing={4}>
-          {urgentAlerts.map((alert) => (
-            // Only render the alert if it's not read
-            !alert.read_or_not && (
-              <Alert
-                key={alert.id}
-                status="error"
-                variant="subtle"
-                flexDirection="column"
-                alignItems="flex-start"
-                justifyContent="center"
-                textAlign="left"
-                position="relative"
-                width="100%"
-                px={6}
-                py={4}
-                pr={14}
-                rounded="md"
-              >
-                <AlertIcon />
-                <Stack spacing={2}>
-                  <Text fontWeight="bold" fontSize="lg">
-                    {alert.text_alert}
-                  </Text>
-                  <Text fontSize="sm" color="gray.500">
-                    Team: {alert.team_name} {alert.teams_id}
-                  </Text>
-                  <Button
-                    onClick={() =>
-                      handleToggleReadStatus(alert.id, alert.read_or_not)
-                    }
-                    size="sm"
-                    variant="outline"
-                    colorScheme="red"
-                  >
-                    Not Read
-                  </Button>
-                  <Text fontSize="sm" color="gray.500">
-                    Created At: {new Date(alert.created_at).toLocaleString()}
-                  </Text>
-                </Stack>
-              </Alert>
-            )
-          ))}
-        </Stack>
-      )}
-      <Modal isOpen={showResponseForm} onClose={() => setShowResponseForm(false)}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Enter Response</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Response</FormLabel>
-              <Textarea
-                value={responseText}
-                onChange={(e) => setResponseText(e.target.value)}
-                placeholder="Enter response here..."
-                size="lg"
-              />
-              <FormHelperText>Enter your response to this urgent alert.</FormHelperText>
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleSubmitResponse}>
-              Submit
-            </Button>
-            <Button onClick={() => setShowResponseForm(false)}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </Box>
-  );
+          <Box >
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <Stack spacing={4}>
+            {urgentAlerts.map((alert) => (
+              // Only render the alert if it's not read
+              !alert.read_or_not && (
+                <Alert
+                  key={alert.id}
+                  status="error"
+                  variant="subtle"
+                  flexDirection="column"
+                  alignItems="flex-start"
+                  justifyContent="center"
+                  textAlign="left"
+                  position="relative"
+                  width="100%"
+                  px={6}
+                  py={4}
+                  pr={14}
+                  rounded="md"
+                >
+                  <AlertIcon />
+                  <Stack spacing={2}>
+                    <Text fontWeight="bold" fontSize="lg">
+                      {alert.text_alert}
+                    </Text>
+                    <Text fontSize="sm" color="gray.500">
+                      Équipe : {alert.team_name} {alert.teams_id} {/* Translate UI elements to French */}
+                    </Text>
+                    <Button
+                      onClick={() =>
+                        handleToggleReadStatus(alert.id, alert.read_or_not)
+                      }
+                      size="sm"
+                      variant="outline"
+                      colorScheme="red"
+                    >
+                      Non lu
+                    </Button>
+                    <Text fontSize="sm" color="gray.500">
+                      Créé à : {new Date(alert.created_at).toLocaleString()}
+                    </Text>
+                  </Stack>
+                </Alert>
+              )
+            ))}
+          </Stack>
+        )}
+        <Modal isOpen={showResponseForm} onClose={() => setShowResponseForm(false)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Entrez la réponse</ModalHeader> 
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <FormLabel>Réponse</FormLabel>
+                <Textarea
+                  value={responseText}
+                  onChange={(e) => setResponseText(e.target.value)}
+                  placeholder="Entrez votre réponse ici..."
+                  size="lg"
+                />
+                <FormHelperText>Entrez votre réponse à cette alerte urgente.</FormHelperText>
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={handleSubmitResponse}>
+                Soumettre
+              </Button>
+              <Button onClick={() => setShowResponseForm(false)}>Annuler</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </Box>
+      );
 };
-  
+
 export default UrgentAlerts;
