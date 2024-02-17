@@ -42,22 +42,43 @@ const UrgentAlerts = () => {
         if (selectedEventId) {
           query = query.eq('event_id', selectedEventId);
         }
-
-        const { data, error } = await query;
-
-        if (error) {
-          throw error;
+  
+        const { data: alertsData, error: alertsError } = await query;
+  
+        if (alertsError) {
+          throw alertsError;
         }
-
-        setUrgentAlerts(data);
+  
+        // Fetch team names corresponding to teams_id
+        const teamIds = alertsData.map(alert => alert.teams_id);
+        const { data: teamsData, error: teamsError } = await supabase.from('vianney_teams').select('id, name_of_the_team').in('id', teamIds);
+  
+        if (teamsError) {
+          throw teamsError;
+        }
+  
+        // Create a map of team id to team name
+        const teamNameMap = {};
+        teamsData.forEach(team => {
+          teamNameMap[team.id] = team.name_of_the_team;
+        });
+  
+        // Combine alert data with team names
+        const enrichedAlertsData = alertsData.map(alert => ({
+          ...alert,
+          team_name: teamNameMap[alert.teams_id]
+        }));
+  
+        setUrgentAlerts(enrichedAlertsData);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching urgent alerts:", error.message);
       }
     }
-
+  
     fetchUrgentAlerts();
   }, [selectedEventId]); // Re-fetch alerts when selectedEventId changes
+  
 
   const handleToggleReadStatus = async (id, currentStatus) => {
     try {
@@ -138,7 +159,7 @@ const UrgentAlerts = () => {
                   {alert.text_alert}
                 </Text>
                 <Text fontSize="sm" color="gray.500">
-                  Teams ID: {alert.teams_id}
+                  Team: {alert.team_name} {alert.teams_id}
                 </Text>
                 <Button
                   onClick={() =>
@@ -191,5 +212,5 @@ const UrgentAlerts = () => {
     </Box>
   );
 };
-
+  
 export default UrgentAlerts;
