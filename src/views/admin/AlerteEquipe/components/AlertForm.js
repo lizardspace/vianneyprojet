@@ -8,7 +8,7 @@ import {
     VStack,
     useToast,
     Select // Import Select from Chakra UI
-} from "@chakra-ui/react";
+    } from "@chakra-ui/react";
 import { v4 as uuidv4 } from "uuid";
 import { supabase } from './../../../../supabaseClient';
 import { useEvent } from '../../../../EventContext';
@@ -46,8 +46,6 @@ const AlertForm = () => {
 
         fetchTeams();
     }, [selectedEventId]);
-
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -92,44 +90,44 @@ const AlertForm = () => {
     };    
 
     return (
-        <form onSubmit={handleSubmit}>
-            <VStack spacing="4" alignItems="flex-start">
-                <FormControl>
-                    <FormLabel>Text Alert</FormLabel>
-                    <Input
-                        type="text"
-                        value={textAlert}
-                        onChange={(e) => setTextAlert(e.target.value)}
-                    />
-                </FormControl>
-                <FormControl>
-                    <FormLabel>Teams ID</FormLabel>
-                    <Select
-                        value={teamsId}
-                        onChange={(e) => setTeamsId(e.target.value)}
-                    >
-                        {/* Map over teams data and create options for each team */}
-                        {teams.map((team) => (
-                            <option key={team.id} value={team.id}>
-                                {team.name_of_the_team}
-                            </option>
-                        ))}
-                    </Select>
-                </FormControl>
-                <FormControl>
-                    <Checkbox
-                        isChecked={readOrNot}
-                        onChange={(e) => setReadOrNot(e.target.checked)}
-                    >
-                        Read or Not
-                    </Checkbox>
-                </FormControl>
-                <Button type="submit" colorScheme="blue">
-                    Submit
-                </Button>
-            </VStack>
-        </form>
-    );
+                    <form onSubmit={handleSubmit}>
+                <VStack spacing="4" alignItems="flex-start">
+                    <FormControl>
+                        <FormLabel>Texte d'Alerte</FormLabel> {/* Translate UI elements to French */}
+                        <Input
+                            type="text"
+                            value={textAlert}
+                            onChange={(e) => setTextAlert(e.target.value)}
+                        />
+                    </FormControl>
+                    <FormControl>
+                        <FormLabel>ID des Équipes</FormLabel> {/* Translate UI elements to French */}
+                        <Select
+                            value={teamsId}
+                            onChange={(e) => setTeamsId(e.target.value)}
+                        >
+                            {/* Map over teams data and create options for each team */}
+                            {teams.map((team) => (
+                                <option key={team.id} value={team.id}>
+                                    {team.name_of_the_team}
+                                </option>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl>
+                        <Checkbox
+                            isChecked={readOrNot}
+                            onChange={(e) => setReadOrNot(e.target.checked)}
+                        >
+                            Lu ou Non lu
+                        </Checkbox> {/* Translate UI elements to French */}
+                    </FormControl>
+                    <Button type="submit" colorScheme="blue">
+                        Soumettre
+                    </Button> {/* Translate UI elements to French */}
+                </VStack>
+            </form>
+            );
 };
 
 export default AlertForm;

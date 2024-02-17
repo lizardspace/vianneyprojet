@@ -4,10 +4,7 @@ import {
   AlertIcon,
   Box,
   Text,
-  Badge,
   Stack,
-  Divider,
-  useColorModeValue,
   Spinner,
   Button,
   Modal,
@@ -131,7 +128,7 @@ const UrgentAlerts = () => {
   return (
     <Box p={4} borderWidth="1px" borderRadius="lg">
       <Text fontSize="xl" fontWeight="bold" mb={4}>
-        Urgent Alerts
+        Alertes Urgentes
       </Text>
       {isLoading ? (
         <Spinner />
@@ -159,7 +156,7 @@ const UrgentAlerts = () => {
                   {alert.text_alert}
                 </Text>
                 <Text fontSize="sm" color="gray.500">
-                  Team: {alert.team_name} {alert.teams_id}
+                  Équipe: {alert.team_name} {alert.teams_id}
                 </Text>
                 <Button
                   onClick={() =>
@@ -169,14 +166,14 @@ const UrgentAlerts = () => {
                   variant="outline"
                   colorScheme={alert.read_or_not ? "green" : "red"}
                 >
-                  {alert.read_or_not ? "Read" : "Not Read"}
+                  {alert.read_or_not ? "Lu" : "Non lu"}
                 </Button>
                 <Text fontSize="sm" color="gray.500">
-                  Created At: {new Date(alert.created_at).toLocaleString()}
+                  Créé le: {new Date(alert.created_at).toLocaleString()}
                 </Text>
                 {alert.response && (
                   <Text fontWeight="bold" fontSize="lg">
-                    Response: {alert.response}
+                    Réponse: {alert.response}
                   </Text>
                 )}
               </Stack>
@@ -187,25 +184,25 @@ const UrgentAlerts = () => {
       <Modal isOpen={showResponseForm} onClose={() => setShowResponseForm(false)}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Enter Response</ModalHeader>
+          <ModalHeader>Entrez votre réponse</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
-              <FormLabel>Response</FormLabel>
+              <FormLabel>Réponse</FormLabel>
               <Textarea
                 value={responseText}
                 onChange={(e) => setResponseText(e.target.value)}
-                placeholder="Enter response here..."
+                placeholder="Entrez votre réponse ici..."
                 size="lg"
               />
-              <FormHelperText>Enter your response to this urgent alert.</FormHelperText>
+              <FormHelperText>Entrez votre réponse à cette alerte urgente.</FormHelperText>
             </FormControl>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={handleSubmitResponse}>
-              Submit
+              Soumettre
             </Button>
-            <Button onClick={() => setShowResponseForm(false)}>Cancel</Button>
+            <Button onClick={() => setShowResponseForm(false)}>Annuler</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
