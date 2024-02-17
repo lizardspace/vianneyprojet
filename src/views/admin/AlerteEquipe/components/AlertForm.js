@@ -103,11 +103,10 @@ const AlertForm = () => {
                         {/* Map over teams data and create options for each team */}
                         {teams.map((team) => (
                             <option key={team.id} value={team.id}>
-                                {team.name_of_the_team} {/* Display the name_of_the_team */}
+                                {team.name_of_the_team}
                             </option>
                         ))}
                     </Select>
-
                 </FormControl>
                 <FormControl>
                     <Checkbox
