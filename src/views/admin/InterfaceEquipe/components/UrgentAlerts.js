@@ -6,7 +6,8 @@ import {
   Stack,
   Divider,
   useColorModeValue,
-  Spinner
+  Spinner,
+  Button
 } from "@chakra-ui/react";
 import { supabase } from './../../../../supabaseClient';
 
@@ -37,6 +38,28 @@ const UrgentAlerts = () => {
     fetchUrgentAlerts();
   }, []);
 
+  const handleToggleReadStatus = async (id, currentStatus) => {
+    try {
+      const { data, error } = await supabase
+        .from('vianney_alertes_specifiques')
+        .update({ read_or_not: !currentStatus })
+        .eq('id', id);
+
+      if (error) {
+        throw error;
+      }
+
+      // Update the read_or_not status locally
+      setUrgentAlerts((prevAlerts) =>
+        prevAlerts.map((alert) =>
+          alert.id === id ? { ...alert, read_or_not: !currentStatus } : alert
+        )
+      );
+    } catch (error) {
+      console.error("Error toggling read status:", error.message);
+    }
+  };
+
   return (
     <Box p={4} borderWidth="1px" borderRadius="lg">
       <Text fontSize="xl" fontWeight="bold" mb={4}>
@@ -54,11 +77,16 @@ const UrgentAlerts = () => {
               <Text fontSize="sm" color="gray.500">
                 Teams ID: {alert.teams_id}
               </Text>
-              <Text>
-                <Badge colorScheme={alert.read_or_not ? "green" : "red"}>
-                  {alert.read_or_not ? "Read" : "Not Read"}
-                </Badge>
-              </Text>
+              <Button
+                onClick={() =>
+                  handleToggleReadStatus(alert.id, alert.read_or_not)
+                }
+                size="sm"
+                variant="outline"
+                colorScheme={alert.read_or_not ? "green" : "red"}
+              >
+                {alert.read_or_not ? "Read" : "Not Read"}
+              </Button>
               <Text fontSize="sm" color="gray.500">
                 Created At: {new Date(alert.created_at).toLocaleString()}
               </Text>
