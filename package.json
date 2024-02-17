@@ -18,7 +18,7 @@
     "@fullcalendar/timegrid": "^6.1.10",
     "@hypertheme-editor/chakra-ui": "^0.1.5",
     "@spacemen1000/react-scheduler": "^0.1.2",
-    "@supabase/supabase-js": "^2.38.5",
+    "@supabase/supabase-js": "^2.39.6",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
