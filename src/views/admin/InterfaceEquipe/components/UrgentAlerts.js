@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
+  Alert,
+  AlertIcon,
   Box,
   Text,
   Badge,
@@ -110,28 +112,44 @@ const UrgentAlerts = () => {
       ) : (
         <Stack spacing={4}>
           {urgentAlerts.map((alert) => (
-            <Box key={alert.id}>
-              <Text fontSize="lg" fontWeight="bold">
-                {alert.text_alert}
-              </Text>
-              <Text fontSize="sm" color="gray.500">
-                Teams ID: {alert.teams_id}
-              </Text>
-              <Button
-                onClick={() =>
-                  handleToggleReadStatus(alert.id, alert.read_or_not)
-                }
-                size="sm"
-                variant="outline"
-                colorScheme={alert.read_or_not ? "green" : "red"}
-              >
-                {alert.read_or_not ? "Read" : "Not Read"}
-              </Button>
-              <Text fontSize="sm" color="gray.500">
-                Created At: {new Date(alert.created_at).toLocaleString()}
-              </Text>
-              <Divider mt={2} />
-            </Box>
+            <Alert
+              key={alert.id}
+              status={alert.read_or_not ? "success" : "error"}
+              variant="subtle"
+              flexDirection="column"
+              alignItems="flex-start"
+              justifyContent="center"
+              textAlign="left"
+              position="relative"
+              width="100%"
+              px={6}
+              py={4}
+              pr={14}
+              rounded="md"
+            >
+              <AlertIcon />
+              <Stack spacing={2}>
+                <Text fontWeight="bold" fontSize="lg">
+                  {alert.text_alert}
+                </Text>
+                <Text fontSize="sm" color="gray.500">
+                  Teams ID: {alert.teams_id}
+                </Text>
+                <Button
+                  onClick={() =>
+                    handleToggleReadStatus(alert.id, alert.read_or_not)
+                  }
+                  size="sm"
+                  variant="outline"
+                  colorScheme={alert.read_or_not ? "green" : "red"}
+                >
+                  {alert.read_or_not ? "Read" : "Not Read"}
+                </Button>
+                <Text fontSize="sm" color="gray.500">
+                  Created At: {new Date(alert.created_at).toLocaleString()}
+                </Text>
+              </Stack>
+            </Alert>
           ))}
         </Stack>
       )}
