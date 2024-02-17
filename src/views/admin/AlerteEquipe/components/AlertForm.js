@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { v4 as uuidv4 } from "uuid";
 import { supabase } from './../../../../supabaseClient';
+import { useEvent } from '../../../../EventContext';
 
 const AlertForm = () => {
     const [textAlert, setTextAlert] = useState("");
@@ -18,14 +19,19 @@ const AlertForm = () => {
     const [readOrNot, setReadOrNot] = useState(false);
     const [teams, setTeams] = useState([]);
     const toast = useToast();
+    const { selectedEventId } = useEvent();
 
-    // Fetch teams data from vianney_teams table
     useEffect(() => {
         async function fetchTeams() {
             try {
-                const { data, error } = await supabase
-                    .from("vianney_teams")
-                    .select("id, name_of_the_team"); // Select both id and name_of_the_team
+                let query = supabase.from("vianney_teams").select("id, name_of_the_team");
+
+                // Filter teams based on the selected event ID
+                if (selectedEventId) {
+                    query = query.eq('event_id', selectedEventId);
+                }
+
+                const { data, error } = await query;
 
                 if (error) {
                     throw error;
@@ -39,7 +45,8 @@ const AlertForm = () => {
         }
 
         fetchTeams();
-    }, []);
+    }, [selectedEventId]);
+
 
 
     const handleSubmit = async (e) => {
