@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FormControl,
   FormLabel,
@@ -6,7 +6,8 @@ import {
   Button,
   Checkbox,
   VStack,
-  useToast
+  useToast,
+  Select // Import Select from Chakra UI
 } from "@chakra-ui/react";
 import { v4 as uuidv4 } from "uuid";
 import { supabase } from './../../../../supabaseClient';
@@ -15,7 +16,28 @@ const AlertForm = () => {
   const [textAlert, setTextAlert] = useState("");
   const [teamsId, setTeamsId] = useState("");
   const [readOrNot, setReadOrNot] = useState(false);
+  const [teams, setTeams] = useState([]);
   const toast = useToast();
+
+  // Fetch teams data from vianney_teams table
+  useEffect(() => {
+    async function fetchTeams() {
+      try {
+        const { data, error } = await supabase.from("vianney_teams").select("id");
+
+        if (error) {
+          throw error;
+        }
+
+        // Set teams data in state
+        setTeams(data);
+      } catch (error) {
+        console.error("Error fetching teams:", error.message);
+      }
+    }
+
+    fetchTeams();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,11 +93,17 @@ const AlertForm = () => {
         </FormControl>
         <FormControl>
           <FormLabel>Teams ID</FormLabel>
-          <Input
-            type="text"
+          <Select
             value={teamsId}
             onChange={(e) => setTeamsId(e.target.value)}
-          />
+          >
+            {/* Map over teams data and create options for each team */}
+            {teams.map((team) => (
+              <option key={team.id} value={team.id}>
+                {team.id}
+              </option>
+            ))}
+          </Select>
         </FormControl>
         <FormControl>
           <Checkbox
