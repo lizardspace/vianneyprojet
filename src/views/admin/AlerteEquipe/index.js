@@ -2,7 +2,7 @@ import React from "react";
 import { Box } from "@chakra-ui/react"; 
 
 import AlertForm from "./components/AlertForm"; 
-import UrgentAlerts from "../InterfaceEquipe/components/UrgentAlerts";
+import UrgentAlerts from "./components/UrgentAlerts";
 
 const AlerteEquipe = () => {
     return (
