@@ -79,7 +79,7 @@ const UrgentAlerts = () => {
 
   const handleToggleReadStatus = async (id, currentStatus) => {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('vianney_alertes_specifiques')
         .update({ read_or_not: !currentStatus })
         .eq('id', id);
@@ -107,7 +107,7 @@ const UrgentAlerts = () => {
 
   const handleSubmitResponse = async () => {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('vianney_alertes_specifiques')
         .update({ response: responseText })
         .eq('id', selectedAlertId);
