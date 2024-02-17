@@ -7,6 +7,7 @@ import NFTMarketplace from "views/admin/carte";
 import TableauDeBord from "views/admin/TableauDeBord";
 import InterfaceEquipe from "views/admin/InterfaceEquipe";
 import TableauExcel from "views/admin/TableauExcel";
+import AlerteEquipe from "views/admin/AlerteEquipe"; // Import the component for Alerte à une équipe
 
 // Auth Imports
 //import SignInCentered from "views/auth/signIn";
@@ -70,6 +71,13 @@ const routes = [
     path: "/tableau-excel",
     icon: <Icon as={FcGrid} width='20px' height='20px' color='inherit' />,
     component: TableauExcel,
+  },
+  {
+    name: "Alerte à une équipe", // Name of the new route
+    layout: "/admin",
+    path: "/alerte-equipe", // Path for the new route
+    icon: <Icon as={YourIconComponent} width='20px' height='20px' color='inherit' />, // You can use an appropriate icon component here
+    component: AlerteEquipe, // Component for the new route
   },
 ];
 
