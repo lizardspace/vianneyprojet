@@ -134,10 +134,7 @@ const UrgentAlerts = () => {
   };
 
   return (
-    <Box p={4} borderWidth="1px" borderRadius="lg">
-      <Text fontSize="xl" fontWeight="bold" mb={4}>
-        Urgent Alerts
-      </Text>
+    <Box >
       {isLoading ? (
         <Spinner />
       ) : (
