@@ -11,6 +11,8 @@ import { createClient } from '@supabase/supabase-js';
 import './CalendarStyles.css';
 import Menu from "components/menu/MainMenuTeamScheduleMadeMySelf";
 import AddActionForm from './AddActionForm';
+import { useEvent } from '../../../../EventContext'; // Import useEvent hook
+
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -31,6 +33,8 @@ function TeamScheduleByMySelf() {
   const [updatedEventEnd, setUpdatedEventEnd] = useState('');
   const [teams, setTeams] = useState([]);
   const textColor = useColorModeValue("secondaryGray.900", "white");
+  const { selectedEventId } = useEvent(); // Get selectedEventId from context
+
   const handleEventSelect = (event) => {
     setSelectedEvent(event);
     setIsAlertOpen(true);
@@ -118,7 +122,10 @@ function TeamScheduleByMySelf() {
 
   // Fetching team data and setting teams state
   const fetchTeams = async () => {
-    const { data, error } = await supabase.from('vianney_teams').select('*');
+    const { data, error } = await supabase
+      .from('vianney_teams')
+      .select('*')
+      .eq('event_id', selectedEventId); // Filter teams by selectedEventId
     if (error) {
       console.error('Error fetching teams:', error);
       return [];
@@ -126,7 +133,7 @@ function TeamScheduleByMySelf() {
     return data.map(team => ({
       id: team.id,
       titel: team.name_of_the_team,
-      color: team.color // Assuming each team has a unique color
+      color: team.color 
     }));
   };
 
@@ -156,7 +163,7 @@ function TeamScheduleByMySelf() {
     };
   
     fetchData();
-  }, []);
+  }, [selectedEventId]); 
 
 
   function adjustBrightness(col, amount) {
