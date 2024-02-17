@@ -1,6 +1,6 @@
 import React from "react";
 import { Icon } from "@chakra-ui/react";
-import {  FcMindMap, FcSerialTasks, FcSurvey, FcSettings, FcSelfie, FcGrid } from "react-icons/fc";
+import {  FcMindMap, FcSerialTasks, FcSurvey, FcSettings, FcSelfie, FcGrid, FcHighPriority } from "react-icons/fc";
 import MainDashboard from "views/admin/default";
 import NFTMarketplace from "views/admin/carte";
 //import Profile from "views/admin/profile";
@@ -76,7 +76,7 @@ const routes = [
     name: "Alerte à une équipe", // Name of the new route
     layout: "/admin",
     path: "/alerte-equipe", // Path for the new route
-    icon: <Icon as={YourIconComponent} width='20px' height='20px' color='inherit' />, // You can use an appropriate icon component here
+    icon: <Icon as={FcHighPriority} width='20px' height='20px' color='inherit' />, // You can use an appropriate icon component here
     component: AlerteEquipe, // Component for the new route
   },
 ];
