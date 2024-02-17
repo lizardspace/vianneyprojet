@@ -7,13 +7,27 @@ import {
   Divider,
   useColorModeValue,
   Spinner,
-  Button
+  Button,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Textarea,
+  FormControl,
+  FormLabel,
+  FormHelperText,
 } from "@chakra-ui/react";
 import { supabase } from './../../../../supabaseClient';
 
 const UrgentAlerts = () => {
   const [urgentAlerts, setUrgentAlerts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showResponseForm, setShowResponseForm] = useState(false);
+  const [selectedAlertId, setSelectedAlertId] = useState(null);
+  const [responseText, setResponseText] = useState("");
 
   useEffect(() => {
     async function fetchUrgentAlerts() {
@@ -55,8 +69,34 @@ const UrgentAlerts = () => {
           alert.id === id ? { ...alert, read_or_not: !currentStatus } : alert
         )
       );
+
+      if (!currentStatus) {
+        // If the alert is marked as read, show the response form
+        setSelectedAlertId(id);
+        setShowResponseForm(true);
+      }
     } catch (error) {
       console.error("Error toggling read status:", error.message);
+    }
+  };
+
+  const handleSubmitResponse = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('vianney_alertes_specifiques')
+        .update({ response: responseText })
+        .eq('id', selectedAlertId);
+
+      if (error) {
+        throw error;
+      }
+
+      // Close the response form modal
+      setShowResponseForm(false);
+      // Reset response text
+      setResponseText("");
+    } catch (error) {
+      console.error("Error submitting response:", error.message);
     }
   };
 
@@ -95,6 +135,31 @@ const UrgentAlerts = () => {
           ))}
         </Stack>
       )}
+      <Modal isOpen={showResponseForm} onClose={() => setShowResponseForm(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Enter Response</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel>Response</FormLabel>
+              <Textarea
+                value={responseText}
+                onChange={(e) => setResponseText(e.target.value)}
+                placeholder="Enter response here..."
+                size="lg"
+              />
+              <FormHelperText>Enter your response to this urgent alert.</FormHelperText>
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleSubmitResponse}>
+              Submit
+            </Button>
+            <Button onClick={() => setShowResponseForm(false)}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };
