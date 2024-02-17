@@ -59,14 +59,15 @@ const AlertForm = () => {
                         id: uuidv4(),
                         text_alert: textAlert,
                         teams_id: teamsId,
-                        read_or_not: readOrNot
+                        read_or_not: readOrNot,
+                        event_id: selectedEventId // Include selectedEventId in the insert operation
                     }
                 ]);
-
+    
             if (error) {
                 throw error;
             }
-
+    
             // Reset form fields
             setTextAlert("");
             setTeamsId("");
@@ -88,7 +89,7 @@ const AlertForm = () => {
                 isClosable: true,
             });
         }
-    };
+    };    
 
     return (
         <form onSubmit={handleSubmit}>
