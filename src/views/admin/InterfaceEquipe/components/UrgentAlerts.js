@@ -23,6 +23,7 @@ import {
   FormHelperText,
 } from "@chakra-ui/react";
 import { supabase } from './../../../../supabaseClient';
+import { useEvent } from '../../../../EventContext'; // Import useEvent
 
 const UrgentAlerts = () => {
   const [urgentAlerts, setUrgentAlerts] = useState([]);
@@ -30,15 +31,19 @@ const UrgentAlerts = () => {
   const [showResponseForm, setShowResponseForm] = useState(false);
   const [selectedAlertId, setSelectedAlertId] = useState(null);
   const [responseText, setResponseText] = useState("");
+  const { selectedEventId } = useEvent(); // Get selectedEventId from context
 
   useEffect(() => {
     async function fetchUrgentAlerts() {
       try {
-        const { data, error } = await supabase
-          .from('vianney_alertes_specifiques')
-          .select("*")
-          .order('created_at', { ascending: false })
-          .limit(5); // Limit to the latest 5 urgent alerts
+        let query = supabase.from('vianney_alertes_specifiques').select("*").order('created_at', { ascending: false }).limit(5);
+        
+        // Filter alerts based on the selected event ID
+        if (selectedEventId) {
+          query = query.eq('event_id', selectedEventId);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
           throw error;
@@ -52,7 +57,7 @@ const UrgentAlerts = () => {
     }
 
     fetchUrgentAlerts();
-  }, []);
+  }, [selectedEventId]); // Re-fetch alerts when selectedEventId changes
 
   const handleToggleReadStatus = async (id, currentStatus) => {
     try {
@@ -113,49 +118,48 @@ const UrgentAlerts = () => {
         <Stack spacing={4}>
           {urgentAlerts.map((alert) => (
             <Alert
-            key={alert.id}
-            status={alert.read_or_not ? "success" : "error"}
-            variant="subtle"
-            flexDirection="column"
-            alignItems="flex-start"
-            justifyContent="center"
-            textAlign="left"
-            position="relative"
-            width="100%"
-            px={6}
-            py={4}
-            pr={14}
-            rounded="md"
-          >
-            <AlertIcon />
-            <Stack spacing={2}>
-              <Text fontWeight="bold" fontSize="lg">
-                {alert.text_alert}
-              </Text>
-              <Text fontSize="sm" color="gray.500">
-                Teams ID: {alert.teams_id}
-              </Text>
-              <Button
-                onClick={() =>
-                  handleToggleReadStatus(alert.id, alert.read_or_not)
-                }
-                size="sm"
-                variant="outline"
-                colorScheme={alert.read_or_not ? "green" : "red"}
-              >
-                {alert.read_or_not ? "Read" : "Not Read"}
-              </Button>
-              <Text fontSize="sm" color="gray.500">
-                Created At: {new Date(alert.created_at).toLocaleString()}
-              </Text>
-              {alert.response && (
+              key={alert.id}
+              status={alert.read_or_not ? "success" : "error"}
+              variant="subtle"
+              flexDirection="column"
+              alignItems="flex-start"
+              justifyContent="center"
+              textAlign="left"
+              position="relative"
+              width="100%"
+              px={6}
+              py={4}
+              pr={14}
+              rounded="md"
+            >
+              <AlertIcon />
+              <Stack spacing={2}>
                 <Text fontWeight="bold" fontSize="lg">
-                  Response: {alert.response}
+                  {alert.text_alert}
                 </Text>
-              )}
-            </Stack>
-          </Alert>
-          
+                <Text fontSize="sm" color="gray.500">
+                  Teams ID: {alert.teams_id}
+                </Text>
+                <Button
+                  onClick={() =>
+                    handleToggleReadStatus(alert.id, alert.read_or_not)
+                  }
+                  size="sm"
+                  variant="outline"
+                  colorScheme={alert.read_or_not ? "green" : "red"}
+                >
+                  {alert.read_or_not ? "Read" : "Not Read"}
+                </Button>
+                <Text fontSize="sm" color="gray.500">
+                  Created At: {new Date(alert.created_at).toLocaleString()}
+                </Text>
+                {alert.response && (
+                  <Text fontWeight="bold" fontSize="lg">
+                    Response: {alert.response}
+                  </Text>
+                )}
+              </Stack>
+            </Alert>
           ))}
         </Stack>
       )}
