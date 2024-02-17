@@ -20,6 +20,7 @@ import VianneyAlertChat from '../TableauDeBord/components/VianneyAlertChat';
 import { supabase } from './../../../supabaseClient';
 import TeamMembersDisplay from './components/TeamMembersDisplay';
 import App from '../videoChatRoom/App';
+import UrgentAlerts from './components/UrgentAlerts';
 
 const InterfaceEquipe = () => {
   const { selectedTeam, setSelectedTeam, teamData, setTeamData } = useTeam();
@@ -65,6 +66,7 @@ const InterfaceEquipe = () => {
 
   return (
     <Box pt={{ base: '180px', md: '80px', xl: '80px' }}>
+      <UrgentAlerts/>
       {showAlert && (
         <Alert status="error" mb="4" minHeight="200px">
           <AlertIcon />

@@ -33,6 +33,7 @@ const UrgentAlerts = () => {
   const [selectedAlertId, setSelectedAlertId] = useState(null);
   const [responseText, setResponseText] = useState("");
   const { selectedEventId } = useEvent(); // Get selectedEventId from context
+  const { selectedTeam } = useTeam(); // Access the selected team from the context
 
   useEffect(() => {
     async function fetchUrgentAlerts() {
@@ -69,8 +70,11 @@ const UrgentAlerts = () => {
           ...alert,
           team_name: teamNameMap[alert.teams_id]
         }));
+
+        // Filter alerts based on the selected team
+        const filteredAlerts = selectedTeam ? enrichedAlertsData.filter(alert => alert.team_name === selectedTeam) : enrichedAlertsData;
   
-        setUrgentAlerts(enrichedAlertsData);
+        setUrgentAlerts(filteredAlerts);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching urgent alerts:", error.message);
@@ -78,7 +82,7 @@ const UrgentAlerts = () => {
     }
   
     fetchUrgentAlerts();
-  }, [selectedEventId]); // Re-fetch alerts when selectedEventId changes
+  }, [selectedEventId, selectedTeam]);
   
 
   const handleToggleReadStatus = async (id, currentStatus) => {
