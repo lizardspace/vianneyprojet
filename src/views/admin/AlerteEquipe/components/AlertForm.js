@@ -9,6 +9,7 @@ import {
   useToast
 } from "@chakra-ui/react";
 import { v4 as uuidv4 } from "uuid";
+import { supabase } from './../../../../supabaseClient';
 
 const AlertForm = () => {
   const [textAlert, setTextAlert] = useState("");
@@ -18,16 +19,22 @@ const AlertForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Assuming you have a function to send data to the backend
     try {
-      const newData = {
-        id: uuidv4(), // Generating a UUID for the id field
-        text_alert: textAlert,
-        teams_id: teamsId,
-        read_or_not: readOrNot
-      };
-      // Send newData to your backend to save to the database
-      console.log("Data to be saved:", newData);
+      const { data, error } = await supabase
+        .from('vianney_alertes_specifiques')
+        .insert([
+          {
+            id: uuidv4(),
+            text_alert: textAlert,
+            teams_id: teamsId,
+            read_or_not: readOrNot
+          }
+        ]);
+
+      if (error) {
+        throw error;
+      }
+
       // Reset form fields
       setTextAlert("");
       setTeamsId("");
