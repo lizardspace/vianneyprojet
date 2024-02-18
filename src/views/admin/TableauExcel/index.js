@@ -45,7 +45,7 @@ const InterfaceEquipe = () => {
           </SimpleGrid>
         )}
         <Heading as="h1" size="lg" mb={4} mt={4}>
-          Les données de l'évênment
+          Les données de l'évênement
         </Heading>
         <SimpleGrid columns={{ base: 1, sm: 1, md: 2, lg: 2 }} spacing={4}>
           <VianneyActionsTableEvent />
