@@ -16,7 +16,7 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import EditUserForm from './components/EditUserForm';
-import MiniCalendar from "components/calendar/MiniCalendar";
+//import MiniCalendar from "components/calendar/MiniCalendar";
 import { FcPlus } from "react-icons/fc";
 import MiniStatistics from "components/card/MiniStatistics";
 import TeamStatistics from "components/card/TeamStatistics"; 
@@ -261,15 +261,6 @@ export default function UserReports() {
         tableData={tableDataTopCreators}
         columnsData={tableColumnsTopCreators}
       />
-      <Heading me='auto'
-        color={textColor}
-        fontSize='2xl'
-        fontWeight='700'
-        lineHeight='100%'
-        mb="20px">
-        Le calendrier des évènements
-      </Heading>
-      <MiniCalendar />
     </Box>
   );
 }
