@@ -5,6 +5,66 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export default supabase;
+// Define a function to handle real-time updates
+const handleRealTimeUpdate = (event, payload) => {
+  console.log(`Change in ${event.table}:`, payload);
+};
 
-export { supabase, supabaseUrl }; // Exporting supabaseUrl along with supabase
+// Enable real-time updates for each table by subscribing to changes
+const subscriptions = [];
+
+// Subscribe to changes in the first table
+const subscription1 = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'vianney_actions',
+    },
+    payload => handleRealTimeUpdate('vianney_actions', payload)
+  )
+  .subscribe();
+
+subscriptions.push(subscription1);
+
+// Subscribe to changes in the second table
+const subscription2 = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'vianney_teams',
+    },
+    payload => handleRealTimeUpdate('vianney_teams', payload)
+  )
+  .subscribe();
+
+subscriptions.push(subscription2);
+
+// Subscribe to changes in the third table
+const subscription3 = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'vianney_alert',
+    },
+    payload => handleRealTimeUpdate('vianney_alert', payload)
+  )
+  .subscribe();
+
+subscriptions.push(subscription3);
+
+// You can continue adding subscriptions for each table as needed
+
+// Don't forget to unsubscribe from each subscription when you're done listening for updates
+// subscriptions.forEach(subscription => subscription.unsubscribe());
+
+export default supabase;
+export { supabase, supabaseUrl };
