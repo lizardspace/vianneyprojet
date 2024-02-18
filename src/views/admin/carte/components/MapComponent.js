@@ -51,7 +51,7 @@ const MapComponent = () => {
 
   useEffect(() => {
     if (!mapRef.current) {
-      mapRef.current = L.map('map').setView([0, 0], 13); // Initial map setup
+      mapRef.current = L.map('map').setView([0, 0], 16); // Initial map setup
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: ''
@@ -59,7 +59,7 @@ const MapComponent = () => {
     }
 
     if (users.length > 0) {
-      mapRef.current.setView([users[0].latitude, users[0].longitude], 13);
+      mapRef.current.setView([users[0].latitude, users[0].longitude], 16);
 
       users.forEach(user => {
         if (user) {
