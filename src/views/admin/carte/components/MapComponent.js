@@ -3,13 +3,11 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MdPlace } from "react-icons/md";
 import { renderToString } from "react-dom/server";
-import { createClient } from '@supabase/supabase-js';
+
 import { useEvent } from './../../../../EventContext'; // Update the path to your EventContext file
 
 // Initialize Supabase client
-const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from './../../../../supabaseClient';
 
 const createCustomIcon = () => {
   const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: 'red' }} />);
