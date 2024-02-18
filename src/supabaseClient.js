@@ -61,6 +61,118 @@ const subscription3 = supabase
 
 subscriptions.push(subscription3);
 
+// Subscribe to changes in the fourth table
+const subscription4 = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'vianney_alertes_specifiques',
+    },
+    payload => handleRealTimeUpdate('vianney_alertes_specifiques', payload)
+  )
+  .subscribe();
+
+subscriptions.push(subscription4);
+
+// Subscribe to changes in the fifth table
+const subscription5 = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'vianney_event',
+    },
+    payload => handleRealTimeUpdate('vianney_event', payload)
+  )
+  .subscribe();
+
+subscriptions.push(subscription5);
+
+// Subscribe to changes in the sixth table
+const subscription6 = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'vianney_form_utile_salle_de_crise',
+    },
+    payload => handleRealTimeUpdate('vianney_form_utile_salle_de_crise', payload)
+  )
+  .subscribe();
+
+subscriptions.push(subscription6);
+
+// Subscribe to changes in the seventh table
+const subscription7 = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'vianney_pdf_documents',
+    },
+    payload => handleRealTimeUpdate('vianney_pdf_documents', payload)
+  )
+  .subscribe();
+
+subscriptions.push(subscription7);
+
+// Subscribe to changes in the eighth table
+const subscription8 = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'vianney_pdf_documents_salle_de_crise',
+    },
+    payload => handleRealTimeUpdate('vianney_pdf_documents_salle_de_crise', payload)
+  )
+  .subscribe();
+
+subscriptions.push(subscription8);
+
+// Subscribe to changes in the ninth table
+const subscription9 = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'vianney_textarea',
+    },
+    payload => handleRealTimeUpdate('vianney_textarea', payload)
+  )
+  .subscribe();
+
+subscriptions.push(subscription9);
+
+// Subscribe to changes in the tenth table
+const subscription10 = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'vianney_textarea_salle_de_crise',
+    },
+    payload => handleRealTimeUpdate('vianney_textarea_salle_de_crise', payload)
+  )
+  .subscribe();
+
+subscriptions.push(subscription10);
+
 // You can continue adding subscriptions for each table as needed
 
 // Don't forget to unsubscribe from each subscription when you're done listening for updates
