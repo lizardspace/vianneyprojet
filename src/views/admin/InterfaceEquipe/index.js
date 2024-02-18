@@ -68,7 +68,7 @@ const InterfaceEquipe = () => {
     <Box pt={{ base: '180px', md: '80px', xl: '80px' }}>
       <UrgentAlerts/>
       {showAlert && (
-        <Alert status="error" mb="4" minHeight="200px">
+        <Alert status="error" mb="4" minHeight="100px">
           <AlertIcon />
           <AlertTitle>Attention!</AlertTitle>
           <AlertDescription>
