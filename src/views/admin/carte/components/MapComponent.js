@@ -50,36 +50,51 @@ const MapComponent = () => {
   
 
   useEffect(() => {
-    if (!mapRef.current) {
-      mapRef.current = L.map('map').setView([0, 0], 16); // Initial map setup
+    let mapInstance = mapRef.current;
+  
+    if (!mapInstance) {
+      mapInstance = L.map('map').setView([45, 4.7], 7); // Initial map setup
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: ''
-      }).addTo(mapRef.current);
+      }).addTo(mapInstance);
+      mapRef.current = mapInstance; // Set the current map instance
     }
-
-    if (users.length > 0) {
-      mapRef.current.setView([users[0].latitude, users[0].longitude], 16);
-
-      users.forEach(user => {
-        if (user) {
-          // Updated HTML content for the popup
-          const popupContent = `
-            <div>
-              <strong>${user.name_of_the_team}</strong>
-              ${user.photo_profile_url ? `<br/><img src="${user.photo_profile_url}" alt="${user.name_of_the_team}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-top: 5px;"/>` : ''}
-            </div>
-          `;
-
-          const customIcon = createCustomIcon(); // Custom icon without user photo
-
-          L.marker([user.latitude, user.longitude], { icon: customIcon })
-            .addTo(mapRef.current)
+  
+    // Check if markers need to be added/updated
+    users.forEach(user => {
+      if (user) {
+        // Updated HTML content for the popup
+        const popupContent = `
+          <div>
+            <strong>${user.name_of_the_team}</strong>
+            ${user.photo_profile_url ? `<br/><img src="${user.photo_profile_url}" alt="${user.name_of_the_team}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-top: 5px;"/>` : ''}
+          </div>
+        `;
+  
+        const customIcon = createCustomIcon(); // Custom icon without user photo
+  
+        // Find existing marker by user ID
+        let existingMarker = null;
+        mapInstance.eachLayer(layer => {
+          if (layer.options.userId === user.id) {
+            existingMarker = layer;
+          }
+        });
+  
+        if (existingMarker) {
+          existingMarker.setLatLng([user.latitude, user.longitude]);
+          existingMarker.setPopupContent(popupContent);
+        } else {
+          L.marker([user.latitude, user.longitude], { icon: customIcon, userId: user.id })
+            .addTo(mapInstance)
             .bindPopup(popupContent);
         }
-      });
-    }
+      }
+    });
   }, [users]);
+  
+  
 
   return (
     <div id="map" style={{ height: '800px', width: '100%', zIndex: '0' }}></div>

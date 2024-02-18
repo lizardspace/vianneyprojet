@@ -96,7 +96,7 @@ const GpsPosition = () => {
         icon: customIcon,
       }).addTo(mapRef.current);
 
-      mapRef.current.setView([latitude, longitude], 13);
+      mapRef.current.setView([latitude, longitude], 16);
     }
   }, [gpsPosition, mapInitialized, selectedTeam, lastUpdateTime]);
 
