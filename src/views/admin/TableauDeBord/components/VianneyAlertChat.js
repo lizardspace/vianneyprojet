@@ -343,7 +343,7 @@ function VianneyAlertChat() {
             fontSize='22px'
             fontWeight='700'
             lineHeight='100%'>
-            Table des alertes
+            Messages et Alertes
           </Text>
           <Menu 
           onFilterSelect={handleFilterSelect} 

@@ -9,7 +9,6 @@ import moment from 'moment';
 import 'moment/locale/fr'; // Import French locale
 
 import './CalendarStyles.css';
-import Menu from "components/menu/MainMenuTeamScheduleMadeMySelf";
 import AddActionForm from './AddActionForm';
 import { useEvent } from '../../../../EventContext'; // Import useEvent hook
 
@@ -270,7 +269,6 @@ const TeamScheduleByMySelf = () => {
                 lineHeight='100%'>
                 Emploi du temps
               </Text>
-              <Menu />
               <Tooltip label="Cliquer pour ajouter une action" hasArrow>
                 <Box position='absolute' top='15px' right='15px' cursor='pointer'>
                   <FcPlus size="24px" onClick={onOpenAddActionModal} />

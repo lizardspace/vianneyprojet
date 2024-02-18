@@ -103,30 +103,7 @@ const InterfaceEquipe = () => {
         </Badge>
       )}
       <TeamMembersDisplay />
-      
-      <Heading
-        me="auto"
-        color={textColor}
-        fontSize="2xl"
-        fontWeight="700"
-        lineHeight="100%"
-        mb={1}
-        mt={10}
-      >
-        La position que vous communiquez au PC sécurité
-      </Heading>
       <GpsPosition />
-      <Heading
-        me="auto"
-        color={textColor}
-        fontSize="2xl"
-        fontWeight="700"
-        lineHeight="100%"
-        mb={10}
-        mt={10}
-      >
-        Messages et alertes
-      </Heading>
       <VianneyAlertChat />
       <Heading
         me="auto"
