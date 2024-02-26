@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box, Text, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
 } from '@chakra-ui/react';
@@ -20,6 +20,16 @@ const localizer = momentLocalizer(moment);
 
 const TeamScheduleByMySelf = () => {
   const [events, setEvents] = useState([]);
+  const [inputDate, setInputDate] = useState(moment().format('YYYY-MM-DD')); // Default to today's date
+  const [currentDate, setCurrentDate] = useState(new Date()); 
+  const handleDateChange = (e) => {
+    const newDate = e.target.value;
+    setInputDate(newDate);
+    setCurrentDate(new Date(newDate)); // Directly update the currentDate state
+  };
+  const { defaultDate } = useMemo(() => ({
+    defaultDate: inputDate ? new Date(inputDate) : new Date(),
+  }), [inputDate]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const onClose = () => setIsAlertOpen(false);
@@ -137,11 +147,11 @@ const TeamScheduleByMySelf = () => {
       const teamsData = await fetchTeams();
       const sortedTeams = teamsData.sort((a, b) => a.titel.localeCompare(b.titel));
       setTeams(sortedTeams);
-      
+
       const { data: eventsData, error } = await supabase
         .from('team_action_view_rendering')
         .select('*');
-  
+
       if (error) {
         console.error('Error fetching events:', error);
       } else {
@@ -269,6 +279,13 @@ const TeamScheduleByMySelf = () => {
                 lineHeight='100%'>
                 Emploi du temps des équipes
               </Text>
+              <Input
+                type="date"
+                value={inputDate}
+                onChange={handleDateChange}
+                placeholder="Select date"
+                mb={4} // Margin bottom for spacing
+              />
               <Tooltip label="Cliquer pour ajouter une action" hasArrow>
                 <Box position='absolute' top='15px' right='15px' cursor='pointer'>
                   <FcPlus size="24px" onClick={onOpenAddActionModal} />
@@ -278,6 +295,8 @@ const TeamScheduleByMySelf = () => {
             <Calendar
               localizer={localizer}
               events={events}
+              defaultDate={defaultDate}
+              date={currentDate} 
               resources={teams}
               resourceIdAccessor="id"
               resourceTitleAccessor="titel"
