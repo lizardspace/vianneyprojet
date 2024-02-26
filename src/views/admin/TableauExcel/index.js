@@ -18,6 +18,7 @@ import VianneyPdfDocumentsTableEvent from './componentsEventContext/VianneyPdfDo
 import VianneyPdfDocumentsSalleDeCriseTableEvent from './componentsEventContext/VianneyPdfDocumentsSalleDeCriseTableEvent'; // Replace with the actual import path
 import VianneyTextareaTableEvent from './componentsEventContext/VianneyTextareaTableEvent'; // Replace with the actual import path
 import VianneyTextareaSalleDeCriseTableEvent from './componentsEventContext/VianneyTextareaSalleDeCriseTableEvent'; // Replace with the actual import path
+import VianneyActionsTableEventDate from './componentsEventContext/VianneyActionsTableEventDate';
 
 const InterfaceEquipe = () => {
   const [showRawData, setShowRawData] = useState(false);
@@ -49,6 +50,7 @@ const InterfaceEquipe = () => {
         </Heading>
         <SimpleGrid columns={{ base: 1, sm: 1, md: 2, lg: 2 }} spacing={4}>
           <VianneyActionsTableEvent />
+          <VianneyActionsTableEventDate/>
           <VianneyAlertTableEvent />
           <VianneyTeamsTableEvent />
           <VianneyFormUtileSalleDeCriseTableEvent />
