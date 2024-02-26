@@ -267,7 +267,7 @@ const TeamScheduleByMySelf = () => {
                 fontSize='22px'
                 fontWeight='700'
                 lineHeight='100%'>
-                Emploi du temps
+                Emploi du temps des équipes
               </Text>
               <Tooltip label="Cliquer pour ajouter une action" hasArrow>
                 <Box position='absolute' top='15px' right='15px' cursor='pointer'>
