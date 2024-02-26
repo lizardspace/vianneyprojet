@@ -284,7 +284,8 @@ const TeamScheduleByMySelf = () => {
                 value={inputDate}
                 onChange={handleDateChange}
                 placeholder="Select date"
-                mb={4} // Margin bottom for spacing
+                mb={4} 
+                maxW="300px" 
               />
               <Tooltip label="Cliquer pour ajouter une action" hasArrow>
                 <Box position='absolute' top='15px' right='15px' cursor='pointer'>
