@@ -7,16 +7,16 @@ import { Flex, Image } from "@chakra-ui/react";
 import { HSeparator } from "components/separator/Separator";
 
 // Importing the image
-import logoSecu from 'components/icons/logosecu.png'; // Adjust the path if necessary
+import logoSecu from 'components/icons/logosite.jpeg'; // Adjust the path if necessary
 
 export function SidebarBrand() {
 
   return (
     <Flex align='center' direction='column'>
-      <Image 
+            <Image 
         src={logoSecu}
-        h='26px' 
-        w='175px' 
+        h='133px' 
+        w='202px' 
         my='32px'
         alt='Logo' // Provide an alt description for accessibility
       />
