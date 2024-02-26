@@ -1,17 +1,17 @@
 import React from "react";
 import { Icon } from "@chakra-ui/react";
-import {  FcMindMap, FcSerialTasks, FcSurvey, FcSettings, FcSelfie, FcGrid, FcHighPriority } from "react-icons/fc";
-import MainDashboard from "views/admin/default";
-import NFTMarketplace from "views/admin/carte";
+import { FcSelfie} from "react-icons/fc";
+//import MainDashboard from "views/admin/default";
+//import NFTMarketplace from "views/admin/carte";
 //import Profile from "views/admin/profile";
-import TableauDeBord from "views/admin/TableauDeBord";
+//import TableauDeBord from "views/admin/TableauDeBord";
 import InterfaceEquipe from "views/admin/InterfaceEquipe";
-import TableauExcel from "views/admin/TableauExcel";
-import AlerteEquipe from "views/admin/AlerteEquipe"; // Import the component for Alerte à une équipe
+//import TableauExcel from "views/admin/TableauExcel";
+//import AlerteEquipe from "views/admin/AlerteEquipe"; // Import the component for Alerte à une équipe
 
 // Auth Imports
 //import SignInCentered from "views/auth/signIn";
-import Parameters from "views/admin/Parameters";
+//import Parameters from "views/admin/Parameters";
 
 const routes = [
   {
