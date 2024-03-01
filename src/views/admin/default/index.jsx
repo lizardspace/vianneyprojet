@@ -19,7 +19,7 @@ import EditUserForm from './components/EditUserForm';
 //import MiniCalendar from "components/calendar/MiniCalendar";
 import { FcPlus } from "react-icons/fc";
 import MiniStatistics from "components/card/MiniStatistics";
-import TeamStatistics from "components/card/TeamStatistics"; 
+import TeamStatistics from "components/card/TeamStatistics";
 import AddEventForm from "./components/AddEventForm";
 import EditEventForm from "./components/EditEventForm";
 import DocumentationsComponent from "./DocumentionsComponent/DocumentationsComponent";
@@ -35,6 +35,7 @@ import { supabase } from './../../../supabaseClient';
 
 export default function UserReports() {
   const [showAddEventForm, setShowAddEventForm] = useState(false);
+  const [showAddEvent, setShowAddEvent] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showUserform] = useState(false); // State for showing Userform component
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -45,12 +46,12 @@ export default function UserReports() {
   const [editingTeam, setEditingTeam] = useState(null);
   const [showEditUserFormModal, setShowEditUserFormModal] = useState(false);
   const { selectedEventId } = useEvent(); // Access the selectedEventId from the EventContext
- 
+
   const handleEditTeam = (team) => {
     setEditingTeam(team);
     setShowEditUserFormModal(true); // Open the edit modal here
   };
-  
+
   const handleSaveTeam = (updatedTeamData) => {
     // Perform the update operation with updatedTeamData
     // Close the edit modal
@@ -127,37 +128,41 @@ export default function UserReports() {
 
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-      <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
-        Evènements
-      </Heading>
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }} gap='20px' mb='20px'>
-        {events.map((event, index) => (
-          <Box
-            key={index}
-            cursor="pointer" // Add cursor pointer style
-            transition="background-color 0.2s" // Add transition for hover effect
-            _hover={{ backgroundColor: "gray.100" }} // Define hover effect style
-            onClick={() => handleMiniStatisticsClick(event)} // Add click handler
-          >
-            <MiniStatistics
-              event_name={event.event_name}
-              date={event.event_date}
-            />
-          </Box>
-        ))}
-        <Button
-          mt="30px"
-          onClick={toggleAddEventForm}
-          leftIcon={<Icon as={FcPlus} />}
-          colorScheme='blue'
-          variant='solid'
-          size='md'
-          boxShadow='sm'
-          _hover={{ boxShadow: 'md' }}
-          _active={{ boxShadow: 'lg' }}>
-          Ajouter un évènement
-        </Button>
-      </SimpleGrid>
+      {showAddEvent && (
+        <Box>
+          <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
+            Evènements
+          </Heading>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }} gap='20px' mb='20px'>
+            {events.map((event, index) => (
+              <Box
+                key={index}
+                cursor="pointer" // Add cursor pointer style
+                transition="background-color 0.2s" // Add transition for hover effect
+                _hover={{ backgroundColor: "gray.100" }} // Define hover effect style
+                onClick={() => handleMiniStatisticsClick(event)} // Add click handler
+              >
+                <MiniStatistics
+                  event_name={event.event_name}
+                  date={event.event_date}
+                />
+              </Box>
+            ))}
+            <Button
+              mt="30px"
+              onClick={toggleAddEventForm}
+              leftIcon={<Icon as={FcPlus} />}
+              colorScheme='blue'
+              variant='solid'
+              size='md'
+              boxShadow='sm'
+              _hover={{ boxShadow: 'md' }}
+              _active={{ boxShadow: 'lg' }}>
+              Ajouter un évènement
+            </Button>
+          </SimpleGrid>
+        </Box>
+      )}
       <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
         Equipes
       </Heading>
@@ -204,7 +209,7 @@ export default function UserReports() {
           Créer une équipe
         </Button>
       </SimpleGrid>
-{showAddEventForm && (
+      {showAddEventForm && (
         <Modal isOpen={showAddEventForm} onClose={() => setShowAddEventForm(false)}>
           <ModalOverlay />
           <ModalContent>
@@ -228,8 +233,8 @@ export default function UserReports() {
             <ModalBody>
               <EditEventForm event={selectedEvent} refreshEvents={fetchEvents} />
             </ModalBody>
-      {/* ... */}
-</ModalContent>
+            {/* ... */}
+          </ModalContent>
         </Modal>
       )}
       {showUserform && (
