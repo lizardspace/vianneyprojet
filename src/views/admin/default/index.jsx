@@ -35,7 +35,7 @@ import { supabase } from './../../../supabaseClient';
 
 export default function UserReports() {
   const [showAddEventForm, setShowAddEventForm] = useState(false);
-  const [showAddEvent, setShowAddEvent] = useState(false);
+  const [showAddEvent] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showUserform] = useState(false); // State for showing Userform component
   const textColor = useColorModeValue("secondaryGray.900", "white");
