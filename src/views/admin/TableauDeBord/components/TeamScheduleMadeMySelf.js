@@ -313,6 +313,7 @@ const TeamScheduleByMySelf = () => {
               components={{
                 event: CustomEvent, // Use Custom Event Component
               }}
+              toolbar={false}
             />
 
           </Box>
