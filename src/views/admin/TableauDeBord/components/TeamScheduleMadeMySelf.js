@@ -21,7 +21,7 @@ const localizer = momentLocalizer(moment);
 
 const TeamScheduleByMySelf = () => {
 const [events, setEvents] = useState([]);
-  const [inputDate, setInputDate] = useState(moment().format('YYYY-MM-DD')); // Default to today's date
+  const [inputDate] = useState(moment().format('YYYY-MM-DD')); // Default to today's date
   const [currentDate, setCurrentDate] = useState(new Date());
   const handleDateChange = (e) => {
     const newDate = new Date(e.target.value);
