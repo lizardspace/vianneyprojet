@@ -298,10 +298,7 @@ color={textColor}
                 Emploi du temps des équipess
               </Text>
               <Flex align="center">
-                <Button onClick={handlePrevious} variant="ghost" size="sm" mr="2">
-                  <FaChevronLeft />
-                </Button>
-                <Input
+              <Input
                   type="date"
                   value={moment(currentDate).format('YYYY-MM-DD')}
                   onChange={handleDateChange}
@@ -309,6 +306,9 @@ color={textColor}
                   mb={4} 
                   maxW="150px" 
                 />
+                <Button onClick={handlePrevious} variant="ghost" size="sm" mr="2">
+                  <FaChevronLeft />
+                </Button>
                 <Button onClick={handleToday} variant="ghost" size="sm">
                   Aujourd'hui
                 </Button>
