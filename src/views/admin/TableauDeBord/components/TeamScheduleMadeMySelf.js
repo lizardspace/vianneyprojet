@@ -253,7 +253,7 @@ const TeamScheduleByMySelf = () => {
 
   const CustomEvent = ({ event }) => (
     <Tooltip label={event.titel} aria-label="Event Tooltip">
-      <div style={eventStyleGetter(event).style}>
+      <div style={{ ...eventStyleGetter(event).style, color: 'black' }}>
         {event.titel}
       </div>
     </Tooltip>
@@ -277,7 +277,7 @@ const TeamScheduleByMySelf = () => {
                 fontSize='22px'
                 fontWeight='700'
                 lineHeight='100%'>
-                Emploi du temps des équipes
+                Emploi du temps des équipess
               </Text>
               <Input
                 type="date"
@@ -308,7 +308,7 @@ const TeamScheduleByMySelf = () => {
               endAccessor="end"
               eventPropGetter={eventStyleGetter}
               messages={messages}
-              style={{ height: 500 }}
+              style={{ height: 500, color: 'black' }}
               onSelectEvent={handleEventSelect}
               components={{
                 event: CustomEvent, // Use Custom Event Component
