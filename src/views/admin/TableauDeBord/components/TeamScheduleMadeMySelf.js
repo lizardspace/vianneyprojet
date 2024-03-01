@@ -24,10 +24,12 @@ const [events, setEvents] = useState([]);
   const [inputDate, setInputDate] = useState(moment().format('YYYY-MM-DD')); // Default to today's date
   const [currentDate, setCurrentDate] = useState(new Date());
   const handleDateChange = (e) => {
-    const newDate = e.target.value;
-    setInputDate(newDate);
-    setCurrentDate(new Date(newDate)); // Directly update the currentDate state
+    const newDate = new Date(e.target.value);
+    if (!isNaN(newDate.getTime())) {
+      setCurrentDate(newDate);
+    }
   };
+  
   const { defaultDate } = useMemo(() => ({
     defaultDate: inputDate ? new Date(inputDate) : new Date(),
   }), [inputDate]);
