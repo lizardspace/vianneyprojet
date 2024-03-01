@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import {
   Box, Text, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
 } from '@chakra-ui/react';
@@ -19,9 +20,9 @@ moment.locale('fr');
 const localizer = momentLocalizer(moment);
 
 const TeamScheduleByMySelf = () => {
-  const [events, setEvents] = useState([]);
+const [events, setEvents] = useState([]);
   const [inputDate, setInputDate] = useState(moment().format('YYYY-MM-DD')); // Default to today's date
-  const [currentDate, setCurrentDate] = useState(new Date()); 
+  const [currentDate, setCurrentDate] = useState(new Date());
   const handleDateChange = (e) => {
     const newDate = e.target.value;
     setInputDate(newDate);
@@ -262,6 +263,23 @@ const TeamScheduleByMySelf = () => {
   const onOpenAddActionModal = () => setIsAddActionModalOpen(true);
   const onCloseAddActionModal = () => setIsAddActionModalOpen(false);
 
+  const handlePrevious = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() - 1);
+    setCurrentDate(newDate);
+  };
+
+  const handleNext = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + 1);
+    setCurrentDate(newDate);
+  };
+
+  const handleToday = () => {
+    setCurrentDate(new Date());
+  };
+
+
   return (
     <Card
       direction='column'
@@ -273,20 +291,31 @@ const TeamScheduleByMySelf = () => {
           <Box p={4}>
             <Flex px='25px' justify='space-between' mb='20px' align='center'>
               <Text
-                color={textColor}
+color={textColor}
                 fontSize='22px'
                 fontWeight='700'
                 lineHeight='100%'>
                 Emploi du temps des équipess
               </Text>
-              <Input
-                type="date"
-                value={inputDate}
-                onChange={handleDateChange}
-                placeholder="Select date"
-                mb={4} 
-                maxW="150px" 
-              />
+              <Flex align="center">
+                <Button onClick={handlePrevious} variant="ghost" size="sm" mr="2">
+                  <FaChevronLeft />
+                </Button>
+                <Input
+                  type="date"
+                  value={moment(currentDate).format('YYYY-MM-DD')}
+                  onChange={handleDateChange}
+                  placeholder="Select date"
+                  mb={4} 
+                  maxW="150px" 
+                />
+                <Button onClick={handleToday} variant="ghost" size="sm">
+                  Aujourd'hui
+                </Button>
+                <Button onClick={handleNext} variant="ghost" size="sm" ml="2">
+                  <FaChevronRight />
+                </Button>
+              </Flex>
               <Tooltip label="Cliquer pour ajouter une action" hasArrow>
                 <Box position='absolute' top='15px' right='15px' cursor='pointer'>
                   <FcPlus size="24px" onClick={onOpenAddActionModal} />
@@ -317,7 +346,7 @@ const TeamScheduleByMySelf = () => {
             />
 
           </Box>
-          <Modal isOpen={isAddActionModalOpen} onClose={onCloseAddActionModal}>
+<Modal isOpen={isAddActionModalOpen} onClose={onCloseAddActionModal}>
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>Ajouter une action</ModalHeader>
