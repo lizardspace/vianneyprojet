@@ -19,7 +19,7 @@ import { supabase } from '../../../../supabaseClient';
 moment.locale('fr');
 const localizer = momentLocalizer(moment);
 
-const TeamScheduleByMySelf = () => {
+const TeamScheduleByMySelfEquipe = () => {
   const [events, setEvents] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState([]);
   const [ setSelectedTeamId] = useState(null);
@@ -440,4 +440,4 @@ const TeamScheduleByMySelf = () => {
   );
 }
 
-export default TeamScheduleByMySelf;
+export default TeamScheduleByMySelfEquipe;

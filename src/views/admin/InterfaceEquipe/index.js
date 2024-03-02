@@ -21,6 +21,7 @@ import { supabase } from './../../../supabaseClient';
 import TeamMembersDisplay from './components/TeamMembersDisplay';
 import App from '../videoChatRoom/App';
 import UrgentAlerts from './components/UrgentAlerts';
+import TeamScheduleByMySelfEquipe from '../TableauDeBord/components/TeamScheduleMadeMySelfEquipe';
 
 const InterfaceEquipe = () => {
   const { selectedTeam, setSelectedTeam, teamData, setTeamData } = useTeam();
@@ -105,14 +106,13 @@ const InterfaceEquipe = () => {
       <TeamMembersDisplay />
       <GpsPosition />
       <VianneyAlertChat />
+      <TeamScheduleByMySelfEquipe/>
       <Heading
         me="auto"
         color={textColor}
         fontSize="2xl"
         fontWeight="700"
         lineHeight="100%"
-        mb={4}
-        mt={4}
       >
         Radio CB
       </Heading>
