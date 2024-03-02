@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import {
-  Box, Text, Select, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
+  Box, Select, Text, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
 } from '@chakra-ui/react';
 import { FcPlus } from "react-icons/fc";
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
@@ -22,6 +22,7 @@ const localizer = momentLocalizer(moment);
 const TeamScheduleByMySelf = () => {
   const [events, setEvents] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState([]);
+  const [ setSelectedTeamId] = useState(null);
   const [inputDate] = useState(moment().format('YYYY-MM-DD')); // Default to today's date
   const [currentDate, setCurrentDate] = useState(new Date());
   const handleDateChange = (e) => {
@@ -47,12 +48,13 @@ const TeamScheduleByMySelf = () => {
   const { selectedEventId } = useEvent(); // Get selectedEventId from context
 
   const handleEventSelect = (event) => {
+    setSelectedTeamId(event.resourceId);
     setSelectedEvent(event);
     setIsAlertOpen(true);
     setUpdatedEventName(event.titel);
     setUpdatedEventStart(moment(event.start).format('YYYY-MM-DDTHH:mm'));
     setUpdatedEventEnd(moment(event.end).format('YYYY-MM-DDTHH:mm'));
-    // Don't set isUpdateMode here; let the user choose
+    setSelectedTeam(event.resourceId); // Set the selected team
   };
 
   const deleteEvent = async () => {
@@ -166,13 +168,13 @@ const TeamScheduleByMySelf = () => {
           end: new Date(action.ending_date),
           resourceId: action.team_id,
           color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
-        }));
+        })).filter(event => selectedTeam ? event.resourceId === selectedTeam : true); // Filter events based on selected team
         setEvents(formattedEvents);
       }
     };
 
     fetchData();
-  }, [fetchTeams]); // Now fetchTeams is a dependency
+  }, [fetchTeams, selectedTeam]);
 
 
   function adjustBrightness(col, amount) {
@@ -212,7 +214,7 @@ const TeamScheduleByMySelf = () => {
         textAlign: 'left', // Center align the text
         display: 'flex', // Use flexbox for alignment
         alignItems: 'left', // Align items vertically center
-        justifyContent: 'flex-start', 
+        justifyContent: 'flex-start',
         fontSize: '14px',
       },
     };
@@ -271,9 +273,9 @@ const TeamScheduleByMySelf = () => {
       </div>
     </Tooltip>
   );
-  
-  
-    const [isAddActionModalOpen, setIsAddActionModalOpen] = useState(false);
+
+
+  const [isAddActionModalOpen, setIsAddActionModalOpen] = useState(false);
   const onOpenAddActionModal = () => setIsAddActionModalOpen(true);
   const onCloseAddActionModal = () => setIsAddActionModalOpen(false);
 
@@ -329,6 +331,13 @@ const TeamScheduleByMySelf = () => {
                 <Button onClick={handleNext} variant="ghost" size="sm" ml="2">
                   <FaChevronRight />
                 </Button>
+                <Select value={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)}>
+                  {teams.map((team) => (
+                    <option key={team.id} value={team.id}>
+                      {team.titel}
+                    </option>
+                  ))}
+                </Select>
               </Flex>
               <Tooltip label="Cliquer pour ajouter une action" hasArrow>
                 <Box position='absolute' top='15px' right='15px' cursor='pointer'>
@@ -341,7 +350,7 @@ const TeamScheduleByMySelf = () => {
               events={events}
               defaultDate={defaultDate}
               date={currentDate}
-              resources={teams}
+              resources={teams.filter(team => team.id === selectedTeam)} // Filter teams to show only the selected team
               resourceIdAccessor="id"
               resourceTitleAccessor="titel"
               formats={formats}
@@ -358,6 +367,8 @@ const TeamScheduleByMySelf = () => {
               }}
               toolbar={false}
             />
+
+
           </Box>
           <Modal isOpen={isAddActionModalOpen} onClose={onCloseAddActionModal}>
             <ModalOverlay />
