@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import {
-  Box, Text, Flex, Card, useColorModeValue, Tooltip, Button, Input,
+  Box, Select, Text, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
 } from '@chakra-ui/react';
+import { FcPlus } from "react-icons/fc";
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
 import 'moment/locale/fr'; // Import French locale
 
 import './CalendarStyles.css';
+import AddActionForm from './AddActionForm';
 import { useEvent } from '../../../../EventContext'; // Import useEvent hook
 
 import { supabase } from '../../../../supabaseClient';
@@ -20,8 +22,10 @@ const localizer = momentLocalizer(moment);
 
 const TeamScheduleByMySelfEquipe = () => {
   const [events, setEvents] = useState([]);
-  const { selectedTeamId } = useTeam(); // Get selected team ID from context
+  const [selectedTeam, setSelectedTeam ] = useState([]);
+  const { selectedTeamId} = useTeam(); // Get selected team ID from context
 
+  const [inputDate] = useState(moment().format('YYYY-MM-DD')); // Default to today's date
   const [currentDate, setCurrentDate] = useState(new Date());
   const handleDateChange = (e) => {
     const newDate = new Date(e.target.value);
@@ -31,11 +35,13 @@ const TeamScheduleByMySelfEquipe = () => {
   };
 
   const { defaultDate } = useMemo(() => ({
-    defaultDate: moment().format('YYYY-MM-DD'),
-  }), []);
-
+    defaultDate: inputDate ? new Date(inputDate) : new Date(),
+  }), [inputDate]);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [ setIsAlertOpen] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const onClose = () => setIsAlertOpen(false);
+  const cancelRef = React.useRef();
+  const toast = useToast();
   const [updatedEventName, setUpdatedEventName] = useState('');
   const [updatedEventStart, setUpdatedEventStart] = useState('');
   const [updatedEventEnd, setUpdatedEventEnd] = useState('');
@@ -52,6 +58,81 @@ const TeamScheduleByMySelfEquipe = () => {
     setUpdatedEventEnd(moment(event.end).format('YYYY-MM-DDTHH:mm'));
   };
 
+  const deleteEvent = async () => {
+    console.log('Selected event on delete:', selectedEvent); // Log the event when attempting to delete
+
+    if (!selectedEvent || typeof selectedEvent.id === 'undefined') {
+      toast({
+        title: "Error",
+        description: "No event selected or event ID is missing.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const { error } = await supabase
+      .from('vianney_actions')
+      .delete()
+      .match({ id: selectedEvent.id });
+
+    if (error) {
+      console.log(messages.errorEventDelete); // Log the error message
+      toast({
+        title: "Erreur lors de la suppression de l'événement",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } else {
+      console.log(messages.successEventDelete); // Log the success message
+      setEvents(events.filter(event => event.id !== selectedEvent.id));
+      toast({
+        title: "Événement supprimé",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+    onClose();
+  };
+  const updateEvent = async () => {
+    // Validation can be added here for updated event details
+    const { error } = await supabase
+      .from('vianney_actions')
+      .update({
+        action_name: updatedEventName,
+        starting_date: updatedEventStart,
+        ending_date: updatedEventEnd,
+        last_updated: new Date() // update the last updated time
+      })
+      .match({ id: selectedEvent.id });
+
+    if (error) {
+      console.log(messages.errorEventUpdate); // Log the error message
+      toast({
+        title: "Erreur lors de la mise à jour de l'événement",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } else {
+      console.log(messages.successEventUpdate); // Log the success message
+      setEvents(events.map(event =>
+        event.id === selectedEvent.id ? { ...event, titel: updatedEventName, start: new Date(updatedEventStart), end: new Date(updatedEventEnd) } : event
+      ));
+      toast({
+        title: "Événement mis à jour",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+    onClose();
+  };
   const fetchTeams = useCallback(async () => {
     const { data, error } = await supabase
       .from('vianney_teams')
@@ -97,15 +178,19 @@ const TeamScheduleByMySelfEquipe = () => {
   }, [fetchTeams, selectedTeamId]);
 
   useEffect(() => {
-    // Update the selected team in the input field when the selectedTeamId changes
+    // Update the selected team in the dropdown menu when the selectedTeamId changes
     if (selectedTeamId) {
-      const teamName = teams.find(team => team.id === selectedTeamId)?.titel;
-      setTeamName(teamName);
+      // Find the dropdown menu element by its ID or ref
+      const dropdown = document.getElementById('teamDropdown'); // Replace 'teamDropdown' with the actual ID of your dropdown element
+  
+      // Trigger a change event on the dropdown with the selectedTeamId as the value
+      dropdown.value = selectedTeamId;
+      dropdown.dispatchEvent(new Event('change'));
     }
-  }, [selectedTeamId, teams]);
+  }, [selectedTeamId]);
+  
+  
 
-  // State to hold the team name for the input field
-  const [teamName, setTeamName] = useState('');
 
   function adjustBrightness(col, amount) {
     let usePound = false;
@@ -174,7 +259,9 @@ const TeamScheduleByMySelfEquipe = () => {
     updateEvent: 'Mettre à jour l\'événement',
     deleteEvent: 'Supprimer l\'événement',
     successMessage: 'Action réalisée avec succès',
+
   };
+
 
   const formats = {
     dayFormat: 'DD/MM', // Format for day view
@@ -203,6 +290,10 @@ const TeamScheduleByMySelfEquipe = () => {
   );
 
 
+  const [isAddActionModalOpen, setIsAddActionModalOpen] = useState(false);
+  const onOpenAddActionModal = () => setIsAddActionModalOpen(true);
+  const onCloseAddActionModal = () => setIsAddActionModalOpen(false);
+
   const handlePrevious = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(newDate.getDate() - 1);
@@ -219,6 +310,7 @@ const TeamScheduleByMySelfEquipe = () => {
     setCurrentDate(new Date());
   };
 
+
   return (
     <Card
       direction='column'
@@ -226,60 +318,138 @@ const TeamScheduleByMySelfEquipe = () => {
       px='0px'
       overflowX={{ sm: "scroll", lg: "hidden" }}>
       <Box p={4}>
-        <Box p={4}>
-          <Flex px='25px' justify='space-between' mb='20px' align='center'>
-            <Text
-              color={textColor}
-              fontSize='22px'
-              fontWeight='700'
-              lineHeight='100%'>
-              Emploi du temps des équipes
-            </Text>
-            <Flex align="center">
-              <Input
-                type="date"
-                value={moment(currentDate).format('YYYY-MM-DD')}
-                onChange={handleDateChange}
-                placeholder="Select date"
-                mb={4}
-                maxW="150px"
-              />
-              <Button onClick={handlePrevious} variant="ghost" size="sm" mr="2">
-                <FaChevronLeft />
-              </Button>
-              <Button onClick={handleToday} variant="ghost" size="sm">
-                Aujourd'hui
-              </Button>
-              <Button onClick={handleNext} variant="ghost" size="sm" ml="2">
-                <FaChevronRight />
-              </Button>
-              <Input value={teamName} readOnly />
+        <ChakraProvider>
+          <Box p={4}>
+            <Flex px='25px' justify='space-between' mb='20px' align='center'>
+              <Text
+                color={textColor}
+                fontSize='22px'
+                fontWeight='700'
+                lineHeight='100%'>
+                Emploi du temps des équipes
+              </Text>
+              <Flex align="center">
+                <Input
+                  type="date"
+                  value={moment(currentDate).format('YYYY-MM-DD')}
+                  onChange={handleDateChange}
+                  placeholder="Select date"
+                  mb={4}
+                  maxW="150px"
+                />
+                <Button onClick={handlePrevious} variant="ghost" size="sm" mr="2">
+                  <FaChevronLeft />
+                </Button>
+                <Button onClick={handleToday} variant="ghost" size="sm">
+                  Aujourd'hui
+                </Button>
+                <Button onClick={handleNext} variant="ghost" size="sm" ml="2">
+                  <FaChevronRight />
+                </Button>
+                <Select value={selectedTeamId} onChange={(e) => setSelectedTeam(e.target.value)}>
+                  {teams.map((team) => (
+                    <option key={team.id} value={team.id}>
+                      {team.titel}
+                    </option>
+                  ))}
+                </Select>
+              </Flex>
+              <Tooltip label="Cliquer pour ajouter une action" hasArrow>
+                <Box position='absolute' top='15px' right='15px' cursor='pointer'>
+                  <FcPlus size="24px" onClick={onOpenAddActionModal} />
+                </Box>
+              </Tooltip>
             </Flex>
-          
-          </Flex>
-          <Calendar
-            localizer={localizer}
-            events={events}
-            defaultDate={defaultDate}
-            date={currentDate}
-            resources={teams.filter(team => team.id === selectedTeamId)} // Filter teams to show only the selected team
-            resourceIdAccessor="id"
-            resourceTitleAccessor="titel"
-            formats={formats}
-            defaultView={Views.DAY}
-            views={['day', 'week', 'month', 'agenda']}
-            startAccessor="start"
-            endAccessor="end"
-            eventPropGetter={eventStyleGetter}
-            messages={messages}
-            style={{ height: 500, color: 'black' }}
-            onSelectEvent={handleEventSelect}
-            components={{
-              event: CustomEvent, // Use Custom Event Component
-            }}
-            toolbar={false}
-          />
-        </Box>        
+            <Calendar
+              localizer={localizer}
+              events={events}
+              defaultDate={defaultDate}
+              date={currentDate}
+              resources={teams.filter(team => team.id === selectedTeam)} // Filter teams to show only the selected team
+              resourceIdAccessor="id"
+              resourceTitleAccessor="titel"
+              formats={formats}
+              defaultView={Views.DAY}
+              views={['day', 'week', 'month', 'agenda']}
+              startAccessor="start"
+              endAccessor="end"
+              eventPropGetter={eventStyleGetter}
+              messages={messages}
+              style={{ height: 500, color: 'black' }}
+              onSelectEvent={handleEventSelect}
+              components={{
+                event: CustomEvent, // Use Custom Event Component
+              }}
+              toolbar={false}
+            />
+
+
+          </Box>
+          <Modal isOpen={isAddActionModalOpen} onClose={onCloseAddActionModal}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Ajouter une action</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <AddActionForm />
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+          <AlertDialog
+            isOpen={isAlertOpen}
+            leastDestructiveRef={cancelRef}
+            onClose={onClose}
+          >
+            <AlertDialogOverlay>
+              <AlertDialogContent>
+                <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                  Options de l'événement
+                </AlertDialogHeader>
+                <AlertDialogBody>
+                  {selectedEvent ? (
+                    <Stack spacing={3}>
+                      <Input
+                        value={updatedEventName}
+                        onChange={(e) => setUpdatedEventName(e.target.value)}
+                        placeholder="Nom de l'événement"
+                      />
+                      <Input
+                        type="datetime-local"
+                        value={updatedEventStart}
+                        onChange={(e) => setUpdatedEventStart(e.target.value)}
+                      />
+                      <Input
+                        type="datetime-local"
+                        value={updatedEventEnd}
+                        onChange={(e) => setUpdatedEventEnd(e.target.value)}
+                      />
+                      <Select value={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)}>
+                        {teams.map((team) => (
+                          <option key={team.id} value={team.id}>
+                            {team.titel}
+                          </option>
+                        ))}
+                      </Select>
+                    </Stack>
+                  ) : (
+                    'Sélectionnez un événement à modifier ou à supprimer.'
+                  )}
+                </AlertDialogBody>
+                <AlertDialogFooter>
+                  <Button ref={cancelRef} onClick={onClose}>
+                    Annuler
+                  </Button>
+                  <Button colorScheme="blue" onClick={updateEvent} ml={3}>
+                    Mettre à jour
+                  </Button>
+                  <Button colorScheme="red" onClick={deleteEvent} ml={3}>
+                    Supprimer
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialogOverlay>
+          </AlertDialog>
+        </ChakraProvider>
       </Box>
     </Card>
   );
