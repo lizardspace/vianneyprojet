@@ -180,9 +180,16 @@ const TeamScheduleByMySelfEquipe = () => {
   useEffect(() => {
     // Update the selected team in the dropdown menu when the selectedTeamId changes
     if (selectedTeamId) {
-      setSelectedTeam(selectedTeamId);
+      // Find the dropdown menu element by its ID or ref
+      const dropdown = document.getElementById('teamDropdown'); // Replace 'teamDropdown' with the actual ID of your dropdown element
+  
+      // Trigger a change event on the dropdown with the selectedTeamId as the value
+      dropdown.value = selectedTeamId;
+      dropdown.dispatchEvent(new Event('change'));
     }
-  }, [selectedTeamId, setSelectedTeam]);
+  }, [selectedTeamId]);
+  
+  
 
 
   function adjustBrightness(col, amount) {
@@ -319,7 +326,7 @@ const TeamScheduleByMySelfEquipe = () => {
                 fontSize='22px'
                 fontWeight='700'
                 lineHeight='100%'>
-                Emploi du temps des équipess
+                Emploi du temps des équipes
               </Text>
               <Flex align="center">
                 <Input
