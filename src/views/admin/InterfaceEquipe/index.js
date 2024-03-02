@@ -113,6 +113,7 @@ const InterfaceEquipe = () => {
         fontSize="2xl"
         fontWeight="700"
         lineHeight="100%"
+
       >
         Radio CB
       </Heading>
