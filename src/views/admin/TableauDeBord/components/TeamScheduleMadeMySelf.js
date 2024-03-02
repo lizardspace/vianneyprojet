@@ -208,10 +208,11 @@ const TeamScheduleByMySelf = () => {
       style: {
         backgroundImage: `linear-gradient(to right, ${baseColor}, ${gradientColor})`,
         color: '#FF914D', // Set text color to white for better readability
-        textAlign: 'center', // Center align the text
+        textAlign: 'left', // Center align the text
         display: 'flex', // Use flexbox for alignment
-        alignItems: 'center', // Align items vertically center
-        justifyContent: 'center', // Align items horizontally center
+        alignItems: 'left', // Align items vertically center
+        justifyContent: 'flex-start', 
+        fontSize: '14px',
       },
     };
   };
@@ -256,11 +257,14 @@ const TeamScheduleByMySelf = () => {
 
   const CustomEvent = ({ event }) => (
     <Tooltip label={event.titel} aria-label="Event Tooltip">
-      <div style={{ ...eventStyleGetter(event).style, color: 'black' }}>
+      <div style={eventStyleGetter(event).style}>
+        <div style={{ color: 'black', fontSize: '14px' }}> {/* Reduce font size */}
           {event.titel}
-              </div>
+        </div>
+      </div>
     </Tooltip>
   );
+  
     const [isAddActionModalOpen, setIsAddActionModalOpen] = useState(false);
   const onOpenAddActionModal = () => setIsAddActionModalOpen(true);
   const onCloseAddActionModal = () => setIsAddActionModalOpen(false);
