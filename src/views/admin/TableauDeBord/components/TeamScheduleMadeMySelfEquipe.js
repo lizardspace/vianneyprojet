@@ -13,7 +13,7 @@ import './CalendarStyles.css';
 import AddActionForm from './AddActionForm';
 import { useEvent } from '../../../../EventContext'; // Import useEvent hook
 
-import { supabase } from './../../../../supabaseClient';
+import { supabase } from '../../../../supabaseClient';
 
 // Set moment to French locale
 moment.locale('fr');
