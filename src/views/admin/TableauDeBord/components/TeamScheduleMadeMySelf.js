@@ -256,14 +256,21 @@ const TeamScheduleByMySelf = () => {
   };
 
   const CustomEvent = ({ event }) => (
-    <Tooltip label={event.titel} aria-label="Event Tooltip">
+    <Tooltip
+      label={`${event.titel} - ${moment(event.start).format('HH:mm')} à ${moment(event.end).format('HH:mm')}`}
+      aria-label="Event Tooltip"
+      hasArrow
+      overflowWrap="anywhere" // Ensure text wraps within the tooltip
+      whiteSpace="pre-line"   // Allow for line breaks
+    >
       <div style={eventStyleGetter(event).style}>
-        <div style={{ color: 'black', fontSize: '14px' }}> {/* Reduce font size */}
+        <div style={{ color: 'black', fontSize: '14px' }}>
           {event.titel}
         </div>
       </div>
     </Tooltip>
   );
+  
   
     const [isAddActionModalOpen, setIsAddActionModalOpen] = useState(false);
   const onOpenAddActionModal = () => setIsAddActionModalOpen(true);
