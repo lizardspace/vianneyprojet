@@ -347,12 +347,13 @@ const TeamScheduleByMySelfEquipe = () => {
                   <FaChevronRight />
                 </Button>
                 <Select value={selectedTeamId} onChange={(e) => setSelectedTeam(e.target.value)}>
-                  {teams.map((team) => (
-                    <option key={team.id} value={team.id}>
-                      {team.titel}
-                    </option>
-                  ))}
-                </Select>
+  {teams.map((team) => (
+    <option key={team.id} value={team.id}>
+      {team.titel}
+    </option>
+  ))}
+</Select>
+
               </Flex>
             </Flex>
             <Calendar
