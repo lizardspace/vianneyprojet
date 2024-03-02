@@ -14,6 +14,7 @@ import AddActionForm from './AddActionForm';
 import { useEvent } from '../../../../EventContext'; // Import useEvent hook
 
 import { supabase } from '../../../../supabaseClient';
+import { useTeam } from '../../InterfaceEquipe/TeamContext'; // Import useTeam hook
 
 // Set moment to French locale
 moment.locale('fr');
@@ -21,8 +22,8 @@ const localizer = momentLocalizer(moment);
 
 const TeamScheduleByMySelfEquipe = () => {
   const [events, setEvents] = useState([]);
-  const [selectedTeam, setSelectedTeam] = useState([]);
-  const [ setSelectedTeamId] = useState(null);
+  const { selectedTeamId, selectedTeam, setSelectedTeam } = useTeam(); // Get selected team ID from context
+
   const [inputDate] = useState(moment().format('YYYY-MM-DD')); // Default to today's date
   const [currentDate, setCurrentDate] = useState(new Date());
   const handleDateChange = (e) => {
@@ -45,16 +46,15 @@ const TeamScheduleByMySelfEquipe = () => {
   const [updatedEventEnd, setUpdatedEventEnd] = useState('');
   const [teams, setTeams] = useState([]);
   const textColor = useColorModeValue("secondaryGray.900", "white");
+
   const { selectedEventId } = useEvent(); // Get selectedEventId from context
 
   const handleEventSelect = (event) => {
-    setSelectedTeamId(event.resourceId);
     setSelectedEvent(event);
     setIsAlertOpen(true);
     setUpdatedEventName(event.titel);
     setUpdatedEventStart(moment(event.start).format('YYYY-MM-DDTHH:mm'));
     setUpdatedEventEnd(moment(event.end).format('YYYY-MM-DDTHH:mm'));
-    setSelectedTeam(event.resourceId); // Set the selected team
   };
 
   const deleteEvent = async () => {
@@ -168,13 +168,13 @@ const TeamScheduleByMySelfEquipe = () => {
           end: new Date(action.ending_date),
           resourceId: action.team_id,
           color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
-        })).filter(event => selectedTeam ? event.resourceId === selectedTeam : true); // Filter events based on selected team
+        })).filter(event => selectedTeamId ? event.resourceId === selectedTeamId : true); // Filter events based on selected team
         setEvents(formattedEvents);
       }
     };
 
     fetchData();
-  }, [fetchTeams, selectedTeam]);
+  }, [fetchTeams, selectedTeamId]);
 
 
   function adjustBrightness(col, amount) {
