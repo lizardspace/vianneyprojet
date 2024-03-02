@@ -354,11 +354,6 @@ const TeamScheduleByMySelfEquipe = () => {
                   ))}
                 </Select>
               </Flex>
-              <Tooltip label="Cliquer pour ajouter une action" hasArrow>
-                <Box position='absolute' top='15px' right='15px' cursor='pointer'>
-                  <FcPlus size="24px" onClick={onOpenAddActionModal} />
-                </Box>
-              </Tooltip>
             </Flex>
             <Calendar
               localizer={localizer}
