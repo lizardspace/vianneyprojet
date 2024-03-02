@@ -20,7 +20,7 @@ moment.locale('fr');
 const localizer = momentLocalizer(moment);
 
 const TeamScheduleByMySelf = () => {
-const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState([]);
   const [inputDate] = useState(moment().format('YYYY-MM-DD')); // Default to today's date
   const [currentDate, setCurrentDate] = useState(new Date());
   const handleDateChange = (e) => {
@@ -29,7 +29,7 @@ const [events, setEvents] = useState([]);
       setCurrentDate(newDate);
     }
   };
-  
+
   const { defaultDate } = useMemo(() => ({
     defaultDate: inputDate ? new Date(inputDate) : new Date(),
   }), [inputDate]);
@@ -293,20 +293,20 @@ const [events, setEvents] = useState([]);
           <Box p={4}>
             <Flex px='25px' justify='space-between' mb='20px' align='center'>
               <Text
-color={textColor}
+                color={textColor}
                 fontSize='22px'
                 fontWeight='700'
                 lineHeight='100%'>
                 Emploi du temps des équipess
               </Text>
               <Flex align="center">
-              <Input
+                <Input
                   type="date"
                   value={moment(currentDate).format('YYYY-MM-DD')}
                   onChange={handleDateChange}
                   placeholder="Select date"
-                  mb={4} 
-                  maxW="150px" 
+                  mb={4}
+                  maxW="150px"
                 />
                 <Button onClick={handlePrevious} variant="ghost" size="sm" mr="2">
                   <FaChevronLeft />
@@ -328,7 +328,7 @@ color={textColor}
               localizer={localizer}
               events={events}
               defaultDate={defaultDate}
-              date={currentDate} 
+              date={currentDate}
               resources={teams}
               resourceIdAccessor="id"
               resourceTitleAccessor="titel"
@@ -348,7 +348,7 @@ color={textColor}
             />
 
           </Box>
-<Modal isOpen={isAddActionModalOpen} onClose={onCloseAddActionModal}>
+          <Modal isOpen={isAddActionModalOpen} onClose={onCloseAddActionModal}>
             <ModalOverlay />
             <ModalContent>
               <ModalHeader>Ajouter une action</ModalHeader>
