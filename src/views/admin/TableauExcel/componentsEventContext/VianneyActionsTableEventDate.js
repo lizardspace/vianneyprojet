@@ -1,8 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Alert, AlertIcon, AlertDescription, CloseButton } from '@chakra-ui/react';
+import {
+  Button,
+  Alert,
+  AlertIcon,
+  AlertDescription,
+  CloseButton,
+  Box,
+  Heading,
+  VStack,
+  useToken,
+  HStack, 
+  Icon, 
+} from '@chakra-ui/react';
 import { utils, writeFile } from 'xlsx';
 import { supabase } from './../../../../supabaseClient';
-import { FcAddDatabase, FcRightUp2 } from "react-icons/fc";
+import { FcAddDatabase, FcRightUp2, FcCalendar } from "react-icons/fc"; // Make sure FcCalendar is imported
 import { useEvent } from './../../../../EventContext';
 
 const VianneyActionsTableEventDate = () => {
@@ -123,22 +135,25 @@ const [data, setData] = useState([]);
 
 
 
-  return (
-    <Box
-      bg={cardBg}
-      p={4}
-      boxShadow="md"
-      borderRadius="lg"
-      mb={6}
-      mt={6}
-      border="1px solid"
-      borderColor="gray.200"
-    >
-      <VStack spacing={4} align="stretch">
-        <Heading as="h3" size="lg" textAlign="center">
+return (
+  <Box
+    bg={cardBg}
+    p={4}
+    boxShadow="md"
+    borderRadius="lg"
+    mb={6}
+    mt={6}
+    border="1px solid"
+    borderColor="gray.200"
+  >
+    <VStack spacing={4} align="stretch">
+      <HStack justifyContent="center"> {/* Use HStack to align items horizontally */}
+        <Icon as={FcCalendar} w={6} h={6} /> {/* Adjust icon size as needed */}
+        <Heading as="h3" size="lg">
           Calendrier en excel
         </Heading>
-        <div>
+      </HStack>
+      <div>
           <label htmlFor="start-date">Date de début:</label>
           <input type="date" id="start-date" onChange={(e) => setStartDate(e.target.value)} />
           <label htmlFor="end-date">Date de fin:</label>
@@ -154,9 +169,9 @@ const [data, setData] = useState([]);
             </Alert>
           )}
         </div>
-      </VStack>
-    </Box>
-  );
+    </VStack>
+  </Box>
+);
 };
 
 export default VianneyActionsTableEventDate;
