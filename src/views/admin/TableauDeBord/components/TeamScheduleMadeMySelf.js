@@ -208,12 +208,13 @@ const TeamScheduleByMySelf = () => {
     return {
       style: {
         backgroundImage: `linear-gradient(to right, ${baseColor}, ${gradientColor})`,
-        color: '#FF914D', // Set text color to white for better readability
+        color: 'black', // Set text color to white for better readability
         textAlign: 'left', // Center align the text
         display: 'flex', // Use flexbox for alignment
         alignItems: 'left', // Align items vertically center
         justifyContent: 'flex-start', 
         fontSize: '14px',
+        fontWeight: 'bold',
       },
     };
   };
@@ -265,7 +266,7 @@ const TeamScheduleByMySelf = () => {
       whiteSpace="pre-line"   // Allow for line breaks
     >
       <div style={eventStyleGetter(event).style}>
-        <div style={{ color: 'black', fontSize: '10px' }}>
+        <div style={{ color: 'black', fontWeight: 'bold', fontSize: '10px' }}>
           {event.titel}
         </div>
       </div>
