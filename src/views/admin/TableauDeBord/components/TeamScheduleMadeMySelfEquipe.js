@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import {
-  Box, Select, Badge, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
+  Box, Select, Badge, Flex, Card, ChakraProvider, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
 } from '@chakra-ui/react';
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -20,7 +20,11 @@ moment.locale('fr');
 const localizer = momentLocalizer(moment);
 
 const TeamScheduleByMySelfEquipe = () => {
-  const [events, setEvents] = useState([]);
+    const [showSchedule, setShowSchedule] = useState(true); // New state for controlling visibility
+    const toggleScheduleVisibility = () => {
+      setShowSchedule(!showSchedule);
+    };
+const [events, setEvents] = useState([]);
   const [selectedTeam, setSelectedTeam ] = useState([]);
   const { selectedTeamId, teamUUID} = useTeam(); // Get selected team ID from context
 
@@ -40,13 +44,10 @@ const TeamScheduleByMySelfEquipe = () => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const onClose = () => setIsAlertOpen(false);
   const cancelRef = React.useRef();
-  const toast = useToast();
   const [updatedEventName, setUpdatedEventName] = useState('');
   const [updatedEventStart, setUpdatedEventStart] = useState('');
   const [updatedEventEnd, setUpdatedEventEnd] = useState('');
   const [teams, setTeams] = useState([]);
-  const textColor = useColorModeValue("secondaryGray.900", "white");
-
   const { selectedEventId } = useEvent(); // Get selectedEventId from context
 
   const handleEventSelect = (event) => {
@@ -57,81 +58,7 @@ const TeamScheduleByMySelfEquipe = () => {
     setUpdatedEventEnd(moment(event.end).format('YYYY-MM-DDTHH:mm'));
   };
 
-  const deleteEvent = async () => {
-    console.log('Selected event on delete:', selectedEvent); // Log the event when attempting to delete
-
-    if (!selectedEvent || typeof selectedEvent.id === 'undefined') {
-      toast({
-        title: "Error",
-        description: "No event selected or event ID is missing.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    const { error } = await supabase
-      .from('vianney_actions')
-      .delete()
-      .match({ id: selectedEvent.id });
-
-    if (error) {
-      console.log(messages.errorEventDelete); // Log the error message
-      toast({
-        title: "Erreur lors de la suppression de l'événement",
-        description: error.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    } else {
-      console.log(messages.successEventDelete); // Log the success message
-      setEvents(events.filter(event => event.id !== selectedEvent.id));
-      toast({
-        title: "Événement supprimé",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-    onClose();
-  };
-  const updateEvent = async () => {
-    // Validation can be added here for updated event details
-    const { error } = await supabase
-      .from('vianney_actions')
-      .update({
-        action_name: updatedEventName,
-        starting_date: updatedEventStart,
-        ending_date: updatedEventEnd,
-        last_updated: new Date() // update the last updated time
-      })
-      .match({ id: selectedEvent.id });
-
-    if (error) {
-      console.log(messages.errorEventUpdate); // Log the error message
-      toast({
-        title: "Erreur lors de la mise à jour de l'événement",
-        description: error.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    } else {
-      console.log(messages.successEventUpdate); // Log the success message
-      setEvents(events.map(event =>
-        event.id === selectedEvent.id ? { ...event, titel: updatedEventName, start: new Date(updatedEventStart), end: new Date(updatedEventEnd) } : event
-      ));
-      toast({
-        title: "Événement mis à jour",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-    onClose();
-  };
+  
   const fetchTeams = useCallback(async () => {
     const { data, error } = await supabase
       .from('vianney_teams')
@@ -310,20 +237,18 @@ const TeamScheduleByMySelfEquipe = () => {
 
 
   return (
-    <Card
-      direction='column'
-      w='100%'
-      px='0px'
-      overflowX={{ sm: "scroll", lg: "hidden" }}>
+    <Card direction='column' w='100%'  overflowX={{ sm: "scroll", lg: "hidden" }}>
       <Box p={1}>
         <ChakraProvider>
           <Box p={1}>
-            <Flex  justify='space-between'  align='center'>
-            <Badge colorScheme="orange">
-                Emploi du temps de l'équipe
+            <Flex justify='space-between' align='center'>
+              {/* Updated Badge for toggling schedule visibility */}
+              <Badge colorScheme="orange" cursor="pointer" onClick={toggleScheduleVisibility}>
+                {showSchedule ? "Cacher Emploi du Temps" : "Montrer Emploi du Temps"}
               </Badge>
-              <Flex align="center">
-                <Input
+              {showSchedule && (
+                <Flex align="center">
+                  <Input
                   type="date"
                   value={moment(currentDate).format('YYYY-MM-DD')}
                   onChange={handleDateChange}
@@ -342,9 +267,13 @@ const TeamScheduleByMySelfEquipe = () => {
                 </Button>
                 
 
-              </Flex>
+                </Flex>
+              )}
             </Flex>
-            <Calendar
+                        {/* Conditional Rendering based on showSchedule state */}
+                        {showSchedule && (
+              <>
+<Calendar
               localizer={localizer}
               events={events}
               defaultDate={defaultDate}
@@ -366,7 +295,8 @@ const TeamScheduleByMySelfEquipe = () => {
               }}
               toolbar={false}
             />
-
+                </>
+            )}
 
           </Box>
           <Modal isOpen={isAddActionModalOpen} onClose={onCloseAddActionModal}>
@@ -421,14 +351,9 @@ const TeamScheduleByMySelfEquipe = () => {
                 </AlertDialogBody>
                 <AlertDialogFooter>
                   <Button ref={cancelRef} onClick={onClose}>
-                    Annuler
+                    Fermer
                   </Button>
-                  <Button colorScheme="blue" onClick={updateEvent} ml={3}>
-                    Mettre à jour
-                  </Button>
-                  <Button colorScheme="red" onClick={deleteEvent} ml={3}>
-                    Supprimer
-                  </Button>
+                  
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialogOverlay>
