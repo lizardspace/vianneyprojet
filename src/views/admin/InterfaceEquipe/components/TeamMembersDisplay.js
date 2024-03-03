@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTeam } from './../TeamContext';
-import { Box, Text, VStack, Button } from '@chakra-ui/react';
+import { Box, Text, VStack, HStack, Button } from '@chakra-ui/react';
 
 const TeamMembersDisplay = () => {
   const { teamMembers } = useTeam(); // Use the custom hook to access the context
@@ -19,17 +19,24 @@ const TeamMembersDisplay = () => {
         {/* Render leaders with bold heading */}
         {leaders.length > 0 && (
           <>
-            <Text fontWeight="bold" color="green.500">Chefs d'équipe :</Text>
-            {leaders.map((leader, index) => (
-              <Box key={index} >
-                <Text fontWeight="bold">{leader.firstname} {leader.familyname}</Text>
-                {showNonLeaders && leaders.length > 0 && (
-                  <>
+            <HStack>
+              <Text fontWeight="bold" color="green.500">Chefs d'équipe :</Text>
+              {leaders.map((leader, index) => (
+                <Box key={index}>
+                  <Text fontWeight="bold">{leader.firstname} {leader.familyname}</Text>
+                </Box>
+              ))}
+            </HStack>
+            {showNonLeaders && leaders.length > 0 && (
+              <>
+                {leaders.map((leader, index) => (
+                  <Box key={index}>
                     <Text>Email: {leader.mail}</Text>
                     <Text>Téléphone: {leader.phone}</Text>
-                  </>)}
-              </Box>
-            ))}
+                  </Box>
+                ))}
+              </>
+            )}
           </>
         )}
         {/* Render non-leader members with bold heading */}
@@ -37,7 +44,7 @@ const TeamMembersDisplay = () => {
           <>
             <Text fontWeight="bold" color="blue.500">Autres membres d'équipe :</Text>
             {nonLeaders.map((member, index) => (
-              <Box key={index} >
+              <Box key={index}>
                 <Text fontWeight="bold">{member.firstname} {member.familyname}</Text>
                 <Text>Email: {member.mail}</Text>
                 <Text>Téléphone: {member.phone}</Text>
@@ -47,9 +54,9 @@ const TeamMembersDisplay = () => {
         )}
         {leaders.length > 0 && (
           <Box display="flex" justifyContent="flex-end">
-          <Button onClick={() => setShowNonLeaders(!showNonLeaders)} size="sm" colorScheme="blue">
-            {showNonLeaders ? "Masquer les détails de l'équipe" : "Afficher les détails de l'équipe"}
-          </Button>
+            <Button onClick={() => setShowNonLeaders(!showNonLeaders)} size="sm" colorScheme="blue">
+              {showNonLeaders ? "Masquer les détails de l'équipe" : "Afficher les détails de l'équipe"}
+            </Button>
           </Box>
         )}
       </VStack>
