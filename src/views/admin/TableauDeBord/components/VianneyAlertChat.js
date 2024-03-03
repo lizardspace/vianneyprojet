@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Textarea, Image, Tooltip, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useColorModeValue, useToast } from '@chakra-ui/react';
+import { Textarea, Image, Tooltip, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useColorModeValue, useToast, Badge } from '@chakra-ui/react';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
 import Card from "components/card/Card";
 import Menu from "components/menu/MainMenuVianneyAlertChat";
@@ -402,7 +402,7 @@ function VianneyAlertChat() {
               <Alert key={index} status={alertStatus} >
                 <AlertIcon />
                 <Box flex="1">
-                  <Text>{alert.alert_text}</Text>
+                  <Text>{alert.team_name && (<><Badge colorScheme="orange">{alert.team_name}</Badge> dit: </> )} {alert.alert_text}</Text>
                   <Text fontSize="sm" color="gray.500">
                     {new Date(alert.timestamp).toLocaleString()}
                   </Text>
