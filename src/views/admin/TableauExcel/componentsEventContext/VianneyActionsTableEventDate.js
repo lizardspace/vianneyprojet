@@ -49,21 +49,24 @@ const VianneyActionsTableEventDate = () => {
       return;
     }
   
-    // Ensure both start date and end date are selected
     if (!startDate || !endDate) {
       setError('Veuillez sélectionner à la fois la date de début et la date de fin.');
       setIsErrorVisible(true);
       return;
     }
   
-    // Parse the start and end dates for comparison
-    const parsedStartDate = new Date(startDate);
-    const parsedEndDate = new Date(endDate);
+    // Adjust start and end dates to UTC midnight to avoid timezone issues
+    const adjustDateToUTC = (date) => {
+      const localDate = new Date(date);
+      return new Date(Date.UTC(localDate.getFullYear(), localDate.getMonth(), localDate.getDate()));
+    };
   
-    // Filter data based on date range
+    const parsedStartDate = adjustDateToUTC(startDate);
+    const parsedEndDate = adjustDateToUTC(endDate);
+  
     const filteredData = data.filter(({ starting_date, ending_date }) => {
-      const parsedStartingDate = new Date(starting_date);
-      const parsedEndingDate = new Date(ending_date);
+      const parsedStartingDate = adjustDateToUTC(starting_date);
+      const parsedEndingDate = adjustDateToUTC(ending_date);
       return (parsedStartingDate >= parsedStartDate && parsedStartingDate <= parsedEndDate) ||
              (parsedEndingDate >= parsedStartDate && parsedEndingDate <= parsedEndDate);
     });
@@ -74,8 +77,17 @@ const VianneyActionsTableEventDate = () => {
       return;
     }
   
-    // Process and export the filtered data as before
-    const mappedData = filteredData.map(({ created_at, updated_at, last_updated, event_id, id, ...rest }) => rest);
+    const mappedData = filteredData.map(({ created_at, updated_at, last_updated, event_id, id, ...rest }) => {
+      // Adjust dates within each record for export
+      const adjustedData = { ...rest };
+      if (adjustedData.starting_date) {
+        adjustedData.starting_date = adjustDateToUTC(adjustedData.starting_date).toISOString().split('T')[0];
+      }
+      if (adjustedData.ending_date) {
+        adjustedData.ending_date = adjustDateToUTC(adjustedData.ending_date).toISOString().split('T')[0];
+      }
+      return adjustedData;
+    });
   
     const ws = utils.json_to_sheet(mappedData);
     const wb = utils.book_new();
@@ -88,6 +100,7 @@ const VianneyActionsTableEventDate = () => {
       setIsErrorVisible(true);
     }
   };
+  
   
   
   return (
