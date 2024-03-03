@@ -4,8 +4,6 @@ import { useEvent } from '../../../EventContext'; // Import useEvent context
 import {
   Box,
   Badge,
-  Heading,
-  useColorModeValue,
   Alert,
   AlertIcon,
   AlertTitle,
@@ -27,7 +25,6 @@ import TeamScheduleByMySelfEquipe from '../TableauDeBord/components/TeamSchedule
 const InterfaceEquipe = () => {
   const { teamMembers, selectedTeam, setSelectedTeam, teamData, setTeamData } = useTeam();
   const { selectedEventId } = useEvent(); // Get selected event ID from useEvent context
-  const textColor = useColorModeValue('secondaryGray.900', 'white');
   const leaders = teamMembers.filter(member => member.isLeader);
   const [showAlert, setShowAlert] = useState(!selectedTeam);
   const [showDropdown, setShowDropdown] = useState(true);
@@ -112,16 +109,9 @@ const InterfaceEquipe = () => {
       <GpsPosition />
       <VianneyAlertChat />
       <TeamScheduleByMySelfEquipe />
-      <Heading
-        me="auto"
-        color={textColor}
-        fontSize="2xl"
-        fontWeight="700"
-        lineHeight="100%"
-
-      >
+  <Badge colorScheme="orange">
         Radio CB
-      </Heading>
+      </Badge>
       <Box >
         <App />
       </Box>
