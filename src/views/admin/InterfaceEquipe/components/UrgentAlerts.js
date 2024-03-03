@@ -34,7 +34,8 @@ const UrgentAlerts = () => {
   const { selectedTeam } = useTeam(); // Access the selected team from the context
 
   useEffect(() => {
-    async function fetchUrgentAlerts() {
+    // Function to fetch urgent alerts
+    const fetchUrgentAlerts = async () => {
       try {
         let query = supabase.from('vianney_alertes_specifiques').select("*").order('created_at', { ascending: false }).limit(5);
 
@@ -77,12 +78,19 @@ const UrgentAlerts = () => {
       } catch (error) {
         console.error("Error fetching urgent alerts:", error.message);
       }
-    }
+    };
 
+    // Call the fetch function initially
     fetchUrgentAlerts();
+
+    // Set up interval to fetch new alerts every minute
+    const interval = setInterval(fetchUrgentAlerts, 10000); // 10000 milliseconds = 1 minute
+
+    // Clear the interval on component unmount
+    return () => clearInterval(interval);
   }, [selectedEventId, selectedTeam]);
 
-
+  
   const handleToggleReadStatus = async (id, currentStatus) => {
     try {
       const { error } = await supabase
