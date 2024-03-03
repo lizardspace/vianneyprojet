@@ -201,85 +201,80 @@ function VianneyAlertChat() {
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
       const fakeUUID = uuidv4(); // Use UUID v4 to generate a unique user_id for the demo
-
-      if (selectedFile) {
-
-        const fileExtension = selectedFile.name.split('.').pop();
-        const fileName = `${uuidv4()}.${fileExtension}`;
-        const filePath = `${fakeUUID}/${fileName}`;
-
-        try {
-
+  
+      try {
+        let imageUrl = ''; // Initialize imageUrl variable
+  
+        if (selectedFile) {
+          const fileExtension = selectedFile.name.split('.').pop();
+          const fileName = `${uuidv4()}.${fileExtension}`;
+          const filePath = `${fakeUUID}/${fileName}`;
+  
+          // Upload the file if it exists
           let { error: uploadError } = await supabase.storage
             .from('alert-images')
             .upload(filePath, selectedFile, {
               cacheControl: '3600',
               upsert: false,
             });
-
+  
           if (uploadError) {
             throw new Error(`Failed to upload image: ${uploadError.message}`);
           }
-
-
-          const imageUrl = `${supabaseUrl.replace('.co', '.in')}/storage/v1/object/public/alert-images/${filePath}`;
-
-          const { data, error } = await supabase
-            .from('vianney_alert')
-            .insert([
-              {
-                alert_text: newAlertText,
-                user_id: fakeUUID,
-                solved_or_not: alertStatus,
-                details: details,
-                event_id: selectedEventId,
-                image_url: imageUrl,
-              },
-            ]);
-
-          if (error) {
-            throw new Error(`Failed to insert alert: ${error.message}`);
-          }
-
-
-          if (data && data.length > 0) {
-
-            setAlerts([...alerts, { ...data[0], timestamp: new Date().toISOString() }]);
-          } else {
-            console.error('No data returned from the insert operation.');
-          }
-
-          setNewAlertText('');
-          setDetails('');
-          setImageUrl('');
-          setSelectedFile(null);
-          fetchAlerts();
-
-          toast({
-            title: "Alerte ajoutée",
-            description: "Votre alerte a été ajoutée avec succès.",
-            status: "success",
-            duration: 5000,
-            isClosable: true,
-          });
-        } catch (error) {
-          console.error(error.message);
-          toast({
-            title: "Erreur",
-            description: error.message,
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-          });
+  
+          imageUrl = `${supabaseUrl.replace('.co', '.in')}/storage/v1/object/public/alert-images/${filePath}`;
         }
-      } else {
-        console.error('No file selected.');
+  
+        // Insert the alert into the database with or without imageUrl
+        const { data, error } = await supabase
+          .from('vianney_alert')
+          .insert([
+            {
+              alert_text: newAlertText,
+              user_id: fakeUUID,
+              solved_or_not: alertStatus,
+              details: details,
+              event_id: selectedEventId,
+              image_url: imageUrl,
+            },
+          ]);
+  
+        if (error) {
+          throw new Error(`Failed to insert alert: ${error.message}`);
+        }
+  
+        if (data && data.length > 0) {
+          setAlerts([...alerts, { ...data[0], timestamp: new Date().toISOString() }]);
+        } else {
+          console.error('No data returned from the insert operation.');
+        }
+  
+        setNewAlertText('');
+        setDetails('');
+        setImageUrl('');
+        setSelectedFile(null);
+  
+        toast({
+          title: "Alerte ajoutée",
+          description: "Votre alerte a été ajoutée avec succès.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      } catch (error) {
+        console.error(error.message);
+        toast({
+          title: "Erreur",
+          description: error.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
       }
+    } else {
+      console.error('Alert text is required.');
     }
   };
-
-
-
   const textColor = useColorModeValue("secondaryGray.900", "white");
 
 
