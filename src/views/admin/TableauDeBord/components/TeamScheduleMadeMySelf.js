@@ -151,29 +151,64 @@ const TeamScheduleByMySelf = () => {
       const teamsData = await fetchTeams();
       const sortedTeams = teamsData.sort((a, b) => a.titel.localeCompare(b.titel));
       setTeams(sortedTeams);
-
+  
       const { data: eventsData, error } = await supabase
         .from('team_action_view_rendering')
         .select('*');
-
+  
       if (error) {
         console.error('Error fetching events:', error);
       } else {
-        const formattedEvents = eventsData.map(action => ({
-          id: action.action_id,
-          titel: action.action_name,
-          start: new Date(action.starting_date),
-          end: new Date(action.ending_date),
-          resourceId: action.team_id,
-          color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
-        }));
+        const formattedEvents = [];
+  
+        eventsData.forEach(action => {
+          const start = new Date(action.starting_date);
+          const end = new Date(action.ending_date);
+  
+          // Check if the event spans across multiple days
+          if (moment(start).isSame(end, 'day')) {
+            // If the event is on the same day, just add it as it is
+            formattedEvents.push({
+              id: action.action_id,
+              titel: action.action_name,
+              start: start,
+              end: end,
+              resourceId: action.team_id,
+              color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
+            });
+          } else {
+            // If the event spans multiple days, split it into two events
+            const endOfDay = moment(start).endOf('day');
+            const startOfNextDay = moment(endOfDay).add(1, 'second');
+  
+            // First event: from the start time to 23:59:59 on the start date
+            formattedEvents.push({
+              id: action.action_id,
+              titel: action.action_name,
+              start: start,
+              end: endOfDay.toDate(),
+              resourceId: action.team_id,
+              color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
+            });
+  
+            // Second event: from 00:00:01 on the end date to the original end time
+            formattedEvents.push({
+              id: action.action_id,
+              titel: action.action_name,
+              start: startOfNextDay.toDate(),
+              end: end,
+              resourceId: action.team_id,
+              color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
+            });
+          }
+        });
+  
         setEvents(formattedEvents);
       }
     };
-
+  
     fetchData();
-  }, [fetchTeams]); // Now fetchTeams is a dependency
-
+  }, [fetchTeams]); 
 
   function adjustBrightness(col, amount) {
     let usePound = false;
