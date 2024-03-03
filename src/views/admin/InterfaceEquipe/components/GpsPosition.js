@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Alert, AlertIcon, Button } from '@chakra-ui/react';
+import { Box, Alert, AlertIcon, Button, Badge } from '@chakra-ui/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MdPlace } from 'react-icons/md';
@@ -15,7 +15,7 @@ const GpsPosition = () => {
   const { selectedTeam } = useTeam(); // Access the selected team using the hook
   const gpsPosition = useGPSPosition(); // Access the GPS position using the hook
   const [lastUpdateTime, setLastUpdateTime] = useState(null); // Store the last update time
-  const [showTeamAlert, setShowTeamAlert] = useState(true); // State to control the visibility of the team alert
+  const [ setShowTeamAlert] = useState(true); // State to control the visibility of the team alert
   const [mapHeight, setMapHeight] = useState('250px'); // State to control the height of the map container
   const timeoutRef = useRef(null); // Ref for timeout
   const heightTimeoutRef = useRef(null); // Ref for heightTimeout
@@ -63,11 +63,11 @@ const GpsPosition = () => {
   const startTimeout = useCallback(() => {
     timeoutRef.current = setTimeout(() => {
       setShowTeamAlert(false);
-    }, 5000);
+    }, 50000);
 
     heightTimeoutRef.current = setTimeout(() => {
-      setMapHeight('130px');
-    }, 5000);
+      setMapHeight('0px');
+    }, 50000);
   }, []);
 
   useEffect(() => {
@@ -131,10 +131,10 @@ const GpsPosition = () => {
       clearTimeout(timeoutRef.current);
       clearTimeout(heightTimeoutRef.current);
     };
-  }, [gpsPosition, mapInitialized, selectedTeam, lastUpdateTime, startTimeout, timeoutRef, heightTimeoutRef]);
+  }, [gpsPosition, mapInitialized, selectedTeam, lastUpdateTime, startTimeout, timeoutRef, heightTimeoutRef, setShowTeamAlert]);
 
   return (
-    <Box p={4}>
+    <Box >
       {gpsPosition ? null : (
         <Alert status="info" mt={4}>
           <AlertIcon />
@@ -142,20 +142,11 @@ const GpsPosition = () => {
         </Alert>
       )}
 
-      {/* Display team alert only if showTeamAlert is true */}
-      {showTeamAlert && (
-        <Box mb={4}>
-          <Alert status="success">
-            <AlertIcon />
-            Équipe sélectionnée : {selectedTeam}
-          </Alert>
-        </Box>
-      )}
+<Button onClick={restartTimeout} colorScheme="gray.100" ml={2}>
+  <Badge colorScheme="orange">Montrer ma position</Badge> <FcCollect /> {/* Use the FcCollect icon */}
+</Button>
 
-      {/* Button to restart the timeout */}
-      <Button onClick={restartTimeout} colorScheme="gray.100">
-        <FcCollect /> {/* Use the FcCollect icon */}
-      </Button>
+
 
       <div
         id="map"
