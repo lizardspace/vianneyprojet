@@ -15,7 +15,7 @@ const GpsPosition = () => {
   const { selectedTeam } = useTeam(); // Access the selected team using the hook
   const gpsPosition = useGPSPosition(); // Access the GPS position using the hook
   const [lastUpdateTime, setLastUpdateTime] = useState(null); // Store the last update time
-  const [ setShowTeamAlert] = useState(true); // State to control the visibility of the team alert
+  const [showTeamAlert, setShowTeamAlert] = useState(true); // Corrected state declaration
   const [mapHeight, setMapHeight] = useState('250px'); // State to control the height of the map container
   const timeoutRef = useRef(null); // Ref for timeout
   const heightTimeoutRef = useRef(null); // Ref for heightTimeout
