@@ -31,7 +31,7 @@ const InterfaceEquipe = () => {
   const [showApp, setShowApp] = useState(false);
   const toggleAppVisibility = () => {
     setShowApp(!showApp);
-  };  
+  };
 
   useEffect(() => {
     async function fetchTeamData() {
@@ -103,10 +103,10 @@ const InterfaceEquipe = () => {
       {selectedTeam && (
         <Badge colorScheme="green" mb="2">
           L'équipe que vous avez sélectionnée est : {selectedTeam} avec le chef d'équipe : {leaders.map((leader, index) => (
-        <Box key={index}>
-          <Text fontWeight="bold">{leader.firstname} {leader.familyname}</Text>
-        </Box>
-      ))}
+            <Box key={index}>
+              <Text fontWeight="bold">{leader.firstname} {leader.familyname}</Text>
+            </Box>
+          ))}
         </Badge>
       )}
       <TeamMembersDisplay />
@@ -114,13 +114,13 @@ const InterfaceEquipe = () => {
       <VianneyAlertChat />
       <TeamScheduleByMySelfEquipe />
       <Badge colorScheme="orange" onClick={toggleAppVisibility} cursor="pointer" mt={1}>
-         {showApp ? "Cacher" : "Montrer"} Radio CB virtuelle
+        {showApp ? "Cacher" : "Montrer"} Radio CB virtuelle
       </Badge>
       {showApp && (
         <div>
           <App />
         </div>
-        )}
+      )}
     </Box>
   );
 };
