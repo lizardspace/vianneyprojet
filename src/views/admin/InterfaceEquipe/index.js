@@ -112,9 +112,9 @@ const InterfaceEquipe = () => {
   <Badge colorScheme="orange">
         Radio CB
       </Badge>
-      <Box >
+      <div >
         <App />
-      </Box>
+      </div>
     </Box>
   );
 };
