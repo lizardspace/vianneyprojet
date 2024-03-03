@@ -3,6 +3,7 @@ import { Box, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MdPlace } from 'react-icons/md';
+import { FcCollect } from 'react-icons/fc'; // Import the FcCollect icon
 import ReactDOMServer from 'react-dom/server';
 import { useGPSPosition } from './../../../../GPSPositionContext'; // Import the custom hook
 import { useTeam } from './../TeamContext'; // Import the useTeam hook
@@ -53,7 +54,7 @@ const GpsPosition = () => {
   const restartTimeout = () => {
     setShowTeamAlert(true);
     clearTimeout(timeout);
-    setMapHeight('250px');
+setMapHeight('250px');
     clearTimeout(heightTimeout);
     startTimeout();
   };
@@ -120,10 +121,10 @@ const GpsPosition = () => {
         icon: customIcon,
       }).addTo(mapRef.current);
 
-      mapRef.current.setView([latitude, longitude], 16);
+            mapRef.current.setView([latitude, longitude], 16);
     }
 
-    startTimeout();
+        startTimeout();
 
     // Cleanup timeouts
     return () => {
@@ -152,8 +153,8 @@ const GpsPosition = () => {
       )}
 
       {/* Button to restart the timeout */}
-      <Button onClick={restartTimeout} colorScheme="blue">
-        Redémarrer le délai
+      <Button onClick={restartTimeout} colorScheme="gray.100">
+        <FcCollect /> {/* Use the FcCollect icon */}
       </Button>
 
       <div
