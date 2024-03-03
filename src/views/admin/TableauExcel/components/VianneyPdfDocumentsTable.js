@@ -48,7 +48,7 @@ const VianneyPdfDocumentsTable = () => {
   return (
     <div>
       {error && <div>Erreur : {error}</div>} {/* Updated error message for French */}
-      <Button colorScheme="teal" onClick={handleExport}>
+      <Button colorScheme="orange" onClick={handleExport}>
         Exporter vers Excel les documents PDF <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
     </div>

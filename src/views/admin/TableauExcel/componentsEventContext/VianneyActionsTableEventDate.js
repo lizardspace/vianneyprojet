@@ -8,7 +8,6 @@ import {
   Box,
   Heading,
   VStack,
-  useToken,
   HStack, 
   Icon, 
 } from '@chakra-ui/react';
@@ -18,7 +17,7 @@ import { FcAddDatabase, FcRightUp2, FcCalendar } from "react-icons/fc"; // Make 
 import { useEvent } from './../../../../EventContext';
 
 const VianneyActionsTableEventDate = () => {
-  const [cardBg] = useToken('colors', ['white']);
+
 const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
@@ -136,16 +135,16 @@ const [data, setData] = useState([]);
 
 
 return (
-  <Box
-    bg={cardBg}
-    p={4}
-    boxShadow="md"
-    borderRadius="lg"
-    mb={6}
-    mt={6}
-    border="1px solid"
-    borderColor="gray.200"
-  >
+<Box
+  bgGradient="linear(to-r, orange.50, orange.100)" // Adjust the color shades as needed
+  p={4}
+  boxShadow="md"
+  borderRadius="lg"
+  mb={6}
+  mt={6}
+  border="1px solid"
+  borderColor="gray.200"
+>
     <VStack spacing={4} align="stretch">
       <HStack justifyContent="center"> {/* Use HStack to align items horizontally */}
         <Icon as={FcCalendar} w={6} h={6} /> {/* Adjust icon size as needed */}
@@ -158,7 +157,7 @@ return (
           <input type="date" id="start-date" onChange={(e) => setStartDate(e.target.value)} />
           <label htmlFor="end-date">Date de fin:</label>
           <input type="date" id="end-date" onChange={(e) => setEndDate(e.target.value)} />
-          <Button colorScheme="teal" onClick={handleExport}>
+          <Button colorScheme="orange" onClick={handleExport}>
             Exporter vers Excel le calendrier <FcAddDatabase style={{ marginLeft: '8px' }} />
           </Button>
           {error && isErrorVisible && (

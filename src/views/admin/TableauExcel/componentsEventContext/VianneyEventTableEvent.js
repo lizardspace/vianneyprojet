@@ -53,7 +53,7 @@ const VianneyEventTable = () => {
   return (
     <div>
       {error && <div> {error}</div>} {/* Updated error message for French */}
-      <Button colorScheme="teal" onClick={handleExport}>
+      <Button colorScheme="orange" onClick={handleExport}>
          Exporter vers Excel les evenements <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
     </div>

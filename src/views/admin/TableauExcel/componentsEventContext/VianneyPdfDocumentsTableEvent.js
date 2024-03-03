@@ -63,7 +63,7 @@ const VianneyPdfDocumentsTableEvent = () => {
 
   return (
     <div>
-      <Button colorScheme="teal" onClick={handleExport}>
+      <Button colorScheme="orange" onClick={handleExport}>
         Exporter vers Excel les documents PDF <FcAddDatabase style={{ marginLeft: '8px' }} />
       </Button>
       {error && isErrorVisible && (
