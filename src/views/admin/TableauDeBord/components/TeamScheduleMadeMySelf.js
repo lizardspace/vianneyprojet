@@ -265,7 +265,7 @@ const TeamScheduleByMySelf = () => {
       whiteSpace="pre-line"   // Allow for line breaks
     >
       <div style={eventStyleGetter(event).style}>
-        <div style={{ color: 'black', fontSize: '14px' }}>
+        <div style={{ color: 'black', fontSize: '10px' }}>
           {event.titel}
         </div>
       </div>
