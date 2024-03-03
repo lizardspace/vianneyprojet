@@ -6,7 +6,8 @@ import { FcAddDatabase, FcRightUp2 } from "react-icons/fc";
 import { useEvent } from './../../../../EventContext';
 
 const VianneyActionsTableEventDate = () => {
-  const [data, setData] = useState([]);
+  const [cardBg] = useToken('colors', ['white']);
+const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [startDate, setStartDate] = useState(null);
@@ -123,22 +124,38 @@ const VianneyActionsTableEventDate = () => {
 
 
   return (
-    <div>
-      <label htmlFor="start-date">Date de début:</label>
-      <input type="date" id="start-date" onChange={(e) => setStartDate(e.target.value)} />
-      <label htmlFor="end-date">Date de fin:</label>
-      <input type="date" id="end-date" onChange={(e) => setEndDate(e.target.value)} />
-      <Button colorScheme="teal" onClick={handleExport}>
-        Exporter vers Excel les actions <FcAddDatabase style={{ marginLeft: '8px' }} />
-      </Button>
-      {error && isErrorVisible && (
-        <Alert status="info" mt="2" maxW="300px">
-          <AlertDescription>{error}</AlertDescription>
-          <AlertIcon as={FcRightUp2} />
-          <CloseButton onClick={handleCloseError} position="absolute" right="8px" top="8px" />
-        </Alert>
-      )}
-    </div>
+    <Box
+      bg={cardBg}
+      p={4}
+      boxShadow="md"
+      borderRadius="lg"
+      mb={6}
+      mt={6}
+      border="1px solid"
+      borderColor="gray.200"
+    >
+      <VStack spacing={4} align="stretch">
+        <Heading as="h3" size="lg" textAlign="center">
+          Calendrier en excel
+        </Heading>
+        <div>
+          <label htmlFor="start-date">Date de début:</label>
+          <input type="date" id="start-date" onChange={(e) => setStartDate(e.target.value)} />
+          <label htmlFor="end-date">Date de fin:</label>
+          <input type="date" id="end-date" onChange={(e) => setEndDate(e.target.value)} />
+          <Button colorScheme="teal" onClick={handleExport}>
+            Exporter vers Excel le calendrier <FcAddDatabase style={{ marginLeft: '8px' }} />
+          </Button>
+          {error && isErrorVisible && (
+            <Alert status="info" mt="2" maxW="300px">
+              <AlertDescription>{error}</AlertDescription>
+              <AlertIcon as={FcRightUp2} />
+              <CloseButton onClick={handleCloseError} position="absolute" right="8px" top="8px" />
+            </Alert>
+          )}
+        </div>
+      </VStack>
+    </Box>
   );
 };
 
