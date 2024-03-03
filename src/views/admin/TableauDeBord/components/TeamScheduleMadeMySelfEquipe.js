@@ -326,7 +326,7 @@ const TeamScheduleByMySelfEquipe = () => {
                 fontSize='22px'
                 fontWeight='700'
                 lineHeight='100%'>
-                Emploi du temps des équipes
+                Emploi du temps de l'équipe
               </Text>
               <Flex align="center">
                 <Input
