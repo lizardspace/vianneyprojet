@@ -24,7 +24,7 @@ function VianneyAlertChat() {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [alertToDelete, setAlertToDelete] = useState(null);
   const [allowScrolling, setAllowScrolling] = useState(false); 
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState('warning'); 
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
@@ -359,7 +359,6 @@ function VianneyAlertChat() {
           <Box mt={4}>
             <Select placeholder="Sélectionnez le degrès d'urgence" value={alertStatus} onChange={handleStatusChange}>
               <option value="error">Urgence</option>
-              <option value="success">Problème résolu</option>
               <option value="warning">Avertissement</option>
               <option value="info">Information</option>
             </Select>
