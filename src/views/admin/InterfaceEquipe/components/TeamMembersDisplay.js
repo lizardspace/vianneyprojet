@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTeam } from './../TeamContext';
-import { Box, Text, VStack } from '@chakra-ui/react';
+import { Box, Text, VStack, Button } from '@chakra-ui/react';
 
 const TeamMembersDisplay = () => {
   const { teamMembers } = useTeam(); // Use the custom hook to access the context
+
+  const [showNonLeaders, setShowNonLeaders] = useState(false);
 
   if (!teamMembers.length) return null; // Do not render if no team members
 
@@ -21,14 +23,17 @@ const TeamMembersDisplay = () => {
             {leaders.map((leader, index) => (
               <Box key={index} >
                 <Text fontWeight="bold">{leader.firstname} {leader.familyname}</Text>
-                <Text>Email: {leader.mail}</Text>
-                <Text>Téléphone: {leader.phone}</Text>
+                {showNonLeaders && leaders.length > 0 && (
+                  <>
+                    <Text>Email: {leader.mail}</Text>
+                    <Text>Téléphone: {leader.phone}</Text>
+                  </>)}
               </Box>
             ))}
           </>
         )}
         {/* Render non-leader members with bold heading */}
-        {nonLeaders.length > 0 && (
+        {showNonLeaders && leaders.length > 0 && (
           <>
             <Text fontWeight="bold" color="blue.500">Autres membres d'équipe :</Text>
             {nonLeaders.map((member, index) => (
@@ -39,6 +44,11 @@ const TeamMembersDisplay = () => {
               </Box>
             ))}
           </>
+        )}
+        {leaders.length > 0 && (
+          <Button onClick={() => setShowNonLeaders(!showNonLeaders)} size="sm" colorScheme="blue">
+            {showNonLeaders ? "Masquer les détails de l'équipe" : "Afficher les détails de l'équipe"}
+          </Button>
         )}
       </VStack>
     </Box>
