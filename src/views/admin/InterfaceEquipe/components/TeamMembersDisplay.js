@@ -12,10 +12,10 @@ const TeamMembersDisplay = () => {
       <VStack align="stretch">
         {teamMembers.map((member, index) => (
           <Box key={index} p={2}>
+            {member.isLeader && <Text fontWeight="bold" color="green.500">Chef d'équipe: </Text>}
             <Text fontWeight="bold">{member.firstname} {member.familyname}</Text>
             <Text>Email: {member.mail}</Text>
-            <Text>Phone: {member.phone}</Text>
-            {member.isLeader && <Text fontWeight="bold" color="green.500">Chef d'équipe</Text>}
+            <Text>Téléphone: {member.phone}</Text>
           </Box>
         ))}
       </VStack>
