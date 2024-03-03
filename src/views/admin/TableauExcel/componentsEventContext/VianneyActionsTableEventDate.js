@@ -18,25 +18,34 @@ const VianneyActionsTableEventDate = () => {
       if (!selectedEventId) {
         return;
       }
-
+  
       try {
-        const { data: tableData, error } = await supabase
+        const { data: joinedData, error } = await supabase
           .from('vianney_actions')
-          .select('*')
+          .select(`
+            *,
+            vianney_teams:team_to_which_its_attached (name_of_the_team)
+          `)
           .eq('event_id', selectedEventId);
-
+  
         if (error) {
           console.log(error.message); // Log to console instead of showing to the user
         } else {
-          setData(tableData);
+          // Map through the data to replace UUID with team name
+          const tableDataWithTeamNames = joinedData.map(action => ({
+            ...action,
+            team_to_which_its_attached: action.vianney_teams?.name_of_the_team || 'Unknown Team'
+          }));
+          setData(tableDataWithTeamNames);
         }
       } catch (error) {
         console.log(error.message); // Log to console instead
       }
     };
-
+  
     fetchData();
   }, [selectedEventId]);
+  
 
   const handleCloseError = () => {
     setIsErrorVisible(false);
