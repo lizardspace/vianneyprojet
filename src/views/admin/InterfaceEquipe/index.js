@@ -113,7 +113,7 @@ const InterfaceEquipe = () => {
       <GpsPosition />
       <VianneyAlertChat />
       <TeamScheduleByMySelfEquipe />
-      <Badge colorScheme="orange" onClick={toggleAppVisibility} cursor="pointer">
+      <Badge colorScheme="orange" onClick={toggleAppVisibility} cursor="pointer" mt={1}>
          {showApp ? "Cacher" : "Montrer"} Radio CB virtuelle
       </Badge>
       {showApp && (
