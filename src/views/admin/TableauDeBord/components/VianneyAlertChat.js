@@ -344,7 +344,7 @@ function VianneyAlertChat() {
           />
         </Flex>
         {/* Button to toggle the visibility of the add alert form */}
-        <Button onClick={toggleAddAlertForm} mb={4}>
+        <Button size="sm" colorScheme="blue" onClick={toggleAddAlertForm} mb={1}>
           {showAddAlertForm ? 'Cacher le formulaire' : 'Ajouter une alerte'}
         </Button>
         {/* Conditionally render the add alert form based on the state */}
@@ -376,7 +376,7 @@ function VianneyAlertChat() {
               }}
               mt={2}
             />
-            <Button mt={2} colorScheme="blue" onClick={handleSubmit}>
+            <Button size="sm" colorScheme="blue" onClick={handleSubmit} mb={1}>
               Ajouter une alerte
             </Button>
           </Box>

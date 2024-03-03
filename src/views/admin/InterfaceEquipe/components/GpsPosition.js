@@ -15,7 +15,6 @@ const GpsPosition = () => {
   const { selectedTeam } = useTeam(); // Access the selected team using the hook
   const gpsPosition = useGPSPosition(); // Access the GPS position using the hook
   const [lastUpdateTime, setLastUpdateTime] = useState(null); // Store the last update time
-  const [showTeamAlert, setShowTeamAlert] = useState(true); // Corrected state declaration
   const [mapHeight, setMapHeight] = useState('250px'); // State to control the height of the map container
   const timeoutRef = useRef(null); // Ref for timeout
   const heightTimeoutRef = useRef(null); // Ref for heightTimeout
@@ -52,7 +51,6 @@ const GpsPosition = () => {
 
   // Function to reset the timeout and show the team alert
   const restartTimeout = () => {
-    setShowTeamAlert(true);
     clearTimeout(timeoutRef.current);
     setMapHeight('250px');
     clearTimeout(heightTimeoutRef.current);
@@ -60,14 +58,11 @@ const GpsPosition = () => {
   };
 
   const startTimeout = useCallback(() => {
-    timeoutRef.current = setTimeout(() => {
-      setShowTeamAlert(false);
-    }, 50000);
   
     heightTimeoutRef.current = setTimeout(() => {
       setMapHeight('0px');
     }, 50000);
-  }, [setMapHeight, setShowTeamAlert]); 
+  }, [setMapHeight]); 
 
   useEffect(() => {
     if (!gpsPosition) {
@@ -127,10 +122,9 @@ const GpsPosition = () => {
 
     // Cleanup timeouts
     return () => {
-      clearTimeout(timeoutRef.current);
       clearTimeout(heightTimeoutRef.current);
     };
-  }, [gpsPosition, mapInitialized, selectedTeam, lastUpdateTime, startTimeout, timeoutRef, heightTimeoutRef, setShowTeamAlert]);
+  }, [gpsPosition, mapInitialized, selectedTeam, lastUpdateTime, startTimeout, timeoutRef, heightTimeoutRef]);
 
   return (
     <Box >
