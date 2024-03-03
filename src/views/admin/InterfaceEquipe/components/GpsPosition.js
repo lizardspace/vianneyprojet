@@ -15,6 +15,7 @@ const GpsPosition = () => {
   const gpsPosition = useGPSPosition(); // Access the GPS position using the hook
   const [lastUpdateTime, setLastUpdateTime] = useState(null); // Store the last update time
   const [showTeamAlert, setShowTeamAlert] = useState(true); // State to control the visibility of the team alert
+  const [mapHeight, setMapHeight] = useState('250px'); // State to control the height of the map container
 
   // Function to update latitude and longitude coordinates in the database
   const updateCoordinates = async (teamName, latitude, longitude) => {
@@ -105,8 +106,16 @@ const GpsPosition = () => {
       setShowTeamAlert(false);
     }, 5000);
 
-    // Cleanup timeout
-    return () => clearTimeout(timeout);
+    // Toggle map height after 5 seconds
+    const heightTimeout = setTimeout(() => {
+      setMapHeight('130px');
+    }, 5000);
+
+    // Cleanup timeouts
+    return () => {
+      clearTimeout(timeout);
+      clearTimeout(heightTimeout);
+    };
   }, [gpsPosition, mapInitialized, selectedTeam, lastUpdateTime]);
 
   return (
@@ -130,7 +139,7 @@ const GpsPosition = () => {
 
       <div
         id="map"
-        style={{ height: '250px', width: '100%', zIndex: '0' }}
+        style={{ height: mapHeight, width: '100%', zIndex: '0' }}
       ></div>
     </Box>
   );
