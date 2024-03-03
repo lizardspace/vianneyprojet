@@ -21,12 +21,17 @@ function VianneyAlertChat() {
   const [editingAlert, setEditingAlert] = useState(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [alertToDelete, setAlertToDelete] = useState(null);
-  const [allowScrolling, setAllowScrolling] = useState(false);
+  const [allowScrolling, setAllowScrolling] = useState(false); 
   const [filter, setFilter] = useState('all');
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
-  const [isImageEnlarged, setIsImageEnlarged] = useState(false); 
+  const [isImageEnlarged, setIsImageEnlarged] = useState(false);
   const [showUnsolvedAlerts, setShowUnsolvedAlerts] = useState(false);
+  const [showAddAlertForm, setShowAddAlertForm] = useState(false); // State to control the visibility of the add alert form
+
+  const toggleAddAlertForm = () => {
+    setShowAddAlertForm(!showAddAlertForm);
+  };
 
   const openConfirmModal = (alertId) => {
     setAlertToDelete(alertId);
@@ -310,8 +315,8 @@ function VianneyAlertChat() {
       const { data: fileData, error: fileError } = await supabase.storage
         .from('alert-images')
         .upload(`/${fakeUUID}/${uuidv4()}.png`, formData, {
-          cacheControl: '3600', 
-          upsert: false, 
+          cacheControl: '3600',
+          upsert: false,
         });
 
       if (fileError) {
@@ -345,12 +350,52 @@ function VianneyAlertChat() {
             lineHeight='100%'>
             Messages et Alertes
           </Text>
-          <Menu 
-          onFilterSelect={handleFilterSelect} 
-          onAllowScrollingToggle={handleAllowScrollingToggle} 
-          onShowUnsolvedAlertsClick={handleShowUnsolvedAlertsClick} 
+          <Menu
+            onFilterSelect={handleFilterSelect}
+            onAllowScrollingToggle={handleAllowScrollingToggle}
+            onShowUnsolvedAlertsClick={handleShowUnsolvedAlertsClick}
           />
         </Flex>
+        {/* Button to toggle the visibility of the add alert form */}
+        <Button onClick={toggleAddAlertForm} mb={4}>
+          {showAddAlertForm ? 'Cacher le formulaire' : 'Ajouter une alerte'}
+        </Button>
+        {/* Conditionally render the add alert form based on the state */}
+        {showAddAlertForm && (
+          <Box mt={4}>
+            <Select placeholder="Sélectionnez le degrès d'urgence" value={alertStatus} onChange={handleStatusChange}>
+              <option value="error">Urgence</option>
+              <option value="success">Problème résolu</option>
+              <option value="warning">Avertissement</option>
+              <option value="info">Information</option>
+            </Select>
+            <Input
+              placeholder="Tapez votre alerte..."
+              value={newAlertText}
+              onChange={handleInputChange}
+              mt={2}
+            />
+            <Textarea
+              placeholder="Ajoutez des détails ici..."
+              value={details}
+              onChange={handleDetailsChange}
+              mt={2}
+            />
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                setSelectedFile(e.target.files[0]);
+                handleFileChange(e);
+              }}
+              mt={2}
+            />
+            <Button mt={2} colorScheme="blue" onClick={handleSubmit}>
+              Ajouter une alerte
+            </Button>
+          </Box>
+        )}
+
         <VStack
           spacing={4}
           overflowY={allowScrolling ? "scroll" : "hidden"}
@@ -372,8 +417,8 @@ function VianneyAlertChat() {
                     <img
                       src={imageUrl}
                       alt="essai"
-                      style={{ maxHeight: isImageEnlarged ? "auto" : "120px", cursor: "pointer" }} 
-                      onClick={toggleImageSize} 
+                      style={{ maxHeight: isImageEnlarged ? "auto" : "120px", cursor: "pointer" }}
+                      onClick={toggleImageSize}
                     />
                   )}
                   {alert.image_url && (
@@ -393,38 +438,7 @@ function VianneyAlertChat() {
             );
           })}
         </VStack>
-        <Box mt={4}>
-          <Select placeholder="Sélectionnez le degrès d'urgence" value={alertStatus} onChange={handleStatusChange}>
-            <option value="error">Urgence</option>
-            <option value="success">Problème résolu</option>
-            <option value="warning">Avertissement</option>
-            <option value="info">Information</option>
-          </Select>
-          <Input
-            placeholder="Tapez votre alerte..."
-            value={newAlertText}
-            onChange={handleInputChange}
-            mt={2}
-          />
-          <Textarea
-            placeholder="Ajoutez des détails ici..."
-            value={details}
-            onChange={handleDetailsChange}
-            mt={2}
-          />
-          <Input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              setSelectedFile(e.target.files[0]);
-              handleFileChange(e);
-            }}
-            mt={2}
-          />
-          <Button mt={2} colorScheme="blue" onClick={handleSubmit}>
-            Ajouter une alerte
-          </Button>
-        </Box>
+        
         <Modal isOpen={isEditOpen} onClose={closeEditModal}>
           <ModalOverlay />
           <ModalContent>
