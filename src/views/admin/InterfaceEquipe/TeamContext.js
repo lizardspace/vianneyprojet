@@ -8,7 +8,7 @@ export const TeamProvider = ({ children }) => {
     const [selectedTeam, setSelectedTeam] = useState(""); // The selected team
     const [teamData, setTeamData] = useState([]); // To store fetched team data
     const [teamMembers, setTeamMembers] = useState([]);
-    // In TeamContext.js or wherever you have defined your context and provider
+    const [teamUUID, setTeamUUID] = useState(""); // To store the team UUID
 
     useEffect(() => {
         async function fetchSelectedTeamDetails() {
@@ -17,11 +17,16 @@ export const TeamProvider = ({ children }) => {
             try {
                 const { data, error } = await supabase
                     .from('vianney_teams')
-                    .select('team_members')
+                    .select('id, team_members') // Include 'id' in the select query
                     .eq('name_of_the_team', selectedTeam) // Assuming 'name_of_the_team' is what you store in 'selectedTeam'
                     .single(); // Assuming you want to fetch a single record
 
                 if (error) throw error;
+
+                // Assume 'id' is the team UUID
+                if (data && data.id) {
+                    setTeamUUID(data.id); // Set the team UUID
+                }
 
                 // Assume 'team_members' is stored directly as an array in the fetched data
                 if (data && data.team_members) {
@@ -33,16 +38,18 @@ export const TeamProvider = ({ children }) => {
         }
 
         fetchSelectedTeamDetails();
-    }, [selectedTeam, setTeamMembers]); // Add setTeamMembers to your context if it's not already there
+    }, [selectedTeam, setTeamMembers, setTeamUUID]); // Add setTeamUUID to the dependencies array
 
     const value = {
         selectedTeam,
         setSelectedTeam,
         teamData,
         setTeamData,
-        teamMembers, // Add this line
-        setTeamMembers, // And this
-      };
+        teamMembers,
+        setTeamMembers,
+        teamUUID, // Include teamUUID in the context value
+        setTeamUUID,
+    };
 
     return <TeamContext.Provider value={value}>{children}</TeamContext.Provider>;
 };

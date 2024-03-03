@@ -22,7 +22,7 @@ const localizer = momentLocalizer(moment);
 const TeamScheduleByMySelfEquipe = () => {
   const [events, setEvents] = useState([]);
   const [selectedTeam, setSelectedTeam ] = useState([]);
-  const { selectedTeamId} = useTeam(); // Get selected team ID from context
+  const { selectedTeamId, teamUUID, setTeamUUID,} = useTeam(); // Get selected team ID from context
 
   const [inputDate] = useState(moment().format('YYYY-MM-DD')); // Default to today's date
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -359,7 +359,7 @@ const TeamScheduleByMySelfEquipe = () => {
               events={events}
               defaultDate={defaultDate}
               date={currentDate}
-              resources={teams.filter(team => team.id === selectedTeam)} // Filter teams to show only the selected team
+              resources={teams.filter(team => team.id === teamUUID)} // Filter teams to show only the selected team
               resourceIdAccessor="id"
               resourceTitleAccessor="titel"
               formats={formats}
