@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -10,15 +10,15 @@ import { useTeam } from './../TeamContext'; // Import the useTeam hook
 import { supabase } from './../../../../supabaseClient'; // Import Supabase client
 
 const GpsPosition = () => {
-  const mapRef = React.useRef(null);
+  const mapRef = useRef(null);
   const [mapInitialized, setMapInitialized] = useState(false);
   const { selectedTeam } = useTeam(); // Access the selected team using the hook
   const gpsPosition = useGPSPosition(); // Access the GPS position using the hook
   const [lastUpdateTime, setLastUpdateTime] = useState(null); // Store the last update time
   const [showTeamAlert, setShowTeamAlert] = useState(true); // State to control the visibility of the team alert
   const [mapHeight, setMapHeight] = useState('250px'); // State to control the height of the map container
-  let timeout; // Define timeout variable
-  let heightTimeout; // Define heightTimeout variable
+  const timeoutRef = useRef(null); // Ref for timeout
+  const heightTimeoutRef = useRef(null); // Ref for heightTimeout
 
   // Function to update latitude and longitude coordinates in the database
   const updateCoordinates = async (teamName, latitude, longitude) => {
@@ -53,22 +53,22 @@ const GpsPosition = () => {
   // Function to reset the timeout and show the team alert
   const restartTimeout = () => {
     setShowTeamAlert(true);
-    clearTimeout(timeout);
-setMapHeight('250px');
-    clearTimeout(heightTimeout);
+    clearTimeout(timeoutRef.current);
+    setMapHeight('250px');
+    clearTimeout(heightTimeoutRef.current);
     startTimeout();
   };
 
   // Function to start the timeout
-  const startTimeout = () => {
-    timeout = setTimeout(() => {
+  const startTimeout = useCallback(() => {
+    timeoutRef.current = setTimeout(() => {
       setShowTeamAlert(false);
     }, 5000);
 
-    heightTimeout = setTimeout(() => {
+    heightTimeoutRef.current = setTimeout(() => {
       setMapHeight('130px');
     }, 5000);
-  };
+  }, []);
 
   useEffect(() => {
     if (!gpsPosition) {
@@ -121,17 +121,17 @@ setMapHeight('250px');
         icon: customIcon,
       }).addTo(mapRef.current);
 
-            mapRef.current.setView([latitude, longitude], 16);
+      mapRef.current.setView([latitude, longitude], 16);
     }
 
-        startTimeout();
+    startTimeout();
 
     // Cleanup timeouts
     return () => {
-      clearTimeout(timeout);
-      clearTimeout(heightTimeout);
+      clearTimeout(timeoutRef.current);
+      clearTimeout(heightTimeoutRef.current);
     };
-  }, [gpsPosition, mapInitialized, selectedTeam, lastUpdateTime]);
+  }, [gpsPosition, mapInitialized, selectedTeam, lastUpdateTime, startTimeout, timeoutRef, heightTimeoutRef]);
 
   return (
     <Box p={4}>
