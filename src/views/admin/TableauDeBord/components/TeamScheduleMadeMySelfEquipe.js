@@ -244,7 +244,7 @@ const [events, setEvents] = useState([]);
             <Flex justify='space-between' align='center'>
               {/* Updated Badge for toggling schedule visibility */}
               <Badge colorScheme="orange" cursor="pointer" onClick={toggleScheduleVisibility}>
-                {showSchedule ? "Cacher Emploi du Temps" : "Montrer Emploi du Temps"}
+                {showSchedule ? "Cacher" : "Montrer Emploi du Temps"}
               </Badge>
               {showSchedule && (
                 <Flex align="center">
