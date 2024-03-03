@@ -22,7 +22,7 @@ const localizer = momentLocalizer(moment);
 const TeamScheduleByMySelfEquipe = () => {
   const [events, setEvents] = useState([]);
   const [selectedTeam, setSelectedTeam ] = useState([]);
-  const { selectedTeamId, teamUUID, setTeamUUID,} = useTeam(); // Get selected team ID from context
+  const { selectedTeamId, teamUUID} = useTeam(); // Get selected team ID from context
 
   const [inputDate] = useState(moment().format('YYYY-MM-DD')); // Default to today's date
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -344,13 +344,7 @@ const TeamScheduleByMySelfEquipe = () => {
                 <Button onClick={handleNext} variant="ghost" size="sm" ml="2">
                   <FaChevronRight />
                 </Button>
-                <Select value={selectedTeamId} onChange={(e) => setSelectedTeam(e.target.value)}>
-  {teams.map((team) => (
-    <option key={team.id} value={team.id}>
-      {team.titel}
-    </option>
-  ))}
-</Select>
+                
 
               </Flex>
             </Flex>
