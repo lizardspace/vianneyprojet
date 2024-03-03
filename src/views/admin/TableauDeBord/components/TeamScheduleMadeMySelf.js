@@ -351,7 +351,7 @@ const TeamScheduleByMySelf = () => {
               endAccessor="end"
               eventPropGetter={eventStyleGetter}
               messages={messages}
-              style={{ height: 500, color: 'black' }}
+              style={{  color: 'black' }} //height: 500,
               onSelectEvent={handleEventSelect}
               components={{
                 event: CustomEvent, // Use Custom Event Component
