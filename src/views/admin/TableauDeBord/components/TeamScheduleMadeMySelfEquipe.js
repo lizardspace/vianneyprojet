@@ -3,7 +3,6 @@ import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import {
   Box, Select, Text, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
 } from '@chakra-ui/react';
-import { FcPlus } from "react-icons/fc";
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
@@ -291,7 +290,6 @@ const TeamScheduleByMySelfEquipe = () => {
 
 
   const [isAddActionModalOpen, setIsAddActionModalOpen] = useState(false);
-  const onOpenAddActionModal = () => setIsAddActionModalOpen(true);
   const onCloseAddActionModal = () => setIsAddActionModalOpen(false);
 
   const handlePrevious = () => {
