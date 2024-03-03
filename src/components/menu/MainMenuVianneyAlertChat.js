@@ -11,7 +11,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { MdOutlineMoreHoriz } from "react-icons/md";
-import { FcApproval, FcAdvertising, FcBookmark, FcAutomatic } from "react-icons/fc";
+import { FcApproval, FcCancel, FcClock, FcAdvertising, FcBookmark, FcAutomatic } from "react-icons/fc";
 
 
 export default function Banner(props) {
@@ -59,6 +59,10 @@ export default function Banner(props) {
 
   const handleUnsolvedAlertsClick = () => {
     onFilterSelect('warning');
+  };
+
+  const handleUnsolvedAllAlertsClick = () => {
+    onFilterSelect('info');
   };
 
   return (
@@ -150,6 +154,23 @@ export default function Banner(props) {
           </Flex>
         </MenuItem>
         <MenuItem
+          onClick={handleUnsolvedAllAlertsClick}
+          transition='0.2s linear'
+          p='0px'
+          borderRadius='8px'
+          color={textColor}
+          _hover={textHover}
+          _active={{ bg: "transparent" }}
+          _focus={{ bg: "transparent" }}
+          mb='10px'>
+          <Flex align='center'>
+            <Icon as={FcCancel} h='16px' w='16px' me='8px' />
+            <Text fontSize='sm' fontWeight='400'>
+              Afficher les alertes non résolues
+            </Text>
+          </Flex>
+        </MenuItem>
+        <MenuItem
           onClick={handleUnsolvedAlertsClick}
           transition='0.2s linear'
           p='0px'
@@ -160,9 +181,9 @@ export default function Banner(props) {
           _focus={{ bg: "transparent" }}
           mb='10px'>
           <Flex align='center'>
-            <Icon as={FcAutomatic} h='16px' w='16px' me='8px' />
+            <Icon as={FcClock} h='16px' w='16px' me='8px' />
             <Text fontSize='sm' fontWeight='400'>
-              Afficher les alertes non résolues
+              Afficher les 3 dernières alertes non résolues
             </Text>
           </Flex>
         </MenuItem>

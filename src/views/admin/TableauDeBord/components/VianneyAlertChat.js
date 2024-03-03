@@ -279,13 +279,21 @@ function VianneyAlertChat() {
     setFilter(selectedFilter);
   };
 
-  const shouldShowAlert = (alert) => {
+  const shouldShowAlert = (alert, index, allAlerts) => {
     if (filter === 'all') return true;
     if (filter === 'success' && alert.solved_or_not === 'success') return true;
     if (filter === 'error' && alert.solved_or_not === 'error') return true;
-    if (filter === 'warning' && (alert.solved_or_not === 'warning' || alert.solved_or_not === 'error' || alert.solved_or_not === 'info')) return true; // Include 'error' and 'info' status
+    if (filter === 'info' && (alert.solved_or_not === 'warning' || alert.solved_or_not === 'error' || alert.solved_or_not === 'info')) return true;
+    if (filter === 'warning') {
+      // Find the last 3 unresolved alerts (warning, error, info)
+      const unresolvedAlerts = allAlerts.filter(a => ['warning', 'error', 'info'].includes(a.solved_or_not))
+                                         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Sort by timestamp, newest first
+                                         .slice(0, 3); // Take only the last 3 items
+      return unresolvedAlerts.some(unresolvedAlert => unresolvedAlert.id === alert.id); // Check if the current alert is one of the last 3 unresolved
+    }
     return false;
   };
+  
   
 
   const updateImageUrl = (fileUrl) => {
@@ -403,7 +411,7 @@ function VianneyAlertChat() {
                     <img
                       src={imageUrl}
                       alt="essai"
-                      style={{ maxHeight: isImageEnlarged ? "auto" : "120px", cursor: "pointer" }}
+                      style={{ maxHeight: isImageEnlarged ? "auto" : "100px", cursor: "pointer" }}
                       onClick={toggleImageSize}
                     />
                   )}
