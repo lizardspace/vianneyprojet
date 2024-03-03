@@ -14,6 +14,7 @@ const GpsPosition = () => {
   const { selectedTeam } = useTeam(); // Access the selected team using the hook
   const gpsPosition = useGPSPosition(); // Access the GPS position using the hook
   const [lastUpdateTime, setLastUpdateTime] = useState(null); // Store the last update time
+  const [showTeamAlert, setShowTeamAlert] = useState(true); // State to control the visibility of the team alert
 
   // Function to update latitude and longitude coordinates in the database
   const updateCoordinates = async (teamName, latitude, longitude) => {
@@ -98,6 +99,14 @@ const GpsPosition = () => {
 
       mapRef.current.setView([latitude, longitude], 16);
     }
+
+    // Hide the team alert after 5 seconds
+    const timeout = setTimeout(() => {
+      setShowTeamAlert(false);
+    }, 5000);
+
+    // Cleanup timeout
+    return () => clearTimeout(timeout);
   }, [gpsPosition, mapInitialized, selectedTeam, lastUpdateTime]);
 
   return (
@@ -109,12 +118,15 @@ const GpsPosition = () => {
         </Alert>
       )}
 
-      <Box mb={4}>
-        <Alert status="success">
-          <AlertIcon />
-          Équipe sélectionnée : {selectedTeam}
-        </Alert>
-      </Box>
+      {/* Display team alert only if showTeamAlert is true */}
+      {showTeamAlert && (
+        <Box mb={4}>
+          <Alert status="success">
+            <AlertIcon />
+            Équipe sélectionnée : {selectedTeam}
+          </Alert>
+        </Box>
+      )}
 
       <div
         id="map"
