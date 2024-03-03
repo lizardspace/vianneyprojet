@@ -11,7 +11,7 @@ import {
   AlertTitle,
   AlertDescription,
   Select,
-  Button, 
+  Button,
   CloseButton,
   Spacer,
   Text,
@@ -25,7 +25,7 @@ import UrgentAlerts from './components/UrgentAlerts';
 import TeamScheduleByMySelfEquipe from '../TableauDeBord/components/TeamScheduleMadeMySelfEquipe';
 
 const InterfaceEquipe = () => {
-  const {  teamMembers, selectedTeam, setSelectedTeam, teamData, setTeamData } = useTeam();
+  const { teamMembers, selectedTeam, setSelectedTeam, teamData, setTeamData } = useTeam();
   const { selectedEventId } = useEvent(); // Get selected event ID from useEvent context
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const leaders = teamMembers.filter(member => member.isLeader);
@@ -68,7 +68,7 @@ const InterfaceEquipe = () => {
 
   return (
     <Box pt={{ base: '180px', md: '80px', xl: '80px' }}>
-      <UrgentAlerts/>
+      <UrgentAlerts />
       {showAlert && (
         <Alert status="error" mb="4" minHeight="100px">
           <AlertIcon />
@@ -98,22 +98,20 @@ const InterfaceEquipe = () => {
           Afficher le menu déroulant
         </Button>
       )}
-      <Spacer/>
+      <Spacer />
       {selectedTeam && (
         <Badge colorScheme="green" mb="2">
-          L'équipe que vous avez sélectionnée est : {selectedTeam}
+          L'équipe que vous avez sélectionnée est : {selectedTeam} avec le chef d'équipe : {leaders.map((leader, index) => (
+        <Box key={index}>
+          <Text fontWeight="bold">{leader.firstname} {leader.familyname}</Text>
+        </Box>
+      ))}
         </Badge>
       )}
-      <Text fontWeight="bold" color="green.500">Chefs d'équipe :</Text>
-              {leaders.map((leader, index) => (
-                <Box key={index}>
-                  <Text fontWeight="bold">{leader.firstname} {leader.familyname}</Text>
-                </Box>
-              ))}
       <TeamMembersDisplay />
       <GpsPosition />
       <VianneyAlertChat />
-      <TeamScheduleByMySelfEquipe/>
+      <TeamScheduleByMySelfEquipe />
       <Heading
         me="auto"
         color={textColor}
@@ -125,7 +123,7 @@ const InterfaceEquipe = () => {
         Radio CB
       </Heading>
       <Box >
-      <App/>
+        <App />
       </Box>
     </Box>
   );
