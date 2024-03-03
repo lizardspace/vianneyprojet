@@ -59,16 +59,15 @@ const GpsPosition = () => {
     startTimeout();
   };
 
-  // Function to start the timeout
   const startTimeout = useCallback(() => {
     timeoutRef.current = setTimeout(() => {
       setShowTeamAlert(false);
     }, 50000);
-
+  
     heightTimeoutRef.current = setTimeout(() => {
       setMapHeight('0px');
     }, 50000);
-  }, []);
+  }, [setMapHeight, setShowTeamAlert]); 
 
   useEffect(() => {
     if (!gpsPosition) {
