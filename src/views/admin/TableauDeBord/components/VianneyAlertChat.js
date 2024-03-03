@@ -334,17 +334,12 @@ function VianneyAlertChat() {
     <Card
       direction='column'
       w='100%'
-      px='0px'
       overflowX={{ sm: "scroll", lg: "hidden" }}>
-      <Box p={4}>
-        <Flex px='25px' justify='space-between' mb='20px' align='center'>
-          <Text
-            color={textColor}
-            fontSize='22px'
-            fontWeight='700'
-            lineHeight='100%'>
+      <Box>
+        <Flex px='25px' justify='space-between' mb='sm' align='center'>
+        <Badge colorScheme="orange">
             Messages et Alertes
-          </Text>
+          </Badge>
           <Menu
             onFilterSelect={handleFilterSelect}
             onAllowScrollingToggle={handleAllowScrollingToggle}

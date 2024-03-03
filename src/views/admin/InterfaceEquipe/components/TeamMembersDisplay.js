@@ -14,10 +14,10 @@ const TeamMembersDisplay = () => {
   const nonLeaders = teamMembers.filter(member => !member.isLeader);
 
   return (
-    <Box p={5} shadow="md" borderWidth="1px">
+    <Box p={1}  >
       <VStack align="stretch">
         {/* Render leaders with bold heading */}
-        {leaders.length > 0 && (
+        {showNonLeaders && leaders.length > 0 && (
           <>
             <HStack>
               <Text fontWeight="bold" color="green.500">Chefs d'équipe :</Text>
@@ -52,7 +52,7 @@ const TeamMembersDisplay = () => {
             ))}
           </>
         )}
-        {leaders.length > 0 && (
+        { leaders.length > 0 && (
           <Box display="flex" justifyContent="flex-end">
             <Button onClick={() => setShowNonLeaders(!showNonLeaders)} size="sm" colorScheme="blue">
               {showNonLeaders ? "Masquer les détails de l'équipe" : "Afficher les détails de l'équipe"}
