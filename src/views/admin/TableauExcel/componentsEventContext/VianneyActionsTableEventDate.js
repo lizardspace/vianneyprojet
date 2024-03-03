@@ -48,51 +48,61 @@ const VianneyActionsTableEventDate = () => {
       setIsErrorVisible(true);
       return;
     }
-  
+
     if (!startDate || !endDate) {
       setError('Veuillez sélectionner à la fois la date de début et la date de fin.');
       setIsErrorVisible(true);
       return;
     }
-  
+
     // Adjust start and end dates to UTC midnight to avoid timezone issues
     const adjustDateToUTC = (date) => {
       const localDate = new Date(date);
       return new Date(Date.UTC(localDate.getFullYear(), localDate.getMonth(), localDate.getDate()));
     };
-  
+
     const parsedStartDate = adjustDateToUTC(startDate);
     const parsedEndDate = adjustDateToUTC(endDate);
-  
+
     const filteredData = data.filter(({ starting_date, ending_date }) => {
       const parsedStartingDate = adjustDateToUTC(starting_date);
       const parsedEndingDate = adjustDateToUTC(ending_date);
       return (parsedStartingDate >= parsedStartDate && parsedStartingDate <= parsedEndDate) ||
-             (parsedEndingDate >= parsedStartDate && parsedEndingDate <= parsedEndDate);
+        (parsedEndingDate >= parsedStartDate && parsedEndingDate <= parsedEndDate);
     });
-  
+
     if (filteredData.length === 0) {
       setError('Aucune donnée disponible pour la plage de dates spécifiée.');
       setIsErrorVisible(true);
       return;
     }
-  
+    // Function to format datetime in French format with hours and minutes
+    const formatDateTimeFrench = (dateString) => {
+      const date = new Date(dateString);
+      const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false };
+      // Use toLocaleString with 'fr-FR' locale for French formatting
+      return date.toLocaleString('fr-FR', options);
+    };
+
     const mappedData = filteredData.map(({ created_at, updated_at, last_updated, event_id, id, ...rest }) => {
-      // Adjust dates within each record for export
       const adjustedData = { ...rest };
       if (adjustedData.starting_date) {
-        adjustedData.starting_date = adjustDateToUTC(adjustedData.starting_date).toISOString().split('T')[0];
+        adjustedData.starting_date = formatDateTimeFrench(adjustedData.starting_date);
       }
       if (adjustedData.ending_date) {
-        adjustedData.ending_date = adjustDateToUTC(adjustedData.ending_date).toISOString().split('T')[0];
+        adjustedData.ending_date = formatDateTimeFrench(adjustedData.ending_date);
       }
       return adjustedData;
     });
-  
+
+
+
+
+
     const ws = utils.json_to_sheet(mappedData);
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, 'Actions de Vianney');
-  
+
     try {
       await writeFile(wb, 'actions_vianney.xlsx');
     } catch (error) {
@@ -100,9 +110,9 @@ const VianneyActionsTableEventDate = () => {
       setIsErrorVisible(true);
     }
   };
-  
-  
-  
+
+
+
   return (
     <div>
       <label htmlFor="start-date">Date de début:</label>
@@ -120,7 +130,7 @@ const VianneyActionsTableEventDate = () => {
         </Alert>
       )}
     </div>
-  );  
+  );
 };
 
 export default VianneyActionsTableEventDate;
