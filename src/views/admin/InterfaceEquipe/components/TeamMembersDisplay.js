@@ -53,7 +53,7 @@ const TeamMembersDisplay = () => {
           </>
         )}
         { leaders.length > 0 && (
-          <Box display="flex" justifyContent="flex-end">
+          <Box display="flex">
             <Button onClick={() => setShowNonLeaders(!showNonLeaders)} size="sm" colorScheme="blue">
               {showNonLeaders ? "Masquer les détails de l'équipe" : "Afficher les détails de l'équipe"}
             </Button>

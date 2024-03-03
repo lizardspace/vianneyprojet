@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Textarea, Image, Tooltip, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useColorModeValue, useToast, Badge } from '@chakra-ui/react';
+import { Textarea, Image, Tooltip, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useToast, Badge } from '@chakra-ui/react';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
 import Card from "components/card/Card";
 import Menu from "components/menu/MainMenuVianneyAlertChat";
@@ -274,8 +274,6 @@ function VianneyAlertChat() {
       console.error('Alert text is required.');
     }
   };
-  const textColor = useColorModeValue("secondaryGray.900", "white");
-
 
   const handleFilterSelect = (selectedFilter) => {
     setFilter(selectedFilter);
