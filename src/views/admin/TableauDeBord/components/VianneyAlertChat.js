@@ -334,7 +334,7 @@ function VianneyAlertChat() {
       w='100%'
       overflowX={{ sm: "scroll", lg: "hidden" }}>
       <Box>
-        <Flex px='25px' justify='space-between' mb='sm' align='center'>
+        <Flex justify='space-between' mb='sm' align='center'>
         <Badge colorScheme="orange">
             Messages et Alertes
           </Badge>

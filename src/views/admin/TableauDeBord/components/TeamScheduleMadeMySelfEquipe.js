@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import {
-  Box, Select, Text, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
+  Box, Select, Badge, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
 } from '@chakra-ui/react';
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -315,17 +315,13 @@ const TeamScheduleByMySelfEquipe = () => {
       w='100%'
       px='0px'
       overflowX={{ sm: "scroll", lg: "hidden" }}>
-      <Box p={4}>
+      <Box p={1}>
         <ChakraProvider>
-          <Box p={4}>
-            <Flex px='25px' justify='space-between' mb='20px' align='center'>
-              <Text
-                color={textColor}
-                fontSize='22px'
-                fontWeight='700'
-                lineHeight='100%'>
+          <Box p={1}>
+            <Flex  justify='space-between'  align='center'>
+            <Badge colorScheme="orange">
                 Emploi du temps de l'équipe
-              </Text>
+              </Badge>
               <Flex align="center">
                 <Input
                   type="date"
@@ -338,9 +334,9 @@ const TeamScheduleByMySelfEquipe = () => {
                 <Button onClick={handlePrevious} variant="ghost" size="sm" mr="2">
                   <FaChevronLeft />
                 </Button>
-                <Button onClick={handleToday} variant="ghost" size="sm">
+                <Badge colorScheme="orange" onClick={handleToday} variant="ghost" size="sm">
                   Aujourd'hui
-                </Button>
+                </Badge>
                 <Button onClick={handleNext} variant="ghost" size="sm" ml="2">
                   <FaChevronRight />
                 </Button>
@@ -363,7 +359,7 @@ const TeamScheduleByMySelfEquipe = () => {
               endAccessor="end"
               eventPropGetter={eventStyleGetter}
               messages={messages}
-              style={{ height: 500, color: 'black' }}
+              style={{ color: 'black' }}
               onSelectEvent={handleEventSelect}
               components={{
                 event: CustomEvent, // Use Custom Event Component
