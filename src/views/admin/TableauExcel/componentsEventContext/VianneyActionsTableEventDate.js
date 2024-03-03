@@ -49,23 +49,32 @@ const VianneyActionsTableEventDate = () => {
       return;
     }
   
-    // Check if both start date and end date are selected
+    // Ensure both start date and end date are selected
     if (!startDate || !endDate) {
       setError('Veuillez sélectionner à la fois la date de début et la date de fin.');
       setIsErrorVisible(true);
       return;
     }
-
+  
+    // Parse the start and end dates for comparison
+    const parsedStartDate = new Date(startDate);
+    const parsedEndDate = new Date(endDate);
+  
     // Filter data based on date range
-    const filteredData = data.filter(({ date }) => date >= startDate && date <= endDate);
-
+    const filteredData = data.filter(({ starting_date, ending_date }) => {
+      const parsedStartingDate = new Date(starting_date);
+      const parsedEndingDate = new Date(ending_date);
+      return (parsedStartingDate >= parsedStartDate && parsedStartingDate <= parsedEndDate) ||
+             (parsedEndingDate >= parsedStartDate && parsedEndingDate <= parsedEndDate);
+    });
+  
     if (filteredData.length === 0) {
       setError('Aucune donnée disponible pour la plage de dates spécifiée.');
       setIsErrorVisible(true);
       return;
     }
   
-    // Remove unwanted columns (created_at and updated_at)
+    // Process and export the filtered data as before
     const mappedData = filteredData.map(({ created_at, updated_at, last_updated, event_id, id, ...rest }) => rest);
   
     const ws = utils.json_to_sheet(mappedData);
@@ -75,11 +84,11 @@ const VianneyActionsTableEventDate = () => {
     try {
       await writeFile(wb, 'actions_vianney.xlsx');
     } catch (error) {
-      setError('Erreur lors de l\'exportation vers Excel : ' + error.message);
-    } finally {
+      setError(`Erreur lors de l'exportation vers Excel : ${error.message}`);
       setIsErrorVisible(true);
     }
   };
+  
   
   return (
     <div>
