@@ -285,7 +285,7 @@ function VianneyAlertChat() {
     if (filter === 'all') return true;
     if (filter === 'success' && alert.solved_or_not === 'success') return true;
     if (filter === 'error' && alert.solved_or_not === 'error') return true;
-    if (filter === 'warning' && alert.solved_or_not === 'warning') return true; // New condition to show unsolved alerts
+    if (filter === 'warning' && (alert.solved_or_not === 'warning' || alert.solved_or_not === 'error' || alert.solved_or_not === 'info')) return true; // Include 'error' and 'info' status
     return false;
   };
   
