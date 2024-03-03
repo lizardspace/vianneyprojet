@@ -146,33 +146,77 @@ const TeamScheduleByMySelf = () => {
     }));
   }, [selectedEventId]); // Add dependencies here, if any
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const teamsData = await fetchTeams();
+// Utility function to split an event into daily segments
+const splitEventByDay = (event) => {
+  const start = moment(event.start);
+  const end = moment(event.end);
+  const daysDiff = end.diff(start, 'days');
+  let events = [];
+
+  for (let i = 0; i <= daysDiff; i++) {
+    let dailyStart = moment(start).add(i, 'days').startOf('day');
+    let dailyEnd = moment(start).add(i, 'days').endOf('day');
+
+    if (i === 0) {
+      // First day
+      dailyStart = start;
+    }
+    if (i === daysDiff) {
+      // Last day
+      dailyEnd = end;
+    }
+    events.push({
+      ...event, // Copy original event properties
+      start: dailyStart.toDate(),
+      end: dailyEnd.toDate(),
+    });
+  }
+  return events;
+};
+
+// Function to process all events and split multi-day events
+const processEvents = (originalEvents) => {
+  let processedEvents = [];
+  originalEvents.forEach(event => {
+    if (moment(event.end).diff(moment(event.start), 'days') > 0) {
+      // If the event spans multiple days, split it
+      let splitEvents = splitEventByDay(event);
+      processedEvents.push(...splitEvents);
+    } else {
+      // Single day event, add as is
+      processedEvents.push(event);
+    }
+  });
+  return processedEvents;
+};
+
+// Replace your event fetching logic in useEffect with something like this:
+useEffect(() => {
+  const fetchData = async () => {
+    const teamsData = await fetchTeams();
       const sortedTeams = teamsData.sort((a, b) => a.titel.localeCompare(b.titel));
       setTeams(sortedTeams);
 
       const { data: eventsData, error } = await supabase
         .from('team_action_view_rendering')
         .select('*');
+    
+    if (!error) {
+      // Instead of directly setting events, process them first
+      const formattedEvents = processEvents(eventsData.map(action => ({
+        id: action.action_id,
+        title: action.action_name,
+        start: new Date(action.starting_date),
+        end: new Date(action.ending_date),
+        resourceId: action.team_id,
+        color: teams.find(t => t.id === action.team_id)?.color || 'lightgrey'
+      })));
+      setEvents(formattedEvents);
+    }
+  };
+  fetchData();
+}, [fetchTeams, processEvents, teams]); // Make sure to include all necessary dependencies
 
-      if (error) {
-        console.error('Error fetching events:', error);
-      } else {
-        const formattedEvents = eventsData.map(action => ({
-          id: action.action_id,
-          titel: action.action_name,
-          start: new Date(action.starting_date),
-          end: new Date(action.ending_date),
-          resourceId: action.team_id,
-          color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
-        }));
-        setEvents(formattedEvents);
-      }
-    };
-
-    fetchData();
-  }, [fetchTeams]); // Now fetchTeams is a dependency
 
 
   function adjustBrightness(col, amount) {
