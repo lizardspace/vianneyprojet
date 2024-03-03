@@ -58,7 +58,7 @@ export default function Banner(props) {
   };
 
   const handleUnsolvedAlertsClick = () => {
-    onShowUnsolvedAlertsClick();
+    onFilterSelect('warning');
   };
 
   return (

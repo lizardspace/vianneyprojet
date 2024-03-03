@@ -28,7 +28,6 @@ function VianneyAlertChat() {
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
-  const [showUnsolvedAlerts, setShowUnsolvedAlerts] = useState(false);
   const [showAddAlertForm, setShowAddAlertForm] = useState(false); // State to control the visibility of the add alert form
 
   const toggleAddAlertForm = () => {
@@ -48,9 +47,6 @@ function VianneyAlertChat() {
     setAllowScrolling(!allowScrolling);
   };
 
-  const handleShowUnsolvedAlertsClick = () => {
-    setShowUnsolvedAlerts(true);
-  };
 
   const openEditModal = (alert) => {
     setEditingAlert(alert);
@@ -289,9 +285,10 @@ function VianneyAlertChat() {
     if (filter === 'all') return true;
     if (filter === 'success' && alert.solved_or_not === 'success') return true;
     if (filter === 'error' && alert.solved_or_not === 'error') return true;
-    if (showUnsolvedAlerts && alert.solved_or_not !== 'success') return true; // New condition to show unsolved alerts
+    if (filter === 'warning' && alert.solved_or_not === 'warning') return true; // New condition to show unsolved alerts
     return false;
   };
+  
 
   const updateImageUrl = (fileUrl) => {
     const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
@@ -351,7 +348,6 @@ function VianneyAlertChat() {
           <Menu
             onFilterSelect={handleFilterSelect}
             onAllowScrollingToggle={handleAllowScrollingToggle}
-            onShowUnsolvedAlertsClick={handleShowUnsolvedAlertsClick}
           />
         </Flex>
         {/* Button to toggle the visibility of the add alert form */}
