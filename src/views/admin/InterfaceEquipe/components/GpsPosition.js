@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Alert, AlertIcon } from '@chakra-ui/react';
+import { Box, Alert, AlertIcon, Button } from '@chakra-ui/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MdPlace } from 'react-icons/md';
@@ -16,6 +16,8 @@ const GpsPosition = () => {
   const [lastUpdateTime, setLastUpdateTime] = useState(null); // Store the last update time
   const [showTeamAlert, setShowTeamAlert] = useState(true); // State to control the visibility of the team alert
   const [mapHeight, setMapHeight] = useState('250px'); // State to control the height of the map container
+  let timeout; // Define timeout variable
+  let heightTimeout; // Define heightTimeout variable
 
   // Function to update latitude and longitude coordinates in the database
   const updateCoordinates = async (teamName, latitude, longitude) => {
@@ -45,6 +47,26 @@ const GpsPosition = () => {
       iconAnchor: [15, 30],
       popupAnchor: [0, -50],
     });
+  };
+
+  // Function to reset the timeout and show the team alert
+  const restartTimeout = () => {
+    setShowTeamAlert(true);
+    clearTimeout(timeout);
+    setMapHeight('250px');
+    clearTimeout(heightTimeout);
+    startTimeout();
+  };
+
+  // Function to start the timeout
+  const startTimeout = () => {
+    timeout = setTimeout(() => {
+      setShowTeamAlert(false);
+    }, 5000);
+
+    heightTimeout = setTimeout(() => {
+      setMapHeight('130px');
+    }, 5000);
   };
 
   useEffect(() => {
@@ -101,15 +123,7 @@ const GpsPosition = () => {
       mapRef.current.setView([latitude, longitude], 16);
     }
 
-    // Hide the team alert after 5 seconds
-    const timeout = setTimeout(() => {
-      setShowTeamAlert(false);
-    }, 5000);
-
-    // Toggle map height after 5 seconds
-    const heightTimeout = setTimeout(() => {
-      setMapHeight('130px');
-    }, 5000);
+    startTimeout();
 
     // Cleanup timeouts
     return () => {
@@ -136,6 +150,11 @@ const GpsPosition = () => {
           </Alert>
         </Box>
       )}
+
+      {/* Button to restart the timeout */}
+      <Button onClick={restartTimeout} colorScheme="blue">
+        Redémarrer le délai
+      </Button>
 
       <div
         id="map"
