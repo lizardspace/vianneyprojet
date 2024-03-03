@@ -50,6 +50,11 @@ const AlertForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            // Check if teamsId is empty
+            if (!teamsId) {
+                throw new Error("ID des Équipes ne peut pas être vide."); // Error message in French
+            }
+    
             const {  error } = await supabase
                 .from('vianney_alertes_specifiques')
                 .insert([
@@ -72,7 +77,7 @@ const AlertForm = () => {
             setReadOrNot(false);
             // Show success toast
             toast({
-                title: "Alert created.",
+                title: "Alerte créée.",
                 status: "success",
                 duration: 3000,
                 isClosable: true,
@@ -80,14 +85,14 @@ const AlertForm = () => {
         } catch (error) {
             // Show error toast
             toast({
-                title: "An error occurred.",
+                title: "Une erreur est survenue.",
                 description: error.message,
                 status: "error",
                 duration: 3000,
                 isClosable: true,
             });
         }
-    };    
+    };         
 
     return (
                     <form onSubmit={handleSubmit}>
@@ -113,14 +118,6 @@ const AlertForm = () => {
                                 </option>
                             ))}
                         </Select>
-                    </FormControl>
-                    <FormControl>
-                        <Checkbox
-                            isChecked={readOrNot}
-                            onChange={(e) => setReadOrNot(e.target.checked)}
-                        >
-                            Lu ou Non lu
-                        </Checkbox> {/* Translate UI elements to French */}
                     </FormControl>
                     <Button type="submit" colorScheme="blue">
                         Soumettre
