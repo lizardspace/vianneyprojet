@@ -46,7 +46,7 @@ export default function Footer() {
           <Link
             fontWeight='500'
             color={textColor}
-            href='https://monpadessai.my.canva.site/instruction-pour-les-utilisateur'>
+            href='https://monpadessai.my.canva.site/tracer-sa-position'>
             Blog
           </Link>
         </ListItem>
