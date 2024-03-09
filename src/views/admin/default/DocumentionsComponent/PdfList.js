@@ -14,6 +14,7 @@ import {
   TagCloseButton,
   FormLabel,
   FormControl,
+  Checkbox, // Import Checkbox from Chakra UI
 } from '@chakra-ui/react';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { useEvent } from '../../../../EventContext';
@@ -23,6 +24,7 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
   const [pdfDocuments, setPdfDocuments] = useState([]);
   const [teams, setTeams] = useState([]);
   const [selectedTeams, setSelectedTeams] = useState([]);
+  const [selectAllTeams, setSelectAllTeams] = useState(false); // State for selecting all teams
   const { eventId } = useEvent();
 
   // Fetch teams
@@ -121,6 +123,16 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
     }
   };
 
+  // Handler for selecting all teams at once
+  const handleSelectAllTeamsChange = (event) => {
+    setSelectAllTeams(event.target.checked);
+    if (event.target.checked) {
+      setSelectedTeams(teams.map(team => team.id));
+    } else {
+      setSelectedTeams([]);
+    }
+  };
+
   return (
     <VStack spacing={4} alignItems="stretch">
       {selectedPdf ? (
@@ -153,6 +165,10 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
           </Center>
           <FormControl mt={4}>
             <FormLabel>Équipes pouvant lire le document</FormLabel>
+            {/* Checkbox to select all teams */}
+            <Checkbox isChecked={selectAllTeams} onChange={handleSelectAllTeamsChange}>
+              Sélectionner toutes les équipes
+            </Checkbox>
             <Select
               placeholder="Sélectionnez une équipe"
               onChange={handleTeamSelectChange}
