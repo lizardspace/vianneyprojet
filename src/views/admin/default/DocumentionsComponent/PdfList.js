@@ -14,7 +14,9 @@ import {
   TagCloseButton,
   FormLabel,
   FormControl,
-  Checkbox, // Import Checkbox from Chakra UI
+  Checkbox,
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { useEvent } from '../../../../EventContext';
@@ -24,6 +26,9 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
   const [pdfDocuments, setPdfDocuments] = useState([]);
   const [teams, setTeams] = useState([]);
   const [selectedTeams, setSelectedTeams] = useState([]);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertStatus, setAlertStatus] = useState('');
   const [selectAllTeams, setSelectAllTeams] = useState(false); // State for selecting all teams
   const { eventId } = useEvent();
 
@@ -100,15 +105,15 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
 
   const handleSaveTeamsForDocument = async (pdfId) => {
     try {
-      const teamsDetails = selectedTeams.map(teamId => {
-        const team = teams.find(t => t.id === teamId);
+      const teamsDetails = selectedTeams.map((teamId) => {
+        const team = teams.find((t) => t.id === teamId);
         return { uuid: team.id, name: team.name_of_the_team };
       });
 
       const { error } = await supabase
         .from('vianney_pdf_documents')
         .update({
-          teams_that_can_read_the_document: teamsDetails
+          teams_that_can_read_the_document: teamsDetails,
         })
         .eq('id', pdfId);
 
@@ -118,8 +123,17 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
       await fetchDocuments();
       // After saving, clear the selected teams
       setSelectedTeams([]);
+
+      // Show success alert
+      setAlertMessage('Équipes sauvegardées avec succès');
+      setAlertStatus('success');
+      setShowAlert(true);
     } catch (error) {
       console.error('Error saving teams for document:', error);
+      // Show error alert
+      setAlertMessage('Une erreur s\'est produite lors de la sauvegarde des équipes');
+      setAlertStatus('error');
+      setShowAlert(true);
     }
   };
 
@@ -135,6 +149,7 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
 
   return (
     <VStack spacing={4} alignItems="stretch">
+
       {selectedPdf ? (
         <Box key={selectedPdf.id} p={4} borderWidth="1px" borderRadius="md">
           <Button
@@ -163,6 +178,12 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
               style={{ border: "none" }}
             />
           </Center>
+          {showAlert && (
+            <Alert status={alertStatus} variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mb={4}>
+              <AlertIcon boxSize="40px" mr={0} />
+              {alertMessage}
+            </Alert>
+          )}
           <FormControl mt={4}>
             <FormLabel>Équipes pouvant lire le document</FormLabel>
             <Checkbox isChecked={selectAllTeams} onChange={handleSelectAllTeamsChange}>
@@ -170,10 +191,10 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
             </Checkbox>
             <Select placeholder="Selectionnez une équipe" onChange={handleTeamSelectChange}
               value={selectedTeams}>
-            {teams.map(team => (
-              <option key={team.id} value={team.id}>{team.name_of_the_team}</option>
-            ))}
-          </Select>
+              {teams.map(team => (
+                <option key={team.id} value={team.id}>{team.name_of_the_team}</option>
+              ))}
+            </Select>
             <HStack spacing={4} mt={2}>
               {selectedTeams.map(teamId => {
                 const team = teams.find(t => t.id === teamId);
