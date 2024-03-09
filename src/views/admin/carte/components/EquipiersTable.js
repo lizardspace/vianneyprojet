@@ -48,16 +48,17 @@ const EquipiersTable = ({ showAll }) => {
 
   const headerStyle = {
     fontSize: '16px',
-    fontWeight: 'normal',
+    fontWeight: 'bold',
     color: useColorModeValue('gray.600', 'gray.200'),
   };
   const headerGradientStyle = {
-    background: 'linear-gradient(to right, #6e8efb, #a777e3)',
+    background: 'linear-gradient(to right, #ff914d, #ff7730)', // Updated to use orange gradient
     color: 'white',
     textTransform: 'none',
-    fontSize: '18px',
+    fontSize: '16px',
     fontWeight: 'bold',
   };
+  
 
   const tableRowStyle = {
     borderBottom: '1px solid',
