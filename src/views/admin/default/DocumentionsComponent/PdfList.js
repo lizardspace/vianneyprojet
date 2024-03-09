@@ -160,7 +160,7 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
               multiple
             >
               {teams.map((team) => (
-                <option key={team.id} value={team.id}>{team.name_of_the_team}</option>
+                <option key={team.id} value={team.id}>{team.name_of_the_team || 'Team Name Not Available'}</option>
               ))}
             </Select>
             <HStack spacing={4} mt={2}>
@@ -168,7 +168,7 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
                 const team = teams.find(t => t.id === teamId);
                 return (
                   <Tag size="lg" key={team.id} borderRadius="full" variant="solid" colorScheme="orange">
-                    <TagLabel>{team.name_of_the_team}</TagLabel>
+                    <TagLabel>{team.name_of_the_team || 'Team Name Not Available'}</TagLabel>
                     <TagCloseButton onClick={() => handleRemoveTeam(team.id)} />
                   </Tag>
                 );
