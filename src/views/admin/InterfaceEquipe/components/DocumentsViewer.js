@@ -1,37 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { Box, VStack, Text } from '@chakra-ui/react';
-import { useTeam } from './../TeamContext'; // Adjust the import path to where your TeamContext is located
+import { useTeam } from './../TeamContext'; // Adjust the import path
 import { supabase } from './../../../../supabaseClient'; // Ensure this path is correct
 
 const DocumentsViewer = () => {
-    const { teamUUID } = useTeam(); // Use the custom hook to access the team context
+    const { teamUUID } = useTeam();
     const [documents, setDocuments] = useState([]);
 
     useEffect(() => {
-        async function fetchDocuments() {
-            if (!teamUUID) {
-                setDocuments([]); // Clear documents if no team is selected
-                return;
-            }
-
+        async function fetchAndFilterDocuments() {
             try {
                 const { data, error } = await supabase
                     .from('vianney_pdf_documents')
-                    .select('*')
-                    .contains('teams_that_can_read_the_document', [teamUUID]); // Use contains to filter by team UUID
+                    .select('*');
 
                 if (error) throw error;
 
-                if (data) {
-                    setDocuments(data);
-                }
+                // Client-side filtering based on the selected teamUUID
+                const filteredDocuments = data.filter(doc =>
+                    doc.teams_that_can_read_the_document.some(team => team.uuid === teamUUID)
+                );
+
+                setDocuments(filteredDocuments);
             } catch (error) {
                 console.error('Error fetching documents:', error);
-                setDocuments([]); // Handle error by clearing documents
+                setDocuments([]);
             }
         }
 
-        fetchDocuments();
+        if (teamUUID) {
+            fetchAndFilterDocuments();
+        } else {
+            setDocuments([]); // Clear documents if no team is selected
+        }
     }, [teamUUID]);
 
     if (!teamUUID) {
@@ -45,7 +46,7 @@ const DocumentsViewer = () => {
                     {documents.map((doc) => (
                         <Box key={doc.id} p={5} shadow="md" borderWidth="1px">
                             <Text>Document Title: {doc.title}</Text>
-                            {/* You can add more document details here */}
+                            {/* More document details */}
                         </Box>
                     ))}
                 </VStack>
