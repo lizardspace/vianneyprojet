@@ -129,7 +129,12 @@ const EquipiersTable = ({ showAll }) => {
           })
         }));
 
-        setEquipiers(teamsWithCurrentActions);
+        // Sort teams to move those with current actions to the top
+        const sortedTeams = teamsWithCurrentActions.sort((a, b) => {
+          return b.vianney_actions.length - a.vianney_actions.length;
+        });
+
+        setEquipiers(sortedTeams);
       } catch (error) {
         console.error('Error fetching equipiers:', error);
       }
@@ -137,6 +142,7 @@ const EquipiersTable = ({ showAll }) => {
 
     fetchEquipiers();
   }, [selectedEventId]);
+
 
   const getLeaderNameAndPhone = (teamMembers) => {
     const leader = teamMembers.find(member => member.isLeader);
@@ -267,7 +273,7 @@ const EquipiersTable = ({ showAll }) => {
               placement="top"
               hasArrow
             >
-              <Badge mx={1} colorScheme="purple" cursor="pointer">
+              <Badge mx={1} colorScheme="green" cursor="pointer">
                 {action.action_name}
               </Badge>
             </Tooltip>
