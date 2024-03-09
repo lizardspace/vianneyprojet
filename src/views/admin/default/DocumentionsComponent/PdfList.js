@@ -98,27 +98,28 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
 
   const handleSaveTeamsForDocument = async (pdfId) => {
     try {
-      const teamsDetails = selectedTeamIds.map(teamId => {
+      const teamsDetails = selectedTeams.map(teamId => {
         const team = teams.find(t => t.id === teamId);
         return { uuid: team.id, name: team.name_of_the_team };
       });
-  
+
       const { error } = await supabase
         .from('vianney_pdf_documents')
         .update({
           teams_that_can_read_the_document: teamsDetails
         })
         .eq('id', pdfId);
-  
+
       if (error) throw error;
-  
+
       // Re-fetch documents to update the UI
       await fetchDocuments();
+      // After saving, clear the selected teams
+      setSelectedTeams([]);
     } catch (error) {
       console.error('Error saving teams for document:', error);
     }
   };
-
 
   return (
     <VStack spacing={4} alignItems="stretch">
@@ -151,35 +152,40 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
             />
           </Center>
           <FormControl mt={4}>
-                <FormLabel>Équipes pouvant lire le document</FormLabel>
-                <Select placeholder="Sélectionnez une équipe" onChange={handleTeamSelectChange}>
-                  {teams.map((team) => (
-                    <option key={team.id} value={team.id}>{team.name_of_the_team}</option>
-                  ))}
-                </Select>
-                <HStack spacing={4} mt={2}>
-                  {selectedTeams.map(teamId => {
-                    const team = teams.find(t => t.id === teamId);
-                    return (
-                      <Tag size="lg" key={team.id} borderRadius="full" variant="solid" colorScheme="orange">
-                        <TagLabel>{team.name_of_the_team}</TagLabel>
-                        <TagCloseButton onClick={() => handleRemoveTeam(team.id)} />
-                      </Tag>
-                    );
-                  })}
-                </HStack>
-                <Button
-                  mt={4}
-                  colorScheme="blue"
-                  onClick={() => handleSaveTeamsForDocument(pdfDocument.id)}
-                >
-                  Sauvegarder les équipes
-                </Button>
-              </FormControl>
+            <FormLabel>Équipes pouvant lire le document</FormLabel>
+            <Select
+              placeholder="Sélectionnez une équipe"
+              onChange={handleTeamSelectChange}
+              value={selectedTeams}
+              multiple
+            >
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>{team.name_of_the_team}</option>
+              ))}
+            </Select>
+            <HStack spacing={4} mt={2}>
+              {selectedTeams.map(teamId => {
+                const team = teams.find(t => t.id === teamId);
+                return (
+                  <Tag size="lg" key={team.id} borderRadius="full" variant="solid" colorScheme="orange">
+                    <TagLabel>{team.name_of_the_team}</TagLabel>
+                    <TagCloseButton onClick={() => handleRemoveTeam(team.id)} />
+                  </Tag>
+                );
+              })}
+            </HStack>
+            <Button
+              mt={4}
+              colorScheme="blue"
+              onClick={() => handleSaveTeamsForDocument(selectedPdf.id)}
+            >
+              Sauvegarder les équipes
+            </Button>
+          </FormControl>
         </Box>
       ) : (
         <VStack spacing={4} alignItems="stretch">
-          <Heading as="h2" size="lg" mb={4}>Documents</Heading>
+          <Heading as="h2" size="lg" mb={4}>Documents PDF</Heading>
           {pdfDocuments.map((pdfDocument) => (
             <Box
               key={pdfDocument.id}
@@ -191,11 +197,13 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
               <Heading as="h3" size="md" my={2}>{pdfDocument.title}</Heading>
               <Text>{pdfDocument.description}</Text>
               <Link href={pdfDocument.file_url} isExternal mt={2} color="blue.500">Voir le PDF</Link>
-              <Button colorScheme="red" size="sm" mt={2} onClick={() => handleDeletePdf(pdfDocument.id)}>Supprimer</Button>
+              <Button colorScheme="red" size="sm" mt={2} onClick={() => handleDeletePdf(pdfDocument.id)}>
+                Supprimer
+              </Button>
               <Button
                 mt={4}
                 colorScheme="blue"
-                onClick={() => setSelectedPdf(pdfDocument)} // Only set selectedPdf when "Edit" button is clicked
+                onClick={() => setSelectedPdf(pdfDocument)}
               >
                 Modifier
               </Button>
