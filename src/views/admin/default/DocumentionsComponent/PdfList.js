@@ -97,9 +97,29 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
     setSelectedTeams(prevSelectedTeams => prevSelectedTeams.filter(id => id !== teamId));
   };
 
-  const handleSaveTeamsForDocument = async (pdfId) => {
-    // ... Save teams for the document
+  const handleSaveTeamsForDocument = async (pdfId, selectedTeamIds) => {
+    try {
+      const teamsDetails = selectedTeamIds.map(teamId => {
+        const team = teams.find(t => t.id === teamId);
+        return { uuid: team.id, name: team.name_of_the_team };
+      });
+  
+      const { error } = await supabase
+        .from('vianney_pdf_documents')
+        .update({
+          teams_that_can_read_the_document: teamsDetails
+        })
+        .eq('id', pdfId);
+  
+      if (error) throw error;
+  
+      // Re-fetch documents to update the UI
+      await fetchDocuments();
+    } catch (error) {
+      console.error('Error saving teams for document:', error);
+    }
   };
+  
 
   return (
     <VStack spacing={4} alignItems="stretch">
@@ -168,13 +188,19 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
               borderWidth="1px"
               borderRadius="md"
               _hover={{ bg: "gray.50", cursor: "pointer" }}
-              onClick={() => setSelectedPdf(pdfDocument)}
+              // Remove the onClick here to avoid setting selectedPdf when clicking on any area of the Box
             >
               <Heading as="h3" size="md" my={2}>{pdfDocument.title}</Heading>
               <Text>{pdfDocument.description}</Text>
               <Link href={pdfDocument.file_url} isExternal mt={2} color="blue.500">Voir le PDF</Link>
               <Button colorScheme="red" size="sm" mt={2} onClick={() => handleDeletePdf(pdfDocument.id)}>Supprimer</Button>
-              
+              <Button
+                mt={4}
+                colorScheme="blue"
+                onClick={() => handleSaveTeamsForDocument(pdfDocument.id, selectedTeams)}
+              >
+                Sauvegarder les équipes
+              </Button>
             </Box>
           ))}
         </VStack>
@@ -182,5 +208,5 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
     </VStack>
   );
 };
-
+  
 export default PdfList;
