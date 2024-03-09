@@ -67,7 +67,7 @@ const DropdownMenu = () => {
         // Reload the page if no event is selected
         window.location.reload();
       }
-    }, 15000); // 10 seconds in milliseconds
+    }, 30000); // 30 seconds in milliseconds
 
     // Clear the interval when the component unmounts
     return () => clearInterval(intervalId);

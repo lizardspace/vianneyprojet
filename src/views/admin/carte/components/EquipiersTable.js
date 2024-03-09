@@ -34,7 +34,7 @@ import { useEvent } from '../../../../EventContext';
 // Initialize Supabase client
 import { supabase } from './../../../../supabaseClient';
 
-const EquipiersTable = ({ showAll}) => {
+const EquipiersTable = ({ showAll }) => {
   const [equipiers, setEquipiers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEquipier, setSelectedEquipier] = useState(null);
@@ -95,7 +95,20 @@ const EquipiersTable = ({ showAll}) => {
   useEffect(() => {
     const fetchEquipiers = async () => {
       try {
-        let query = supabase.from('vianney_teams').select('*').order('name_of_the_team', { ascending: true }); // Order by team name in ascending order
+        let query = supabase
+          .from('vianney_teams')
+          .select(`
+          *,
+          vianney_actions (
+            id,
+            action_name,
+            starting_date,
+            ending_date,
+            action_comment,
+            last_updated
+          )
+        `)
+          .order('name_of_the_team', { ascending: true });
 
         if (selectedEventId) {
           query = query.eq('event_id', selectedEventId);
@@ -227,14 +240,17 @@ const EquipiersTable = ({ showAll}) => {
     <Tr _hover={hoverStyle} onClick={() => onClick(equipier)} style={tableRowStyle}>
       <Td><Avatar size="md" src={equipier.photo_profile_url} style={avatarStyle} /></Td>
       <Td>{equipier.name_of_the_team}</Td>
-      {/* Display leader's name and phone number */}
-      <Td>
-        {/* Use getLeaderNameAndPhone function */}
-        <Text>
-          {getLeaderNameAndPhone(equipier.team_members)}
-        </Text>
-      </Td>
+      <Td>{getLeaderNameAndPhone(equipier.team_members)}</Td>
       <Td>{equipier.mission}</Td>
+      <Td>
+        {equipier.vianney_actions.length > 0 ? (
+          equipier.vianney_actions.map(action => (
+            <Text key={action.id}>{action.action_name}</Text>
+          ))
+        ) : (
+          <Text>No vianney_actions attached actually to this team</Text>
+        )}
+      </Td>
     </Tr>
   );
 
@@ -248,6 +264,7 @@ const EquipiersTable = ({ showAll}) => {
               <Th><Text style={headerStyle}>nom de l'équipe</Text></Th>
               <Th><Text style={headerStyle}>nom du responsable</Text></Th>
               <Th><Text style={headerStyle}>mission</Text></Th>
+              <Th><Text style={headerStyle}>Actions</Text></Th> {/* New column header */}
             </Tr>
           </Thead>
           <Tbody>
