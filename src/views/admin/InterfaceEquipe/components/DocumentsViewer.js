@@ -8,7 +8,7 @@ const DocumentsViewer = () => {
     const [documents, setDocuments] = useState([]);
 
     useEffect(() => {
-        async function fetchAndFilterDocuments() {
+        async function fetchDocuments() {
             try {
                 const { data, error } = await supabase
                     .from('vianney_pdf_documents')
@@ -16,7 +16,7 @@ const DocumentsViewer = () => {
 
                 if (error) throw error;
 
-                // Client-side filtering based on the selected teamUUID
+                // Filter the documents client-side after fetching
                 const filteredDocuments = data.filter(doc =>
                     doc.teams_that_can_read_the_document.some(team => team.uuid === teamUUID)
                 );
@@ -24,15 +24,11 @@ const DocumentsViewer = () => {
                 setDocuments(filteredDocuments);
             } catch (error) {
                 console.error('Error fetching documents:', error);
-                setDocuments([]);
+                setDocuments([]); // Handle error by clearing documents
             }
         }
 
-        if (teamUUID) {
-            fetchAndFilterDocuments();
-        } else {
-            setDocuments([]); // Clear documents if no team is selected
-        }
+        fetchDocuments();
     }, [teamUUID]);
 
     if (!teamUUID) {
