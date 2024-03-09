@@ -95,40 +95,47 @@ const EquipiersTable = ({ showAll }) => {
   useEffect(() => {
     const fetchEquipiers = async () => {
       try {
-        let query = supabase
+        const now = new Date().toISOString();
+  
+        let { data: teams, error: teamsError } = await supabase
           .from('vianney_teams')
           .select(`
-          *,
-          vianney_actions (
-            id,
-            action_name,
-            starting_date,
-            ending_date,
-            action_comment,
-            last_updated
-          )
-        `)
+            *,
+            vianney_actions (
+              id,
+              action_name,
+              starting_date,
+              ending_date,
+              action_comment,
+              last_updated
+            )
+          `)
           .order('name_of_the_team', { ascending: true });
-
-        if (selectedEventId) {
-          query = query.eq('event_id', selectedEventId);
-        }
-
-        const { data, error } = await query;
-
-        if (error) {
-          console.error('Error fetching equipiers:', error);
+  
+        if (teamsError) {
+          console.error('Error fetching equipiers:', teamsError);
           return;
         }
-
-        setEquipiers(data);
+  
+        // Filter actions for each team to only include those happening now
+        const teamsWithCurrentActions = teams.map(team => ({
+          ...team,
+          vianney_actions: team.vianney_actions.filter(action => {
+            const start = new Date(action.starting_date).getTime();
+            const end = new Date(action.ending_date).getTime();
+            const currentTime = new Date(now).getTime();
+            return currentTime >= start && currentTime <= end;
+          })
+        }));
+  
+        setEquipiers(teamsWithCurrentActions);
       } catch (error) {
         console.error('Error fetching equipiers:', error);
       }
     };
-
+  
     fetchEquipiers();
-  }, [selectedEventId]);
+  }, [selectedEventId]);  
 
   const getLeaderNameAndPhone = (teamMembers) => {
     const leader = teamMembers.find(member => member.isLeader);
