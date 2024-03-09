@@ -12,13 +12,17 @@ import {
   FormLabel,
   FormErrorMessage,
   Select,
+  HStack,
+  Tag,
+  TagLabel,
+  TagCloseButton,
 } from "@chakra-ui/react";
 import { FcUpload } from "react-icons/fc";
 import { useEvent } from '../../../../EventContext';
 import { supabase, supabaseUrl } from './../../../../supabaseClient';
 
 const PdfUploader = () => {
-  const { selectedEventId } = useEvent(); 
+  const { selectedEventId } = useEvent();
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const [fileUrl, setFileUrl] = useState("");
@@ -52,8 +56,15 @@ const PdfUploader = () => {
   };
 
   const handleTeamsChange = (event) => {
-    const selectedOptions = [...event.target.options].filter(o => o.selected).map(o => o.value);
-    setSelectedTeams(selectedOptions);
+    const selectedTeamId = event.target.value;
+    if (selectedTeamId && !selectedTeams.find(team => team.id === selectedTeamId)) {
+      const teamToAdd = teams.find(team => team.id === selectedTeamId);
+      setSelectedTeams([...selectedTeams, teamToAdd]);
+    }
+  };
+
+  const removeTeam = (teamId) => {
+    setSelectedTeams(selectedTeams.filter(team => team.id !== teamId));
   };
 
   const handleUpload = async () => {
@@ -129,7 +140,7 @@ const PdfUploader = () => {
         Ajouter un fichier
       </Heading>
       <VStack spacing={4} alignItems="stretch" width="100%">
-      <FormControl pb={5} pt={5} isInvalid={formErrors.file}>
+        <FormControl pb={5} pt={5} isInvalid={formErrors.file}>
           <FormLabel isRequired>Selectionnez un fichier</FormLabel>
           <Input type="file" onChange={handleFileChange} />
           {formErrors.file && (
@@ -162,14 +173,19 @@ const PdfUploader = () => {
         </FormControl>
         <FormControl pb={5} pt={5} isInvalid={formErrors.teams}>
           <FormLabel>Équipes pouvant lire le document</FormLabel>
-          <Select multiple placeholder="Select teams" onChange={handleTeamsChange} value={selectedTeams}>
+          <Select placeholder="Select a team" onChange={handleTeamsChange}>
             {teams.map(team => (
               <option key={team.id} value={team.id}>{team.name_of_the_team}</option>
             ))}
           </Select>
-          {formErrors.teams && (
-            <FormErrorMessage>This field is required</FormErrorMessage>
-          )}
+          <HStack spacing={4} mt={2}>
+            {selectedTeams.map(team => (
+              <Tag size="lg" key={team.id} borderRadius="full" variant="solid" colorScheme="green">
+                <TagLabel>{team.name_of_the_team}</TagLabel>
+                <TagCloseButton onClick={() => removeTeam(team.id)} />
+              </Tag>
+            ))}
+          </HStack>
         </FormControl>
 
         <Button
