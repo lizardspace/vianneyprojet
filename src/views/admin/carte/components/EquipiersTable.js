@@ -22,6 +22,7 @@ import {
   Heading,
   Image,
   Badge,
+  Tooltip,
 } from '@chakra-ui/react';
 import { FcPhone } from "react-icons/fc";
 import L from 'leaflet';
@@ -96,7 +97,7 @@ const EquipiersTable = ({ showAll }) => {
     const fetchEquipiers = async () => {
       try {
         const now = new Date().toISOString();
-  
+
         let { data: teams, error: teamsError } = await supabase
           .from('vianney_teams')
           .select(`
@@ -111,12 +112,12 @@ const EquipiersTable = ({ showAll }) => {
             )
           `)
           .order('name_of_the_team', { ascending: true });
-  
+
         if (teamsError) {
           console.error('Error fetching equipiers:', teamsError);
           return;
         }
-  
+
         // Filter actions for each team to only include those happening now
         const teamsWithCurrentActions = teams.map(team => ({
           ...team,
@@ -127,15 +128,15 @@ const EquipiersTable = ({ showAll }) => {
             return currentTime >= start && currentTime <= end;
           })
         }));
-  
+
         setEquipiers(teamsWithCurrentActions);
       } catch (error) {
         console.error('Error fetching equipiers:', error);
       }
     };
-  
+
     fetchEquipiers();
-  }, [selectedEventId]);  
+  }, [selectedEventId]);
 
   const getLeaderNameAndPhone = (teamMembers) => {
     const leader = teamMembers.find(member => member.isLeader);
@@ -252,10 +253,27 @@ const EquipiersTable = ({ showAll }) => {
       <Td>
         {equipier.vianney_actions.length > 0 ? (
           equipier.vianney_actions.map(action => (
-            <Text key={action.id}>{action.action_name}</Text>
+            <Tooltip
+              key={action.id}
+              label={
+                <Box>
+                  <Text><strong>Nom :</strong> {action.action_name}</Text>
+                  <Text><strong>Début :</strong> {new Date(action.starting_date).toLocaleString()}</Text>
+                  <Text><strong>Fin :</strong> {new Date(action.ending_date).toLocaleString()}</Text>
+                  <Text><strong>Commentaire :</strong> {action.action_comment || 'Aucun commentaire'}</Text>
+                  <Text><strong>Dernière mise à jour :</strong> {new Date(action.last_updated).toLocaleString()}</Text>
+                </Box>
+              }
+              placement="top"
+              hasArrow
+            >
+              <Badge mx={1} colorScheme="purple" cursor="pointer">
+                {action.action_name}
+              </Badge>
+            </Tooltip>
           ))
         ) : (
-          <Text>No vianney_actions attached actually to this team</Text>
+          <Badge colorScheme="red">Inactive</Badge>
         )}
       </Td>
     </Tr>
