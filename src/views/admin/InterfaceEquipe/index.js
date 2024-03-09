@@ -21,6 +21,7 @@ import TeamMembersDisplay from './components/TeamMembersDisplay';
 import App from '../videoChatRoom/App';
 import UrgentAlerts from './components/UrgentAlerts';
 import TeamScheduleByMySelfEquipe from '../TableauDeBord/components/TeamScheduleMadeMySelfEquipe';
+import DocumentsViewer from './components/DocumentsViewer';
 
 const InterfaceEquipe = () => {
   const { teamMembers, selectedTeam, setSelectedTeam, teamData, setTeamData } = useTeam();
@@ -111,6 +112,7 @@ const InterfaceEquipe = () => {
       )}
       <TeamMembersDisplay />
       <GpsPosition />
+      <DocumentsViewer/>
       <VianneyAlertChat />
       <TeamScheduleByMySelfEquipe />
       <Badge colorScheme="orange" onClick={toggleAppVisibility} cursor="pointer" mt={1}>
