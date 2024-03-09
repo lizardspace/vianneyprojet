@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, VStack, Text } from '@chakra-ui/react';
+import { Box, VStack, Text, Image, Link, Badge, Stack } from '@chakra-ui/react';
 import { useTeam } from '../TeamContext'; // Adjust the import path
 import { supabase } from '../../../../supabaseClient'; // Ensure this path is correct
 
@@ -26,7 +26,6 @@ const DocumentsViewer = () => {
                 // Filter the documents client-side after fetching
                 const filteredDocuments = data.filter(doc => {
                     const teams = doc.teams_that_can_read_the_document;
-                    // Check if 'teams' is an array and if it contains an object with the matching 'teamUUID'
                     return Array.isArray(teams) && teams.some(team => team.uuid === teamUUID);
                 });
 
@@ -51,20 +50,43 @@ const DocumentsViewer = () => {
     }
 
     return (
-        <Box>
+        <VStack spacing={5}>
             {documents.length > 0 ? (
-                <VStack spacing={4}>
-                    {documents.map((doc) => (
-                        <Box key={doc.id} p={5} shadow="md" borderWidth="1px">
-                            <Text>Document Title: {doc.title}</Text>
-                            {/* You can add more document details here */}
-                        </Box>
-                    ))}
-                </VStack>
+                documents.map((doc) => (
+                    <Box
+                        key={doc.id}
+                        p={5}
+                        shadow="md"
+                        borderWidth="1px"
+                        borderRadius="md"
+                        bg="gray.50"
+                        width="full"
+                        _hover={{ bg: "gray.100" }}
+                    >
+                        <Stack direction={["column", "row"]} spacing={4} align="center">
+                            <Image
+                                borderRadius="md"
+                                boxSize="100px"
+                                objectFit="cover"
+                                src={doc.file_url}
+                                alt={`Image for ${doc.title}`}
+                                fallbackSrc="https://via.placeholder.com/100"
+                            />
+                            <Box flex="1">
+                            <Badge colorScheme="orange" fontWeight="bold" mt={2}>{doc.title}</Badge>
+                                <Text color="gray.500">{doc.description}</Text>
+                                
+                            </Box>
+                            <Link href={doc.file_url} isExternal color="teal.500">
+                                Ouvrir le document
+                            </Link>
+                        </Stack>
+                    </Box>
+                ))
             ) : (
                 <Text>No documents available for this team.</Text>
             )}
-        </Box>
+        </VStack>
     );
 };
 
