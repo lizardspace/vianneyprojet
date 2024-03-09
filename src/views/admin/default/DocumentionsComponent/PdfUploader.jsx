@@ -16,6 +16,7 @@ import {
   Tag,
   TagLabel,
   TagCloseButton,
+  Checkbox,
 } from "@chakra-ui/react";
 import { FcUpload } from "react-icons/fc";
 import { useEvent } from '../../../../EventContext';
@@ -30,6 +31,7 @@ const PdfUploader = () => {
   const [description, setDescription] = useState("");
   const [teams, setTeams] = useState([]);
   const [selectedTeams, setSelectedTeams] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
   const [formErrors, setFormErrors] = useState({
     file: false,
@@ -55,18 +57,29 @@ const PdfUploader = () => {
     setFileName(selectedFile.name);
   };
 
+  const handleSelectAllChange = (event) => {
+    setSelectAll(event.target.checked);
+    if (event.target.checked) {
+      setSelectedTeams([...teams]);
+    } else {
+      setSelectedTeams([]);
+    }
+  };
+
   const handleTeamsChange = (event) => {
-    const selectedTeamId = event.target.value;
-    if (selectedTeamId && !selectedTeams.find(team => team.id === selectedTeamId)) {
-      const teamToAdd = teams.find(team => team.id === selectedTeamId);
-      setSelectedTeams([...selectedTeams, teamToAdd]);
+    if (!selectAll) {
+      const selectedTeamId = event.target.value;
+      if (selectedTeamId && !selectedTeams.find(team => team.id === selectedTeamId)) {
+        const teamToAdd = teams.find(team => team.id === selectedTeamId);
+        setSelectedTeams([...selectedTeams, teamToAdd]);
+      }
     }
   };
 
   const removeTeam = (teamId) => {
     setSelectedTeams(selectedTeams.filter(team => team.id !== teamId));
+    if (selectAll) setSelectAll(false);
   };
-
   const handleUpload = async () => {
     if (!file || !title || !description) {
       // Update formErrors state accordingly
@@ -79,16 +92,16 @@ const PdfUploader = () => {
       }));
       return;
     }
-  
+
     try {
       const { error: uploadError } = await supabase.storage
         .from("pdfs")
         .upload(fileName, file);
-  
+
       if (uploadError) throw new Error(uploadError.message);
-  
+
       const publicURL = `${supabaseUrl}/storage/v1/object/public/pdfs/${fileName}`;
-  
+
       // Ensure all selectedTeams elements are defined and have an 'id'
       const teamsDetails = selectedTeams.reduce((acc, team) => {
         if (team && team.id) {
@@ -96,20 +109,20 @@ const PdfUploader = () => {
         }
         return acc;
       }, []);
-  
+
       const { error: insertError } = await supabase
         .from("vianney_pdf_documents")
         .insert({
-          event_id: selectedEventId, 
+          event_id: selectedEventId,
           file_name: fileName,
           title,
           description,
           file_url: publicURL,
           teams_that_can_read_the_document: teamsDetails,
         });
-  
+
       if (insertError) throw new Error(insertError.message);
-  
+
       setFileUrl(publicURL);
       // Handle success alert here
     } catch (error) {
@@ -117,7 +130,9 @@ const PdfUploader = () => {
       console.error("Upload error:", error.message);
     }
   };
-  
+
+
+
   return (
     <Box
       display="flex"
@@ -133,14 +148,14 @@ const PdfUploader = () => {
         Ajouter un fichier
       </Heading>
       <VStack spacing={4} alignItems="stretch" width="100%">
-        <FormControl pb={5} pt={5} isInvalid={formErrors.file}>
+        <FormControl pb={3} pt={3} isInvalid={formErrors.file}>
           <FormLabel isRequired>Selectionnez un fichier</FormLabel>
           <Input type="file" onChange={handleFileChange} />
           {formErrors.file && (
             <FormErrorMessage>Ce champ est requis</FormErrorMessage>
           )}
         </FormControl>
-        <FormControl pb={5} pt={5} isInvalid={formErrors.title}>
+        <FormControl pb={3} pt={3} isInvalid={formErrors.title}>
           <FormLabel isRequired>Titre du document</FormLabel>
           <Input
             type="text"
@@ -152,7 +167,7 @@ const PdfUploader = () => {
             <FormErrorMessage>Ce champ est requis</FormErrorMessage>
           )}
         </FormControl>
-        <FormControl pb={5} pt={5} isInvalid={formErrors.description}>
+        <FormControl pb={3} pt={3} isInvalid={formErrors.description}>
           <FormLabel isRequired>Description du document</FormLabel>
           <Input
             type="text"
@@ -164,9 +179,9 @@ const PdfUploader = () => {
             <FormErrorMessage>Ce champ est requis</FormErrorMessage>
           )}
         </FormControl>
-        <FormControl pb={5} pt={5} isInvalid={formErrors.teams}>
+        <FormControl pb={3} pt={3} isInvalid={formErrors.teams}>
           <FormLabel>Équipes pouvant lire le document</FormLabel>
-          <Select placeholder="Select a team" onChange={handleTeamsChange}>
+          <Select placeholder="Selectionnez une équipe" onChange={handleTeamsChange}>
             {teams.map(team => (
               <option key={team.id} value={team.id}>{team.name_of_the_team}</option>
             ))}
@@ -179,6 +194,11 @@ const PdfUploader = () => {
               </Tag>
             ))}
           </HStack>
+        </FormControl>
+        <FormControl pb={1} pt={1}>
+          <Checkbox isChecked={selectAll} onChange={handleSelectAllChange}>
+            Selectionnez toutes
+          </Checkbox>
         </FormControl>
 
         <Button
@@ -193,13 +213,13 @@ const PdfUploader = () => {
           Cliquez pour ajouter le fichier
         </Button>
         {fileUrl && (
-          <Alert status="success" width="100%" pb={5} pt={5}>
+          <Alert status="success" width="100%" pb={3} pt={3}>
             <AlertIcon />
             Le fichier a été téléchargé avec succès!
           </Alert>
         )}
         {errorAlert && (
-          <Alert status="error" width="100%" pb={5} pt={5}>
+          <Alert status="error" width="100%" pb={3} pt={3}>
             <AlertIcon />
             Erreur lors du téléchargement. Veuillez essayer de nouveau.
           </Alert>
