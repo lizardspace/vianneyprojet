@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   VStack,
@@ -23,7 +23,7 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
   const [pdfDocuments, setPdfDocuments] = useState([]);
   const [teams, setTeams] = useState([]);
   const [selectedTeams, setSelectedTeams] = useState([]);
-  const { eventId } = useEvent(); // Extract the eventId from the useEvent hook
+  const { eventId } = useEvent();
 
   // Fetch teams
   useEffect(() => {
@@ -37,9 +37,9 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
   }, []);
 
   // Fetch documents
-  const fetchDocuments = async () => {
+  const fetchDocuments = useCallback(async () => {
     try {
-      const { data: pdfDocumentsData, error } = await supabase
+      const { data, error } = await supabase
         .from('vianney_pdf_documents')
         .select('*')
         .eq('event_id', eventId);
@@ -47,16 +47,15 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
         console.error('Error fetching PDF documents:', error);
         return;
       }
-      setPdfDocuments(pdfDocumentsData);
+      setPdfDocuments(data);
     } catch (error) {
       console.error('Error fetching PDF documents:', error);
     }
-  };
+  }, [eventId]);
 
-  // Call fetchDocuments when the component mounts or eventId changes
   useEffect(() => {
     fetchDocuments();
-  }, [eventId]);
+  }, [fetchDocuments, eventId]);
 
   const handleReturnBack = () => {
     setSelectedPdf(null);
@@ -97,7 +96,7 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
     setSelectedTeams(prevSelectedTeams => prevSelectedTeams.filter(id => id !== teamId));
   };
 
-  const handleSaveTeamsForDocument = async (pdfId, selectedTeamIds) => {
+  const handleSaveTeamsForDocument = async (pdfId) => {
     try {
       const teamsDetails = selectedTeamIds.map(teamId => {
         const team = teams.find(t => t.id === teamId);
@@ -119,7 +118,7 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
       console.error('Error saving teams for document:', error);
     }
   };
-  
+
 
   return (
     <VStack spacing={4} alignItems="stretch">
@@ -187,8 +186,7 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
               p={4}
               borderWidth="1px"
               borderRadius="md"
-              _hover={{ bg: "gray.50", cursor: "pointer" }}
-              // Remove the onClick here to avoid setting selectedPdf when clicking on any area of the Box
+              _hover={{ bg: "gray.50" }}
             >
               <Heading as="h3" size="md" my={2}>{pdfDocument.title}</Heading>
               <Text>{pdfDocument.description}</Text>
@@ -197,9 +195,9 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
               <Button
                 mt={4}
                 colorScheme="blue"
-                onClick={() => handleSaveTeamsForDocument(pdfDocument.id, selectedTeams)}
+                onClick={() => setSelectedPdf(pdfDocument)} // Only set selectedPdf when "Edit" button is clicked
               >
-                Sauvegarder les équipes
+                Modifier
               </Button>
             </Box>
           ))}
@@ -208,5 +206,5 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
     </VStack>
   );
 };
-  
+
 export default PdfList;
