@@ -165,20 +165,15 @@ const PdfList = ({ selectedPdf, setSelectedPdf }) => {
           </Center>
           <FormControl mt={4}>
             <FormLabel>Équipes pouvant lire le document</FormLabel>
-            {/* Checkbox to select all teams */}
             <Checkbox isChecked={selectAllTeams} onChange={handleSelectAllTeamsChange}>
               Sélectionner toutes les équipes
             </Checkbox>
-            <Select
-              placeholder="Sélectionnez une équipe"
-              onChange={handleTeamSelectChange}
-              value={selectedTeams}
-              multiple
-            >
-              {teams.map((team) => (
-                <option key={team.id} value={team.id}>{team.name_of_the_team || 'Team Name Not Available'}</option>
-              ))}
-            </Select>
+            <Select placeholder="Selectionnez une équipe" onChange={handleTeamSelectChange}
+              value={selectedTeams}>
+            {teams.map(team => (
+              <option key={team.id} value={team.id}>{team.name_of_the_team}</option>
+            ))}
+          </Select>
             <HStack spacing={4} mt={2}>
               {selectedTeams.map(teamId => {
                 const team = teams.find(t => t.id === teamId);
