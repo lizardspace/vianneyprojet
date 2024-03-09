@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -11,10 +11,10 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
+  Select,
 } from "@chakra-ui/react";
 import { FcUpload } from "react-icons/fc";
-import { useEvent } from '../../../../EventContext'; 
-
+import { useEvent } from '../../../../EventContext';
 import { supabase, supabaseUrl } from './../../../../supabaseClient';
 
 const PdfUploader = () => {
@@ -24,18 +24,36 @@ const PdfUploader = () => {
   const [fileUrl, setFileUrl] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [ setSuccessAlert] = useState(false);
-  const [errorAlert] = useState(false);
+  const [teams, setTeams] = useState([]);
+  const [selectedTeams, setSelectedTeams] = useState([]);
+  const [errorAlert, setErrorAlert] = useState(false);
   const [formErrors, setFormErrors] = useState({
     file: false,
     title: false,
     description: false,
+    teams: false,
   });
+
+  useEffect(() => {
+    const fetchTeams = async () => {
+      const { data, error } = await supabase.from('vianney_teams').select('id, name_of_the_team');
+      if (!error && data) {
+        setTeams(data);
+      }
+    };
+
+    fetchTeams();
+  }, []);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     setFile(selectedFile);
     setFileName(selectedFile.name);
+  };
+
+  const handleTeamsChange = (event) => {
+    const selectedOptions = [...event.target.options].filter(o => o.selected).map(o => o.value);
+    setSelectedTeams(selectedOptions);
   };
 
   const handleUpload = async () => {
@@ -58,15 +76,20 @@ const PdfUploader = () => {
     }
 
     try {
-      const { error } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("pdfs")
         .upload(fileName, file);
-      if (error) {
 
-        return;
+      if (uploadError) {
+        throw new Error(uploadError.message);
       }
 
       const publicURL = `${supabaseUrl}/storage/v1/object/public/pdfs/${fileName}`;
+
+      const teamsDetails = selectedTeams.map(teamId => {
+        const team = teams.find(t => t.id === teamId);
+        return { uuid: team.id, name: team.name_of_the_team };
+      });
 
       const { error: insertError } = await supabase
         .from("vianney_pdf_documents")
@@ -76,16 +99,18 @@ const PdfUploader = () => {
           title,
           description,
           file_url: publicURL,
+          teams_that_can_read_the_document: teamsDetails,
         });
 
       if (insertError) {
-        return;
+        throw new Error(insertError.message);
       }
 
       setFileUrl(publicURL);
-      setSuccessAlert(true);
+      // Handle success alert
     } catch (error) {
-
+      setErrorAlert(true);
+      console.error("Upload error:", error.message);
     }
   };
 
@@ -104,7 +129,7 @@ const PdfUploader = () => {
         Ajouter un fichier
       </Heading>
       <VStack spacing={4} alignItems="stretch" width="100%">
-        <FormControl pb={5} pt={5} isInvalid={formErrors.file}>
+      <FormControl pb={5} pt={5} isInvalid={formErrors.file}>
           <FormLabel isRequired>Selectionnez un fichier</FormLabel>
           <Input type="file" onChange={handleFileChange} />
           {formErrors.file && (
@@ -135,6 +160,17 @@ const PdfUploader = () => {
             <FormErrorMessage>Ce champ est requis</FormErrorMessage>
           )}
         </FormControl>
+        <FormControl pb={5} pt={5} isInvalid={formErrors.teams}>
+          <FormLabel>Équipes pouvant lire le document</FormLabel>
+          <Select multiple placeholder="Select teams" onChange={handleTeamsChange} value={selectedTeams}>
+            {teams.map(team => (
+              <option key={team.id} value={team.id}>{team.name_of_the_team}</option>
+            ))}
+          </Select>
+          {formErrors.teams && (
+            <FormErrorMessage>This field is required</FormErrorMessage>
+          )}
+        </FormControl>
 
         <Button
           onClick={handleUpload}
@@ -156,8 +192,7 @@ const PdfUploader = () => {
         {errorAlert && (
           <Alert status="error" width="100%" pb={5} pt={5}>
             <AlertIcon />
-            Erreur lors du téléchargement. Attention! Vous ne pouvez
-            télécharger 2 fois le même fichier.
+            Erreur lors du téléchargement. Veuillez essayer de nouveau.
           </Alert>
         )}
       </VStack>
