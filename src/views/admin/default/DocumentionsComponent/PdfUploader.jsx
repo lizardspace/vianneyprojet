@@ -68,40 +68,35 @@ const PdfUploader = () => {
   };
 
   const handleUpload = async () => {
-    if (!file) {
-
-      setFormErrors({ ...formErrors, file: true });
+    if (!file || !title || !description) {
+      // Update formErrors state accordingly
+      // return to prevent further execution
+      setFormErrors(prev => ({
+        ...prev,
+        file: !file,
+        title: !title,
+        description: !description,
+      }));
       return;
     }
-
-    if (!title) {
-
-      setFormErrors({ ...formErrors, title: true });
-      return;
-    }
-
-    if (!description) {
-
-      setFormErrors({ ...formErrors, description: true });
-      return;
-    }
-
+  
     try {
       const { error: uploadError } = await supabase.storage
         .from("pdfs")
         .upload(fileName, file);
-
-      if (uploadError) {
-        throw new Error(uploadError.message);
-      }
-
+  
+      if (uploadError) throw new Error(uploadError.message);
+  
       const publicURL = `${supabaseUrl}/storage/v1/object/public/pdfs/${fileName}`;
-
-      const teamsDetails = selectedTeams.map(teamId => {
-        const team = teams.find(t => t.id === teamId);
-        return { uuid: team.id, name: team.name_of_the_team };
-      });
-
+  
+      // Ensure all selectedTeams elements are defined and have an 'id'
+      const teamsDetails = selectedTeams.reduce((acc, team) => {
+        if (team && team.id) {
+          acc.push({ uuid: team.id, name: team.name_of_the_team });
+        }
+        return acc;
+      }, []);
+  
       const { error: insertError } = await supabase
         .from("vianney_pdf_documents")
         .insert({
@@ -112,19 +107,17 @@ const PdfUploader = () => {
           file_url: publicURL,
           teams_that_can_read_the_document: teamsDetails,
         });
-
-      if (insertError) {
-        throw new Error(insertError.message);
-      }
-
+  
+      if (insertError) throw new Error(insertError.message);
+  
       setFileUrl(publicURL);
-      // Handle success alert
+      // Handle success alert here
     } catch (error) {
       setErrorAlert(true);
       console.error("Upload error:", error.message);
     }
   };
-
+  
   return (
     <Box
       display="flex"
@@ -180,7 +173,7 @@ const PdfUploader = () => {
           </Select>
           <HStack spacing={4} mt={2}>
             {selectedTeams.map(team => (
-              <Tag size="lg" key={team.id} borderRadius="full" variant="solid" colorScheme="green">
+              <Tag size="lg" key={team.id} borderRadius="full" variant="solid" colorScheme="orange">
                 <TagLabel>{team.name_of_the_team}</TagLabel>
                 <TagCloseButton onClick={() => removeTeam(team.id)} />
               </Tag>
@@ -191,7 +184,7 @@ const PdfUploader = () => {
         <Button
           onClick={handleUpload}
           leftIcon={<Icon as={FcUpload} boxSize={5} />}
-          colorScheme="teal"
+          colorScheme="orange"
           alignItems="center"
           justifyContent="center"
           pb={5}
