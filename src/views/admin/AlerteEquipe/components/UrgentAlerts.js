@@ -19,6 +19,8 @@ import {
   FormControl,
   FormLabel,
   FormHelperText,
+  Flex, 
+  Spacer,
 } from "@chakra-ui/react";
 import { MdDeleteForever } from "react-icons/md"; // Import the icon
 import { supabase } from '../../../../supabaseClient';
@@ -153,62 +155,63 @@ async function fetchUrgentAlerts() {
         <Spinner />
       ) : (
         <Stack spacing={4}>
-      {urgentAlerts.map((alert) => (
-        <Alert
-              key={alert.id}
-              status={alert.read_or_not ? "success" : "error"}
-              variant="subtle"
-              flexDirection="column"
-              alignItems="flex-start"
-              justifyContent="center"
-              textAlign="left"
-              position="relative"
-              width="100%"
-              px={6}
-              py={4}
-              pr={14}
-              rounded="md"
-            >
-              <Box display="flex" alignItems="center"> {/* Utilisez une boîte flex pour aligner les éléments sur la même ligne */}
-                <AlertIcon />
-                <Text fontWeight="bold" fontSize="lg">
-                  {alert.text_alert}
-                </Text>
-              </Box>
-              <Stack spacing={2}>
-              <Button
-                  onClick={() =>
-                    handleToggleReadStatus(alert.id, alert.read_or_not)
-                  }
-                  size="sm"
-                  variant="outline"
-                  colorScheme={alert.read_or_not ? "green" : "red"}
-                >
-                  {alert.read_or_not ? "Lu" : "Non lu"}
-                </Button>
-        <Button
-          onClick={() => handleDeleteAlert(alert.id)}
-          size="sm"
-          leftIcon={<MdDeleteForever />}
-          colorScheme="red"
-          variant="solid"
-        >
-          Supprimer
-        </Button>
-      ))}
-      {alert.response && (
-                  <Text fontWeight="bold" fontSize="lg">
-                    Réponse de l'équipe {alert.team_name} : {alert.response}
-                  </Text>
-                )}
-                <Text fontSize="sm" color="gray.500">
-                  Créé le  {format(new Date(alert.created_at), "dd/MM/yyyy à HH:mm")} pour {alert.team_name}
-                </Text>
-
-              </Stack>
-            </Alert>
-          ))}
-        </Stack>
+{urgentAlerts.map((alert) => (
+  <Alert
+    key={alert.id}
+    status={alert.read_or_not ? "success" : "error"}
+    variant="subtle"
+    flexDirection="column"
+    alignItems="flex-start"
+    justifyContent="center"
+    textAlign="left"
+    position="relative"
+    width="100%"
+    px={6}
+    py={4}
+    pr={14}
+    rounded="md"
+  >
+    <Flex direction="column" width="100%">
+      <Box display="flex" alignItems="center">
+        <AlertIcon />
+        <Text fontWeight="bold" fontSize="lg">
+          {alert.text_alert}
+        </Text>
+      </Box>
+      <Stack spacing={2} mt={2}>
+        <Flex direction="row" width="100%">
+          <Button
+            onClick={() => handleToggleReadStatus(alert.id, alert.read_or_not)}
+            size="sm"
+            variant="outline"
+            colorScheme={alert.read_or_not ? "green" : "red"}
+          >
+            {alert.read_or_not ? "Lu" : "Non lu"}
+          </Button>
+          <Spacer /> {/* This pushes the delete button to the right */}
+          <Button
+            onClick={() => handleDeleteAlert(alert.id)}
+            size="sm" 
+            leftIcon={<MdDeleteForever />}
+            colorScheme="red"
+            variant="solid"
+          >
+            Supprimer
+          </Button>
+        </Flex>
+        {alert.response && (
+          <Text fontWeight="bold" fontSize="lg">
+            Réponse de l'équipe {alert.team_name} : {alert.response}
+          </Text>
+        )}
+        <Text fontSize="sm" color="gray.500">
+          Créé le {format(new Date(alert.created_at), "dd/MM/yyyy à HH:mm")} pour {alert.team_name}
+        </Text>
+      </Stack>
+    </Flex>
+  </Alert>
+))}
+</Stack>
       )}
       <Modal isOpen={showResponseForm} onClose={() => setShowResponseForm(false)}>
         <ModalOverlay />
