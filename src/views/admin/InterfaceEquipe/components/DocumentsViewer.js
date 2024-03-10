@@ -42,11 +42,11 @@ const DocumentsViewer = () => {
     }, [teamUUID]);
 
     if (loading) {
-        return <Text>Loading documents...</Text>;
+        return <Text>Chargement des documents...</Text>;
     }
 
     if (!teamUUID) {
-        return <Text>Please select a team to view documents.</Text>;
+        return <Text>Veuillez sélectionner une équipe pour voir les documents.</Text>;
     }
 
     return (
@@ -73,9 +73,8 @@ const DocumentsViewer = () => {
                                 fallbackSrc="https://via.placeholder.com/100"
                             />
                             <Box flex="1">
-                            <Badge colorScheme="orange" fontWeight="bold" mt={2}>{doc.title}</Badge>
+                                <Badge colorScheme="orange" fontWeight="bold" mt={2}>{doc.title}</Badge>
                                 <Text color="gray.500">{doc.description}</Text>
-                                
                             </Box>
                             <Link href={doc.file_url} isExternal color="teal.500">
                                 Ouvrir le document
@@ -84,7 +83,7 @@ const DocumentsViewer = () => {
                     </Box>
                 ))
             ) : (
-                <Text>No documents available for this team.</Text>
+                <Text>Aucun document disponible pour cette équipe.</Text>
             )}
         </VStack>
     );
