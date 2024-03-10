@@ -78,11 +78,10 @@ const DocumentsViewer = () => {
             {documents.map((doc) => (
                 <Box
                     key={doc.id}
-                    p={5}
-                    shadow="md"
-                    borderWidth="1px"
+                    p={3}
+
                     borderRadius="md"
-                    bg="gray.50"
+
                     width="full"
                     _hover={{ bg: "gray.100" }}
                 >
@@ -99,8 +98,8 @@ const DocumentsViewer = () => {
                             <Badge colorScheme="orange" fontWeight="bold" mt={2}>{doc.title}</Badge>
                             <Text color="gray.500">{doc.description}</Text>
                         </Box>
-                        <Link href={doc.file_url} isExternal color="teal.500">
-                            Ouvrir le document
+                        <Link href={doc.file_url} isExternal>
+                            <Badge colorScheme="teal">Ouvrir le document</Badge>
                         </Link>
                     </Stack>
                 </Box>
