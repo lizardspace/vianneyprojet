@@ -79,9 +79,7 @@ const DocumentsViewer = () => {
                 <Box
                     key={doc.id}
                     p={3}
-
                     borderRadius="md"
-
                     width="full"
                     _hover={{ bg: "gray.100" }}
                 >
@@ -96,7 +94,7 @@ const DocumentsViewer = () => {
                         />
                         <Box flex="1">
                             <Badge colorScheme="orange" fontWeight="bold" mt={2}>{doc.title}</Badge>
-                            <Text color="gray.500">{doc.description}</Text>
+                            <Badge colorScheme="gray" mt={2}>{doc.description}</Badge>
                         </Box>
                         <Link href={doc.file_url} isExternal>
                             <Badge colorScheme="teal">Ouvrir le document</Badge>
