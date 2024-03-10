@@ -44,10 +44,10 @@ const DocumentsViewer = () => {
     }, [teamUUID]);
 
     useEffect(() => {
-        // Start the timeout to hide the viewer after 50 seconds
+        // Start the timeout to hide the viewer after 30 seconds
         const timer = setTimeout(() => {
             setShowViewer(false); // Hide the viewer after the timeout
-        }, 30000); // 50 seconds
+        }, 30000); // 30 seconds
 
         // Clear the timeout when the component unmounts or when teamUUID changes
         return () => {
@@ -100,9 +100,11 @@ const DocumentsViewer = () => {
 
     return (
         <VStack spacing={2}>
-            <Button onClick={restartTimeout} colorScheme="gray.100">
-                <Badge colorScheme="orange">Mes documents</Badge>
-            </Button>
+            <Box alignSelf="flex-start"> {/* Container to position the button to the left */}
+                <Button onClick={restartTimeout} colorScheme="gray.100">
+                    <Badge colorScheme="orange">Mes documents</Badge>
+                </Button>
+            </Box>
             {showViewer && ( // Render the viewer only if showViewer is true
                 documents.map((doc) => (
                     <Box
