@@ -20,6 +20,7 @@ import {
   FormLabel,
   FormHelperText,
 } from "@chakra-ui/react";
+import { MdDeleteForever } from "react-icons/md"; // Import the icon
 import { supabase } from '../../../../supabaseClient';
 import { useEvent } from '../../../../EventContext'; // Import useEvent
 
@@ -32,7 +33,7 @@ const UrgentAlerts = () => {
   const { selectedEventId } = useEvent(); // Get selectedEventId from context
 
   useEffect(() => {
-    async function fetchUrgentAlerts() {
+async function fetchUrgentAlerts() {
       try {
         let query = supabase.from('vianney_alertes_specifiques').select("*").order('created_at', { ascending: false }).limit(5);
 
@@ -76,7 +77,6 @@ const UrgentAlerts = () => {
 
     fetchUrgentAlerts();
   }, [selectedEventId]); // Re-fetch alerts when selectedEventId changes
-
 
   const handleToggleReadStatus = async (id, currentStatus) => {
     try {
@@ -126,6 +126,24 @@ const UrgentAlerts = () => {
     }
   };
 
+  const handleDeleteAlert = async (id) => {
+    try {
+      const { error } = await supabase
+        .from('vianney_alertes_specifiques')
+        .delete()
+        .match({ id });
+
+      if (error) {
+        throw error;
+      }
+
+      // Remove the alert from the state to update UI
+      setUrgentAlerts(currentAlerts => currentAlerts.filter(alert => alert.id !== id));
+    } catch (error) {
+      console.error("Error deleting alert:", error.message);
+    }
+  };
+
   return (
     <Box p={4} borderWidth="1px" borderRadius="lg">
       <Text fontSize="xl" fontWeight="bold" mb={4}>
@@ -135,8 +153,8 @@ const UrgentAlerts = () => {
         <Spinner />
       ) : (
         <Stack spacing={4}>
-          {urgentAlerts.map((alert) => (
-            <Alert
+      {urgentAlerts.map((alert) => (
+        <Alert
               key={alert.id}
               status={alert.read_or_not ? "success" : "error"}
               variant="subtle"
@@ -158,7 +176,7 @@ const UrgentAlerts = () => {
                 </Text>
               </Box>
               <Stack spacing={2}>
-                <Button
+              <Button
                   onClick={() =>
                     handleToggleReadStatus(alert.id, alert.read_or_not)
                   }
@@ -168,7 +186,17 @@ const UrgentAlerts = () => {
                 >
                   {alert.read_or_not ? "Lu" : "Non lu"}
                 </Button>
-                {alert.response && (
+        <Button
+          onClick={() => handleDeleteAlert(alert.id)}
+          size="sm"
+          leftIcon={<MdDeleteForever />}
+          colorScheme="red"
+          variant="solid"
+        >
+          Supprimer
+        </Button>
+      ))}
+      {alert.response && (
                   <Text fontWeight="bold" fontSize="lg">
                     Réponse de l'équipe {alert.team_name} : {alert.response}
                   </Text>
