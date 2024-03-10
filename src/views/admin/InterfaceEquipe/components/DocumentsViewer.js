@@ -46,18 +46,14 @@ const DocumentsViewer = () => {
     useEffect(() => {
         // Start the timeout to hide the viewer after 50 seconds
         const timer = setTimeout(() => {
-            setShowViewer(false);
-        }, 50000); // 50 seconds
+            setShowViewer(false); // Hide the viewer after the timeout
+        }, 30000); // 50 seconds
 
         // Clear the timeout when the component unmounts or when teamUUID changes
         return () => {
             clearTimeout(timer);
         };
     }, [teamUUID]);
-
-    if (!showViewer) {
-        return null; // Return null to hide the viewer
-    }
 
     const restartTimeout = () => {
         clearTimeout(timeoutRef.current);
@@ -67,7 +63,7 @@ const DocumentsViewer = () => {
 
     const startTimeout = () => {
         timeoutRef.current = setTimeout(() => {
-            setShowViewer(false);
+            setShowViewer(false); // Hide the viewer after the timeout
         }, 50000); // 50 seconds
     };
 
@@ -107,33 +103,35 @@ const DocumentsViewer = () => {
             <Button onClick={restartTimeout} colorScheme="gray.100">
                 <Badge colorScheme="orange">Mes documents</Badge>
             </Button>
-            {documents.map((doc) => (
-                <Box
-                    key={doc.id}
-                    p={1}
-                    borderRadius="md"
-                    width="full"
-                    _hover={{ bg: "gray.100" }}
-                >
-                    <Stack direction={["column", "row"]} spacing={4} align="center">
-                        <Image
-                            borderRadius="md"
-                            boxSize="100px"
-                            objectFit="cover"
-                            src={doc.file_url}
-                            alt={`Image for ${doc.title}`}
-                            fallbackSrc="https://via.placeholder.com/100"
-                        />
-                        <Box flex="1">
-                            <Badge colorScheme="orange" fontWeight="bold" mt={2}>{doc.title}</Badge>
-                            <Badge colorScheme="gray" mt={2}>{doc.description}</Badge>
-                        </Box>
-                        <Link href={doc.file_url} isExternal>
-                            <Badge colorScheme="teal">Ouvrir le document</Badge>
-                        </Link>
-                    </Stack>
-                </Box>
-            ))}
+            {showViewer && ( // Render the viewer only if showViewer is true
+                documents.map((doc) => (
+                    <Box
+                        key={doc.id}
+                        p={1}
+                        borderRadius="md"
+                        width="full"
+                        _hover={{ bg: "gray.100" }}
+                    >
+                        <Stack direction={["column", "row"]} spacing={4} align="center">
+                            <Image
+                                borderRadius="md"
+                                boxSize="100px"
+                                objectFit="cover"
+                                src={doc.file_url}
+                                alt={`Image for ${doc.title}`}
+                                fallbackSrc="https://via.placeholder.com/100"
+                            />
+                            <Box flex="1">
+                                <Badge colorScheme="orange" fontWeight="bold" mt={2}>{doc.title}</Badge>
+                                <Badge colorScheme="gray" mt={2}>{doc.description}</Badge>
+                            </Box>
+                            <Link href={doc.file_url} isExternal>
+                                <Badge colorScheme="teal">Ouvrir le document</Badge>
+                            </Link>
+                        </Stack>
+                    </Box>
+                ))
+            )}
         </VStack>
     );
 };
