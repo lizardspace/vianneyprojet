@@ -1,76 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  Flex,
-  Grid,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import React, { useEffect, useState, useRef } from 'react';
+import { Box, Flex, Tabs, TabList, TabPanels, Tab, TabPanel, Grid } from "@chakra-ui/react";
 import MapComponent from "views/admin/carte/components/MapComponent";
-import EventVideos from './components/EventVideos';
+import VianneyAlertChat from "views/admin/TableauDeBord/components/VianneyAlertChat";
 import TableTopCreators from "views/admin/carte/components/TableTopCreators";
-import Card from "components/card/Card.js";
 import tableDataTopCreators from "views/admin/carte/variables/tableDataTopCreators.json";
 import { tableColumnsTopCreators } from "views/admin/carte/variables/tableColumnsTopCreators";
-import CameraForm from "./components/CameraForm";
-import { createClient } from '@supabase/supabase-js';
-import UserForm from './components/UserForm';
-import VianneyAlertChat from '../TableauDeBord/components/VianneyAlertChat';
-import TeamScheduleMadeMySelf from '../TableauDeBord/components/TeamScheduleMadeMySelf';
-
-const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import MeteoBlue from './components/MeteoBlue';
+import MeteoAgricole from './components/MeteoAgricole';
+import BaseDeDonnee from './components/BaseDeDonnee';
+import EquipiersTableSimplify from './components/EquipiersTableSimplify';
+import LiveVideo from './components/tv/LiveVideo';
+import EuronewsLive from './components/tv/EuronewsLive';
+import MyChannelLive from './components/tv/MyChannelLive';
+import NewChannelLive from './components/tv/NewChannelLive';
+import PlanSITAC from './components/PlanSITAC';
+import ShowSITACbis from './components/ShowSITACbis';
+import RenseignementsInformationsForm from './components/RenseignementsInformationsForm';
+import RenseignementsInformationsDisplayReports from './components/RenseignementsInformationsDisplayReports';
+import InventoryDisplay from './components/InventoryDisplay';
+import LiveStreamsPage from './components/surveillance/LiveStreamsPage';
 
 export default function Marketplace() {
-  // Chakra Color Mode
-  const textColor = useColorModeValue("secondaryGray.900", "white");
-  const [cameras, setCameras] = useState([]);
-  const [showGrid, setShowGrid] = useState(false);
-  // Other state and useEffects...
-
-  useEffect(() => {
-    const fetchCameras = async () => {
-      const { data, error } = await supabase
-        .from('vianney_cameras')
-        .select('*');
-
-      if (error) {
-        console.log('Error fetching data:', error);
-        setCameras([]); // Set cameras to an empty array in case of error
-      } else {
-        setCameras(data);
-      }
-    };
-
-    fetchCameras();
-  }, []);
-  // New state for controlling the visibility of forms
-  const [showForms, setShowForms] = useState(false);
-
-  // Toggle function for the button
-  const toggleForms = () => {
-    setShowForms(!showForms);
-  };
-  const toggleGrid = () => {
-    setShowGrid(!showGrid); // Toggle the visibility of the grid
-  };
-
+  // eslint-disable-next-line no-unused-vars
   const [maxWidth, setMaxWidth] = useState(null);
+  // eslint-disable-next-line no-unused-vars
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [mapKey, setMapKey] = useState(Date.now());
+  const mapRef = useRef(null);
 
-  // Function to set maxWidth based on screen size
   const setMaxWidthBasedOnScreen = () => {
     const screenSize = window.innerWidth;
     const newMaxWidth = screenSize / 2.1;
     setMaxWidth(screenSize <= 768 ? '100%' : `${newMaxWidth}px`);
   };
 
-  // Call the function initially and add event listener for window resize
   useEffect(() => {
     setMaxWidthBasedOnScreen();
     window.addEventListener('resize', setMaxWidthBasedOnScreen);
 
-    // Clean up the event listener when component unmounts
     return () => {
       window.removeEventListener('resize', setMaxWidthBasedOnScreen);
     };
@@ -78,62 +46,127 @@ export default function Marketplace() {
 
   return (
     <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
-      <Box mt="10px" borderRadius="lg" overflow="hidden">
-        <MapComponent />
-      </Box>
-      <Box mt="10px" borderRadius="lg" overflow="hidden">
-        <TableTopCreators
-          tableData={tableDataTopCreators}
-          columnsData={tableColumnsTopCreators}
-        />
-      </Box>
-      <Button onClick={toggleGrid} mt='4' mb='4'>
-        {showGrid ? 'Cacher' : 'Montrer'}
-      </Button>
-      {showGrid && (
-        <Box mt="10px" borderRadius="lg" overflow="hidden">
-          <Grid
-            mb='20px'
-            gridTemplateColumns={{ xl: "repeat(3, 1fr)", "2xl": "1fr 0.46fr" }}
-            gap={{ base: "20px", xl: "20px" }}
-            display={{ base: "block", xl: "grid" }}>
-            <Flex
-              flexDirection='column'
-              gridArea={{ xl: "1 / 1 / 2 / 3", "2xl": "1 / 1 / 2 / 2" }}>
-              <Card p='0px'>
-                <VianneyAlertChat />
-              </Card>
-              <Button onClick={toggleForms} mt='4' mb='4'>
-                {showForms ? 'Cacher le formulaire' : 'Montrer le formulaire'}
-              </Button>
-              {showForms && (
-                <>
+      <Tabs isFitted variant="enclosed">
+        <TabList mb="1em">
+          <Tab>Opérationnel</Tab>
+          <Tab>Renseignements</Tab>
+          <Tab>Moyens</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <Tabs variant="enclosed">
+              <TabList>
+                <Tab>Situation - GOC</Tab>
+                <Tab>SITAC</Tab>
+                <Tab>Base de données</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
                   <Box>
-                    <CameraForm />
+                    <Flex direction={{ base: "column", md: "row" }} mt="10px">
+                      <Box flex="1" borderRadius="lg" overflow="hidden">
+                        {/* Utiliser une clé unique pour détruire et recréer la carte */}
+                        <MapComponent key={mapKey} ref={mapRef} />
+                      </Box>
+                      <Box flex="1" ml={{ md: "10px" }} display={isFullScreen ? 'none' : 'block'}>
+                        <VianneyAlertChat />
+                      </Box>
+                    </Flex>
+                    <Box mt="10px" borderRadius="lg" overflow="hidden">
+                      <TableTopCreators
+                        tableData={tableDataTopCreators}
+                        columnsData={tableColumnsTopCreators}
+                      />
+                    </Box>
                   </Box>
-                  <Box>
-                    <UserForm />
+                </TabPanel>
+                <TabPanel>
+                  <PlanSITAC/>
+                  <ShowSITACbis/>
+                </TabPanel>
+                <TabPanel>
+                  <BaseDeDonnee />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </TabPanel>
+          <TabPanel>
+            <Tabs variant="enclosed">
+              <TabList>
+                <Tab>Recherches</Tab>
+                <Tab>Informations</Tab>
+                <Tab>Surveillances</Tab> {/* Changed "Surveillance" to "Surveillances" */}
+                <Tab>Météo</Tab>
+                <Tab>Télévision</Tab> {/* Changed "Télévisions" to "Télévision" */}
+                <Tab>Base de données</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  {/* Content for "Recherches" sub-tab */}
+                </TabPanel>
+                <TabPanel>
+                  {/* Content for "Informations" sub-tab */}
+                  <RenseignementsInformationsForm/>
+                  <Box mt={4}>
+                  <RenseignementsInformationsDisplayReports/>
                   </Box>
-                  <Box>
-                  <EventVideos cameras={cameras} textColor={textColor} />
+                </TabPanel>
+                <TabPanel>
+                  {/* Content for "Surveillances" sub-tab */}
+                  <LiveStreamsPage/>
+                </TabPanel>
+                <TabPanel>
+                  <MeteoAgricole />
+                  <Box mt={4}>
+                    <MeteoBlue />
                   </Box>
-                </>
-              )}
-            </Flex>
-            <Flex
-              flexDirection='column'
-              gridArea={{ xl: "1 / 3 / 2 / 4", "2xl": "1 / 2 / 2 / 3" }}>
-
-
-              <Box maxWidth={maxWidth}>
-                <Card px='0px' mb='20px'>
-                  <TeamScheduleMadeMySelf />
-                </Card>
-              </Box>
-            </Flex>
-          </Grid>
-        </Box>
-      )}
-    </Box >
+                </TabPanel>
+                <TabPanel>
+                  <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                    <Box>
+                      <LiveVideo />
+                    </Box>
+                    <Box>
+                      <EuronewsLive />
+                    </Box>
+                    <Box>
+                      <MyChannelLive />
+                    </Box>
+                    <Box>
+                      <NewChannelLive />
+                    </Box>
+                  </Grid>
+                </TabPanel>
+                <TabPanel>
+                  <BaseDeDonnee />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </TabPanel>
+          <TabPanel>
+            <Tabs variant="enclosed">
+              <TabList>
+                <Tab>Matériel</Tab> {/* Changed "Matériels" to "Matériel" */}
+                <Tab>Effectif</Tab> {/* Changed "Effectifs" to "Effectif" */}
+                <Tab>Base de données</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  {/* Content for "Matériel" sub-tab */}
+                  <InventoryDisplay/>
+                </TabPanel>
+                <TabPanel>
+                  {/* Content for "Effectif" sub-tab */}
+                  <EquipiersTableSimplify />
+                </TabPanel>
+                <TabPanel>
+                  <BaseDeDonnee />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </Box>
   );
 }

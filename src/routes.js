@@ -1,13 +1,18 @@
 import React from "react";
 import { Icon } from "@chakra-ui/react";
 import {  FcMindMap, FcSerialTasks, FcSurvey, FcSettings, FcSelfie, FcGrid, FcHighPriority } from "react-icons/fc";
+import { MdQrCodeScanner } from "react-icons/md"; // Importe MdQrCodeScanner pour l'icône du nouveau route
+
 import MainDashboard from "views/admin/default";
 import NFTMarketplace from "views/admin/carte";
 //import Profile from "views/admin/profile";
 import TableauDeBord from "views/admin/TableauDeBord";
 import InterfaceEquipe from "views/admin/InterfaceEquipe";
 import TableauExcel from "views/admin/TableauExcel";
-import AlerteEquipe from "views/admin/AlerteEquipe"; // Import the component for Alerte à une équipe
+import AlerteEquipe from "views/admin/AlerteEquipe"; 
+import MaterialComponent from "views/admin/MaterialComponent";
+import ZoomedMapComponent from "views/admin/ZoomedMapComponent";
+
 
 // Auth Imports
 //import SignInCentered from "views/auth/signIn";
@@ -22,7 +27,7 @@ const routes = [
     component: MainDashboard,
   },
   {
-    name: "Carte",
+    name: "Gestion opérationnelle",
     layout: "/admin",
     path: "/map",
     icon: <Icon as={FcMindMap} width='20px' height='20px' color='inherit' />,
@@ -30,11 +35,17 @@ const routes = [
     secondary: true,
   },
   {
-    name: "Tableau de bord",
+    name: "Emploi du temps",
     layout: "/admin",
     path: "/data-tables",
     icon: <Icon as={FcSerialTasks} width='20px' height='20px' color='inherit' />,
     component: TableauDeBord,
+  },
+  {
+    name: "Carte zoomée", // Name of the new route
+    layout: "/admin",
+    path: "/zoomed-map", // Path for the new route
+    component: ZoomedMapComponent, // Component for the new route
   },
   //
  // {
@@ -78,6 +89,13 @@ const routes = [
     path: "/alerte-equipe", // Path for the new route
     icon: <Icon as={FcHighPriority} width='20px' height='20px' color='inherit' />, // You can use an appropriate icon component here
     component: AlerteEquipe, // Component for the new route
+  },
+  {
+    name: "Matériel", // Name of the new route
+    layout: "/admin",
+    path: "/material", // Path for the new route
+    icon: <Icon as={MdQrCodeScanner} width='20px' height='20px' color='inherit' />, // Icon for the new route
+    component: MaterialComponent, // Component for the new route
   },
 ];
 

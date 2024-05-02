@@ -1,0 +1,14 @@
+@media print {
+    body * {
+      visibility: hidden; /* Hide everything in the body when printing... */
+    }
+    #printContainer, #printContainer * {
+      visibility: visible; /* ...except the print container and its children */
+    }
+    #printContainer {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+  }
+  
