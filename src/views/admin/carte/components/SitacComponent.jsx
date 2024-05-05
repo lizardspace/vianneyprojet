@@ -25,13 +25,13 @@ function SitacComponent() {
     const fileExt = uploadedFile.name.split('.').pop();
     const fileName = `${Math.random()}.${fileExt}`;
     const { data: uploadData, error: uploadError } = await supabase
-        .storage
-        .from('vianneysitac')
-        .upload(fileName, uploadedFile);
+      .storage
+      .from('vianneysitac')
+      .upload(fileName, uploadedFile);
 
     if (uploadError) {
-        console.error('Error uploading file:', uploadError);
-        return;
+      console.error('Error uploading file:', uploadError);
+      return;
     }
 
     const { fullPath } = uploadData;
@@ -42,60 +42,60 @@ function SitacComponent() {
 
   const handleSaveSITAC = async () => {
     if (!file || !selectedEventId) {
-        toast({
-            title: 'Erreur',
-            description: "Veuillez d'abord télécharger un fichier et sélectionner un événement.",
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-        });
-        return;
+      toast({
+        title: 'Erreur',
+        description: "Veuillez d'abord télécharger un fichier et sélectionner un événement.",
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
     }
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random()}.${fileExt}`;
     const { data: uploadData, error: uploadError } = await supabase
-        .storage
-        .from('vianneysitac')
-        .upload(fileName, file);
+      .storage
+      .from('vianneysitac')
+      .upload(fileName, file);
 
     if (uploadError) {
-        console.error('Error uploading file:', uploadError);
-        return;
+      console.error('Error uploading file:', uploadError);
+      return;
     }
 
     const { fullPath } = uploadData;
     const publicURL = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/${fullPath}`;
-  // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars
     const { data, error } = await supabase.from('vianney_sitac').insert([
-        {
-            situation,
-            moyen_logistique: moyenLogistique,
-            commandement,
-            anticipation,
-            objectif,
-            idee_manoeuvre: ideeManoeuvre,
-            execution,
-            file_url: publicURL,
-            event_id: selectedEventId
-        }
+      {
+        situation,
+        moyen_logistique: moyenLogistique,
+        commandement,
+        anticipation,
+        objectif,
+        idee_manoeuvre: ideeManoeuvre,
+        execution,
+        file_url: publicURL,
+        event_id: selectedEventId
+      }
     ]);
 
     if (error) {
-        toast({
-            title: 'Erreur lors de la sauvegarde du SITAC',
-            description: error.message,
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-        });
+      toast({
+        title: 'Erreur lors de la sauvegarde du SITAC',
+        description: error.message,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     } else {
-        toast({
-            title: 'Succès',
-            description: 'Les informations du SITAC ont été enregistrées avec succès!',
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-        });
+      toast({
+        title: 'Succès',
+        description: 'Les informations du SITAC ont été enregistrées avec succès!',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -110,7 +110,7 @@ function SitacComponent() {
       <Input position="absolute" top="15%" left="76%" w="20%" h="20%" placeholder="Moyen Logistique" onChange={(e) => setMoyenLogistique(e.target.value)} />
       <Input position="absolute" top="42%" left="76%" w="20%" h="20%" placeholder="Commandement" onChange={(e) => setCommandement(e.target.value)} />
       <Input position="absolute" bottom="75%" right="75%" w="auto" h="auto" type="file" ref={fileInputRef} hidden onChange={handleFileUpload} />
-      <Button position="absolute" bottom="75%" right="75%" onClick={() => fileInputRef.current.click()}>
+      <Button position="absolute" top="2%" left="2%" onClick={() => fileInputRef.current.click()}>
         Télécharger le fichier
       </Button>
       <Button position="absolute" bottom="-10%" left="80%" onClick={handleSaveSITAC}>
