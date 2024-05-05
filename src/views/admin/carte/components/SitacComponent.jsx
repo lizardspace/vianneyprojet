@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react';
-import { Box, Input,   useToast, Image, Button } from '@chakra-ui/react';
-import sitacImage from './../../../../assets/img/sitac.png'; 
+import { Box, Input, useToast, Image, Button } from '@chakra-ui/react';
+import sitacImage from './../../../../assets/img/sitac.png';
 import supabase from './../../../../supabaseClient';
-import { useEvent } from './../../../../EventContext'; 
+import { useEvent } from './../../../../EventContext';
 
 function SitacComponent() {
   const fileInputRef = useRef(null);
+  const [file, setFile] = useState(null);
   const [fileUrl, setFileUrl] = useState('');
   const toast = useToast();
   const [situation, setSituation] = useState('');
@@ -35,11 +36,12 @@ function SitacComponent() {
 
     const { fullPath } = uploadData;
     const publicURL = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/${fullPath}`;
+    setFile(uploadedFile);
     setFileUrl(publicURL);
   };
 
   const handleSaveSITAC = async () => {
-    if (!fileUrl || !selectedEventId) {
+    if (!file || !selectedEventId) {
         toast({
             title: 'Erreur',
             description: "Veuillez d'abord télécharger un fichier et sélectionner un événement.",
@@ -49,6 +51,20 @@ function SitacComponent() {
         });
         return;
     }
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const { data: uploadData, error: uploadError } = await supabase
+        .storage
+        .from('vianneysitac')
+        .upload(fileName, file);
+
+    if (uploadError) {
+        console.error('Error uploading file:', uploadError);
+        return;
+    }
+
+    const { fullPath } = uploadData;
+    const publicURL = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/${fullPath}`;
   // eslint-disable-next-line no-unused-vars
     const { data, error } = await supabase.from('vianney_sitac').insert([
         {
@@ -59,7 +75,7 @@ function SitacComponent() {
             objectif,
             idee_manoeuvre: ideeManoeuvre,
             execution,
-            file_url: fileUrl,
+            file_url: publicURL,
             event_id: selectedEventId
         }
     ]);
@@ -85,7 +101,7 @@ function SitacComponent() {
 
   return (
     <Box position="relative" h="768px" w="1020px">
-      <Image src={sitacImage} alt="Sitac Background" fit="cover" w="100%" h="100%" />
+      <Image src={fileUrl || sitacImage} alt="Sitac Background" fit="cover" w="100%" h="100%" />
       <Input position="absolute" top="70%" left="2%" w="15%" h="20%" placeholder="Situation" onChange={(e) => setSituation(e.target.value)} />
       <Input position="absolute" top="70%" left="22%" w="15%" h="20%" placeholder="Anticipation" onChange={(e) => setAnticipation(e.target.value)} />
       <Input position="absolute" top="70%" left="40%" w="15%" h="20%" placeholder="Objectif" onChange={(e) => setObjectif(e.target.value)} />
