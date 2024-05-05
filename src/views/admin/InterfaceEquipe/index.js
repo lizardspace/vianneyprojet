@@ -18,7 +18,7 @@ import GpsPosition from './components/GpsPosition';
 import VianneyAlertChat from '../TableauDeBord/components/VianneyAlertChat';
 import { supabase } from './../../../supabaseClient';
 import TeamMembersDisplay from './components/TeamMembersDisplay';
-import App from '../videoChatRoom/App';
+
 import UrgentAlerts from './components/UrgentAlerts';
 import TeamScheduleByMySelfEquipe from '../TableauDeBord/components/TeamScheduleMadeMySelfEquipe';
 import DocumentsViewer from './components/DocumentsViewer';
@@ -120,7 +120,7 @@ const InterfaceEquipe = () => {
       </Badge>
       {showApp && (
         <div>
-          <App />
+
         </div>
       )}
     </Box>
