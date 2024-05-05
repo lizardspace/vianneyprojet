@@ -19,6 +19,7 @@ import RenseignementsInformationsForm from './components/RenseignementsInformati
 import RenseignementsInformationsDisplayReports from './components/RenseignementsInformationsDisplayReports';
 import InventoryDisplay from './components/InventoryDisplay';
 import LiveStreamsPage from './components/surveillance/LiveStreamsPage';
+import EditableRectangle from './components/SitacComponent';
 
 export default function Marketplace() {
   // eslint-disable-next-line no-unused-vars
@@ -82,6 +83,7 @@ export default function Marketplace() {
                 </TabPanel>
                 <TabPanel>
                   <PlanSITAC/>
+                  <EditableRectangle/>
                   <ShowSITACbis/>
                 </TabPanel>
                 <TabPanel>
