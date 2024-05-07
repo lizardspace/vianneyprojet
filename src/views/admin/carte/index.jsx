@@ -20,6 +20,7 @@ import RenseignementsInformationsDisplayReports from './components/Renseignement
 import InventoryDisplay from './components/InventoryDisplay';
 import LiveStreamsPage from './components/surveillance/LiveStreamsPage';
 import EditableRectangle from './components/SitacComponent';
+import JSPaintComponent from './components/JSPaintComponent';
 
 export default function Marketplace() {
   // eslint-disable-next-line no-unused-vars
@@ -60,6 +61,7 @@ export default function Marketplace() {
                 <Tab>Situation - GOC</Tab>
                 <Tab>SITAC</Tab>
                 <Tab>Base de données</Tab>
+                <Tab>Dessin</Tab> {/* Nouvel onglet "Dessin" */}
               </TabList>
               <TabPanels>
                 <TabPanel>
@@ -105,6 +107,10 @@ export default function Marketplace() {
               <TabPanels>
                 <TabPanel>
                   {/* Content for "Recherches" sub-tab */}
+                </TabPanel>
+                <TabPanel>
+                  {/* Contenu de l'onglet "Dessin" */}
+                  <JSPaintComponent />
                 </TabPanel>
                 <TabPanel>
                   {/* Content for "Informations" sub-tab */}
@@ -155,7 +161,7 @@ export default function Marketplace() {
               <TabPanels>
                 <TabPanel>
                   {/* Content for "Matériel" sub-tab */}
-                  <InventoryDisplay/>
+                  <InventoryDisplay />
                 </TabPanel>
                 <TabPanel>
                   {/* Content for "Effectif" sub-tab */}
