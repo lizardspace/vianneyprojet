@@ -102,7 +102,7 @@ function SitacComponent() {
   return (
     <Box position="relative" h="768px" w="1020px">
       <Image src={sitacImage} alt="Sitac Background" fit="cover" w="100%" h="100%" zIndex="1" />
-      <Image src={fileUrl} fit="cover" w="50%" h="50%" zIndex="2" position="absolute" top="0" left="0" />
+      <Image src={fileUrl} fit="cover" w="70.5%" h="62.5%" zIndex="2" position="absolute" top="0" left="0" />
       <Input position="absolute" top="70%" left="2%" w="15%" h="20%" placeholder="Situation" onChange={(e) => setSituation(e.target.value)} />
       <Input position="absolute" top="70%" left="22%" w="15%" h="20%" placeholder="Anticipation" onChange={(e) => setAnticipation(e.target.value)} />
       <Input position="absolute" top="70%" left="40%" w="15%" h="20%" placeholder="Objectif" onChange={(e) => setObjectif(e.target.value)} />
