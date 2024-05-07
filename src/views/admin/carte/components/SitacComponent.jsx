@@ -101,7 +101,8 @@ function SitacComponent() {
 
   return (
     <Box position="relative" h="768px" w="1020px">
-      <Image src={fileUrl || sitacImage} alt="Sitac Background" fit="cover" w="100%" h="100%" />
+      <Image src={sitacImage} alt="Sitac Background" fit="cover" w="100%" h="100%" zIndex="1" />
+      <Image src={fileUrl} fit="cover" w="50%" h="50%" zIndex="2" position="absolute" top="0" left="0" />
       <Input position="absolute" top="70%" left="2%" w="15%" h="20%" placeholder="Situation" onChange={(e) => setSituation(e.target.value)} />
       <Input position="absolute" top="70%" left="22%" w="15%" h="20%" placeholder="Anticipation" onChange={(e) => setAnticipation(e.target.value)} />
       <Input position="absolute" top="70%" left="40%" w="15%" h="20%" placeholder="Objectif" onChange={(e) => setObjectif(e.target.value)} />
@@ -110,7 +111,7 @@ function SitacComponent() {
       <Input position="absolute" top="15%" left="76%" w="20%" h="20%" placeholder="Moyen Logistique" onChange={(e) => setMoyenLogistique(e.target.value)} />
       <Input position="absolute" top="42%" left="76%" w="20%" h="20%" placeholder="Commandement" onChange={(e) => setCommandement(e.target.value)} />
       <Input position="absolute" bottom="75%" right="75%" w="auto" h="auto" type="file" ref={fileInputRef} hidden onChange={handleFileUpload} />
-      <Button position="absolute" top="2%" left="2%" onClick={() => fileInputRef.current.click()}>
+      <Button position="absolute" zIndex="4" top="2%" left="2%" onClick={() => fileInputRef.current.click()}>
         Télécharger le fichier
       </Button>
       <Button position="absolute" bottom="-10%" left="80%" onClick={handleSaveSITAC}>
