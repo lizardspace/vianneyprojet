@@ -13,7 +13,6 @@ import LiveVideo from './components/tv/LiveVideo';
 import EuronewsLive from './components/tv/EuronewsLive';
 import MyChannelLive from './components/tv/MyChannelLive';
 import NewChannelLive from './components/tv/NewChannelLive';
-import PlanSITAC from './components/PlanSITAC';
 import ShowSITACbis from './components/ShowSITACbis';
 import RenseignementsInformationsForm from './components/RenseignementsInformationsForm';
 import RenseignementsInformationsDisplayReports from './components/RenseignementsInformationsDisplayReports';
@@ -84,8 +83,9 @@ export default function Marketplace() {
                   </Box>
                 </TabPanel>
                 <TabPanel>
-                  <PlanSITAC/>
+                  <Box mb="70px">
                   <EditableRectangle/>
+                  </Box>
                   <ShowSITACbis/>
                 </TabPanel>
                 <TabPanel>
