@@ -91,6 +91,10 @@ export default function Marketplace() {
                 <TabPanel>
                   <BaseDeDonnee />
                 </TabPanel>
+                <TabPanel>
+                  {/* Contenu de l'onglet "Dessin" */}
+                  <JSPaintComponent />
+                </TabPanel>
               </TabPanels>
             </Tabs>
           </TabPanel>
@@ -108,10 +112,7 @@ export default function Marketplace() {
                 <TabPanel>
                   {/* Content for "Recherches" sub-tab */}
                 </TabPanel>
-                <TabPanel>
-                  {/* Contenu de l'onglet "Dessin" */}
-                  <JSPaintComponent />
-                </TabPanel>
+
                 <TabPanel>
                   {/* Content for "Informations" sub-tab */}
                   <RenseignementsInformationsForm/>
