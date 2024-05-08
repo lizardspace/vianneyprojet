@@ -4,8 +4,8 @@ function JSPaintComponent() {
   const iframeRef = useRef(null);
 
   useEffect(() => {
-    // Utilisez une URL absolue pour le développement local ou la production
-    const iframePath = 'https://super-duper-doodle-r44wqp6rp6jjhxv6x-3000.app.github.dev/index.html'; // Ajustez selon votre configuration
+    // Assurez-vous que le chemin d'accès est correct et accessible
+    const iframePath = './../../../../../jspaint/index.html'; // Modifiez selon votre configuration
 
     if (iframeRef.current) {
       iframeRef.current.src = iframePath;
