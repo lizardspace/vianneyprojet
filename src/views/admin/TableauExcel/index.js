@@ -19,6 +19,7 @@ import VianneyPdfDocumentsSalleDeCriseTableEvent from './componentsEventContext/
 import VianneyTextareaTableEvent from './componentsEventContext/VianneyTextareaTableEvent'; // Replace with the actual import path
 import VianneyTextareaSalleDeCriseTableEvent from './componentsEventContext/VianneyTextareaSalleDeCriseTableEvent'; // Replace with the actual import path
 import VianneyActionsTableEventDate from './componentsEventContext/VianneyActionsTableEventDate';
+import JSPaintComponent from '../carte/components/JSPaintComponent';
 
 const InterfaceEquipe = () => {
   const [showRawData, setShowRawData] = useState(false);
@@ -28,6 +29,8 @@ const InterfaceEquipe = () => {
   };
 
   return (
+    <>
+    <JSPaintComponent/>
     <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
       <Box p={{ base: 4, md: 8, xl: 12 }}>
 
@@ -61,6 +64,7 @@ const InterfaceEquipe = () => {
         </SimpleGrid>
       </Box>
     </Box>
+    </>
   );
 };
 

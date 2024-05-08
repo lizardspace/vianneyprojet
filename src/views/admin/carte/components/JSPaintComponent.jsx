@@ -4,8 +4,8 @@ function JSPaintComponent() {
   const iframeRef = useRef(null);
 
   useEffect(() => {
-    // Assurez-vous que le chemin d'accès est correct et accessible
-    const iframePath = './../../../../../jspaint/index.html'; // Modifiez selon votre configuration
+    // Utilisez une URL absolue pour le développement local ou la production
+    const iframePath = 'http://localhost:3000/jspaint/index.html'; // Ajustez selon votre configuration
 
     if (iframeRef.current) {
       iframeRef.current.src = iframePath;
