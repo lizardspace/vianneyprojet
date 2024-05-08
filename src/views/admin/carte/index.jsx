@@ -20,6 +20,7 @@ import InventoryDisplay from './components/InventoryDisplay';
 import LiveStreamsPage from './components/surveillance/LiveStreamsPage';
 import EditableRectangle from './components/SitacComponent';
 import JSPaintComponent from './components/JSPaintComponent';
+import YandexImage from './components/YandexImage';
 
 export default function Marketplace() {
   // eslint-disable-next-line no-unused-vars
@@ -111,6 +112,7 @@ export default function Marketplace() {
               <TabPanels>
                 <TabPanel>
                   {/* Content for "Recherches" sub-tab */}
+                  <YandexImage/>
                 </TabPanel>
 
                 <TabPanel>
