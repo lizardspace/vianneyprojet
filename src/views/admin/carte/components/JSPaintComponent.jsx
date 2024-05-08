@@ -5,7 +5,7 @@ function JSPaintComponent() {
 
   useEffect(() => {
     // Assurez-vous que le chemin d'accès est correct et accessible
-    const iframePath = './../../../../../jspaint/index.html'; // Modifiez selon votre configuration
+    const iframePath = './../../../../src/jspaint/index.html'; // Modifiez selon votre configuration
 
     if (iframeRef.current) {
       iframeRef.current.src = iframePath;
