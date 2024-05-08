@@ -1,22 +1,15 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 
-function JSPaintComponent() {
-  const iframeRef = useRef(null);
-
-  useEffect(() => {
-    // Utilisation d'un chemin absolu par rapport à la base de l'URL du serveur
-    const iframePath = '/jspaint/index.html'; // Cette URL pointe vers le dossier public
-
-    if (iframeRef.current) {
-      iframeRef.current.src = iframePath;
-    }
-  }, []);
-
-  return (
-    <div style={{ width: '100%', height: '700px', border: 'none' }}>
-      <iframe ref={iframeRef} title="JSPaint" width="100%" height="100%" style={{ border: 'none' }} />
-    </div>
-  );
-}
+const JSPaintComponent = () => {
+    return (
+        <div style={{ width: '100%', height: '100vh', border: 'none' }}>
+            <iframe
+                src="https://663b3406291e6f0090c43d00--genuine-concha-944595.netlify.app/"
+                style={{ width: '100%', height: '100%', border: 'none' }}
+                title="External Application"
+            />
+        </div>
+    );
+};
 
 export default JSPaintComponent;
