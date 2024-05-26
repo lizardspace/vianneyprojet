@@ -1,6 +1,6 @@
 import React from "react";
 import { Icon } from "@chakra-ui/react";
-import {  FcMindMap, FcSerialTasks, FcSurvey, FcSettings, FcSelfie, FcGrid, FcHighPriority } from "react-icons/fc";
+import { FcMindMap, FcSerialTasks, FcSurvey, FcSettings, FcSelfie, FcGrid, FcHighPriority, FcDiploma2 } from "react-icons/fc";
 import { MdQrCodeScanner } from "react-icons/md"; // Importe MdQrCodeScanner pour l'icône du nouveau route
 
 import MainDashboard from "views/admin/default";
@@ -12,7 +12,7 @@ import TableauExcel from "views/admin/TableauExcel";
 import AlerteEquipe from "views/admin/AlerteEquipe"; 
 import MaterialComponent from "views/admin/MaterialComponent";
 import ZoomedMapComponent from "views/admin/ZoomedMapComponent";
-
+import NoteDeFraisComponent from "views/admin/NoteDeFraisComponent"; // Assurez-vous d'avoir ce composant
 
 // Auth Imports
 //import SignInCentered from "views/auth/signIn";
@@ -96,6 +96,13 @@ const routes = [
     path: "/material", // Path for the new route
     icon: <Icon as={MdQrCodeScanner} width='20px' height='20px' color='inherit' />, // Icon for the new route
     component: MaterialComponent, // Component for the new route
+  },
+  {
+    name: "Note de frais", // Name of the new route
+    layout: "/admin",
+    path: "/note-de-frais", // Path for the new route
+    icon: <Icon as={FcDiploma2} width='20px' height='20px' color='inherit' />, // Icon for the new route
+    component: NoteDeFraisComponent, // Component for the new route
   },
 ];
 
