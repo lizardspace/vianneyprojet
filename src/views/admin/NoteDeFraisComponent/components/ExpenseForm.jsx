@@ -11,8 +11,7 @@ import {
   FormLabel,
   VStack,
   HStack,
-  Text,
-  Icon
+  Text
 } from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
 
