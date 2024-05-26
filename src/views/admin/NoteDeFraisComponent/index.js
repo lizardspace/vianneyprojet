@@ -1,12 +1,12 @@
 // views/admin/NoteDeFraisComponent.jsx
 import React from 'react';
-import { Box, Heading } from '@chakra-ui/react';
+import { Box} from '@chakra-ui/react';
+import ExpenseForm from './components/ExpenseForm';
 
 const NoteDeFraisComponent = () => {
   return (
-    <Box>
-      <Heading>Note de frais</Heading>
-      {/* Ajoutez le contenu du formulaire de note de frais ici */}
+    <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
+      <ExpenseForm/>
     </Box>
   );
 };
