@@ -27,6 +27,7 @@ import {
   Flex,
   Center,
 } from '@chakra-ui/react';
+import { PhoneIcon, EmailIcon } from '@chakra-ui/icons';
 import { supabase } from './../../../../supabaseClient';
 import TeamScheduleByMySelfUnique from 'views/admin/TableauDeBord/components/TeamScheduleByMySelfUnique';
 import AfficherMaterielsUnique from './AfficherMaterielsUnique';
