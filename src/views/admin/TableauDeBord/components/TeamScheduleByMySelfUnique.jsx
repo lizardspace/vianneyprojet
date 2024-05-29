@@ -11,7 +11,6 @@ import 'moment/locale/fr'; // Import French locale
 
 import './CalendarStyles.css';
 import AddActionForm from './AddActionForm';
-import { useEvent } from '../../../../EventContext'; // Import useEvent hook
 
 import { supabase } from './../../../../supabaseClient';
 
