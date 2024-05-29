@@ -26,6 +26,11 @@ import {
   ModalCloseButton,
   Flex,
   Center,
+  Text,
+  StackDivider,
+  Badge,
+  Grid,
+  GridItem
 } from '@chakra-ui/react';
 import { PhoneIcon, EmailIcon } from '@chakra-ui/icons';
 import { supabase } from './../../../../supabaseClient';
@@ -89,7 +94,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
     };
 
     try {
-      const {error } = await supabase
+      const { error } = await supabase
         .from('vianney_teams')
         .update(updatedTeamData)
         .eq('id', teamData.id);
@@ -226,6 +231,56 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       <ModalCloseButton />
       <ModalBody>
         <form onSubmit={handleSubmit}>
+          <Grid
+            templateAreas={`"header header"
+                      "missions team"
+                      "materials timeline"`}
+            gridTemplateRows={'50px 1fr 1fr'}
+            gridTemplateColumns={'1fr 1fr'}
+            h='600px'
+            gap='4'
+            color='black'
+            fontWeight='bold'
+          >
+            <GridItem area={'header'}>
+              <Flex justifyContent='space-between' alignItems='center' bg='yellow.100' p='2'>
+                <Text>Nom/Prénom CE</Text>
+                <Badge>Spécialité</Badge>
+                <Text>Âge</Text>
+                <PhoneIcon />
+                <EmailIcon />
+                {/* ... Autres informations ... */}
+              </Flex>
+            </GridItem>
+
+            <GridItem area={'missions'} bg='orange.100' p='2'>
+              <VStack alignItems='flex-start' spacing='4' divider={<StackDivider borderColor='gray.200' />}>
+                <Text>Missions:</Text>
+                {/* ... Détails des missions ... */}
+              </VStack>
+            </GridItem>
+
+            <GridItem area={'team'} bg='teal.100' p='2'>
+              <VStack alignItems='flex-start' spacing='4'>
+                <Text>Membres équipe:</Text>
+                {/* ... Membres de l'équipe ... */}
+              </VStack>
+            </GridItem>
+
+            <GridItem area={'materials'} bg='blue.100' p='2'>
+              <VStack alignItems='flex-start' spacing='4'>
+                <Text>Matériel:</Text>
+                {/* ... Détails du matériel ... */}
+              </VStack>
+            </GridItem>
+
+            <GridItem area={'timeline'} bg='purple.100' p='2'>
+              <VStack alignItems='flex-start' spacing='4'>
+                <Text>Emploi du temps équipe:</Text>
+                {/* ... Détails de l'emploi du temps ... */}
+              </VStack>
+            </GridItem>
+          </Grid>
           <Box id="mapId" h="400px" w="100%">
             <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -331,64 +386,64 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                   name="isLeader"
                   isChecked={teamMember.isLeader}
                   onChange={(e) => handleTeamMemberChange(index, e)}
+                >
+                  Leader ?
+                </Checkbox>
+                <Flex align="center" justify="center">
+                  <Button
+                    size="sm"
+                    colorScheme="red"
+                    onClick={() => handleDeleteTeamMember(index)}
                   >
-                    Leader ?
-                  </Checkbox>
-                  <Flex align="center" justify="center">
-                    <Button
-                      size="sm"
-                      colorScheme="red"
-                      onClick={() => handleDeleteTeamMember(index)}
-                    >
-                      <Center>
-                        <FaTrash />
-                      </Center>
-                    </Button>
-                  </Flex>
-                </HStack>
-              ))}
-              {showDeleteWarningAlert && (
-                <Alert status="warning" mt={4}>
-                  <AlertIcon />
-                  Attention de bien cliquer sur "Modifier" pour enregistrer vos changements.
-                </Alert>
-              )}
-              {showSuccessAlert && (
-                <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mt={4}>
-                  <AlertIcon boxSize="40px" mr={0} />
-                  <AlertTitle mt={4} mb={1} fontSize="lg">
-                    Equipe modifiée avec succès.
-                  </AlertTitle>
-                  <AlertDescription maxWidth="sm">
-                    ⚠️ Penser à recharger la page
-                  </AlertDescription>
-                  <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowSuccessAlert(false)} />
-                </Alert>
-              )}
-              <Button colorScheme="blue" onClick={handleAddTeamMember}>Ajouter un membre de l'équipe</Button>
-            </VStack>
-          </form>
-          {showDeleteSuccessAlert && (
-            <Alert status="success" mt={4}>
-              <AlertIcon />
-              Equipe supprimée avec succès
-            </Alert>
-          )}
-          <Box mt={4}>
-            <TeamScheduleByMySelfUnique selectedTeamId={teamData?.id} />
-          </Box>
-          <Box mt={4}>
-            <AfficherMaterielsUnique selectedTeamId={teamData?.id} />
-          </Box>
-        </ModalBody>
-        <ModalFooter>
-          <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
-          <Button mr={1} colorScheme="blue" onClick={onClose}>Fermer</Button>
-          <Button mr={1} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
-        </ModalFooter>
-      </ModalContent>
-    );
-  };
-  
-  export default EditUserForm;
-  
+                    <Center>
+                      <FaTrash />
+                    </Center>
+                  </Button>
+                </Flex>
+              </HStack>
+            ))}
+            {showDeleteWarningAlert && (
+              <Alert status="warning" mt={4}>
+                <AlertIcon />
+                Attention de bien cliquer sur "Modifier" pour enregistrer vos changements.
+              </Alert>
+            )}
+            {showSuccessAlert && (
+              <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mt={4}>
+                <AlertIcon boxSize="40px" mr={0} />
+                <AlertTitle mt={4} mb={1} fontSize="lg">
+                  Equipe modifiée avec succès.
+                </AlertTitle>
+                <AlertDescription maxWidth="sm">
+                  ⚠️ Penser à recharger la page
+                </AlertDescription>
+                <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowSuccessAlert(false)} />
+              </Alert>
+            )}
+            <Button colorScheme="blue" onClick={handleAddTeamMember}>Ajouter un membre de l'équipe</Button>
+          </VStack>
+        </form>
+        {showDeleteSuccessAlert && (
+          <Alert status="success" mt={4}>
+            <AlertIcon />
+            Equipe supprimée avec succès
+          </Alert>
+        )}
+        <Box mt={4}>
+          <TeamScheduleByMySelfUnique selectedTeamId={teamData?.id} />
+        </Box>
+        <Box mt={4}>
+          <AfficherMaterielsUnique selectedTeamId={teamData?.id} />
+        </Box>
+      </ModalBody>
+      <ModalFooter>
+        <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
+        <Button mr={1} colorScheme="blue" onClick={onClose}>Fermer</Button>
+        <Button mr={1} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
+      </ModalFooter>
+    </ModalContent>
+  );
+};
+
+export default EditUserForm;
+
