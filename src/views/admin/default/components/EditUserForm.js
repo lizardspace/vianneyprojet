@@ -28,6 +28,7 @@ import {
   Center,
 } from '@chakra-ui/react';
 import { supabase } from './../../../../supabaseClient';
+import TeamScheduleByMySelfUnique from 'views/admin/TableauDeBord/components/TeamScheduleByMySelfUnique';
 
 const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
   const [nameOfTheTeam, setNameOfTheTeam] = useState('');
@@ -44,21 +45,21 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
   const [showDeleteSuccessAlert, setShowDeleteSuccessAlert] = useState(false);
   const [showDeleteWarningAlert, setShowDeleteWarningAlert] = useState(false);
   const [teamMembers, setTeamMembers] = useState([{
-    id: uuidv4(), // Generate unique ID for the first team member
+    id: uuidv4(),
     familyname: '',
     firstname: '',
     mail: '',
     phone: '',
-    isLeader: false, // Added isLeader property
+    isLeader: false,
   }]);
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    console.log('Selected File:', selectedFile);
-
     if (selectedFile) {
       setProfilePhoto(selectedFile);
     }
   };
+
   const handleTeamMemberChange = (index, event) => {
     let values = [...teamMembers];
 
@@ -71,6 +72,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
 
     setTeamMembers(values);
   };
+
   const handleModifyAndPushData = async () => {
     const updatedTeamData = {
       name_of_the_team: nameOfTheTeam,
@@ -81,7 +83,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       immatriculation: immatriculation,
       specialite: specialite,
       team_members: teamMembers,
-      photo_profile_url: profilePhotoUrl, // Include the profile photo URL here
+      photo_profile_url: profilePhotoUrl,
     };
 
     try {
@@ -93,20 +95,21 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       if (error) {
         console.error('Error updating data:', error);
       } else {
-        console.log('Data updated successfully:', data);
         setShowSuccessAlert(true);
       }
     } catch (error) {
       console.error('Error updating data:', error);
     }
   };
+
   const handleAddTeamMember = () => {
     setTeamMembers([...teamMembers, {
-      id: uuidv4(), // Generate unique ID for new team member
+      id: uuidv4(),
       familyname: '',
       firstname: '',
       mail: '',
-      phone: ''
+      phone: '',
+      isLeader: false,
     }]);
   };
 
@@ -128,11 +131,11 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
     e.preventDefault();
 
     const updatedTeamData = {
-      name_of_the_team: nameOfTheTeam, // Use state variable
+      name_of_the_team: nameOfTheTeam,
       latitude: lat,
       longitude: lng,
       mission: mission,
-      type_de_vehicule: typeDeVehicule, // Use state variable
+      type_de_vehicule: typeDeVehicule,
       immatriculation: immatriculation,
       specialite: specialite,
       team_members: teamMembers,
@@ -140,6 +143,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
 
     onSave(updatedTeamData);
   };
+
   const handleSaveProfilePhoto = async () => {
     try {
       if (profilePhoto) {
@@ -148,16 +152,14 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
         const fileName = `${teamData.id}-${profilePhoto.name}`;
         const { error: uploadError } = await supabase.storage
           .from('users_on_the_ground')
-          .upload(fileName, profilePhoto); // Remove 'profile-photos/' from the path
+          .upload(fileName, profilePhoto);
 
         if (uploadError) {
           console.error('Error uploading file:', uploadError);
-          // Handle the error appropriately (e.g., show an error message to the user)
         }
 
         const publicURL = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/users_on_the_ground/${fileName}`;
 
-        // Update the profile photo URL in the database
         const { error: updateError } = await supabase
           .from('vianney_teams')
           .update({ photo_profile_url: publicURL })
@@ -165,18 +167,14 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
 
         if (updateError) {
           console.error('Error updating profile photo URL in the database:', updateError);
-          // Handle the error appropriately (e.g., show an error message to the user)
         }
 
-        // Update the profile photo URL in the state
         setProfilePhotoUrl(publicURL);
         setIsEditingProfilePhoto(false);
-        // Optionally, show a success message to the user
         setShowSuccessAlert(true);
       }
     } catch (error) {
       console.error('Error handling profile photo:', error);
-      // Handle the error appropriately (e.g., show an error message to the user)
     }
   };
 
@@ -193,6 +191,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       setTeamMembers(teamData.team_members || []);
     }
   }, [teamData]);
+
   const handleDeleteTeam = async () => {
     try {
       const { data, error } = await supabase
@@ -203,26 +202,21 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       if (error) {
         console.error('Error deleting team:', error);
       } else {
-        console.log('Team deleted successfully:', data);
-        setShowDeleteSuccessAlert(true); // Show the success alert
-        onDelete(); // Trigger the onDelete callback to handle closing the modal and other actions
+        setShowDeleteSuccessAlert(true);
+        onDelete();
       }
     } catch (error) {
       console.error('Error deleting team:', error);
     }
   };
+
   const handleDeleteTeamMember = (index) => {
-    // Create a copy of the teamMembers array
     const updatedTeamMembers = [...teamMembers];
-    // Remove the team member at the specified index
     updatedTeamMembers.splice(index, 1);
-    // Update the state with the updated team members
     setTeamMembers(updatedTeamMembers);
 
-    // Show the warning alert
     setShowDeleteWarningAlert(true);
   };
-
 
   return (
     <ModalContent>
@@ -254,7 +248,6 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
               </Box>
             )}
 
-            {/* Input for selecting a new profile photo */}
             {isEditingProfilePhoto && (
               <FormControl>
                 <FormLabel htmlFor='new-profile-photo'>Nouvelle Photo de Profil</FormLabel>
@@ -263,15 +256,6 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
               </FormControl>
             )}
 
-            <FormControl>
-              <FormLabel htmlFor='mission'>Mission</FormLabel>
-              <Input
-                id='mission'
-                type="text"
-                value={mission}
-                onChange={(e) => setMission(e.target.value)}
-              />
-            </FormControl>
             <FormControl>
               <FormLabel htmlFor='mission'>Mission</FormLabel>
               <Input
@@ -381,7 +365,6 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             )}
             <Button colorScheme="blue" onClick={handleAddTeamMember}>Ajouter un membre de l'équipe</Button>
           </VStack>
-
         </form>
         {showDeleteSuccessAlert && (
           <Alert status="success" mt={4}>
@@ -389,6 +372,9 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             Equipe supprimée avec succès
           </Alert>
         )}
+        <Box mt={4}>
+          <TeamScheduleByMySelfUnique selectedTeamId={teamData?.id} />
+        </Box>
       </ModalBody>
       <ModalFooter>
         <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>

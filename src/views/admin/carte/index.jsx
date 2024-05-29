@@ -21,6 +21,7 @@ import LiveStreamsPage from './components/surveillance/LiveStreamsPage';
 import EditableRectangle from './components/SitacComponent';
 import JSPaintComponent from './components/JSPaintComponent';
 import YandexImage from './components/YandexImage';
+import TeamCharlieInfo from './components/TeamCharlieInfo';
 
 export default function Marketplace() {
   // eslint-disable-next-line no-unused-vars
@@ -168,6 +169,7 @@ export default function Marketplace() {
                 </TabPanel>
                 <TabPanel>
                   {/* Content for "Effectif" sub-tab */}
+                  <TeamCharlieInfo/>
                   <EquipiersTableSimplify />
                 </TabPanel>
                 <TabPanel>
