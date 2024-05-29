@@ -61,6 +61,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
     phone: '',
     isLeader: false,
   }]);
+  const [leaderName, setLeaderName] = useState({ firstname: '', familyname: '' });
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -80,6 +81,16 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
     }
 
     setTeamMembers(values);
+    updateLeaderName(values);
+  };
+
+  const updateLeaderName = (members) => {
+    const leader = members.find(member => member.isLeader);
+    if (leader) {
+      setLeaderName({ firstname: leader.firstname, familyname: leader.familyname });
+    } else {
+      setLeaderName({ firstname: '', familyname: '' });
+    }
   };
 
   const handleModifyAndPushData = async () => {
@@ -198,6 +209,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       setSpecialite(teamData.specialite || '');
       setProfilePhotoUrl(teamData.photo_profile_url || '');
       setTeamMembers(teamData.team_members || []);
+      updateLeaderName(teamData.team_members || []);
     }
   }, [teamData]);
 
@@ -223,6 +235,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
     const updatedTeamMembers = [...teamMembers];
     updatedTeamMembers.splice(index, 1);
     setTeamMembers(updatedTeamMembers);
+    updateLeaderName(updatedTeamMembers);
 
     setShowDeleteWarningAlert(true);
   };
@@ -248,7 +261,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             >
               <GridItem area={'header'}>
                 <Flex justifyContent='space-between' alignItems='center' bg='yellow.100' p='2'>
-                  <Text>Nom/Prénom CE</Text>
+                  <Text>Nom/Prénom CE: {leaderName.firstname} {leaderName.familyname}</Text>
                   <Badge>Spécialité</Badge>
                   <Text>Âge</Text>
                   <PhoneIcon />
