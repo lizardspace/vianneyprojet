@@ -19,6 +19,8 @@ import {
   AlertDescription,
   CloseButton,
   Avatar,
+  Modal,
+  ModalOverlay,
   ModalFooter,
   ModalContent,
   ModalBody,
@@ -226,224 +228,226 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
   };
 
   return (
-    <ModalContent>
-      <ModalHeader>Modifier l'équipe</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <form onSubmit={handleSubmit}>
-          <Grid
-            templateAreas={`"header header"
-                      "missions team"
-                      "materials timeline"`}
-            gridTemplateRows={'50px 1fr 1fr'}
-            gridTemplateColumns={'1fr 1fr'}
-            h='600px'
-            gap='4'
-            color='black'
-            fontWeight='bold'
-          >
-            <GridItem area={'header'}>
-              <Flex justifyContent='space-between' alignItems='center' bg='yellow.100' p='2'>
-                <Text>Nom/Prénom CE</Text>
-                <Badge>Spécialité</Badge>
-                <Text>Âge</Text>
-                <PhoneIcon />
-                <EmailIcon />
-                {/* ... Autres informations ... */}
-              </Flex>
-            </GridItem>
-
-            <GridItem area={'missions'} bg='orange.100' p='2'>
-              <VStack alignItems='flex-start' spacing='4' divider={<StackDivider borderColor='gray.200' />}>
-                <Text>Missions:</Text>
-                {/* ... Détails des missions ... */}
-              </VStack>
-            </GridItem>
-
-            <GridItem area={'team'} bg='teal.100' p='2'>
-              <VStack alignItems='flex-start' spacing='4'>
-                <Text>Membres équipe:</Text>
-                {/* ... Membres de l'équipe ... */}
-              </VStack>
-            </GridItem>
-
-            <GridItem area={'materials'} bg='blue.100' p='2'>
-              <VStack alignItems='flex-start' spacing='4'>
-                <Text>Matériel:</Text>
-                {/* ... Détails du matériel ... */}
-              </VStack>
-            </GridItem>
-
-            <GridItem area={'timeline'} bg='purple.100' p='2'>
-              <VStack alignItems='flex-start' spacing='4'>
-                <Text>Emploi du temps équipe:</Text>
-                {/* ... Détails de l'emploi du temps ... */}
-              </VStack>
-            </GridItem>
-          </Grid>
-          <Box id="mapId" h="400px" w="100%">
-            <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <LocationMarker />
-            </MapContainer>
-          </Box>
-
-          <VStack spacing={4} align="stretch">
-            <FormControl>
-              <FormLabel htmlFor="team-name">Nom de l'équipe</FormLabel>
-              <Input id="team-name" type="text" placeholder="Nom de l'équipe" value={nameOfTheTeam} onChange={(e) => setNameOfTheTeam(e.target.value)} />
-            </FormControl>
-
-            <FormControl>
-              <FormLabel htmlFor="photo-profile-url">Photo Profile URL</FormLabel>
-              <Input id="photo-profile-url" type="text" placeholder="Photo Profile URL" value={profilePhotoUrl} onChange={(e) => setProfilePhotoUrl(e.target.value)} />
-            </FormControl>
-            {profilePhotoUrl && (
-              <Box>
-                <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />
-                <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>Changer la photo</Button>
-              </Box>
-            )}
-
-            {isEditingProfilePhoto && (
-              <FormControl>
-                <FormLabel htmlFor='new-profile-photo'>Nouvelle Photo de Profil</FormLabel>
-                <Input id='new-profile-photo' type="file" onChange={handleFileChange} />
-                <Button colorScheme="blue" onClick={handleSaveProfilePhoto}>Enregistrer la nouvelle photo</Button>
-              </FormControl>
-            )}
-
-            <FormControl>
-              <FormLabel htmlFor='mission'>Mission</FormLabel>
-              <Input
-                id='mission'
-                type="text"
-                value={mission}
-                onChange={(e) => setMission(e.target.value)}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel htmlFor='typeDeVehicule'>Type de Véhicule</FormLabel>
-              <Input
-                id='typeDeVehicule'
-                type="text"
-                value={typeDeVehicule}
-                onChange={(e) => setTypeDeVehicule(e.target.value)}
-              />
-            </FormControl>
-
-            <FormControl>
-              <FormLabel htmlFor='immatriculation'>Immatriculation</FormLabel>
-              <Input
-                id='immatriculation'
-                type="text"
-                value={immatriculation}
-                onChange={(e) => setImmatriculation(e.target.value)}
-              />
-            </FormControl>
-
-            <FormControl>
-              <FormLabel htmlFor='specialite'>Spécialité</FormLabel>
-              <Input
-                id='specialite'
-                type="text"
-                value={specialite}
-                onChange={(e) => setSpecialite(e.target.value)}
-              />
-            </FormControl>
-
-            {teamMembers.map((teamMember, index) => (
-              <HStack key={teamMember.id} spacing={2}>
-                <Input
-                  type="text"
-                  name="familyname"
-                  placeholder="Nom de famille"
-                  value={teamMember.familyname}
-                  onChange={(e) => handleTeamMemberChange(index, e)}
-                />
-                <Input
-                  type="text"
-                  name="firstname"
-                  placeholder="Prénom"
-                  value={teamMember.firstname}
-                  onChange={(e) => handleTeamMemberChange(index, e)}
-                />
-                <Input
-                  type="text"
-                  name="mail"
-                  placeholder="Email"
-                  value={teamMember.mail}
-                  onChange={(e) => handleTeamMemberChange(index, e)}
-                />
-                <Input
-                  type="text"
-                  name="phone"
-                  placeholder="Téléphone"
-                  value={teamMember.phone}
-                  onChange={(e) => handleTeamMemberChange(index, e)}
-                />
-                <Checkbox
-                  name="isLeader"
-                  isChecked={teamMember.isLeader}
-                  onChange={(e) => handleTeamMemberChange(index, e)}
-                >
-                  Leader ?
-                </Checkbox>
-                <Flex align="center" justify="center">
-                  <Button
-                    size="sm"
-                    colorScheme="red"
-                    onClick={() => handleDeleteTeamMember(index)}
-                  >
-                    <Center>
-                      <FaTrash />
-                    </Center>
-                  </Button>
+    <Modal isOpen onClose={onClose} size="full">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Modifier l'équipe</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <form onSubmit={handleSubmit}>
+            <Grid
+              templateAreas={`"header header"
+                        "missions team"
+                        "materials timeline"`}
+              gridTemplateRows={'50px 1fr 1fr'}
+              gridTemplateColumns={'1fr 1fr'}
+              h='600px'
+              gap='4'
+              color='black'
+              fontWeight='bold'
+            >
+              <GridItem area={'header'}>
+                <Flex justifyContent='space-between' alignItems='center' bg='yellow.100' p='2'>
+                  <Text>Nom/Prénom CE</Text>
+                  <Badge>Spécialité</Badge>
+                  <Text>Âge</Text>
+                  <PhoneIcon />
+                  <EmailIcon />
+                  {/* ... Autres informations ... */}
                 </Flex>
-              </HStack>
-            ))}
-            {showDeleteWarningAlert && (
-              <Alert status="warning" mt={4}>
-                <AlertIcon />
-                Attention de bien cliquer sur "Modifier" pour enregistrer vos changements.
-              </Alert>
-            )}
-            {showSuccessAlert && (
-              <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mt={4}>
-                <AlertIcon boxSize="40px" mr={0} />
-                <AlertTitle mt={4} mb={1} fontSize="lg">
-                  Equipe modifiée avec succès.
-                </AlertTitle>
-                <AlertDescription maxWidth="sm">
-                  ⚠️ Penser à recharger la page
-                </AlertDescription>
-                <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowSuccessAlert(false)} />
-              </Alert>
-            )}
-            <Button colorScheme="blue" onClick={handleAddTeamMember}>Ajouter un membre de l'équipe</Button>
-          </VStack>
-        </form>
-        {showDeleteSuccessAlert && (
-          <Alert status="success" mt={4}>
-            <AlertIcon />
-            Equipe supprimée avec succès
-          </Alert>
-        )}
-        <Box mt={4}>
-          <TeamScheduleByMySelfUnique selectedTeamId={teamData?.id} />
-        </Box>
-        <Box mt={4}>
-          <AfficherMaterielsUnique selectedTeamId={teamData?.id} />
-        </Box>
-      </ModalBody>
-      <ModalFooter>
-        <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
-        <Button mr={1} colorScheme="blue" onClick={onClose}>Fermer</Button>
-        <Button mr={1} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
-      </ModalFooter>
-    </ModalContent>
+              </GridItem>
+
+              <GridItem area={'missions'} bg='orange.100' p='2'>
+                <VStack alignItems='flex-start' spacing='4' divider={<StackDivider borderColor='gray.200' />}>
+                  <Text>Missions:</Text>
+                  {/* ... Détails des missions ... */}
+                </VStack>
+              </GridItem>
+
+              <GridItem area={'team'} bg='teal.100' p='2'>
+                <VStack alignItems='flex-start' spacing='4'>
+                  <Text>Membres équipe:</Text>
+                  {/* ... Membres de l'équipe ... */}
+                </VStack>
+              </GridItem>
+
+              <GridItem area={'materials'} bg='blue.100' p='2'>
+                <VStack alignItems='flex-start' spacing='4'>
+                  <Text>Matériel:</Text>
+                  {/* ... Détails du matériel ... */}
+                </VStack>
+              </GridItem>
+
+              <GridItem area={'timeline'} bg='purple.100' p='2'>
+                <VStack alignItems='flex-start' spacing='4'>
+                  <Text>Emploi du temps équipe:</Text>
+                  {/* ... Détails de l'emploi du temps ... */}
+                </VStack>
+              </GridItem>
+            </Grid>
+            <Box id="mapId" h="400px" w="100%">
+              <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <LocationMarker />
+              </MapContainer>
+            </Box>
+
+            <VStack spacing={4} align="stretch">
+              <FormControl>
+                <FormLabel htmlFor="team-name">Nom de l'équipe</FormLabel>
+                <Input id="team-name" type="text" placeholder="Nom de l'équipe" value={nameOfTheTeam} onChange={(e) => setNameOfTheTeam(e.target.value)} />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel htmlFor="photo-profile-url">Photo Profile URL</FormLabel>
+                <Input id="photo-profile-url" type="text" placeholder="Photo Profile URL" value={profilePhotoUrl} onChange={(e) => setProfilePhotoUrl(e.target.value)} />
+              </FormControl>
+              {profilePhotoUrl && (
+                <Box>
+                  <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />
+                  <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>Changer la photo</Button>
+                </Box>
+              )}
+
+              {isEditingProfilePhoto && (
+                <FormControl>
+                  <FormLabel htmlFor='new-profile-photo'>Nouvelle Photo de Profil</FormLabel>
+                  <Input id='new-profile-photo' type="file" onChange={handleFileChange} />
+                  <Button colorScheme="blue" onClick={handleSaveProfilePhoto}>Enregistrer la nouvelle photo</Button>
+                </FormControl>
+              )}
+
+              <FormControl>
+                <FormLabel htmlFor='mission'>Mission</FormLabel>
+                <Input
+                  id='mission'
+                  type="text"
+                  value={mission}
+                  onChange={(e) => setMission(e.target.value)}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel htmlFor='typeDeVehicule'>Type de Véhicule</FormLabel>
+                <Input
+                  id='typeDeVehicule'
+                  type="text"
+                  value={typeDeVehicule}
+                  onChange={(e) => setTypeDeVehicule(e.target.value)}
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel htmlFor='immatriculation'>Immatriculation</FormLabel>
+                <Input
+                  id='immatriculation'
+                  type="text"
+                  value={immatriculation}
+                  onChange={(e) => setImmatriculation(e.target.value)}
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel htmlFor='specialite'>Spécialité</FormLabel>
+                <Input
+                  id='specialite'
+                  type="text"
+                  value={specialite}
+                  onChange={(e) => setSpecialite(e.target.value)}
+                />
+              </FormControl>
+
+              {teamMembers.map((teamMember, index) => (
+                <HStack key={teamMember.id} spacing={2}>
+                  <Input
+                    type="text"
+                    name="familyname"
+                    placeholder="Nom de famille"
+                    value={teamMember.familyname}
+                    onChange={(e) => handleTeamMemberChange(index, e)}
+                  />
+                  <Input
+                    type="text"
+                    name="firstname"
+                    placeholder="Prénom"
+                    value={teamMember.firstname}
+                    onChange={(e) => handleTeamMemberChange(index, e)}
+                  />
+                  <Input
+                    type="text"
+                    name="mail"
+                    placeholder="Email"
+                    value={teamMember.mail}
+                    onChange={(e) => handleTeamMemberChange(index, e)}
+                  />
+                  <Input
+                    type="text"
+                    name="phone"
+                    placeholder="Téléphone"
+                    value={teamMember.phone}
+                    onChange={(e) => handleTeamMemberChange(index, e)}
+                  />
+                  <Checkbox
+                    name="isLeader"
+                    isChecked={teamMember.isLeader}
+                    onChange={(e) => handleTeamMemberChange(index, e)}
+                  >
+                    Leader ?
+                  </Checkbox>
+                  <Flex align="center" justify="center">
+                    <Button
+                      size="sm"
+                      colorScheme="red"
+                      onClick={() => handleDeleteTeamMember(index)}
+                    >
+                      <Center>
+                        <FaTrash />
+                      </Center>
+                    </Button>
+                  </Flex>
+                </HStack>
+              ))}
+              {showDeleteWarningAlert && (
+                <Alert status="warning" mt={4}>
+                  <AlertIcon />
+                  Attention de bien cliquer sur "Modifier" pour enregistrer vos changements.
+                </Alert>
+              )}
+              {showSuccessAlert && (
+                <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mt={4}>
+                  <AlertIcon boxSize="40px" mr={0} />
+                  <AlertTitle mt={4} mb={1} fontSize="lg">
+                    Equipe modifiée avec succès.
+                  </AlertTitle>
+                  <AlertDescription maxWidth="sm">
+                    ⚠️ Penser à recharger la page
+                  </AlertDescription>
+                  <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowSuccessAlert(false)} />
+                </Alert>
+              )}
+              <Button colorScheme="blue" onClick={handleAddTeamMember}>Ajouter un membre de l'équipe</Button>
+            </VStack>
+          </form>
+          {showDeleteSuccessAlert && (
+            <Alert status="success" mt={4}>
+              <AlertIcon />
+              Equipe supprimée avec succès
+            </Alert>
+          )}
+          <Box mt={4}>
+            <TeamScheduleByMySelfUnique selectedTeamId={teamData?.id} />
+          </Box>
+          <Box mt={4}>
+            <AfficherMaterielsUnique selectedTeamId={teamData?.id} />
+          </Box>
+        </ModalBody>
+        <ModalFooter>
+          <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
+          <Button mr={1} colorScheme="blue" onClick={onClose}>Fermer</Button>
+          <Button mr={1} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 };
 
 export default EditUserForm;
-
