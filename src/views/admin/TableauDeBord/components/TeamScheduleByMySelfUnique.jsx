@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import {
-  Box, Text, Select, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
+  Box, Text, Flex, Card, useColorModeValue, ChakraProvider, useToast, Tooltip, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button, Input, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
 } from '@chakra-ui/react';
 import { FcPlus } from "react-icons/fc";
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
@@ -41,14 +41,12 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
   const [updatedEventName, setUpdatedEventName] = useState('');
   const [updatedEventStart, setUpdatedEventStart] = useState('');
   const [updatedEventEnd, setUpdatedEventEnd] = useState('');
-  const [teams, setTeams] = useState([]);
   const textColor = useColorModeValue("secondaryGray.900", "white");
-  const { selectedEventId } = useEvent(); // Get selectedEventId from context
 
   const handleEventSelect = (event) => {
     setSelectedEvent(event);
     setIsAlertOpen(true);
-    setUpdatedEventName(event.titel);
+    setUpdatedEventName(event.title);
     setUpdatedEventStart(moment(event.start).format('YYYY-MM-DDTHH:mm'));
     setUpdatedEventEnd(moment(event.end).format('YYYY-MM-DDTHH:mm'));
   };
@@ -89,6 +87,7 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
     }
     onClose();
   };
+
   const updateEvent = async () => {
     const { error } = await supabase
       .from('vianney_actions')
@@ -110,7 +109,7 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
       });
     } else {
       setEvents(events.map(event =>
-        event.id === selectedEvent.id ? { ...event, titel: updatedEventName, start: new Date(updatedEventStart), end: new Date(updatedEventEnd) } : event
+        event.id === selectedEvent.id ? { ...event, title: updatedEventName, start: new Date(updatedEventStart), end: new Date(updatedEventEnd) } : event
       ));
       toast({
         title: "Événement mis à jour",
@@ -121,83 +120,35 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
     }
     onClose();
   };
-  const fetchTeams = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('vianney_teams')
-      .select('*');
+
+  const fetchEvents = useCallback(async () => {
+    const { data: eventsData, error } = await supabase
+      .from('team_action_view_rendering')
+      .select('*')
+      .eq('team_id', selectedTeamId);
+
     if (error) {
-      console.error('Error fetching teams:', error);
-      return [];
+      console.error('Error fetching events:', error);
+      return;
     }
-    return data.map(team => ({
-      id: team.id,
-      titel: team.name_of_the_team,
-      color: team.color,
+
+    const formattedEvents = eventsData.map(action => ({
+      id: action.action_id,
+      title: action.action_name,
+      start: new Date(action.starting_date),
+      end: new Date(action.ending_date),
+      resourceId: action.team_id,
+      color: action.color || 'lightgrey',
     }));
-  }, []);
+
+    setEvents(formattedEvents);
+  }, [selectedTeamId]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const teamsData = await fetchTeams();
-      const sortedTeams = teamsData.sort((a, b) => a.titel.localeCompare(b.titel));
-      setTeams(sortedTeams);
-  
-      const { data: eventsData, error } = await supabase
-        .from('team_action_view_rendering')
-        .select('*');
-  
-      if (error) {
-        console.error('Error fetching events:', error);
-      } else {
-        const formattedEvents = [];
-  
-        eventsData.forEach(action => {
-          const start = new Date(action.starting_date);
-          const end = new Date(action.ending_date);
-  
-          if (moment(start).isSame(end, 'day')) {
-            formattedEvents.push({
-              id: action.action_id,
-              titel: action.action_name,
-              start: start,
-              end: end,
-              resourceId: action.team_id,
-              color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
-            });
-          } else {
-            const endOfDay = moment(start).endOf('day');
-            const startOfNextDay = moment(endOfDay).add(1, 'second');
-  
-            formattedEvents.push({
-              id: action.action_id,
-              titel: action.action_name,
-              start: start,
-              end: endOfDay.toDate(),
-              resourceId: action.team_id,
-              color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
-            });
-  
-            formattedEvents.push({
-              id: action.action_id,
-              titel: action.action_name,
-              start: startOfNextDay.toDate(),
-              end: end,
-              resourceId: action.team_id,
-              color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
-            });
-          }
-        });
-  
-        if (selectedTeamId) {
-          setEvents(formattedEvents.filter(event => event.resourceId === selectedTeamId));
-        } else {
-          setEvents(formattedEvents);
-        }
-      }
-    };
-  
-    fetchData();
-  }, [fetchTeams, selectedTeamId]); 
+    if (selectedTeamId) {
+      fetchEvents();
+    }
+  }, [fetchEvents, selectedTeamId]);
 
   function adjustBrightness(col, amount) {
     let usePound = false;
@@ -247,7 +198,7 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
     allDay: 'Toute la journée',
     previous: 'Précédent',
     next: 'Suivant',
-    today: 'Aujourd hui',
+    today: 'Aujourd\'hui',
     month: 'Mois',
     week: 'Semaine',
     day: 'Jour',
@@ -256,20 +207,7 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
     time: 'Heure',
     event: 'Événement',
     noEventsInRange: 'Aucun événement pour cette période',
-    errorEventSelect: 'Erreur lors de la sélection de l\'événement',
-    errorEventUpdate: 'Erreur lors de la mise à jour de l\'événement',
-    errorEventDelete: 'Erreur lors de la suppression de l\'événement',
-    errorMissingEventId: 'Aucun événement sélectionné ou identifiant de l\'événement manquant',
-    successEventDelete: 'Événement supprimé avec succès',
-    successEventUpdate: 'Événement mis à jour avec succès',
-    selectEventToModify: 'Sélectionnez un événement à modifier ou à supprimer.',
-    confirmDelete: 'Êtes-vous sûr de vouloir supprimer cet événement ? Cette action ne peut pas être annulée.',
-    updateEvent: 'Mettre à jour l\'événement',
-    deleteEvent: 'Supprimer l\'événement',
-    successMessage: 'Action réalisée avec succès',
-
   };
-
 
   const formats = {
     dayFormat: 'DD/MM',
@@ -282,7 +220,7 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
 
   const CustomEvent = ({ event }) => (
     <Tooltip
-      label={`${event.titel} - ${moment(event.start).format('HH:mm')} à ${moment(event.end).format('HH:mm')}`}
+      label={`${event.title} - ${moment(event.start).format('HH:mm')} à ${moment(event.end).format('HH:mm')}`}
       aria-label="Event Tooltip"
       hasArrow
       overflowWrap="anywhere"
@@ -290,14 +228,13 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
     >
       <div style={eventStyleGetter(event).style}>
         <div style={{ color: 'black', fontWeight: 'bold', fontSize: '10px' }}>
-          {event.titel}
+          {event.title}
         </div>
       </div>
     </Tooltip>
   );
-  
-  
-    const [isAddActionModalOpen, setIsAddActionModalOpen] = useState(false);
+
+  const [isAddActionModalOpen, setIsAddActionModalOpen] = useState(false);
   const onOpenAddActionModal = () => setIsAddActionModalOpen(true);
   const onCloseAddActionModal = () => setIsAddActionModalOpen(false);
 
@@ -317,7 +254,6 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
     setCurrentDate(new Date());
   };
 
-
   return (
     <Card
       direction='column'
@@ -333,7 +269,7 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
                 fontSize='22px'
                 fontWeight='700'
                 lineHeight='100%'>
-                Emploi du temps des équipess
+                Emploi du temps de l'équipe
               </Text>
               <Flex align="center">
                 <Input
@@ -365,9 +301,6 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
               events={events}
               defaultDate={defaultDate}
               date={currentDate}
-              resources={teams}
-              resourceIdAccessor="id"
-              resourceTitleAccessor="titel"
               formats={formats}
               defaultView={Views.DAY}
               views={['day', 'week', 'month', 'agenda']}
@@ -375,7 +308,7 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
               endAccessor="end"
               eventPropGetter={eventStyleGetter}
               messages={messages}
-              style={{  color: 'black' }}
+              style={{ color: 'black' }}
               onSelectEvent={handleEventSelect}
               components={{
                 event: CustomEvent,
@@ -421,13 +354,6 @@ const TeamScheduleByMySelfUnique = ({ selectedTeamId }) => {
                         value={updatedEventEnd}
                         onChange={(e) => setUpdatedEventEnd(e.target.value)}
                       />
-                      <Select value={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)}>
-                        {teams.map((team) => (
-                          <option key={team.id} value={team.id}>
-                            {team.titel}
-                          </option>
-                        ))}
-                      </Select>
                     </Stack>
                   ) : (
                     'Sélectionnez un événement à modifier ou à supprimer.'
