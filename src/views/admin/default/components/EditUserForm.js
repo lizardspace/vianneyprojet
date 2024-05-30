@@ -409,9 +409,6 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
               </GridItem>
             </Grid>
             <VStack spacing={4} align="stretch">
-              
-              
-
               {isEditingProfilePhoto && (
                 <FormControl>
                   <FormLabel htmlFor='new-profile-photo'>Nouvelle Photo de Profil</FormLabel>
@@ -420,11 +417,6 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                 </FormControl>
               )}
 
-              
-
-              
-
-              
               {showDeleteWarningAlert && (
                 <Alert status="warning" mt={4}>
                   <AlertIcon />
@@ -452,7 +444,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             </Alert>
           )}
         </ModalBody>
-      <ModalFooter>
+        <ModalFooter position="sticky" bottom="0" bg="white" zIndex="1000">
           <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
           <Button mr={1} colorScheme="blue" onClick={onClose}>Fermer</Button>
           <Button mr={1} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
