@@ -374,6 +374,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                       </Flex>
                     </HStack>
                   ))}
+                  <Button colorScheme="blue" onClick={handleAddTeamMember}>Ajouter un membre de l'équipe</Button>
                 </VStack>
               </GridItem>
 
@@ -536,7 +537,6 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                   <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowSuccessAlert(false)} />
                 </Alert>
               )}
-              <Button colorScheme="blue" onClick={handleAddTeamMember}>Ajouter un membre de l'équipe</Button>
             </VStack>
           </form>
           {showDeleteSuccessAlert && (
@@ -563,4 +563,3 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
 };
 
 export default EditUserForm;
-
