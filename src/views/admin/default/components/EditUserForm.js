@@ -265,6 +265,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                     {profilePhotoUrl && <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />}
                     <Text>Nom/Prénom CE: {leaderName.firstname} {leaderName.familyname}</Text>
                   </HStack>
+                  <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>Changer la photo</Button>
                   <Badge>{specialite}</Badge>
                   <HStack>
                     <PhoneIcon />
