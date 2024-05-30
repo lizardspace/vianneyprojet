@@ -264,15 +264,22 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             >
               <GridItem area={'header'}>
                 <Flex justifyContent='space-between' alignItems='center' bg='yellow.100' p='2'>
-                  <HStack>
+                  <HStack spacing={4}>
                     {profilePhotoUrl && <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />}
+                    <Input
+                      id="team-name"
+                      type="text"
+                      placeholder="Nom de l'équipe"
+                      value={nameOfTheTeam}
+                      onChange={(e) => setNameOfTheTeam(e.target.value)}
+                    />
                     <Text>Nom/Prénom CE: {leaderName.firstname} {leaderName.familyname}</Text>
+                    <Tooltip label="Changer la photo" aria-label="Changer la photo">
+                      <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>
+                        <FcCameraAddon size={20} />
+                      </Button>
+                    </Tooltip>
                   </HStack>
-                  <Tooltip label="Changer la photo" aria-label="Changer la photo">
-                    <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>
-                      <FcCameraAddon size={20} />
-                    </Button>
-                  </Tooltip>
                   <Badge>{specialite}</Badge>
                   <HStack>
                     <PhoneIcon />
