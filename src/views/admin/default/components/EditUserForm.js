@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { FaTrash } from 'react-icons/fa';
+import { FcCameraAddon } from "react-icons/fc";
 import {
   FormControl,
   FormLabel,
@@ -265,7 +266,9 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                     {profilePhotoUrl && <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />}
                     <Text>Nom/Prénom CE: {leaderName.firstname} {leaderName.familyname}</Text>
                   </HStack>
-                  <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>Changer la photo</Button>
+                  <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>
+                    <FcCameraAddon size={20} />
+                  </Button>
                   <Badge>{specialite}</Badge>
                   <HStack>
                     <PhoneIcon />
@@ -386,7 +389,9 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
               {profilePhotoUrl && (
                 <Box>
                   <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />
-                  <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>Changer la photo</Button>
+                  <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>
+                    <FcCameraAddon size={20} />
+                  </Button>
                 </Box>
               )}
 
