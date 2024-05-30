@@ -409,25 +409,8 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
               </GridItem>
             </Grid>
             <VStack spacing={4} align="stretch">
-              <FormControl>
-                <FormLabel htmlFor="team-name">Nom de l'équipe</FormLabel>
-                <Input id="team-name" type="text" placeholder="Nom de l'équipe" value={nameOfTheTeam} onChange={(e) => setNameOfTheTeam(e.target.value)} />
-              </FormControl>
-
-              <FormControl>
-                <FormLabel htmlFor="photo-profile-url">Photo Profile URL</FormLabel>
-                <Input id="photo-profile-url" type="text" placeholder="Photo Profile URL" value={profilePhotoUrl} onChange={(e) => setProfilePhotoUrl(e.target.value)} />
-              </FormControl>
-              {profilePhotoUrl && (
-                <Box>
-                  <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />
-                  <Tooltip label="Changer la photo" aria-label="Changer la photo">
-                    <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>
-                      <FcCameraAddon size={20} />
-                    </Button>
-                  </Tooltip>
-                </Box>
-              )}
+              
+              
 
               {isEditingProfilePhoto && (
                 <FormControl>
@@ -437,95 +420,11 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                 </FormControl>
               )}
 
-              <FormControl>
-                <FormLabel htmlFor='mission'>Mission</FormLabel>
-                <Input
-                  id='mission'
-                  type="text"
-                  value={mission}
-                  onChange={(e) => setMission(e.target.value)}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel htmlFor='typeDeVehicule'>Type de Véhicule</FormLabel>
-                <Input
-                  id='typeDeVehicule'
-                  type="text"
-                  value={typeDeVehicule}
-                  onChange={(e) => setTypeDeVehicule(e.target.value)}
-                />
-              </FormControl>
+              
 
-              <FormControl>
-                <FormLabel htmlFor='immatriculation'>Immatriculation</FormLabel>
-                <Input
-                  id='immatriculation'
-                  type="text"
-                  value={immatriculation}
-                  onChange={(e) => setImmatriculation(e.target.value)}
-                />
-              </FormControl>
+              
 
-              <FormControl>
-                <FormLabel htmlFor='specialite'>Spécialité</FormLabel>
-                <Input
-                  id='specialite'
-                  type="text"
-                  value={specialite}
-                  onChange={(e) => setSpecialite(e.target.value)}
-                />
-              </FormControl>
-
-              {teamMembers.map((teamMember, index) => (
-                <HStack key={teamMember.id} spacing={2}>
-                  <Input
-                    type="text"
-                    name="familyname"
-                    placeholder="Nom de famille"
-                    value={teamMember.familyname}
-                    onChange={(e) => handleTeamMemberChange(index, e)}
-                  />
-                  <Input
-                    type="text"
-                    name="firstname"
-                    placeholder="Prénom"
-                    value={teamMember.firstname}
-                    onChange={(e) => handleTeamMemberChange(index, e)}
-                  />
-                  <Input
-                    type="text"
-                    name="mail"
-                    placeholder="Email"
-                    value={teamMember.mail}
-                    onChange={(e) => handleTeamMemberChange(index, e)}
-                  />
-                  <Input
-                    type="text"
-                    name="phone"
-                    placeholder="Téléphone"
-                    value={teamMember.phone}
-                    onChange={(e) => handleTeamMemberChange(index, e)}
-                  />
-                  <Checkbox
-                    name="isLeader"
-                    isChecked={teamMember.isLeader}
-                    onChange={(e) => handleTeamMemberChange(index, e)}
-                  >
-                    Leader ?
-                  </Checkbox>
-                  <Flex align="center" justify="center">
-                    <Button
-                      size="sm"
-                      colorScheme="red"
-                      onClick={() => handleDeleteTeamMember(index)}
-                    >
-                      <Center>
-                        <FaTrash />
-                      </Center>
-                    </Button>
-                  </Flex>
-                </HStack>
-              ))}
+              
               {showDeleteWarningAlert && (
                 <Alert status="warning" mt={4}>
                   <AlertIcon />
@@ -552,14 +451,8 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
               Equipe supprimée avec succès
             </Alert>
           )}
-          <Box mt={4}>
-            <TeamScheduleByMySelfUnique selectedTeamId={teamData?.id} />
-          </Box>
-          <Box mt={4}>
-            <AfficherMaterielsUnique selectedTeamId={teamData?.id} />
-          </Box>
         </ModalBody>
-        <ModalFooter>
+      <ModalFooter>
           <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
           <Button mr={1} colorScheme="blue" onClick={onClose}>Fermer</Button>
           <Button mr={1} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
