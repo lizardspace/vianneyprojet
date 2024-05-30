@@ -248,16 +248,15 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       <ModalContent>
         <ModalHeader>Modifier l'équipe</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
+        <ModalBody pb={20}>
           <form onSubmit={handleSubmit}>
             <Grid
               templateAreas={`"header header"
                         "missions team"
-                        "map map"
-                        "materials timeline"`}
-              gridTemplateRows={isEditingProfilePhoto ? '100px 1fr 1fr 1fr' : '50px 1fr 1fr 1fr'}
+                        "materials timeline"
+                        "map map"`}
+              gridTemplateRows={isEditingProfilePhoto ? '100px 1fr 1fr 400px' : '50px 1fr 1fr 400px'}
               gridTemplateColumns={'1fr 1fr'}
-              h='800px'
               gap='4'
               color='black'
               fontWeight='bold'
@@ -385,8 +384,6 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                 </VStack>
               </GridItem>
 
-
-
               <GridItem area={'materials'} bg='blue.100' p='2'>
                 <VStack alignItems='flex-start' spacing='4'>
                   <Text>Matériel:</Text>
@@ -401,10 +398,16 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                 </VStack>
               </GridItem>
 
+              <GridItem area={'map'} p='2'>
+                <Box id="mapId" h="400px" w="100%">
+                  <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <LocationMarker />
+                  </MapContainer>
+                </Box>
+              </GridItem>
             </Grid>
             <VStack spacing={4} align="stretch">
-              
-
               {showDeleteWarningAlert && (
                 <Alert status="warning" mt={4}>
                   <AlertIcon />
@@ -432,14 +435,6 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             </Alert>
           )}
         </ModalBody>
-        <GridItem area={'map'} p='2'>
-                <Box id="mapId" h="400px" w="100%">
-                  <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    <LocationMarker />
-                  </MapContainer>
-                </Box>
-        </GridItem>
         <ModalFooter position="sticky" bottom="0" bg="white" zIndex="1000">
           <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
           <Button mr={1} colorScheme="blue" onClick={onClose}>Fermer</Button>
