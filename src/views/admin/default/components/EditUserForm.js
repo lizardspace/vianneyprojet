@@ -385,14 +385,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                 </VStack>
               </GridItem>
 
-              <GridItem area={'map'} p='2'>
-                <Box id="mapId" h="400px" w="100%">
-                  <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    <LocationMarker />
-                  </MapContainer>
-                </Box>
-              </GridItem>
+
 
               <GridItem area={'materials'} bg='blue.100' p='2'>
                 <VStack alignItems='flex-start' spacing='4'>
@@ -407,6 +400,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                   <TeamScheduleByMySelfUnique selectedTeamId={teamData?.id} />
                 </VStack>
               </GridItem>
+
             </Grid>
             <VStack spacing={4} align="stretch">
               {isEditingProfilePhoto && (
@@ -444,6 +438,14 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             </Alert>
           )}
         </ModalBody>
+        <GridItem area={'map'} p='2'>
+                <Box id="mapId" h="400px" w="100%">
+                  <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <LocationMarker />
+                  </MapContainer>
+                </Box>
+        </GridItem>
         <ModalFooter position="sticky" bottom="0" bg="white" zIndex="1000">
           <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
           <Button mr={1} colorScheme="blue" onClick={onClose}>Fermer</Button>
