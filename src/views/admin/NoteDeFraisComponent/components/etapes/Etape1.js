@@ -11,7 +11,6 @@ import {
   GridItem,
   InputGroup,
   InputRightElement,
-  Icon,
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 
