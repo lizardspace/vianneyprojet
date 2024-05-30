@@ -48,7 +48,7 @@ function Etape1() {
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
-              padding="10px 15px"
+              
               height="40px"
               position="relative"
               zIndex="0"
@@ -75,7 +75,7 @@ function Etape1() {
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
-              padding="10px 15px"
+              
               height="40px"
               position="relative"
               zIndex="0"
@@ -102,7 +102,7 @@ function Etape1() {
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
-              padding="10px 15px"
+              
               height="40px"
               position="relative"
               zIndex="0"
@@ -129,7 +129,7 @@ function Etape1() {
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
-              padding="10px 15px"
+              
               height="40px"
               position="relative"
               zIndex="0"
@@ -156,7 +156,6 @@ function Etape1() {
                 placeholder="Choisir un pôle"
                 borderColor="gray.300"
                 borderRadius="md"
-                padding="10px 15px"
                 height="40px"
               >
                 {/* Options for poles */}
@@ -185,7 +184,6 @@ function Etape1() {
                 placeholder="Choisir un pôle d'abord"
                 borderColor="gray.300"
                 borderRadius="md"
-                padding="10px 15px"
                 height="40px"
               >
                 {/* Options for poles */}
@@ -214,7 +212,7 @@ function Etape1() {
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
-              padding="10px 15px"
+              
               height="40px"
               position="relative"
               zIndex="0"
@@ -241,7 +239,7 @@ function Etape1() {
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
-              padding="10px 15px"
+              
               height="100px"
               position="relative"
               zIndex="0"
@@ -268,7 +266,7 @@ function Etape1() {
                 placeholder="Choisir une option"
                 borderColor="gray.300"
                 borderRadius="md"
-                padding="10px 15px"
+                
                 height="40px"
               >
                 <option value="yes">Oui</option>
