@@ -403,13 +403,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
 
             </Grid>
             <VStack spacing={4} align="stretch">
-              {isEditingProfilePhoto && (
-                <FormControl>
-                  <FormLabel htmlFor='new-profile-photo'>Nouvelle Photo de Profil</FormLabel>
-                  <Input id='new-profile-photo' type="file" onChange={handleFileChange} />
-                  <Button colorScheme="blue" onClick={handleSaveProfilePhoto}>Enregistrer la nouvelle photo</Button>
-                </FormControl>
-              )}
+              
 
               {showDeleteWarningAlert && (
                 <Alert status="warning" mt={4}>
