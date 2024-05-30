@@ -47,10 +47,10 @@ function Etape1() {
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
-              
               height="40px"
               position="relative"
               zIndex="0"
+              _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
             />
           </FormControl>
         </GridItem>
@@ -74,10 +74,10 @@ function Etape1() {
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
-              
               height="40px"
               position="relative"
               zIndex="0"
+              _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
             />
           </FormControl>
         </GridItem>
@@ -101,10 +101,10 @@ function Etape1() {
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
-              
               height="40px"
               position="relative"
               zIndex="0"
+              _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
             />
           </FormControl>
         </GridItem>
@@ -128,10 +128,10 @@ function Etape1() {
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
-              
               height="40px"
               position="relative"
               zIndex="0"
+              _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
             />
           </FormControl>
         </GridItem>
@@ -156,6 +156,7 @@ function Etape1() {
                 borderColor="gray.300"
                 borderRadius="md"
                 height="40px"
+                _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
               >
                 {/* Options for poles */}
               </Select>
@@ -184,6 +185,7 @@ function Etape1() {
                 borderColor="gray.300"
                 borderRadius="md"
                 height="40px"
+                _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
               >
                 {/* Options for poles */}
               </Select>
@@ -211,10 +213,10 @@ function Etape1() {
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
-              
               height="40px"
               position="relative"
               zIndex="0"
+              _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
             />
           </FormControl>
         </GridItem>
@@ -238,10 +240,10 @@ function Etape1() {
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
-              
               height="100px"
               position="relative"
               zIndex="0"
+              _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
             />
           </FormControl>
         </GridItem>
@@ -265,8 +267,8 @@ function Etape1() {
                 placeholder="Choisir une option"
                 borderColor="gray.300"
                 borderRadius="md"
-                
                 height="40px"
+                _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
               >
                 <option value="yes">Oui</option>
                 <option value="no">Non</option>
