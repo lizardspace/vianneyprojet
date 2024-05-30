@@ -33,7 +33,8 @@ import {
   StackDivider,
   Badge,
   Grid,
-  GridItem
+  GridItem,
+  Tooltip
 } from '@chakra-ui/react';
 import { PhoneIcon, EmailIcon } from '@chakra-ui/icons';
 import { supabase } from './../../../../supabaseClient';
@@ -253,7 +254,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
               templateAreas={`"header header"
                         "missions team"
                         "materials timeline"`}
-              gridTemplateRows={'50px 1fr 1fr'}
+              gridTemplateRows={isEditingProfilePhoto ? '200px 1fr 1fr' : '50px 1fr 1fr'}
               gridTemplateColumns={'1fr 1fr'}
               h='600px'
               gap='4'
@@ -266,9 +267,11 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                     {profilePhotoUrl && <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />}
                     <Text>Nom/Prénom CE: {leaderName.firstname} {leaderName.familyname}</Text>
                   </HStack>
-                  <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>
-                    <FcCameraAddon size={20} />
-                  </Button>
+                  <Tooltip label="Changer la photo" aria-label="Changer la photo">
+                    <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>
+                      <FcCameraAddon size={20} />
+                    </Button>
+                  </Tooltip>
                   <Badge>{specialite}</Badge>
                   <HStack>
                     <PhoneIcon />
@@ -280,7 +283,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                   </HStack>
                 </Flex>
                 {isEditingProfilePhoto && (
-                  <FormControl>
+                  <FormControl mt={4}>
                     <FormLabel htmlFor='new-profile-photo'>Nouvelle Photo de Profil</FormLabel>
                     <Input id='new-profile-photo' type="file" onChange={handleFileChange} />
                     <Button colorScheme="blue" onClick={handleSaveProfilePhoto}>Enregistrer la nouvelle photo</Button>
@@ -389,9 +392,11 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
               {profilePhotoUrl && (
                 <Box>
                   <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />
-                  <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>
-                    <FcCameraAddon size={20} />
-                  </Button>
+                  <Tooltip label="Changer la photo" aria-label="Changer la photo">
+                    <Button ml={1} colorScheme="blue" onClick={() => setIsEditingProfilePhoto(true)}>
+                      <FcCameraAddon size={20} />
+                    </Button>
+                  </Tooltip>
                 </Box>
               )}
 
