@@ -253,10 +253,11 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             <Grid
               templateAreas={`"header header"
                         "missions team"
+                        "map map"
                         "materials timeline"`}
-              gridTemplateRows={isEditingProfilePhoto ? '200px 1fr 1fr' : '50px 1fr 1fr'}
+              gridTemplateRows={isEditingProfilePhoto ? '100px 1fr 1fr 1fr' : '50px 1fr 1fr 1fr'}
               gridTemplateColumns={'1fr 1fr'}
-              h='600px'
+              h='800px'
               gap='4'
               color='black'
               fontWeight='bold'
@@ -299,6 +300,24 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                     onChange={(e) => setMission(e.target.value)} 
                     placeholder="Missions de l'équipe" 
                   />
+                  <FormControl>
+                    <FormLabel htmlFor='typeDeVehicule'>Type de Véhicule</FormLabel>
+                    <Input
+                      id='typeDeVehicule'
+                      type="text"
+                      value={typeDeVehicule}
+                      onChange={(e) => setTypeDeVehicule(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel htmlFor='immatriculation'>Immatriculation</FormLabel>
+                    <Input
+                      id='immatriculation'
+                      type="text"
+                      value={immatriculation}
+                      onChange={(e) => setImmatriculation(e.target.value)}
+                    />
+                  </FormControl>
                 </VStack>
               </GridItem>
 
@@ -358,6 +377,15 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                 </VStack>
               </GridItem>
 
+              <GridItem area={'map'} p='2'>
+                <Box id="mapId" h="400px" w="100%">
+                  <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <LocationMarker />
+                  </MapContainer>
+                </Box>
+              </GridItem>
+
               <GridItem area={'materials'} bg='blue.100' p='2'>
                 <VStack alignItems='flex-start' spacing='4'>
                   <Text>Matériel:</Text>
@@ -372,13 +400,6 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                 </VStack>
               </GridItem>
             </Grid>
-            <Box id="mapId" h="400px" w="100%">
-              <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                <LocationMarker />
-              </MapContainer>
-            </Box>
-
             <VStack spacing={4} align="stretch">
               <FormControl>
                 <FormLabel htmlFor="team-name">Nom de l'équipe</FormLabel>
@@ -542,3 +563,4 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
 };
 
 export default EditUserForm;
+
