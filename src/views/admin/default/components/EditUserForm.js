@@ -262,7 +262,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
               <GridItem area={'header'}>
                 <Flex justifyContent='space-between' alignItems='center' bg='yellow.100' p='2'>
                   <Text>Nom/Prénom CE: {leaderName.firstname} {leaderName.familyname}</Text>
-                  <Badge>Spécialité</Badge>
+                  <Badge>{specialite}</Badge>
                   <Text>Âge</Text>
                   <PhoneIcon />
                   <EmailIcon />
@@ -273,28 +273,81 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
               <GridItem area={'missions'} bg='orange.100' p='2'>
                 <VStack alignItems='flex-start' spacing='4' divider={<StackDivider borderColor='gray.200' />}>
                   <Text>Missions:</Text>
-                  {/* ... Détails des missions ... */}
+                  <Input 
+                    value={mission} 
+                    onChange={(e) => setMission(e.target.value)} 
+                    placeholder="Missions de l'équipe" 
+                  />
                 </VStack>
               </GridItem>
 
               <GridItem area={'team'} bg='teal.100' p='2'>
                 <VStack alignItems='flex-start' spacing='4'>
                   <Text>Membres équipe:</Text>
-                  {/* ... Membres de l'équipe ... */}
+                  {teamMembers.map((teamMember, index) => (
+                    <HStack key={teamMember.id} spacing={2}>
+                      <Input
+                        type="text"
+                        name="familyname"
+                        placeholder="Nom de famille"
+                        value={teamMember.familyname}
+                        onChange={(e) => handleTeamMemberChange(index, e)}
+                      />
+                      <Input
+                        type="text"
+                        name="firstname"
+                        placeholder="Prénom"
+                        value={teamMember.firstname}
+                        onChange={(e) => handleTeamMemberChange(index, e)}
+                      />
+                      <Input
+                        type="text"
+                        name="mail"
+                        placeholder="Email"
+                        value={teamMember.mail}
+                        onChange={(e) => handleTeamMemberChange(index, e)}
+                      />
+                      <Input
+                        type="text"
+                        name="phone"
+                        placeholder="Téléphone"
+                        value={teamMember.phone}
+                        onChange={(e) => handleTeamMemberChange(index, e)}
+                      />
+                      <Checkbox
+                        name="isLeader"
+                        isChecked={teamMember.isLeader}
+                        onChange={(e) => handleTeamMemberChange(index, e)}
+                      >
+                        Leader ?
+                      </Checkbox>
+                      <Flex align="center" justify="center">
+                        <Button
+                          size="sm"
+                          colorScheme="red"
+                          onClick={() => handleDeleteTeamMember(index)}
+                        >
+                          <Center>
+                            <FaTrash />
+                          </Center>
+                        </Button>
+                      </Flex>
+                    </HStack>
+                  ))}
                 </VStack>
               </GridItem>
 
               <GridItem area={'materials'} bg='blue.100' p='2'>
                 <VStack alignItems='flex-start' spacing='4'>
                   <Text>Matériel:</Text>
-                  {/* ... Détails du matériel ... */}
+                  <AfficherMaterielsUnique selectedTeamId={teamData?.id} />
                 </VStack>
               </GridItem>
 
               <GridItem area={'timeline'} bg='purple.100' p='2'>
                 <VStack alignItems='flex-start' spacing='4'>
                   <Text>Emploi du temps équipe:</Text>
-                  {/* ... Détails de l'emploi du temps ... */}
+                  <TeamScheduleByMySelfUnique selectedTeamId={teamData?.id} />
                 </VStack>
               </GridItem>
             </Grid>
