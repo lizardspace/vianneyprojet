@@ -9,7 +9,11 @@ import {
   Textarea,
   Grid,
   GridItem,
+  InputGroup,
+  InputRightElement,
+  Icon,
 } from '@chakra-ui/react';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 
 function Etape1() {
   return (
@@ -147,17 +151,18 @@ function Etape1() {
             >
               Choisir un pôle
             </FormLabel>
-            <Select
-              placeholder="Choisir un pôle"
-              borderColor="gray.300"
-              borderRadius="md"
-              padding="10px 15px"
-              height="40px"
-              position="relative"
-              zIndex="0"
-            >
-              {/* Options for poles */}
-            </Select>
+            <InputGroup>
+              <Select
+                placeholder="Choisir un pôle"
+                borderColor="gray.300"
+                borderRadius="md"
+                padding="10px 15px"
+                height="40px"
+              >
+                {/* Options for poles */}
+              </Select>
+              <InputRightElement pointerEvents="none" height="100%" children={<ChevronDownIcon color="gray.500" />} />
+            </InputGroup>
           </FormControl>
         </GridItem>
 
@@ -175,17 +180,18 @@ function Etape1() {
             >
               Choisir un pôle d'abord
             </FormLabel>
-            <Select
-              placeholder="Choisir un pôle d'abord"
-              borderColor="gray.300"
-              borderRadius="md"
-              padding="10px 15px"
-              height="40px"
-              position="relative"
-              zIndex="0"
-            >
-              {/* Options for poles */}
-            </Select>
+            <InputGroup>
+              <Select
+                placeholder="Choisir un pôle d'abord"
+                borderColor="gray.300"
+                borderRadius="md"
+                padding="10px 15px"
+                height="40px"
+              >
+                {/* Options for poles */}
+              </Select>
+              <InputRightElement pointerEvents="none" height="100%" children={<ChevronDownIcon color="gray.500" />} />
+            </InputGroup>
           </FormControl>
         </GridItem>
 
@@ -257,18 +263,19 @@ function Etape1() {
             >
               Souhaitez-vous abandonner vos frais au profit de Notre-dame de Chrétienté ?
             </FormLabel>
-            <Select
-              placeholder="Choisir une option"
-              borderColor="gray.300"
-              borderRadius="md"
-              padding="10px 15px"
-              height="40px"
-              position="relative"
-              zIndex="0"
-            >
-              <option value="yes">Oui</option>
-              <option value="no">Non</option>
-            </Select>
+            <InputGroup>
+              <Select
+                placeholder="Choisir une option"
+                borderColor="gray.300"
+                borderRadius="md"
+                padding="10px 15px"
+                height="40px"
+              >
+                <option value="yes">Oui</option>
+                <option value="no">Non</option>
+              </Select>
+              <InputRightElement pointerEvents="none" height="100%" children={<ChevronDownIcon color="gray.500" />} />
+            </InputGroup>
           </FormControl>
         </GridItem>
       </Grid>
