@@ -61,7 +61,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
     phone: '',
     isLeader: false,
   }]);
-  const [leaderName, setLeaderName] = useState({ firstname: '', familyname: '' });
+  const [leaderName, setLeaderName] = useState({ firstname: '', familyname: '', phone: '', mail: '' });
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -87,9 +87,9 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
   const updateLeaderName = (members) => {
     const leader = members.find(member => member.isLeader);
     if (leader) {
-      setLeaderName({ firstname: leader.firstname, familyname: leader.familyname });
+      setLeaderName({ firstname: leader.firstname, familyname: leader.familyname, phone: leader.phone, mail: leader.mail });
     } else {
-      setLeaderName({ firstname: '', familyname: '' });
+      setLeaderName({ firstname: '', familyname: '', phone: '', mail: '' });
     }
   };
 
@@ -261,13 +261,27 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             >
               <GridItem area={'header'}>
                 <Flex justifyContent='space-between' alignItems='center' bg='yellow.100' p='2'>
-                  <Text>Nom/Prénom CE: {leaderName.firstname} {leaderName.familyname}</Text>
+                  <HStack>
+                    {profilePhotoUrl && <Avatar size="md" name="Profile Photo" src={profilePhotoUrl} />}
+                    <Text>Nom/Prénom CE: {leaderName.firstname} {leaderName.familyname}</Text>
+                  </HStack>
                   <Badge>{specialite}</Badge>
-                  <Text>Âge</Text>
-                  <PhoneIcon />
-                  <EmailIcon />
-                  {/* ... Autres informations ... */}
+                  <HStack>
+                    <PhoneIcon />
+                    <Text>{leaderName.phone}</Text>
+                  </HStack>
+                  <HStack>
+                    <EmailIcon />
+                    <Text>{leaderName.mail}</Text>
+                  </HStack>
                 </Flex>
+                {isEditingProfilePhoto && (
+                  <FormControl>
+                    <FormLabel htmlFor='new-profile-photo'>Nouvelle Photo de Profil</FormLabel>
+                    <Input id='new-profile-photo' type="file" onChange={handleFileChange} />
+                    <Button colorScheme="blue" onClick={handleSaveProfilePhoto}>Enregistrer la nouvelle photo</Button>
+                  </FormControl>
+                )}
               </GridItem>
 
               <GridItem area={'missions'} bg='orange.100' p='2'>
