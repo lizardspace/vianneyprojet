@@ -255,7 +255,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                         "missions team"
                         "materials timeline"
                         "map map"`}
-              gridTemplateRows={isEditingProfilePhoto ? '100px 1fr 1fr 400px' : '50px 1fr 1fr 400px'}
+              gridTemplateRows={'auto'}
               gridTemplateColumns={'1fr 1fr'}
               gap='4'
               color='black'
@@ -399,8 +399,8 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
               </GridItem>
 
               <GridItem area={'map'} p='2'>
-                <Box id="mapId" h="400px" w="100%">
-                  <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                <Box id="mapId" w="100%">
+                  <MapContainer center={[lat, lng]} zoom={13} scrollWheelZoom={false} style={{ height: '400px', width: '100%' }}>
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                     <LocationMarker />
                   </MapContainer>
