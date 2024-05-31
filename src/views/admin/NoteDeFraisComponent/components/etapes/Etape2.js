@@ -8,14 +8,11 @@ import {
   Select,
   Grid,
   GridItem,
-  Textarea,
 } from '@chakra-ui/react';
 
 function Etape2() {
   return (
     <Box
-
-
       mt="10"
       p="6"
       boxShadow="lg"
@@ -147,8 +144,8 @@ function Etape2() {
             >
               Compteur de kilomètres départ
             </FormLabel>
-            <Textarea
-              placeholder="Cliquez ici pour ajouter une photo ou un PDF"
+            <Input
+              type="file"
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
@@ -174,8 +171,8 @@ function Etape2() {
             >
               Compteur de kilomètres retour
             </FormLabel>
-            <Textarea
-              placeholder="Cliquez ici pour ajouter une photo ou un PDF"
+            <Input
+              type="file"
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
@@ -201,8 +198,8 @@ function Etape2() {
             >
               Photo de la carte grise
             </FormLabel>
-            <Textarea
-              placeholder="Cliquez ici pour ajouter une photo ou un PDF"
+            <Input
+              type="file"
               borderColor="gray.300"
               _placeholder={{ color: 'gray.500' }}
               borderRadius="md"
