@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Button, Flex, Text, Link, Icon } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 
-function TripList() {
+function Etape3() {
   const trips = [
     { name: 'Tassin-Paris', distance: 473 },
     { name: 'Chartres-Tassin', distance: 508 }
@@ -40,4 +40,4 @@ function TripList() {
   );
 }
 
-export default TripList;
+export default Etape3;

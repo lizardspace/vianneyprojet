@@ -6,9 +6,6 @@ import {
   AccordionPanel,
   Box,
   Button,
-  Input,
-  FormControl,
-  FormLabel,
   VStack,
   HStack,
   Text
@@ -16,6 +13,7 @@ import {
 import { EditIcon } from '@chakra-ui/icons';
 import Etape1 from './etapes/Etape1';
 import Etape2 from './etapes/Etape2';
+import Etape3 from './etapes/Etape3';
 
 const CustomAccordionButton = ({ number, title }) => (
   <HStack width="100%" justifyContent="space-between">
@@ -69,12 +67,7 @@ const ExpenseForm = () => {
           </AccordionButton>
         </h2>
         <AccordionPanel pb={4}>
-          <VStack>
-            <FormControl>
-              <FormLabel>Frais kilométriques</FormLabel>
-              <Input placeholder="Montant des frais kilométriques" />
-            </FormControl>
-          </VStack>
+            <Etape3/>
         </AccordionPanel>
       </AccordionItem>
 
