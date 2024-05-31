@@ -6,7 +6,6 @@ import {
   FormLabel,
   Input,
   Select,
-  Textarea,
   Grid,
   GridItem,
   InputGroup,
@@ -17,8 +16,6 @@ import { ChevronDownIcon } from '@chakra-ui/icons';
 function Etape1() {
   return (
     <Box
-
-
       mt="10"
       p="6"
       boxShadow="lg"
@@ -231,20 +228,39 @@ function Etape1() {
               px="0.25rem"
               fontSize="xs"
               fontWeight="bold"
-              zIndex="1"
+              zIndex="1000"
             >
               RIB
             </FormLabel>
-            <Textarea
-              placeholder="Cliquez ici pour ajouter une photo ou un PDF"
-              borderColor="gray.300"
-              _placeholder={{ color: 'gray.500' }}
-              borderRadius="md"
-              height="100px"
-              position="relative"
-              zIndex="0"
-              _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
-            />
+            <Box position="relative" height="100px">
+              <Input
+                type="file"
+                opacity="0"
+                position="absolute"
+                top="0"
+                left="0"
+                height="100%"
+                width="100%"
+                zIndex="2"
+              />
+              <Box
+                position="absolute"
+                top="0"
+                left="0"
+                height="100%"
+                width="100%"
+                bg="white"
+                borderRadius="md"
+                borderWidth="1px"
+                borderColor="gray.300"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                zIndex="1"
+              >
+                Cliquez ici pour ajouter une photo ou un PDF
+              </Box>
+            </Box>
           </FormControl>
         </GridItem>
 
