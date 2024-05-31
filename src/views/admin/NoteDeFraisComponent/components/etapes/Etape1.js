@@ -17,8 +17,8 @@ import { ChevronDownIcon } from '@chakra-ui/icons';
 function Etape1() {
   return (
     <Box
-      maxWidth="800px"
-      mx="auto"
+
+
       mt="10"
       p="6"
       boxShadow="lg"

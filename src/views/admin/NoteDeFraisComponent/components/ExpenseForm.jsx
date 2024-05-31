@@ -43,9 +43,9 @@ const ExpenseForm = () => {
           </AccordionButton>
         </h2>
         <AccordionPanel pb={4}>
-          <VStack>
-            <Etape1/>
-          </VStack>
+
+          <Etape1 />
+
         </AccordionPanel>
       </AccordionItem>
 
@@ -56,9 +56,9 @@ const ExpenseForm = () => {
           </AccordionButton>
         </h2>
         <AccordionPanel pb={4}>
-          <VStack>
-          <Etape2/>
-          </VStack>
+
+          <Etape2 />
+
         </AccordionPanel>
       </AccordionItem>
 

@@ -14,8 +14,8 @@ import {
 function Etape2() {
   return (
     <Box
-      maxWidth="800px"
-      mx="auto"
+
+
       mt="10"
       p="6"
       boxShadow="lg"
