@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
 import Etape1 from './etapes/Etape1';
+import Etape2 from './etapes/Etape2';
 
 const CustomAccordionButton = ({ number, title }) => (
   <HStack width="100%" justifyContent="space-between">
@@ -56,10 +57,7 @@ const ExpenseForm = () => {
         </h2>
         <AccordionPanel pb={4}>
           <VStack>
-            <FormControl>
-              <FormLabel>Véhicule</FormLabel>
-              <Input placeholder="Véhicule utilisé" />
-            </FormControl>
+          <Etape2/>
           </VStack>
         </AccordionPanel>
       </AccordionItem>
