@@ -29,12 +29,28 @@ function Etape3() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [newTripName, setNewTripName] = useState('');
   const [newTripDistance, setNewTripDistance] = useState('');
+  const [editingTrip, setEditingTrip] = useState(null);
 
   const handleAddTrip = () => {
-    setTrips([...trips, { name: newTripName, distance: parseInt(newTripDistance) }]);
+    if (editingTrip !== null) {
+      const updatedTrips = trips.map((trip, index) =>
+        index === editingTrip ? { name: newTripName, distance: parseInt(newTripDistance) } : trip
+      );
+      setTrips(updatedTrips);
+    } else {
+      setTrips([...trips, { name: newTripName, distance: parseInt(newTripDistance) }]);
+    }
     setNewTripName('');
     setNewTripDistance('');
+    setEditingTrip(null);
     onClose();
+  };
+
+  const handleEditTrip = (index) => {
+    setNewTripName(trips[index].name);
+    setNewTripDistance(trips[index].distance);
+    setEditingTrip(index);
+    onOpen();
   };
 
   return (
@@ -51,7 +67,7 @@ function Etape3() {
         <Flex key={index} justifyContent="space-between" alignItems="center" mb="4">
           <Text fontWeight="bold">{trip.name}</Text>
           <Text color="green.500">{trip.distance} KM</Text>
-          <Button size="sm">Modifier</Button>
+          <Button size="sm" onClick={() => handleEditTrip(index)}>Modifier</Button>
         </Flex>
       ))}
 
@@ -69,7 +85,7 @@ function Etape3() {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Ajouter un nouveau trajet</ModalHeader>
+          <ModalHeader>{editingTrip !== null ? 'Modifier le trajet' : 'Ajouter un nouveau trajet'}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl id="newTripName" mb="4">
@@ -92,7 +108,7 @@ function Etape3() {
 
           <ModalFooter>
             <Button colorScheme="blue" mr="3" onClick={handleAddTrip}>
-              Ajouter
+              {editingTrip !== null ? 'Modifier' : 'Ajouter'}
             </Button>
             <Button variant="ghost" onClick={onClose}>Annuler</Button>
           </ModalFooter>
