@@ -241,7 +241,7 @@ const Etape1 = ({ data, setData }) => {
                 Cliquez ici pour ajouter une photo ou un PDF
               </Box>
             </Box>
-            {fileUrl && <Image src={fileUrl} alt="RIB Preview" mt="4" />}
+            {fileUrl && <Image src={fileUrl} alt="RIB Preview" mt="4" boxSize="200px" objectFit="cover" borderRadius="md" />}
           </FormControl>
         </GridItem>
       </Grid>
@@ -378,7 +378,7 @@ const Etape2 = ({ data, setData }) => {
                 Cliquez ici pour ajouter une photo ou un PDF
               </Box>
             </Box>
-            {data.departure_odometer && <Image src={getFileUrl(data.departure_odometer)} alt="Departure Odometer Preview" mt="4" />}
+            {data.departure_odometer && <Image src={getFileUrl(data.departure_odometer)} alt="Departure Odometer Preview" mt="4" boxSize="200px" objectFit="cover" borderRadius="md" />}
           </FormControl>
         </GridItem>
 
@@ -393,7 +393,7 @@ const Etape2 = ({ data, setData }) => {
                 Cliquez ici pour ajouter une photo ou un PDF
               </Box>
             </Box>
-            {data.return_odometer && <Image src={getFileUrl(data.return_odometer)} alt="Return Odometer Preview" mt="4" />}
+            {data.return_odometer && <Image src={getFileUrl(data.return_odometer)} alt="Return Odometer Preview" mt="4" boxSize="200px" objectFit="cover" borderRadius="md" />}
           </FormControl>
         </GridItem>
 
@@ -408,7 +408,7 @@ const Etape2 = ({ data, setData }) => {
                 Cliquez ici pour ajouter une photo ou un PDF
               </Box>
             </Box>
-            {data.carte_grise && <Image src={getFileUrl(data.carte_grise)} alt="Carte Grise Preview" mt="4" />}
+            {data.carte_grise && <Image src={getFileUrl(data.carte_grise)} alt="Carte Grise Preview" mt="4" boxSize="200px" objectFit="cover" borderRadius="md" />}
           </FormControl>
         </GridItem>
       </Grid>
@@ -571,7 +571,7 @@ const Etape4 = ({ expenses, setExpenses }) => {
           <Text fontWeight="bold">{expense.name}</Text>
           <Text color="green.500">{expense.cost.toFixed(2)} €</Text>
           {expense.fileName && (
-            <Image src={`https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${expense.fileName}`} alt="Expense File Preview" mt="4" />
+            <Image src={`https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${expense.fileName}`} alt="Expense File Preview" mt="4" boxSize="200px" objectFit="cover" borderRadius="md"/>
           )}
           <Button size="sm" type="button" onClick={() => handleEditExpense(index)}>Modifier</Button>
         </Flex>
