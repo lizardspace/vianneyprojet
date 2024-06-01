@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Accordion,
   AccordionItem,
@@ -567,27 +567,20 @@ const Etape4 = ({ expenses, setExpenses }) => {
 };
 
 const ExpenseForm = () => {
-  const [data, setData] = useState({});
+  const [data, setData] = useState({
+    volunteer_last_name: '',
+    volunteer_first_name: '',
+    phone_number: '',
+    email: '',
+    pole: '',
+    pole_prior: '',
+    address: '',
+    rib: '',
+    donation_option: ''
+  });
   const [trips, setTrips] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const toast = useToast();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data, error } = await supabase.from('vianney_expenses_reimbursement').select('*');
-      if (error) {
-        console.error('Error fetching data:', error);
-      } else {
-        // Assuming only one record per user for simplicity
-        const fetchedData = data[0] || {};
-        setData(fetchedData);
-        setTrips(fetchedData.trips || []);
-        setExpenses(fetchedData.expenses || []);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const handleSubmit = async () => {
     const formattedData = {
@@ -598,7 +591,7 @@ const ExpenseForm = () => {
 
     const { error } = await supabase
       .from('vianney_expenses_reimbursement')
-      .upsert([formattedData], { onConflict: 'id' });
+      .insert([formattedData]);
 
     if (error) {
       toast({
@@ -616,6 +609,20 @@ const ExpenseForm = () => {
         duration: 5000,
         isClosable: true,
       });
+      // Optionally, clear the form after successful submission
+      setData({
+        volunteer_last_name: '',
+        volunteer_first_name: '',
+        phone_number: '',
+        email: '',
+        pole: '',
+        pole_prior: '',
+        address: '',
+        rib: '',
+        donation_option: ''
+      });
+      setTrips([]);
+      setExpenses([]);
     }
   };
 
