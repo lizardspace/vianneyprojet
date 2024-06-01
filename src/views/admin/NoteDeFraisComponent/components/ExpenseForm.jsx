@@ -245,7 +245,7 @@ const Etape1 = ({ data, setData }) => {
       </Grid>
 
       <Box textAlign="right" mt="6">
-        <Button colorScheme="blue" type="submit">
+        <Button colorScheme="blue" type="button">
           Suivant
         </Button>
       </Box>
@@ -387,7 +387,7 @@ const Etape2 = ({ data, setData }) => {
       </Grid>
 
       <Box textAlign="right" mt="6">
-        <Button colorScheme="blue" type="submit">
+        <Button colorScheme="blue" type="button">
           Suivant
         </Button>
       </Box>
@@ -430,19 +430,21 @@ const Etape3 = ({ trips, setTrips }) => {
         <Flex key={index} justifyContent="space-between" alignItems="center" mb="4">
           <Text fontWeight="bold">{trip.name}</Text>
           <Text color="green.500">{trip.distance} KM</Text>
-          <Button size="sm" onClick={() => handleEditTrip(index)}>Modifier</Button>
+          <Button size="sm" type="button" onClick={() => handleEditTrip(index)}>Modifier</Button>
         </Flex>
       ))}
 
       <Flex alignItems="center" mt="6">
         <Icon as={AddIcon} color="blue.500" mr="2" />
-        <Link color="blue.500" href="#" onClick={onOpen}>
+        <Link color="blue.500" href="#" onClick={(e) => { e.preventDefault(); onOpen(); }}>
           Ajouter un trajet
         </Link>
       </Flex>
 
       <Box textAlign="right" mt="6">
-        <Button colorScheme="blue">Suivant</Button>
+        <Button colorScheme="blue" type="button">
+          Suivant
+        </Button>
       </Box>
 
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -516,19 +518,21 @@ const Etape4 = ({ expenses, setExpenses }) => {
         <Flex key={index} justifyContent="space-between" alignItems="center" mb="4">
           <Text fontWeight="bold">{expense.name}</Text>
           <Text color="green.500">{expense.cost.toFixed(2)} €</Text>
-          <Button size="sm" onClick={() => handleEditExpense(index)}>Modifier</Button>
+          <Button size="sm" type="button" onClick={() => handleEditExpense(index)}>Modifier</Button>
         </Flex>
       ))}
 
       <Flex alignItems="center" mt="6">
         <Icon as={AddIcon} color="blue.500" mr="2" />
-        <Link color="blue.500" href="#" onClick={onOpen}>
+        <Link color="blue.500" href="#" onClick={(e) => { e.preventDefault(); onOpen(); }}>
           Ajouter une dépense
         </Link>
       </Flex>
 
       <Box textAlign="right" mt="6">
-        <Button colorScheme="blue">Suivant</Button>
+        <Button colorScheme="blue" type="button">
+          Suivant
+        </Button>
       </Box>
 
       <Modal isOpen={isOpen} onClose={onClose}>
