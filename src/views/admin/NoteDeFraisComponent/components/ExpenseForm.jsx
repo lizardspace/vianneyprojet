@@ -30,6 +30,7 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { ChevronDownIcon, EditIcon, AddIcon } from '@chakra-ui/icons';
+import { v4 as uuidv4 } from 'uuid';  // Import the uuid package
 import supabase from './../../../../supabaseClient';
 
 // Custom Accordion Button
@@ -584,6 +585,7 @@ const ExpenseForm = () => {
 
   const handleSubmit = async () => {
     const formattedData = {
+      id: uuidv4(),  // Generate a UUID
       ...data,
       trips: JSON.stringify(trips),
       expenses: JSON.stringify(expenses),
