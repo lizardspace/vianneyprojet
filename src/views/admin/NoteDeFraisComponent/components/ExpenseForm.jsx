@@ -31,7 +31,7 @@ import {
   Image
 } from '@chakra-ui/react';
 import { ChevronDownIcon, EditIcon, AddIcon } from '@chakra-ui/icons';
-import { v4 as uuidv4 } from 'uuid';  // Import the uuid package
+import { v4 as uuidv4 } from 'uuid';
 import supabase from './../../../../supabaseClient';
 
 // Custom Accordion Button
@@ -53,50 +53,33 @@ const CustomAccordionButton = ({ number, title }) => (
 
 // Step 1: Volunteer Information
 const Etape1 = ({ data, setData }) => {
-  const toast = useToast();
-  
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${uuidv4()}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    let { error: uploadError } = await supabase.storage
-      .from('notedefrais')
-      .upload(filePath, file);
-
-    if (uploadError) {
-      toast({
-        title: "Erreur de téléchargement.",
-        description: `Erreur: ${uploadError.message}`,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    setData((prevData) => ({ ...prevData, rib: filePath }));
-
-    toast({
-      title: "Téléchargement réussi.",
-      description: "Votre fichier a été téléchargé avec succès.",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
-  };
-
   const handleChange = (e) => {
     const { id, value } = e.target;
     setData((prevData) => ({ ...prevData, [id]: value }));
   };
 
-  const getPublicUrl = (filePath) => {
-    return `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${filePath}`;
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      let { error: uploadError } = await supabase.storage
+        .from('notedefrais')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Erreur de téléchargement:', uploadError);
+      } else {
+        setData((prevData) => ({ ...prevData, rib: fileName }));
+      }
+    }
   };
+
+  const fileUrl = data.rib
+    ? `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${data.rib}`
+    : '';
 
   return (
     <Box mt="10" p="6" boxShadow="lg" borderRadius="md" borderWidth="1px" borderColor="gray.200" bg="white">
@@ -258,35 +241,7 @@ const Etape1 = ({ data, setData }) => {
                 Cliquez ici pour ajouter une photo ou un PDF
               </Box>
             </Box>
-            {data.rib && (
-              <Box mt="4">
-                <Text>Prévisualisation:</Text>
-                <Image src={getPublicUrl(data.rib)} alt="RIB Preview" />
-              </Box>
-            )}
-          </FormControl>
-        </GridItem>
-
-        <GridItem colSpan={2}>
-          <FormControl id="donation_option" position="relative" mt="6">
-            <FormLabel position="absolute" top="-0.6rem" left="1rem" bg="white" px="0.25rem" fontSize="xs" fontWeight="bold" zIndex="1">
-              Souhaitez-vous abandonner vos frais au profit de Notre-dame de Chrétienté ?
-            </FormLabel>
-            <InputGroup>
-              <Select
-                value={data.donation_option || ''}
-                onChange={handleChange}
-                placeholder="Choisir une option"
-                borderColor="gray.300"
-                borderRadius="md"
-                height="40px"
-                _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
-              >
-                <option value="yes">Oui</option>
-                <option value="no">Non</option>
-              </Select>
-              <InputRightElement pointerEvents="none" height="100%" children={<ChevronDownIcon color="gray.500" />} />
-            </InputGroup>
+            {fileUrl && <Image src={fileUrl} alt="RIB Preview" mt="4" />}
           </FormControl>
         </GridItem>
       </Grid>
@@ -306,6 +261,28 @@ const Etape2 = ({ data, setData }) => {
     const { id, value } = e.target;
     setData((prevData) => ({ ...prevData, [id]: value }));
   };
+
+  const handleFileChange = async (e, field) => {
+    const file = e.target.files[0];
+    if (file) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      let { error: uploadError } = await supabase.storage
+        .from('notedefrais')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Error uploading file:', uploadError);
+      } else {
+        setData((prevData) => ({ ...prevData, [field]: fileName }));
+      }
+    }
+  };
+
+  const getFileUrl = (filename) => 
+    filename ? `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${filename}` : '';
 
   return (
     <Box mt="10" p="6" boxShadow="lg" borderRadius="md" borderWidth="1px" borderColor="gray.200" bg="white">
@@ -396,11 +373,12 @@ const Etape2 = ({ data, setData }) => {
               Compteur de kilomètres départ
             </FormLabel>
             <Box position="relative" height="100px">
-              <Input type="file" opacity="0" position="absolute" top="0" left="0" height="100%" width="100%" zIndex="2" />
+              <Input type="file" opacity="0" position="absolute" top="0" left="0" height="100%" width="100%" zIndex="2" onChange={(e) => handleFileChange(e, 'departure_odometer')} />
               <Box position="absolute" top="0" left="0" height="100%" width="100%" bg="white" borderRadius="md" borderWidth="1px" borderColor="gray.300" display="flex" alignItems="center" justifyContent="center" zIndex="1">
                 Cliquez ici pour ajouter une photo ou un PDF
               </Box>
             </Box>
+            {data.departure_odometer && <Image src={getFileUrl(data.departure_odometer)} alt="Departure Odometer Preview" mt="4" />}
           </FormControl>
         </GridItem>
 
@@ -410,11 +388,12 @@ const Etape2 = ({ data, setData }) => {
               Compteur de kilomètres retour
             </FormLabel>
             <Box position="relative" height="100px">
-              <Input type="file" opacity="0" position="absolute" top="0" left="0" height="100%" width="100%" zIndex="2" />
+              <Input type="file" opacity="0" position="absolute" top="0" left="0" height="100%" width="100%" zIndex="2" onChange={(e) => handleFileChange(e, 'return_odometer')} />
               <Box position="absolute" top="0" left="0" height="100%" width="100%" bg="white" borderRadius="md" borderWidth="1px" borderColor="gray.300" display="flex" alignItems="center" justifyContent="center" zIndex="1">
                 Cliquez ici pour ajouter une photo ou un PDF
               </Box>
             </Box>
+            {data.return_odometer && <Image src={getFileUrl(data.return_odometer)} alt="Return Odometer Preview" mt="4" />}
           </FormControl>
         </GridItem>
 
@@ -424,11 +403,12 @@ const Etape2 = ({ data, setData }) => {
               Photo de la carte grise
             </FormLabel>
             <Box position="relative" height="100px">
-              <Input type="file" opacity="0" position="absolute" top="0" left="0" height="100%" width="100%" zIndex="2" />
+              <Input type="file" opacity="0" position="absolute" top="0" left="0" height="100%" width="100%" zIndex="2" onChange={(e) => handleFileChange(e, 'carte_grise')} />
               <Box position="absolute" top="0" left="0" height="100%" width="100%" bg="white" borderRadius="md" borderWidth="1px" borderColor="gray.300" display="flex" alignItems="center" justifyContent="center" zIndex="1">
                 Cliquez ici pour ajouter une photo ou un PDF
               </Box>
             </Box>
+            {data.carte_grise && <Image src={getFileUrl(data.carte_grise)} alt="Carte Grise Preview" mt="4" />}
           </FormControl>
         </GridItem>
       </Grid>
@@ -628,7 +608,10 @@ const ExpenseForm = () => {
     pole_prior: '',
     address: '',
     rib: '',
-    donation_option: ''
+    donation_option: '',
+    departure_odometer: '',
+    return_odometer: '',
+    carte_grise: ''
   });
   const [trips, setTrips] = useState([]);
   const [expenses, setExpenses] = useState([]);
@@ -636,7 +619,7 @@ const ExpenseForm = () => {
 
   const handleSubmit = async () => {
     const formattedData = {
-      id: uuidv4(),  // Generate a UUID
+      id: uuidv4(),
       ...data,
       trips: JSON.stringify(trips),
       expenses: JSON.stringify(expenses),
@@ -672,7 +655,10 @@ const ExpenseForm = () => {
         pole_prior: '',
         address: '',
         rib: '',
-        donation_option: ''
+        donation_option: '',
+        departure_odometer: '',
+        return_odometer: '',
+        carte_grise: ''
       });
       setTrips([]);
       setExpenses([]);
