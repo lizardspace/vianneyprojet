@@ -26,7 +26,8 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  useDisclosure
+  useDisclosure,
+  useToast
 } from '@chakra-ui/react';
 import { ChevronDownIcon, EditIcon, AddIcon } from '@chakra-ui/icons';
 import supabase from './../../../../supabaseClient';
@@ -569,6 +570,7 @@ const ExpenseForm = () => {
   const [data, setData] = useState({});
   const [trips, setTrips] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const toast = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -599,9 +601,21 @@ const ExpenseForm = () => {
       .upsert([formattedData], { onConflict: 'id' });
 
     if (error) {
-      console.error('Error submitting data:', error);
+      toast({
+        title: "Erreur de soumission.",
+        description: `Erreur: ${error.message}`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     } else {
-      console.log('Data submitted successfully');
+      toast({
+        title: "Soumission réussie.",
+        description: "Vos données ont été soumises avec succès.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
