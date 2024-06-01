@@ -52,9 +52,43 @@ const CustomAccordionButton = ({ number, title }) => (
 
 // Step 1: Volunteer Information
 const Etape1 = ({ data, setData }) => {
+  const toast = useToast();
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     setData((prevData) => ({ ...prevData, [id]: value }));
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('notedefrais') // Replace with your actual bucket name
+        .upload(filePath, file);
+
+      if (uploadError) {
+        toast({
+          title: 'Erreur de téléchargement.',
+          description: `Erreur: ${uploadError.message}`,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        setData((prevData) => ({ ...prevData, rib: filePath }));
+        toast({
+          title: 'Téléchargement réussi.',
+          description: 'Le fichier a été téléchargé avec succès.',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    }
   };
 
   return (
@@ -212,7 +246,7 @@ const Etape1 = ({ data, setData }) => {
               RIB
             </FormLabel>
             <Box position="relative" height="100px">
-              <Input type="file" opacity="0" position="absolute" top="0" left="0" height="100%" width="100%" zIndex="2" />
+              <Input type="file" opacity="0" position="absolute" top="0" left="0" height="100%" width="100%" zIndex="2" onChange={handleFileChange} />
               <Box position="absolute" top="0" left="0" height="100%" width="100%" bg="white" borderRadius="md" borderWidth="1px" borderColor="gray.300" display="flex" alignItems="center" justifyContent="center" zIndex="1">
                 Cliquez ici pour ajouter une photo ou un PDF
               </Box>
