@@ -27,7 +27,8 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  useToast
+  useToast,
+  Image
 } from '@chakra-ui/react';
 import { ChevronDownIcon, EditIcon, AddIcon } from '@chakra-ui/icons';
 import { v4 as uuidv4 } from 'uuid';  // Import the uuid package
@@ -53,42 +54,48 @@ const CustomAccordionButton = ({ number, title }) => (
 // Step 1: Volunteer Information
 const Etape1 = ({ data, setData }) => {
   const toast = useToast();
+  
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${uuidv4()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    let { error: uploadError } = await supabase.storage
+      .from('notedefrais')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      toast({
+        title: "Erreur de téléchargement.",
+        description: `Erreur: ${uploadError.message}`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    setData((prevData) => ({ ...prevData, rib: filePath }));
+
+    toast({
+      title: "Téléchargement réussi.",
+      description: "Votre fichier a été téléchargé avec succès.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
+  };
 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setData((prevData) => ({ ...prevData, [id]: value }));
   };
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('notedefrais') // Replace with your actual bucket name
-        .upload(filePath, file);
-
-      if (uploadError) {
-        toast({
-          title: 'Erreur de téléchargement.',
-          description: `Erreur: ${uploadError.message}`,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-      } else {
-        setData((prevData) => ({ ...prevData, rib: filePath }));
-        toast({
-          title: 'Téléchargement réussi.',
-          description: 'Le fichier a été téléchargé avec succès.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-    }
+  const getPublicUrl = (filePath) => {
+    return `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${filePath}`;
   };
 
   return (
@@ -251,6 +258,12 @@ const Etape1 = ({ data, setData }) => {
                 Cliquez ici pour ajouter une photo ou un PDF
               </Box>
             </Box>
+            {data.rib && (
+              <Box mt="4">
+                <Text>Prévisualisation:</Text>
+                <Image src={getPublicUrl(data.rib)} alt="RIB Preview" />
+              </Box>
+            )}
           </FormControl>
         </GridItem>
 
