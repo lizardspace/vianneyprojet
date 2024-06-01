@@ -516,18 +516,43 @@ const Etape4 = ({ expenses, setExpenses }) => {
   const [newExpenseName, setNewExpenseName] = useState('');
   const [newExpenseCost, setNewExpenseCost] = useState('');
   const [editingExpense, setEditingExpense] = useState(null);
+  const [newExpenseFile, setNewExpenseFile] = useState(null);
 
-  const handleAddExpense = () => {
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewExpenseFile(file);
+    }
+  };
+
+  const handleAddExpense = async () => {
+    let fileName = null;
+
+    if (newExpenseFile) {
+      const fileExt = newExpenseFile.name.split('.').pop();
+      fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      let { error: uploadError } = await supabase.storage
+        .from('notedefrais')
+        .upload(filePath, newExpenseFile);
+
+      if (uploadError) {
+        console.error('Error uploading file:', uploadError);
+      }
+    }
+
     if (editingExpense !== null) {
       const updatedExpenses = expenses.map((expense, index) =>
-        index === editingExpense ? { name: newExpenseName, cost: parseFloat(newExpenseCost) } : expense
+        index === editingExpense ? { name: newExpenseName, cost: parseFloat(newExpenseCost), fileName } : expense
       );
       setExpenses(updatedExpenses);
     } else {
-      setExpenses([...expenses, { name: newExpenseName, cost: parseFloat(newExpenseCost) }]);
+      setExpenses([...expenses, { name: newExpenseName, cost: parseFloat(newExpenseCost), fileName }]);
     }
     setNewExpenseName('');
     setNewExpenseCost('');
+    setNewExpenseFile(null);
     setEditingExpense(null);
     onClose();
   };
@@ -545,6 +570,9 @@ const Etape4 = ({ expenses, setExpenses }) => {
         <Flex key={index} justifyContent="space-between" alignItems="center" mb="4">
           <Text fontWeight="bold">{expense.name}</Text>
           <Text color="green.500">{expense.cost.toFixed(2)} €</Text>
+          {expense.fileName && (
+            <Image src={`https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${expense.fileName}`} alt="Expense File Preview" mt="4" />
+          )}
           <Button size="sm" type="button" onClick={() => handleEditExpense(index)}>Modifier</Button>
         </Flex>
       ))}
@@ -583,6 +611,10 @@ const Etape4 = ({ expenses, setExpenses }) => {
                 value={newExpenseCost}
                 onChange={(e) => setNewExpenseCost(e.target.value)}
               />
+            </FormControl>
+            <FormControl id="newExpenseFile" mt="4">
+              <FormLabel>Fichier</FormLabel>
+              <Input type="file" onChange={handleFileChange} />
             </FormControl>
           </ModalBody>
 
