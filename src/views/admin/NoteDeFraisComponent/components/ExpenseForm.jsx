@@ -588,9 +588,16 @@ const ExpenseForm = () => {
   }, []);
 
   const handleSubmit = async () => {
+    const formattedData = {
+      ...data,
+      trips: JSON.stringify(trips),
+      expenses: JSON.stringify(expenses),
+    };
+
     const { error } = await supabase
       .from('vianney_expenses_reimbursement')
-      .upsert([{ ...data, trips, expenses }], { onConflict: 'id' });
+      .upsert([formattedData], { onConflict: 'id' });
+
     if (error) {
       console.error('Error submitting data:', error);
     } else {
