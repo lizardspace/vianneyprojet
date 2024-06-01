@@ -14,6 +14,7 @@ import { EditIcon } from '@chakra-ui/icons';
 import Etape1 from './etapes/Etape1';
 import Etape2 from './etapes/Etape2';
 import Etape3 from './etapes/Etape3';
+import Etape4 from './etapes/Etape4';
 
 const CustomAccordionButton = ({ number, title }) => (
   <HStack width="100%" justifyContent="space-between">
@@ -76,19 +77,7 @@ const ExpenseForm = () => {
           </AccordionButton>
         </h2>
         <AccordionPanel pb={4}>
-          <VStack spacing={4}>
-            <HStack justifyContent="space-between" width="100%">
-              <Text>Péage Tassin-Paris</Text>
-              <Text>40.40 €</Text>
-              <Button>Modifier</Button>
-            </HStack>
-            <HStack justifyContent="space-between" width="100%">
-              <Text>Péage Chartres-Tassin</Text>
-              <Text>56.80 €</Text>
-              <Button>Modifier</Button>
-            </HStack>
-            <Button>Ajouter une dépense</Button>
-          </VStack>
+          <Etape4/>
         </AccordionPanel>
       </AccordionItem>
 
@@ -99,15 +88,6 @@ const ExpenseForm = () => {
           </AccordionButton>
         </h2>
         <AccordionPanel pb={4}>
-          <Box>
-            {/* Contenu du récapitulatif */}
-            <Text>Identité du bénévole: [Nom]</Text>
-            <Text>Véhicule utilisé: [Véhicule]</Text>
-            <Text>Frais kilométriques: [Montant]</Text>
-            <Text>Péage Tassin-Paris: 40.40 €</Text>
-            <Text>Péage Chartres-Tassin: 56.80 €</Text>
-          </Box>
-          <Button mt={4}>Suivant</Button>
         </AccordionPanel>
       </AccordionItem>
     </Accordion>
