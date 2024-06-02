@@ -21,6 +21,7 @@ import LiveStreamsPage from './components/surveillance/LiveStreamsPage';
 import EditableRectangle from './components/SitacComponent';
 import JSPaintComponent from './components/JSPaintComponent';
 import YandexImage from './components/YandexImage';
+import FluxRssInput from './components/FluxRssInput';
 
 export default function Marketplace() {
   // eslint-disable-next-line no-unused-vars
@@ -125,6 +126,7 @@ export default function Marketplace() {
                       <RenseignementsInformationsDisplayReports />
                     </Box>
                   </SimpleGrid>
+                  <FluxRssInput/>
                 </TabPanel>
                 <TabPanel>
                   {/* Content for "Surveillances" sub-tab */}
