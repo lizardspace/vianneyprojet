@@ -1,7 +1,7 @@
 // FluxRssInput.js
 import React, { useEffect, useState } from 'react';
 import { useEvent } from './../../../../EventContext'; // Assurez-vous que le chemin est correct
-import { supabase } from './../../../../supabaseClient'; 
+import { supabase } from './../../../../supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 
 const FluxRssInput = () => {
@@ -50,21 +50,14 @@ const FluxRssInput = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor="event">Sélectionnez un événement :</label>
-      <select
-        id="event"
-        onChange={(e) => setEventId(e.target.value)}
-        value={selectedEventId || ''}
-      >
-        <option value="" disabled>
-          Sélectionner un événement
-        </option>
-        {eventList.map((event) => (
-          <option key={event.id} value={event.id}>
-            {event.name}
-          </option>
-        ))}
-      </select>
+      {selectedEventId ? (
+        <div>
+          <label>Événement sélectionné :</label>
+          <input type="text" value={selectedEventId} readOnly />
+        </div>
+      ) : (
+        <p>Pas d'événement sélectionné</p>
+      )}
 
       <label htmlFor="rssUrl">URL du Flux RSS :</label>
       <input
