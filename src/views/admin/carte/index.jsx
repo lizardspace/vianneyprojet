@@ -22,6 +22,7 @@ import EditableRectangle from './components/SitacComponent';
 import JSPaintComponent from './components/JSPaintComponent';
 import YandexImage from './components/YandexImage';
 import FluxRssInput from './components/FluxRssInput';
+import FluxRssRssFeed from './components/FluxRssRssFeed';
 
 export default function Marketplace() {
   // eslint-disable-next-line no-unused-vars
@@ -127,6 +128,7 @@ export default function Marketplace() {
                     </Box>
                   </SimpleGrid>
                   <FluxRssInput/>
+                  <FluxRssRssFeed/>
                 </TabPanel>
                 <TabPanel>
                   {/* Content for "Surveillances" sub-tab */}
