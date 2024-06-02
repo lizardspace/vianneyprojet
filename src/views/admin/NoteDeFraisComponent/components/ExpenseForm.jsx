@@ -37,6 +37,7 @@ import supabase from './../../../../supabaseClient';
 import ExpenseSummaryPDF from './ExpenseSummaryPDF';
 import { useTeam } from './../../../../views/admin/InterfaceEquipe/TeamContext';
 import { useEvent } from './../../../../EventContext';
+import { FaFilePdf } from "react-icons/fa6";
 
 // Custom Accordion Button
 const CustomAccordionButton = ({ number, title }) => (
@@ -857,9 +858,18 @@ const ExpenseForm = () => {
               <PDFDownloadLink
                 document={<ExpenseSummaryPDF data={data} trips={trips} expenses={expenses} />}
                 fileName="note_de_frais.pdf"
-                style={{ marginTop: 20, display: 'block', textAlign: 'center' }}
               >
-                {({ loading }) => (loading ? 'Préparation du PDF...' : 'Télécharger le PDF')}
+                {({ loading }) => (
+                  <Button
+                    leftIcon={<FaFilePdf />}
+                    colorScheme="red"
+                    variant="solid"
+                    size="lg"
+                    mt="4"
+                  >
+                    {loading ? 'Préparation du PDF...' : 'Télécharger le PDF'}
+                  </Button>
+                )}
               </PDFDownloadLink>
             )}
           </AccordionPanel>
