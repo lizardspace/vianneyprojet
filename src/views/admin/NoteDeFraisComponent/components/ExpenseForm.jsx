@@ -181,100 +181,6 @@ const Etape1 = ({ data, setData, events, teams }) => {
           </FormControl>
         </GridItem>
 
-        <GridItem>
-          <FormControl id="pole" position="relative" mt="6">
-            <FormLabel position="absolute" top="-0.6rem" left="1rem" bg="white" px="0.25rem" fontSize="xs" fontWeight="bold" zIndex="1">
-              Choisir un pôle
-            </FormLabel>
-            <InputGroup>
-              <Select
-                value={data.pole || ''}
-                onChange={handleChange}
-                placeholder="Choisir un pôle"
-                borderColor="gray.300"
-                borderRadius="md"
-                height="40px"
-                _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
-              >
-                <option value="pole1">Pole 1</option>
-                <option value="pole2">Pole 2</option>
-              </Select>
-              <InputRightElement pointerEvents="none" height="100%" children={<ChevronDownIcon color="gray.500" />} />
-            </InputGroup>
-          </FormControl>
-        </GridItem>
-
-        <GridItem>
-          <FormControl id="pole_prior" position="relative" mt="6">
-            <FormLabel position="absolute" top="-0.6rem" left="1rem" bg="white" px="0.25rem" fontSize="xs" fontWeight="bold" zIndex="1">
-              Choisir un pôle d'abord
-            </FormLabel>
-            <InputGroup>
-              <Select
-                value={data.pole_prior || ''}
-                onChange={handleChange}
-                placeholder="Choisir un pôle d'abord"
-                borderColor="gray.300"
-                borderRadius="md"
-                height="40px"
-                _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
-              >
-                <option value="prior1">Prior 1</option>
-                <option value="prior2">Prior 2</option>
-              </Select>
-              <InputRightElement pointerEvents="none" height="100%" children={<ChevronDownIcon color="gray.500" />} />
-            </InputGroup>
-          </FormControl>
-        </GridItem>
-
-        <GridItem>
-          <FormControl id="event_id" position="relative" mt="6">
-            <FormLabel position="absolute" top="-0.6rem" left="1rem" bg="white" px="0.25rem" fontSize="xs" fontWeight="bold" zIndex="1">
-              Évènement
-            </FormLabel>
-            <InputGroup>
-              <Select
-                value={data.event_id || ''}
-                onChange={handleChange}
-                placeholder="Sélectionner un évènement"
-                borderColor="gray.300"
-                borderRadius="md"
-                height="40px"
-                _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
-              >
-                {Array.isArray(events) && events.map(event => (
-                  <option key={event.id} value={event.id}>{event.name}</option>
-                ))}
-              </Select>
-              <InputRightElement pointerEvents="none" height="100%" children={<ChevronDownIcon color="gray.500" />} />
-            </InputGroup>
-          </FormControl>
-        </GridItem>
-
-        <GridItem>
-          <FormControl id="team_id" position="relative" mt="6">
-            <FormLabel position="absolute" top="-0.6rem" left="1rem" bg="white" px="0.25rem" fontSize="xs" fontWeight="bold" zIndex="1">
-              Équipe
-            </FormLabel>
-            <InputGroup>
-              <Select
-                value={data.team_id || ''}
-                onChange={handleChange}
-                placeholder="Sélectionner une équipe"
-                borderColor="gray.300"
-                borderRadius="md"
-                height="40px"
-                _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
-              >
-                {Array.isArray(teams) && teams.map(team => (
-                  <option key={team.id} value={team.id}>{team.name}</option>
-                ))}
-              </Select>
-              <InputRightElement pointerEvents="none" height="100%" children={<ChevronDownIcon color="gray.500" />} />
-            </InputGroup>
-          </FormControl>
-        </GridItem>
-
         <GridItem colSpan={2}>
           <FormControl id="address" position="relative" mt="6">
             <FormLabel position="absolute" top="-0.6rem" left="1rem" bg="white" px="0.25rem" fontSize="xs" fontWeight="bold" zIndex="1">
@@ -319,6 +225,7 @@ const Etape1 = ({ data, setData, events, teams }) => {
     </Box>
   );
 };
+
 
 // Step 2: Vehicle Information
 const Etape2 = ({ data, setData }) => {
