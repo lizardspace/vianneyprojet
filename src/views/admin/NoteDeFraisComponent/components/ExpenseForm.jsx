@@ -283,7 +283,7 @@ const Etape2 = ({ data, setData }) => {
     }
   };
 
-  const getFileUrl = (filename) => 
+  const getFileUrl = (filename) =>
     filename ? `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${filename}` : '';
 
   return (
@@ -573,7 +573,7 @@ const Etape4 = ({ expenses, setExpenses }) => {
           <Text fontWeight="bold">{expense.name}</Text>
           <Text color="green.500">{expense.cost.toFixed(2)} €</Text>
           {expense.fileName && (
-            <Image src={`https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${expense.fileName}`} alt="Expense File Preview" mt="4" boxSize="200px" objectFit="cover" borderRadius="md"/>
+            <Image src={`https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${expense.fileName}`} alt="Expense File Preview" mt="4" boxSize="200px" objectFit="cover" borderRadius="md" />
           )}
           <Button size="sm" type="button" onClick={() => handleEditExpense(index)}>Modifier</Button>
         </Flex>
@@ -674,33 +674,54 @@ const ExpenseForm = () => {
         isClosable: true,
       });
     } else {
-      toast({
-        title: "Soumission réussie.",
-        description: "Vos données ont été soumises avec succès.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-      // Optionally, clear the form after successful submission
-      setData({
-        volunteer_last_name: '',
-        volunteer_first_name: '',
-        phone_number: '',
-        email: '',
-        pole: '',
-        pole_prior: '',
-        address: '',
-        rib: '',
-        donation_option: '',
-        departure_odometer: '',
-        return_odometer: '',
-        carte_grise: ''
-      });
-      setTrips([]);
-      setExpenses([]);
-      setShowDownloadLink(true);
+      // Fetch the inserted data from the database
+      const { data: insertedData, error: fetchError } = await supabase
+        .from('vianney_expenses_reimbursement')
+        .select('*')
+        .eq('id', formattedData.id)
+        .single();
+
+      if (fetchError) {
+        toast({
+          title: "Erreur de récupération des données.",
+          description: `Erreur: ${fetchError.message}`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Soumission réussie.",
+          description: "Vos données ont été soumises avec succès.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        // Optionally, clear the form after successful submission
+        setData({
+          volunteer_last_name: '',
+          volunteer_first_name: '',
+          phone_number: '',
+          email: '',
+          pole: '',
+          pole_prior: '',
+          address: '',
+          rib: '',
+          donation_option: '',
+          departure_odometer: '',
+          return_odometer: '',
+          carte_grise: ''
+        });
+        setTrips([]);
+        setExpenses([]);
+        setShowDownloadLink(true);
+        setData(insertedData);
+        setTrips(JSON.parse(insertedData.trips));
+        setExpenses(JSON.parse(insertedData.expenses));
+      }
     }
   };
+
 
   return (
     <>
