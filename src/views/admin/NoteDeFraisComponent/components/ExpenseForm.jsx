@@ -240,9 +240,8 @@ const Etape1 = ({ data, setData, events, teams }) => {
                 borderRadius="md"
                 height="40px"
                 _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
-                isDisabled
               >
-                {events && events.map(event => (
+                {Array.isArray(events) && events.map(event => (
                   <option key={event.id} value={event.id}>{event.name}</option>
                 ))}
               </Select>
@@ -266,7 +265,7 @@ const Etape1 = ({ data, setData, events, teams }) => {
                 height="40px"
                 _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
               >
-                {teams && teams.map(team => (
+                {Array.isArray(teams) && teams.map(team => (
                   <option key={team.id} value={team.id}>{team.name}</option>
                 ))}
               </Select>
@@ -696,7 +695,7 @@ const Etape4 = ({ expenses, setExpenses }) => {
 };
 
 const ExpenseForm = () => {
-  const { events } = useEvent();
+  const { events, selectedEventId, setEventId } = useEvent();
   const { teams } = useTeam();
   const [data, setData] = useState({
     volunteer_last_name: '',
@@ -711,13 +710,19 @@ const ExpenseForm = () => {
     departure_odometer: '',
     return_odometer: '',
     carte_grise: '',
-    event_id: null,
+    event_id: selectedEventId || null,
     team_id: null
   });
   const [trips, setTrips] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [showDownloadLink, setShowDownloadLink] = useState(false);
   const toast = useToast();
+
+  useEffect(() => {
+    if (selectedEventId) {
+      setData(prevData => ({ ...prevData, event_id: selectedEventId }));
+    }
+  }, [selectedEventId]);
 
   const handleSubmit = async () => {
     const formattedData = {
