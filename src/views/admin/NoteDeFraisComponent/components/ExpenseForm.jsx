@@ -31,8 +31,10 @@ import {
   Image
 } from '@chakra-ui/react';
 import { ChevronDownIcon, EditIcon, AddIcon } from '@chakra-ui/icons';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import { v4 as uuidv4 } from 'uuid';
 import supabase from './../../../../supabaseClient';
+import ExpenseSummaryPDF from './ExpenseSummaryPDF';
 
 // Custom Accordion Button
 const CustomAccordionButton = ({ number, title }) => (
@@ -647,6 +649,7 @@ const ExpenseForm = () => {
   });
   const [trips, setTrips] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [showDownloadLink, setShowDownloadLink] = useState(false);
   const toast = useToast();
 
   const handleSubmit = async () => {
@@ -655,6 +658,7 @@ const ExpenseForm = () => {
       ...data,
       trips: JSON.stringify(trips),
       expenses: JSON.stringify(expenses),
+      total: expenses.reduce((acc, expense) => acc + (expense.cost || 0), 0) + trips.reduce((acc, trip) => acc + (trip.distance || 0) * 0.515, 0),
     };
 
     const { error } = await supabase
@@ -694,68 +698,80 @@ const ExpenseForm = () => {
       });
       setTrips([]);
       setExpenses([]);
+      setShowDownloadLink(true);
     }
   };
 
   return (
-    <Accordion allowToggle>
-      <AccordionItem>
-        <h2>
-          <AccordionButton as={Box}>
-            <CustomAccordionButton number="1" title="Identité du bénévole" />
-          </AccordionButton>
-        </h2>
-        <AccordionPanel pb={4}>
-          <Etape1 data={data} setData={setData} />
-        </AccordionPanel>
-      </AccordionItem>
+    <>
+      <Accordion allowToggle>
+        <AccordionItem>
+          <h2>
+            <AccordionButton as={Box}>
+              <CustomAccordionButton number="1" title="Identité du bénévole" />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            <Etape1 data={data} setData={setData} />
+          </AccordionPanel>
+        </AccordionItem>
 
-      <AccordionItem>
-        <h2>
-          <AccordionButton as={Box}>
-            <CustomAccordionButton number="2" title="Véhicule utilisé" />
-          </AccordionButton>
-        </h2>
-        <AccordionPanel pb={4}>
-          <Etape2 data={data} setData={setData} />
-        </AccordionPanel>
-      </AccordionItem>
+        <AccordionItem>
+          <h2>
+            <AccordionButton as={Box}>
+              <CustomAccordionButton number="2" title="Véhicule utilisé" />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            <Etape2 data={data} setData={setData} />
+          </AccordionPanel>
+        </AccordionItem>
 
-      <AccordionItem>
-        <h2>
-          <AccordionButton as={Box}>
-            <CustomAccordionButton number="3" title="Remboursement des frais kilométriques" />
-          </AccordionButton>
-        </h2>
-        <AccordionPanel pb={4}>
-          <Etape3 trips={trips} setTrips={setTrips} />
-        </AccordionPanel>
-      </AccordionItem>
+        <AccordionItem>
+          <h2>
+            <AccordionButton as={Box}>
+              <CustomAccordionButton number="3" title="Remboursement des frais kilométriques" />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            <Etape3 trips={trips} setTrips={setTrips} />
+          </AccordionPanel>
+        </AccordionItem>
 
-      <AccordionItem>
-        <h2>
-          <AccordionButton as={Box}>
-            <CustomAccordionButton number="4" title="Remboursement de frais" />
-          </AccordionButton>
-        </h2>
-        <AccordionPanel pb={4}>
-          <Etape4 expenses={expenses} setExpenses={setExpenses} />
-        </AccordionPanel>
-      </AccordionItem>
+        <AccordionItem>
+          <h2>
+            <AccordionButton as={Box}>
+              <CustomAccordionButton number="4" title="Remboursement de frais" />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            <Etape4 expenses={expenses} setExpenses={setExpenses} />
+          </AccordionPanel>
+        </AccordionItem>
 
-      <AccordionItem>
-        <h2>
-          <AccordionButton as={Box}>
-            <CustomAccordionButton number="5" title="Récapitulatif" />
-          </AccordionButton>
-        </h2>
-        <AccordionPanel pb={4}>
-          <Button colorScheme="blue" onClick={handleSubmit}>
-            Soumettre
-          </Button>
-        </AccordionPanel>
-      </AccordionItem>
-    </Accordion>
+        <AccordionItem>
+          <h2>
+            <AccordionButton as={Box}>
+              <CustomAccordionButton number="5" title="Récapitulatif" />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            <Button colorScheme="blue" onClick={handleSubmit}>
+              Soumettre
+            </Button>
+            {showDownloadLink && (
+              <PDFDownloadLink
+                document={<ExpenseSummaryPDF data={data} trips={trips} expenses={expenses} />}
+                fileName="expense_summary.pdf"
+                style={{ marginTop: 20, display: 'block', textAlign: 'center' }}
+              >
+                {({ loading }) => (loading ? 'Préparation du PDF...' : 'Télécharger le PDF')}
+              </PDFDownloadLink>
+            )}
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
+    </>
   );
 };
 
