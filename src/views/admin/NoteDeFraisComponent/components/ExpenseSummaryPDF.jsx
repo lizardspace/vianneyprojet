@@ -87,7 +87,6 @@ const ExpenseSummaryPDF = ({ data, trips, expenses }) => {
           <Text>Adresse Mail : {data.email}</Text>
           <Text>Numéro de téléphone : {data.phone_number}</Text>
           <Text>Évènement : {eventName}</Text>
-          <Text>Équipe : {data.team_id}</Text>
         </View>
 
         <View style={styles.section}>
