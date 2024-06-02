@@ -14,8 +14,6 @@ import {
   Select,
   Grid,
   GridItem,
-  InputGroup,
-  InputRightElement,
   Flex,
   Link,
   Icon,
@@ -30,7 +28,7 @@ import {
   useToast,
   Image
 } from '@chakra-ui/react';
-import { ChevronDownIcon, EditIcon, AddIcon } from '@chakra-ui/icons';
+import { EditIcon, AddIcon } from '@chakra-ui/icons';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { v4 as uuidv4 } from 'uuid';
 import supabase from './../../../../supabaseClient';
