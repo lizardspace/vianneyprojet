@@ -75,10 +75,7 @@ const FluxRssInput = () => {
         <Box maxW="md" mx="auto" mt={8} p={4} borderWidth={1} borderRadius="md" boxShadow="lg">
             <form onSubmit={handleSubmit}>
                 {selectedEventId ? (
-                    <FormControl mb={4}>
-                        <FormLabel>Événement sélectionné :</FormLabel>
-                        <Input type="text" value={selectedEventId} readOnly />
-                    </FormControl>
+                    <Input type="hidden" value={selectedEventId} readOnly />
                 ) : (
                     <Text mb={4}>Pas d'événement sélectionné</Text>
                 )}
