@@ -95,7 +95,7 @@ const Etape1 = ({ data, setData, events, teams }) => {
         }));
       }
     }
-  }, [data.team_id, teams]);
+  }, [data.team_id, teams, setData]);
 
   return (
     <Box mt="10" p="6" boxShadow="lg" borderRadius="md" borderWidth="1px" borderColor="gray.200" bg="white">
@@ -695,7 +695,7 @@ const Etape4 = ({ expenses, setExpenses }) => {
 };
 
 const ExpenseForm = () => {
-  const { events, selectedEventId, setEventId } = useEvent();
+  const { events, selectedEventId } = useEvent();
   const { teams } = useTeam();
   const [data, setData] = useState({
     volunteer_last_name: '',
