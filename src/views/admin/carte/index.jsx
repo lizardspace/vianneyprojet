@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Box, Flex, Tabs, TabList, TabPanels, Tab, TabPanel, Grid } from "@chakra-ui/react";
+import { Box, Flex, Tabs, TabList, TabPanels, Tab, TabPanel, Grid, SimpleGrid } from "@chakra-ui/react";
 import MapComponent from "views/admin/carte/components/MapComponent";
 import VianneyAlertChat from "views/admin/TableauDeBord/components/VianneyAlertChat";
 import TableTopCreators from "views/admin/carte/components/TableTopCreators";
@@ -85,9 +85,9 @@ export default function Marketplace() {
                 </TabPanel>
                 <TabPanel>
                   <Box mb="70px">
-                  <EditableRectangle/>
+                    <EditableRectangle />
                   </Box>
-                  <ShowSITACbis/>
+                  <ShowSITACbis />
                 </TabPanel>
                 <TabPanel>
                   <BaseDeDonnee />
@@ -112,19 +112,23 @@ export default function Marketplace() {
               <TabPanels>
                 <TabPanel>
                   {/* Content for "Recherches" sub-tab */}
-                  <YandexImage/>
+                  <YandexImage />
                 </TabPanel>
 
                 <TabPanel>
                   {/* Content for "Informations" sub-tab */}
-                  <RenseignementsInformationsForm/>
-                  <Box mt={4}>
-                  <RenseignementsInformationsDisplayReports/>
-                  </Box>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                    <Box>
+                      <RenseignementsInformationsForm />
+                    </Box>
+                    <Box mt={4}>
+                      <RenseignementsInformationsDisplayReports />
+                    </Box>
+                  </SimpleGrid>
                 </TabPanel>
                 <TabPanel>
                   {/* Content for "Surveillances" sub-tab */}
-                  <LiveStreamsPage/>
+                  <LiveStreamsPage />
                 </TabPanel>
                 <TabPanel>
                   <MeteoAgricole />
