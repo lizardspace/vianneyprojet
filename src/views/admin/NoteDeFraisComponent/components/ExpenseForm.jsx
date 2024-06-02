@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Accordion,
   AccordionItem,
@@ -84,6 +84,18 @@ const Etape1 = ({ data, setData, events, teams }) => {
   const fileUrl = data.rib
     ? `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${data.rib}`
     : '';
+
+  useEffect(() => {
+    if (data.team_id && teams.length > 0) {
+      const selectedTeam = teams.find(team => team.id === data.team_id);
+      if (selectedTeam) {
+        setData(prevData => ({
+          ...prevData,
+          event_id: selectedTeam.event_id
+        }));
+      }
+    }
+  }, [data.team_id, teams]);
 
   return (
     <Box mt="10" p="6" boxShadow="lg" borderRadius="md" borderWidth="1px" borderColor="gray.200" bg="white">
@@ -228,6 +240,7 @@ const Etape1 = ({ data, setData, events, teams }) => {
                 borderRadius="md"
                 height="40px"
                 _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
+                isDisabled
               >
                 {events && events.map(event => (
                   <option key={event.id} value={event.id}>{event.name}</option>
