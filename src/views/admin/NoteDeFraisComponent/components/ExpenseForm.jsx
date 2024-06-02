@@ -783,7 +783,7 @@ const ExpenseForm = () => {
             {showDownloadLink && (
               <PDFDownloadLink
                 document={<ExpenseSummaryPDF data={data} trips={trips} expenses={expenses} />}
-                fileName="expense_summary.pdf"
+                fileName="note_de_frais.pdf"
                 style={{ marginTop: 20, display: 'block', textAlign: 'center' }}
               >
                 {({ loading }) => (loading ? 'Préparation du PDF...' : 'Télécharger le PDF')}

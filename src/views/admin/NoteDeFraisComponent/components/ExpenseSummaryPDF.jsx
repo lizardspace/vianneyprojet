@@ -44,6 +44,12 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontSize: 14,
   },
+  explanation: {
+    marginTop: 20,
+    fontSize: 10,
+    textAlign: 'center',
+    color: 'grey',
+  },
 });
 
 const ExpenseSummaryPDF = ({ data, trips, expenses }) => (
@@ -72,6 +78,7 @@ const ExpenseSummaryPDF = ({ data, trips, expenses }) => (
             </View>
           ))}
         </View>
+        <Text style={styles.explanation}>*Les frais kilométriques sont calculés selon la formule : distance parcourue (km) × 0,515 €</Text>
       </View>
 
       <View style={styles.section}>
