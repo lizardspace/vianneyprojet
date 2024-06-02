@@ -366,8 +366,11 @@ const Etape2 = ({ data, setData }) => {
               height="40px"
               _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
             >
-              <option value="voiture">Voiture - Camion</option>
-              {/* Add other vehicle options as needed */}
+              <option value="voiture">Voiture</option>
+              <option value="camion">Camion</option>
+              <option value="moto">Moto</option>
+              <option value="scooter">Scooter</option>
+              <option value="velo">Vélo</option>
             </Select>
           </FormControl>
         </GridItem>
