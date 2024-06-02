@@ -611,8 +611,6 @@ const ExpenseForm = () => {
     volunteer_first_name: '',
     phone_number: '',
     email: '',
-    pole: '',
-    pole_prior: '',
     address: '',
     rib: '',
     donation_option: '',
@@ -684,8 +682,6 @@ const ExpenseForm = () => {
           volunteer_first_name: '',
           phone_number: '',
           email: '',
-          pole: '',
-          pole_prior: '',
           address: '',
           rib: '',
           donation_option: '',
@@ -759,27 +755,29 @@ const ExpenseForm = () => {
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
-            <Button colorScheme="blue" onClick={handleSubmit}>
-              Soumettre
-            </Button>
-            {showDownloadLink && (
-              <PDFDownloadLink
-                document={<ExpenseSummaryPDF data={data} trips={trips} expenses={expenses} />}
-                fileName="note_de_frais.pdf"
-              >
-                {({ loading }) => (
-                  <Button
-                    leftIcon={<FaFilePdf />}
-                    colorScheme="red"
-                    variant="solid"
-                    size="lg"
-                    mt="4"
-                  >
-                    {loading ? 'Préparation du PDF...' : 'Télécharger le PDF'}
-                  </Button>
-                )}
-              </PDFDownloadLink>
-            )}
+            <HStack justifyContent="center" spacing={4}>
+              <Button colorScheme="blue" onClick={handleSubmit} height="50px">
+                Soumettre
+              </Button>
+              {showDownloadLink && (
+                <PDFDownloadLink
+                  document={<ExpenseSummaryPDF data={data} trips={trips} expenses={expenses} />}
+                  fileName="note_de_frais.pdf"
+                >
+                  {({ loading }) => (
+                    <Button
+                      leftIcon={<FaFilePdf />}
+                      colorScheme="red"
+                      variant="solid"
+                      size="lg"
+                      height="50px"
+                    >
+                      {loading ? 'Préparation du PDF...' : 'Télécharger le PDF'}
+                    </Button>
+                  )}
+                </PDFDownloadLink>
+              )}
+            </HStack>
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
