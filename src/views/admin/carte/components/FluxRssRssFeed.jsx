@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useEvent } from './../../../../EventContext'; // Assurez-vous que le chemin est correct
 import { supabase } from './../../../../supabaseClient';
-import RSSParser from 'rss-parser';
 import {
   Box,
   Heading,
@@ -18,7 +17,6 @@ const FluxRssRssFeed = () => {
   const [feed, setFeed] = useState(null);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
-  const parser = new RSSParser();
 
   useEffect(() => {
     if (selectedEventId) {
@@ -55,8 +53,15 @@ const FluxRssRssFeed = () => {
       const fetchFeed = async () => {
         try {
           setLoading(true);
-          const feed = await parser.parseURL(rssUrl);
-          setFeed(feed);
+          const response = await fetch(rssUrl);
+          const text = await response.text();
+          const parser = new DOMParser();
+          const xml = parser.parseFromString(text, 'text/xml');
+          const items = Array.from(xml.querySelectorAll('item')).map((item) => ({
+            title: item.querySelector('title').textContent,
+            link: item.querySelector('link').textContent,
+          }));
+          setFeed(items);
         } catch (error) {
           toast({
             title: 'Erreur',
@@ -72,7 +77,7 @@ const FluxRssRssFeed = () => {
 
       fetchFeed();
     }
-  }, [rssUrl, parser, toast]);
+  }, [rssUrl, toast]);
 
   if (!selectedEventId) {
     return <Text>Pas d'événement sélectionné</Text>;
