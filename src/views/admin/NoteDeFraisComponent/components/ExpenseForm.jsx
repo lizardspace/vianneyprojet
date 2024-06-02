@@ -56,7 +56,7 @@ const CustomAccordionButton = ({ number, title }) => (
 );
 
 // Step 1: Volunteer Information
-const Etape1 = ({ data, setData }) => {
+const Etape1 = ({ data, setData, events, teams }) => {
   const handleChange = (e) => {
     const { id, value } = e.target;
     setData((prevData) => ({ ...prevData, [id]: value }));
@@ -208,6 +208,54 @@ const Etape1 = ({ data, setData }) => {
               >
                 <option value="prior1">Prior 1</option>
                 <option value="prior2">Prior 2</option>
+              </Select>
+              <InputRightElement pointerEvents="none" height="100%" children={<ChevronDownIcon color="gray.500" />} />
+            </InputGroup>
+          </FormControl>
+        </GridItem>
+
+        <GridItem>
+          <FormControl id="event_id" position="relative" mt="6">
+            <FormLabel position="absolute" top="-0.6rem" left="1rem" bg="white" px="0.25rem" fontSize="xs" fontWeight="bold" zIndex="1">
+              Évènement
+            </FormLabel>
+            <InputGroup>
+              <Select
+                value={data.event_id || ''}
+                onChange={handleChange}
+                placeholder="Sélectionner un évènement"
+                borderColor="gray.300"
+                borderRadius="md"
+                height="40px"
+                _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
+              >
+                {events && events.map(event => (
+                  <option key={event.id} value={event.id}>{event.name}</option>
+                ))}
+              </Select>
+              <InputRightElement pointerEvents="none" height="100%" children={<ChevronDownIcon color="gray.500" />} />
+            </InputGroup>
+          </FormControl>
+        </GridItem>
+
+        <GridItem>
+          <FormControl id="team_id" position="relative" mt="6">
+            <FormLabel position="absolute" top="-0.6rem" left="1rem" bg="white" px="0.25rem" fontSize="xs" fontWeight="bold" zIndex="1">
+              Équipe
+            </FormLabel>
+            <InputGroup>
+              <Select
+                value={data.team_id || ''}
+                onChange={handleChange}
+                placeholder="Sélectionner une équipe"
+                borderColor="gray.300"
+                borderRadius="md"
+                height="40px"
+                _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px blue.500', zIndex: '0' }}
+              >
+                {teams && teams.map(team => (
+                  <option key={team.id} value={team.id}>{team.name}</option>
+                ))}
               </Select>
               <InputRightElement pointerEvents="none" height="100%" children={<ChevronDownIcon color="gray.500" />} />
             </InputGroup>
@@ -635,6 +683,8 @@ const Etape4 = ({ expenses, setExpenses }) => {
 };
 
 const ExpenseForm = () => {
+  const { events } = useEvent();
+  const { teams } = useTeam();
   const [data, setData] = useState({
     volunteer_last_name: '',
     volunteer_first_name: '',
@@ -647,7 +697,9 @@ const ExpenseForm = () => {
     donation_option: '',
     departure_odometer: '',
     return_odometer: '',
-    carte_grise: ''
+    carte_grise: '',
+    event_id: null,
+    team_id: null
   });
   const [trips, setTrips] = useState([]);
   const [expenses, setExpenses] = useState([]);
@@ -712,7 +764,9 @@ const ExpenseForm = () => {
           donation_option: '',
           departure_odometer: '',
           return_odometer: '',
-          carte_grise: ''
+          carte_grise: '',
+          event_id: null,
+          team_id: null
         });
         setTrips([]);
         setExpenses([]);
@@ -724,7 +778,6 @@ const ExpenseForm = () => {
     }
   };
 
-
   return (
     <>
       <Accordion allowToggle>
@@ -735,7 +788,7 @@ const ExpenseForm = () => {
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
-            <Etape1 data={data} setData={setData} />
+            <Etape1 data={data} setData={setData} events={events} teams={teams} />
           </AccordionPanel>
         </AccordionItem>
 
