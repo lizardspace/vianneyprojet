@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import supabase from './../../../../supabaseClient';
 
 const styles = StyleSheet.create({
   page: {
@@ -52,56 +53,80 @@ const styles = StyleSheet.create({
   },
 });
 
-const ExpenseSummaryPDF = ({ data, trips, expenses }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <Text style={styles.title}>Note de frais</Text>
-      <View style={styles.section}>
-        <Text>Identité du bénévole : {data.volunteer_last_name} {data.volunteer_first_name}</Text>
-        <Text>Pôle & service : {data.pole}</Text>
-        <Text>Adresse postale : {data.address}</Text>
-        <Text>Adresse Mail : {data.email}</Text>
-        <Text>Numéro de téléphone : {data.phone_number}</Text>
-        <Text>Évènement : {data.event_id}</Text>
-        <Text>Équipe : {data.team_id}</Text>
-      </View>
+const ExpenseSummaryPDF = ({ data, trips, expenses }) => {
+  const [eventName, setEventName] = useState('');
 
-      <View style={styles.section}>
-        <Text style={styles.title}>Déclaration de frais kilométriques</Text>
-        <View style={styles.table}>
-          <View style={styles.tableRow}>
-            <View style={styles.tableCol}><Text style={styles.tableCell}>Motif</Text></View>
-            <View style={styles.tableCol}><Text style={styles.tableCell}>Distance parcourue</Text></View>
-          </View>
-          {trips.map((trip, index) => (
-            <View style={styles.tableRow} key={index}>
-              <View style={styles.tableCol}><Text style={styles.tableCell}>{trip.name}</Text></View>
-              <View style={styles.tableCol}><Text style={styles.tableCell}>{trip.distance} km</Text></View>
-            </View>
-          ))}
+  useEffect(() => {
+    const fetchEventName = async () => {
+      if (data.event_id) {
+        const { data: event, error } = await supabase
+          .from('vianney_event')
+          .select('event_name')
+          .eq('event_id', data.event_id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching event name:', error);
+        } else {
+          setEventName(event.event_name);
+        }
+      }
+    };
+
+    fetchEventName();
+  }, [data.event_id]);
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <Text style={styles.title}>Note de frais</Text>
+        <View style={styles.section}>
+          <Text>Identité du bénévole : {data.volunteer_last_name} {data.volunteer_first_name}</Text>
+          <Text>Pôle & service : {data.pole}</Text>
+          <Text>Adresse postale : {data.address}</Text>
+          <Text>Adresse Mail : {data.email}</Text>
+          <Text>Numéro de téléphone : {data.phone_number}</Text>
+          <Text>Évènement : {eventName}</Text>
+          <Text>Équipe : {data.team_id}</Text>
         </View>
-        <Text style={styles.explanation}>*Les frais kilométriques sont calculés selon la formule : distance parcourue (km) × 0,515 €</Text>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.title}>Déclaration de frais</Text>
-        <View style={styles.table}>
-          <View style={styles.tableRow}>
-            <View style={styles.tableCol}><Text style={styles.tableCell}>Motif</Text></View>
-            <View style={styles.tableCol}><Text style={styles.tableCell}>Montant</Text></View>
-          </View>
-          {expenses.map((expense, index) => (
-            <View style={styles.tableRow} key={index}>
-              <View style={styles.tableCol}><Text style={styles.tableCell}>{expense.name}</Text></View>
-              <View style={styles.tableCol}><Text style={styles.tableCell}>{expense.cost ? expense.cost.toFixed(2) : 'N/A'} €</Text></View>
+        <View style={styles.section}>
+          <Text style={styles.title}>Déclaration de frais kilométriques</Text>
+          <View style={styles.table}>
+            <View style={styles.tableRow}>
+              <View style={styles.tableCol}><Text style={styles.tableCell}>Motif</Text></View>
+              <View style={styles.tableCol}><Text style={styles.tableCell}>Distance parcourue</Text></View>
             </View>
-          ))}
+            {trips.map((trip, index) => (
+              <View style={styles.tableRow} key={index}>
+                <View style={styles.tableCol}><Text style={styles.tableCell}>{trip.name}</Text></View>
+                <View style={styles.tableCol}><Text style={styles.tableCell}>{trip.distance} km</Text></View>
+              </View>
+            ))}
+          </View>
+          <Text style={styles.explanation}>*Les frais kilométriques sont calculés selon la formule : distance parcourue (km) × 0,515 €</Text>
         </View>
-      </View>
 
-      <Text style={styles.total}>Total: {data.total} €</Text>
-    </Page>
-  </Document>
-);
+        <View style={styles.section}>
+          <Text style={styles.title}>Déclaration de frais</Text>
+          <View style={styles.table}>
+            <View style={styles.tableRow}>
+              <View style={styles.tableCol}><Text style={styles.tableCell}>Motif</Text></View>
+              <View style={styles.tableCol}><Text style={styles.tableCell}>Montant</Text></View>
+            </View>
+            {expenses.map((expense, index) => (
+              <View style={styles.tableRow} key={index}>
+                <View style={styles.tableCol}><Text style={styles.tableCell}>{expense.name}</Text></View>
+                <View style={styles.tableCol}><Text style={styles.tableCell}>{expense.cost ? expense.cost.toFixed(2) : 'N/A'} €</Text></View>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <Text style={styles.total}>Total: {data.total} €</Text>
+      </Page>
+    </Document>
+  );
+};
 
 export default ExpenseSummaryPDF;
