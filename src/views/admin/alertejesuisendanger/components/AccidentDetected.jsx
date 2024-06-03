@@ -12,7 +12,7 @@ import {
 import { PhoneIcon, CheckIcon } from '@chakra-ui/icons';
 
 const AccidentDetected = () => {
-  const [counter, setCounter] = useState(120); // 120 seconds countdown
+  const [counter, setCounter] = useState(30); // 30 seconds countdown
 
   useEffect(() => {
     if (counter > 0) {
@@ -36,7 +36,7 @@ const AccidentDetected = () => {
           Envoi de l'alerte dans
         </Text>
         <CircularProgress
-          value={(counter / 120) * 100}
+          value={(counter / 30) * 100}
           size="120px"
           color="green.400"
         >
