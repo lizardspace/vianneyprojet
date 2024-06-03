@@ -97,6 +97,7 @@ const InventoryDisplay = () => {
                     position="absolute"
                     top={4} // Ajustez la valeur en fonction de votre espacement préféré depuis le haut
                     right={4} // Ajustez la valeur en fonction de votre espacement préféré depuis la droite
+                    zIndex="10000"
                 >
                     <CiCirclePlus /> {/* Ajoutez l'icône à l'intérieur du bouton */}
                 </Button>
