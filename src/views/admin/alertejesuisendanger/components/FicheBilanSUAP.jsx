@@ -9,7 +9,9 @@ import {
   CheckboxGroup,
   Checkbox,
   SimpleGrid,
-  Stack
+  Stack,
+  Grid,
+  GridItem
 } from "@chakra-ui/react";
 
 function FicheBilanSUAP() {
@@ -218,39 +220,53 @@ function FicheBilanSUAP() {
 
       <Box bg="black" color="white" p={2} textAlign="center" my={5}>BILAN PRIMAIRE</Box>
 
-      <SimpleGrid columns={2} spacing={5} my={5}>
-        <FormControl>
-          <FormLabel>Voies aériennes (VA):</FormLabel>
-          <CheckboxGroup>
-            <Stack direction="column">
-              <Checkbox value="Libres">Libres</Checkbox>
-              <Checkbox value="Obstruction totale des VA">Obstruction totale des VA</Checkbox>
-              <Checkbox value="Obstruction partielle des VA">Obstruction partielle des VA</Checkbox>
-            </Stack>
-          </CheckboxGroup>
-        </FormControl>
-        <FormControl>
-          <FormLabel>Respiration:</FormLabel>
-          <CheckboxGroup>
-            <Stack direction="column">
-              <Checkbox value="Normale">Normale</Checkbox>
-              <Checkbox value="Arrêt respiratoire ou pause > 6s">Arrêt respiratoire ou pause > 6s</Checkbox>
-            </Stack>
-          </CheckboxGroup>
-        </FormControl>
-      </SimpleGrid>
+      <Grid templateColumns="repeat(3, 1fr)" gap={5} my={5}>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Voies aériennes (VA):</FormLabel>
+            <CheckboxGroup>
+              <Stack direction="column">
+                <Checkbox value="Libres">Libres</Checkbox>
+                <Checkbox value="Obstruction totale des VA">Obstruction totale des VA</Checkbox>
+                <Checkbox value="Obstruction partielle des VA">Obstruction partielle des VA</Checkbox>
+              </Stack>
+            </CheckboxGroup>
+          </FormControl>
+        </GridItem>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Respiration:</FormLabel>
+            <CheckboxGroup>
+              <Stack direction="column">
+                <Checkbox value="Normale">Normale</Checkbox>
+                <Checkbox value="Arrêt respiratoire ou pause > 6s">Arrêt respiratoire ou pause > 6s</Checkbox>
+              </Stack>
+            </CheckboxGroup>
+          </FormControl>
+        </GridItem>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Circulation:</FormLabel>
+            <CheckboxGroup>
+              <Stack direction="column">
+                <Checkbox value="Normale">Normale</Checkbox>
+                <Checkbox value="Pouls radial non perçu">Pouls radial non perçu</Checkbox>
+                <Checkbox value="Hémorragie contrôlée">Hémorragie contrôlée</Checkbox>
+                <Checkbox value="Hémorragie non contrôlée">Hémorragie non contrôlée</Checkbox>
+              </Stack>
+            </CheckboxGroup>
+          </FormControl>
+        </GridItem>
+      </Grid>
 
-      <SimpleGrid columns={2} spacing={5} my={5}>
+      <SimpleGrid columns={3} spacing={5} my={5}>
         <FormControl>
-          <FormLabel>Circulation:</FormLabel>
-          <CheckboxGroup>
-            <Stack direction="column">
-              <Checkbox value="Normale">Normale</Checkbox>
-              <Checkbox value="Pouls radial non perçu">Pouls radial non perçu</Checkbox>
-              <Checkbox value="Hémorragie contrôlée">Hémorragie contrôlée</Checkbox>
-              <Checkbox value="Hémorragie non contrôlée">Hémorragie non contrôlée</Checkbox>
-            </Stack>
-          </CheckboxGroup>
+          <FormLabel>Localisation:</FormLabel>
+          <Input type="text" id="localisation" />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Sensation de soif:</FormLabel>
+          <Input type="text" id="sensationDeSoif" />
         </FormControl>
         <FormControl>
           <FormLabel>Glasgow:</FormLabel>
@@ -280,84 +296,100 @@ function FicheBilanSUAP() {
 
       <Box bg="black" color="white" p={2} textAlign="center" my={5}>BILAN SECONDAIRE</Box>
 
-      <SimpleGrid columns={2} spacing={5} my={5}>
-        <FormControl>
-          <FormLabel>Causes:</FormLabel>
-          <CheckboxGroup>
-            <Stack direction="column">
-              <Checkbox value="Corps étranger">Corps étranger</Checkbox>
-              <Checkbox value="Trauma cervical">Trauma cervical</Checkbox>
-              <Checkbox value="Autres">Autres</Checkbox>
-            </Stack>
-          </CheckboxGroup>
-        </FormControl>
-        <FormControl>
-          <FormLabel>Fréquence respiratoire (FR):</FormLabel>
-          <Input type="number" id="frequenceRespiratoire" />
-        </FormControl>
-        <FormControl>
-          <FormLabel>SpO2:</FormLabel>
-          <Input type="text" id="spo2" />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Fréquence cardiaque (FC):</FormLabel>
-          <Input type="number" id="frequenceCardiaque" />
-        </FormControl>
-      </SimpleGrid>
+      <Grid templateColumns="repeat(3, 1fr)" gap={5} my={5}>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Causes:</FormLabel>
+            <CheckboxGroup>
+              <Stack direction="column">
+                <Checkbox value="Corps étranger">Corps étranger</Checkbox>
+                <Checkbox value="Trauma cervical">Trauma cervical</Checkbox>
+                <Checkbox value="Autres">Autres</Checkbox>
+              </Stack>
+            </CheckboxGroup>
+          </FormControl>
+        </GridItem>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Fréquence respiratoire (FR):</FormLabel>
+            <Input type="number" id="frequenceRespiratoire" />
+          </FormControl>
+        </GridItem>
+        <GridItem>
+          <FormControl>
+            <FormLabel>SpO2:</FormLabel>
+            <Input type="text" id="spo2" />
+          </FormControl>
+        </GridItem>
+      </Grid>
 
-      <SimpleGrid columns={2} spacing={5} my={5}>
-        <FormControl>
-          <FormLabel>Pouls:</FormLabel>
-          <CheckboxGroup>
-            <Stack direction="column">
-              <Checkbox value="Régulier">Régulier</Checkbox>
-              <Checkbox value="Irrégulier">Irrégulier</Checkbox>
-              <Checkbox value="Filant">Filant</Checkbox>
-              <Checkbox value="Asymétrique">Asymétrique</Checkbox>
-              <Checkbox value="Bradycardie">Bradycardie</Checkbox>
-              <Checkbox value="Tachycardie">Tachycardie</Checkbox>
-            </Stack>
-          </CheckboxGroup>
-        </FormControl>
-        <FormControl>
-          <FormLabel>Pupilles:</FormLabel>
-          <CheckboxGroup>
-            <Stack direction="column">
-              <Checkbox value="Normales">Normales</Checkbox>
-              <Checkbox value="Serrées">Serrées</Checkbox>
-              <Checkbox value="Dilatées">Dilatées</Checkbox>
-              <Checkbox value="Non réactives">Non réactives</Checkbox>
-            </Stack>
-          </CheckboxGroup>
-        </FormControl>
-      </SimpleGrid>
+      <Grid templateColumns="repeat(3, 1fr)" gap={5} my={5}>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Fréquence cardiaque (FC):</FormLabel>
+            <Input type="number" id="frequenceCardiaque" />
+          </FormControl>
+        </GridItem>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Pouls:</FormLabel>
+            <CheckboxGroup>
+              <Stack direction="column">
+                <Checkbox value="Régulier">Régulier</Checkbox>
+                <Checkbox value="Irrégulier">Irrégulier</Checkbox>
+                <Checkbox value="Filant">Filant</Checkbox>
+                <Checkbox value="Asymétrique">Asymétrique</Checkbox>
+                <Checkbox value="Bradycardie">Bradycardie</Checkbox>
+                <Checkbox value="Tachycardie">Tachycardie</Checkbox>
+              </Stack>
+            </CheckboxGroup>
+          </FormControl>
+        </GridItem>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Pupilles:</FormLabel>
+            <CheckboxGroup>
+              <Stack direction="column">
+                <Checkbox value="Normales">Normales</Checkbox>
+                <Checkbox value="Serrées">Serrées</Checkbox>
+                <Checkbox value="Dilatées">Dilatées</Checkbox>
+                <Checkbox value="Non réactives">Non réactives</Checkbox>
+              </Stack>
+            </CheckboxGroup>
+          </FormControl>
+        </GridItem>
+      </Grid>
 
-      <SimpleGrid columns={2} spacing={5} my={5}>
-        <FormControl>
-          <FormLabel>Motricité:</FormLabel>
-          <CheckboxGroup>
-            <Stack direction="column">
-              <Checkbox value="Normale">Normale</Checkbox>
-              <Checkbox value="Déficit sensitif">Déficit sensitif</Checkbox>
-              <Checkbox value="Paralysie">Paralysie</Checkbox>
-              <Checkbox value="Agitation">Agitation</Checkbox>
-            </Stack>
-          </CheckboxGroup>
-        </FormControl>
-        <FormControl>
-          <FormLabel>Détection des symptômes:</FormLabel>
-          <CheckboxGroup>
-            <Stack direction="column">
-              <Checkbox value="Hypo">Hypo</Checkbox>
-              <Checkbox value="Hypotension">Hypotension</Checkbox>
-              <Checkbox value="Hyper">Hyper</Checkbox>
-              <Checkbox value="Hypothermie">Hypothermie</Checkbox>
-              <Checkbox value="Hyperthermie">Hyperthermie</Checkbox>
-              <Checkbox value="Hypoxie">Hypoxie</Checkbox>
-            </Stack>
-          </CheckboxGroup>
-        </FormControl>
-      </SimpleGrid>
+      <Grid templateColumns="repeat(3, 1fr)" gap={5} my={5}>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Motricité:</FormLabel>
+            <CheckboxGroup>
+              <Stack direction="column">
+                <Checkbox value="Normale">Normale</Checkbox>
+                <Checkbox value="Déficit sensitif">Déficit sensitif</Checkbox>
+                <Checkbox value="Paralysie">Paralysie</Checkbox>
+                <Checkbox value="Agitation">Agitation</Checkbox>
+              </Stack>
+            </CheckboxGroup>
+          </FormControl>
+        </GridItem>
+        <GridItem>
+          <FormControl>
+            <FormLabel>Détection des symptômes:</FormLabel>
+            <CheckboxGroup>
+              <Stack direction="column">
+                <Checkbox value="Hypo">Hypo</Checkbox>
+                <Checkbox value="Hypotension">Hypotension</Checkbox>
+                <Checkbox value="Hyper">Hyper</Checkbox>
+                <Checkbox value="Hypothermie">Hypothermie</Checkbox>
+                <Checkbox value="Hyperthermie">Hyperthermie</Checkbox>
+                <Checkbox value="Hypoxie">Hypoxie</Checkbox>
+              </Stack>
+            </CheckboxGroup>
+          </FormControl>
+        </GridItem>
+      </Grid>
     </Box>
   );
 }
