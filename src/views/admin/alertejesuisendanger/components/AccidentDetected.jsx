@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
   Text,
   Button,
   VStack,
   CircularProgress,
   CircularProgressLabel,
   Center,
-  IconButton,
 } from '@chakra-ui/react';
 import { PhoneIcon, CheckIcon } from '@chakra-ui/icons';
 
