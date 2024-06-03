@@ -99,9 +99,12 @@ function FicheBilanSUAP() {
       </SimpleGrid>
 
       <Box bg="black" color="white" p={2} textAlign="center" my={5}>BILAN CIRCONSTANCIEL</Box>
-
+      <FormControl>
+          <FormLabel>CIRCONSTANCES:</FormLabel>
+          <Input type="textarea" id="telPersonnePrevenir" />
+        </FormControl>
       <SimpleGrid columns={2} spacing={5} my={5}>
-        <FormControl>
+      <FormControl>
           <FormLabel>Lieu:</FormLabel>
           <CheckboxGroup>
             <Stack direction="row">
