@@ -107,7 +107,7 @@ const routes = [
     name: "Secours",
     layout: "/admin",
     path: "/alertejesuisendanger",
-    icon: <Icon as={LuCross} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={LuCross} width='20px' height='20px' color='red' />, // Set the icon color to red
     component: AlerteJeSuisEnDanger,
   },
 ];
