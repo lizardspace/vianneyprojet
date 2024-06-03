@@ -16,7 +16,7 @@ function WeatherWidget({ src }) {
         <a href="https://www.meteoblue.com/fr/meteo/cartes/france_france_3017382?utm_source=weather_widget&utm_medium=linkus&utm_content=map&utm_campaign=Weather%2BWidget"
            target="_blank"
            rel="noopener noreferrer">
-          meteoblue
+          .
         </a>
       </div>
       <div>
