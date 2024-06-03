@@ -24,6 +24,8 @@ import { PhoneIcon, CheckIcon } from '@chakra-ui/icons';
 const AccidentDetected = () => {
   const [counter, setCounter] = useState(30); // 30 seconds countdown
   const [step, setStep] = useState(1); // Step tracker
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
@@ -34,6 +36,7 @@ const AccidentDetected = () => {
       }, 1000);
     } else if (counter === 0) {
       setStep(3);
+      getCurrentLocation();
     }
     return () => clearInterval(timer);
   }, [counter, step]);
@@ -44,12 +47,24 @@ const AccidentDetected = () => {
 
   const confirmSOS = () => {
     setStep(3);
+    getCurrentLocation();
   };
 
   const cancelAlert = () => {
     setCounter(30);
     setStep(1);
     onClose();
+  };
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        setLatitude(position.coords.latitude);
+        setLongitude(position.coords.longitude);
+      });
+    } else {
+      alert('Geolocation is not supported by this browser.');
+    }
   };
 
   return (
@@ -115,7 +130,14 @@ const AccidentDetected = () => {
           <Alert status="error">
             <AlertIcon />
             <AlertTitle>Alerte déclenchée!</AlertTitle>
-            <AlertDescription>Une alerte a été envoyée.</AlertDescription>
+            <AlertDescription>
+              Une alerte a été envoyée.
+              {latitude && longitude && (
+                <Text mt={4}>
+                  Ma position GPS est: latitude: {latitude}, longitude: {longitude}
+                </Text>
+              )}
+            </AlertDescription>
           </Alert>
         </VStack>
       )}
