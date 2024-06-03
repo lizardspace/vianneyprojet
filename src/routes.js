@@ -1,7 +1,16 @@
 import React from "react";
 import { Icon } from "@chakra-ui/react";
-import { FcMindMap, FcSerialTasks, FcSurvey, FcSettings, FcSelfie, FcGrid, FcHighPriority, FcDiploma2 } from "react-icons/fc";
-import { MdQrCodeScanner } from "react-icons/md";
+import {
+  FcMindMap,
+  FcSerialTasks,
+  FcSurvey,
+  FcSettings,
+  FcSelfie,
+  FcGrid,
+  FcHighPriority,
+  FcDiploma2,
+} from "react-icons/fc";
+import { MdQrCodeScanner, MdOutlineSos } from "react-icons/md"; // Import the new icon
 import { LuCross } from "react-icons/lu"; // Import the new icon
 
 import MainDashboard from "views/admin/default";
@@ -9,13 +18,13 @@ import NFTMarketplace from "views/admin/carte";
 import TableauDeBord from "views/admin/TableauDeBord";
 import InterfaceEquipe from "views/admin/InterfaceEquipe";
 import TableauExcel from "views/admin/TableauExcel";
-import AlerteEquipe from "views/admin/AlerteEquipe"; 
+import AlerteEquipe from "views/admin/AlerteEquipe";
 import MaterialComponent from "views/admin/MaterialComponent";
 import ZoomedMapComponent from "views/admin/ZoomedMapComponent";
 import NoteDeFraisComponent from "views/admin/NoteDeFraisComponent";
 import AlerteJeSuisEnDanger from "views/admin/alertejesuisendanger"; // Import the new component
-
 import Parameters from "views/admin/Parameters";
+import SOSComponent from "views/admin/SOSComponent"; // Assuming you have a new component for the sosroute
 
 const routes = [
   {
@@ -109,6 +118,13 @@ const routes = [
     path: "/alertejesuisendanger",
     icon: <Icon as={LuCross} width='20px' height='20px' color='red' />, // Set the icon color to red
     component: AlerteJeSuisEnDanger,
+  },
+  {
+    name: "SOS Route",
+    layout: "/admin",
+    path: "/sosroute",
+    icon: <Icon as={MdOutlineSos} width='20px' height='20px' color='red' />, // Set the icon color to red
+    component: SOSComponent, // Assuming you have a new component for this route
   },
 ];
 
