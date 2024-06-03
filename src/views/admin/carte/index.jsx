@@ -62,8 +62,8 @@ export default function Marketplace() {
               <TabList>
                 <Tab>Situation - GOC</Tab>
                 <Tab>SITAC</Tab>
-                <Tab>Base de données</Tab>
                 <Tab>Dessin</Tab> {/* Nouvel onglet "Dessin" */}
+                <Tab>Base de données</Tab>
               </TabList>
               <TabPanels>
                 <TabPanel>
@@ -92,11 +92,11 @@ export default function Marketplace() {
                   <ShowSITACbis />
                 </TabPanel>
                 <TabPanel>
-                  <BaseDeDonnee />
-                </TabPanel>
-                <TabPanel>
                   {/* Contenu de l'onglet "Dessin" */}
                   <JSPaintComponent />
+                </TabPanel>
+                <TabPanel>
+                  <BaseDeDonnee />
                 </TabPanel>
               </TabPanels>
             </Tabs>
