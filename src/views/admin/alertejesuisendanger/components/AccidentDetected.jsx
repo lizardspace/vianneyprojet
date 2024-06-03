@@ -27,10 +27,10 @@ const AccidentDetected = () => {
     <Center height="100vh" bg="gray.50" p={4}>
       <VStack spacing={8} bg="white" p={6} rounded="md" shadow="md">
         <Text fontSize="lg" color="red.500" fontWeight="bold">
-          Liberty Rider
+          SOS-sans contact
         </Text>
         <Text fontSize="2xl" fontWeight="bold">
-          Accident détecté
+          Demande d'aide
         </Text>
         <Text fontSize="md" color="gray.500">
           Envoi de l'alerte dans
