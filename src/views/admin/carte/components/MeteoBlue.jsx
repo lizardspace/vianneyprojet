@@ -20,7 +20,7 @@ function WeatherWidget({ src }) {
         </a>
       </div>
       <div>
-      <iframe width="100%"  height="750px" src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=km/h&zoom=6&overlay=rain&product=ecmwf&level=surface&lat=45.737&lon=2.769&detailLat=47.19&detailLon=2.637&detail=true&message=true" frameborder="0"></iframe>
+      <iframe title="Meteo Windy" width="100%"  height="750px" src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=km/h&zoom=6&overlay=rain&product=ecmwf&level=surface&lat=45.737&lon=2.769&detailLat=47.19&detailLon=2.637&detail=true&message=true" frameborder="0"></iframe>
       </div>
     </div>
   );
