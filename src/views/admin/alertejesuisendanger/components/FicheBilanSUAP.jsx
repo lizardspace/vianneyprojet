@@ -69,8 +69,16 @@ function FicheBilanSUAP() {
   };
 
   const handleSubmit = async () => {
+    const dataToSubmit = {
+      ...formData,
+      age: formData.age ? parseInt(formData.age, 10) : null,
+      vitesse_estimee: formData.vitesse_estimee ? parseInt(formData.vitesse_estimee, 10) : null,
+      frequence_respiratoire: formData.frequence_respiratoire ? parseInt(formData.frequence_respiratoire, 10) : null,
+      frequence_cardiaque: formData.frequence_cardiaque ? parseInt(formData.frequence_cardiaque, 10) : null
+    };
+
     try {
-      const { data, error } = await supabase.from('vianney_fiche_bilan_suap').insert([formData]);
+      const { data, error } = await supabase.from('vianney_fiche_bilan_suap').insert([dataToSubmit]);
 
       if (error) {
         throw error;
@@ -173,7 +181,7 @@ function FicheBilanSUAP() {
       <FormControl my={5}>
           <FormLabel>CIRCONSTANCES:</FormLabel>
           <Textarea id="circonstances" value={formData.circonstances} onChange={handleChange} />
-        </FormControl>
+      </FormControl>
       <SimpleGrid columns={2} spacing={5} my={5}>
       <FormControl>
           <FormLabel>Lieu:</FormLabel>
