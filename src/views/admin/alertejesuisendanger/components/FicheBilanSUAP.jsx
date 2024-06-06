@@ -74,7 +74,11 @@ function FicheBilanSUAP() {
       age: formData.age ? parseInt(formData.age, 10) : null,
       vitesse_estimee: formData.vitesse_estimee ? parseInt(formData.vitesse_estimee, 10) : null,
       frequence_respiratoire: formData.frequence_respiratoire ? parseInt(formData.frequence_respiratoire, 10) : null,
-      frequence_cardiaque: formData.frequence_cardiaque ? parseInt(formData.frequence_cardiaque, 10) : null
+      frequence_cardiaque: formData.frequence_cardiaque ? parseInt(formData.frequence_cardiaque, 10) : null,
+      debut_event: formData.debut_event || '00:00:00',
+      prise_charge: formData.prise_charge || '00:00:00',
+      convergence: formData.convergence || '00:00:00',
+      arrive_hop: formData.arrive_hop || '00:00:00',
     };
 
     try {
