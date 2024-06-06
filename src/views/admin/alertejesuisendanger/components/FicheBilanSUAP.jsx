@@ -1,20 +1,91 @@
-import React from 'react';
-import {
-  Box,
-  Heading,
-  FormControl,
-  FormLabel,
-  Input,
-  Textarea,
-  CheckboxGroup,
-  Checkbox,
-  SimpleGrid,
-  Stack,
-  Grid,
-  GridItem
-} from "@chakra-ui/react";
+import React, { useState } from 'react';
+import { Box, Heading, FormControl, FormLabel, Input, Textarea, CheckboxGroup, Checkbox, SimpleGrid, Stack, Grid, GridItem, Button } from "@chakra-ui/react";
+import { supabase } from './../../../../supabaseClient';
 
 function FicheBilanSUAP() {
+  const initialState = {
+    engin_a: '',
+    engin_b: '',
+    date: '',
+    debut_event: '',
+    prise_charge: '',
+    convergence: '',
+    arrive_hop: '',
+    nom: '',
+    prenom: '',
+    date_naissance: '',
+    age: '',
+    adresse: '',
+    tel: '',
+    medecin_traitant: '',
+    personne_prevenir: '',
+    tel_personne_prevenir: '',
+    circonstances: '',
+    lieu: '',
+    accident_circulation: [],
+    type_choc: [],
+    position_vehicule: [],
+    vitesse_estimee: '',
+    equipement_securite: [],
+    situation_arrivee_secours: [],
+    intoxication_par: [],
+    accident_divers: [],
+    accouchement: [],
+    voies_aeriennes: [],
+    respiration: [],
+    circulation: [],
+    localisation: '',
+    sensation_de_soif: '',
+    glasgow: '',
+    convulsions: [],
+    etat: [],
+    causes: [],
+    frequence_respiratoire: '',
+    spo2: '',
+    frequence_cardiaque: '',
+    pouls: [],
+    pupilles: [],
+    motricite: [],
+    detection_symptomes: []
+  };
+
+  const [formData, setFormData] = useState(initialState);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleChange = (e) => {
+    const { id, value, type, checked } = e.target;
+    if (type === 'checkbox') {
+      setFormData(prevState => ({
+        ...prevState,
+        [id]: checked ? [...prevState[id], value] : prevState[id].filter(v => v !== value)
+      }));
+    } else {
+      setFormData(prevState => ({
+        ...prevState,
+        [id]: value
+      }));
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const { data, error } = await supabase.from('vianney_fiche_bilan_suap').insert([formData]);
+
+      if (error) {
+        throw error;
+      }
+
+      setSuccessMessage('Données soumises avec succès !');
+      setErrorMessage('');
+      setFormData(initialState); // Reset the form after successful submission
+    } catch (error) {
+      setErrorMessage('Erreur lors de la soumission des données.');
+      setSuccessMessage('');
+      console.error('Error submitting data:', error.message);
+    }
+  };
+
   return (
     <Box width="80%" margin="auto" border="1px" borderColor="black" p={5}>
       <Heading as="h1" size="lg" textAlign="center">FICHE BILAN SUAP - N° INTER:</Heading>
@@ -22,34 +93,34 @@ function FicheBilanSUAP() {
       <SimpleGrid columns={2} spacing={5} my={5}>
         <FormControl>
           <FormLabel>ENGIN A:</FormLabel>
-          <Input type="text" id="enginA" />
+          <Input type="text" id="engin_a" value={formData.engin_a} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>ENGIN B:</FormLabel>
-          <Input type="text" id="enginB" />
+          <Input type="text" id="engin_b" value={formData.engin_b} onChange={handleChange} />
         </FormControl>
       </SimpleGrid>
 
       <SimpleGrid columns={2} spacing={5} my={5}>
         <FormControl>
           <FormLabel>Date:</FormLabel>
-          <Input type="date" id="date" />
+          <Input type="date" id="date" value={formData.date} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>Début évént:</FormLabel>
-          <Input type="time" id="debutEvent" />
+          <Input type="time" id="debut_event" value={formData.debut_event} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>Prise en ch:</FormLabel>
-          <Input type="time" id="priseCharge" />
+          <Input type="time" id="prise_charge" value={formData.prise_charge} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>Convergence:</FormLabel>
-          <Input type="time" id="convergence" />
+          <Input type="time" id="convergence" value={formData.convergence} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>Arrivée hôp:</FormLabel>
-          <Input type="time" id="arriveHop" />
+          <Input type="time" id="arrive_hop" value={formData.arrive_hop} onChange={handleChange} />
         </FormControl>
       </SimpleGrid>
 
@@ -58,55 +129,55 @@ function FicheBilanSUAP() {
       <SimpleGrid columns={2} spacing={5} my={5}>
         <FormControl>
           <FormLabel>NOM:</FormLabel>
-          <Input type="text" id="nom" />
+          <Input type="text" id="nom" value={formData.nom} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>PRÉNOM:</FormLabel>
-          <Input type="text" id="prenom" />
+          <Input type="text" id="prenom" value={formData.prenom} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>DATE DE NAISSANCE:</FormLabel>
-          <Input type="date" id="dateNaissance" />
+          <Input type="date" id="date_naissance" value={formData.date_naissance} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>ÂGE:</FormLabel>
-          <Input type="number" id="age" />
+          <Input type="number" id="age" value={formData.age} onChange={handleChange} />
         </FormControl>
       </SimpleGrid>
 
       <FormControl my={5}>
         <FormLabel>ADRESSE DE LA VICTIME:</FormLabel>
-        <Textarea id="adresse" />
+        <Textarea id="adresse" value={formData.adresse} onChange={handleChange} />
       </FormControl>
 
       <SimpleGrid columns={2} spacing={5} my={5}>
         <FormControl>
           <FormLabel>TEL:</FormLabel>
-          <Input type="tel" id="tel" />
+          <Input type="tel" id="tel" value={formData.tel} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>MÉDECIN TRAITANT:</FormLabel>
-          <Input type="text" id="medecinTraitant" />
+          <Input type="text" id="medecin_traitant" value={formData.medecin_traitant} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>PERSONNE À PRÉVENIR:</FormLabel>
-          <Input type="text" id="personnePrevenir" />
+          <Input type="text" id="personne_prevenir" value={formData.personne_prevenir} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>TEL:</FormLabel>
-          <Input type="tel" id="telPersonnePrevenir" />
+          <Input type="tel" id="tel_personne_prevenir" value={formData.tel_personne_prevenir} onChange={handleChange} />
         </FormControl>
       </SimpleGrid>
 
       <Box bg="black" color="white" p={2} textAlign="center" my={5}>BILAN CIRCONSTANCIEL</Box>
-      <FormControl>
+      <FormControl my={5}>
           <FormLabel>CIRCONSTANCES:</FormLabel>
-          <Input type="textarea" id="telPersonnePrevenir" />
+          <Textarea id="circonstances" value={formData.circonstances} onChange={handleChange} />
         </FormControl>
       <SimpleGrid columns={2} spacing={5} my={5}>
       <FormControl>
           <FormLabel>Lieu:</FormLabel>
-          <CheckboxGroup>
+          <CheckboxGroup value={formData.lieu} onChange={(value) => setFormData({...formData, lieu: value})}>
             <Stack direction="row">
               <Checkbox value="VR">V.R</Checkbox>
               <Checkbox value="Domicile">Domicile</Checkbox>
@@ -119,7 +190,7 @@ function FicheBilanSUAP() {
         </FormControl>
         <FormControl>
           <FormLabel>Accident de circulation:</FormLabel>
-          <CheckboxGroup>
+          <CheckboxGroup value={formData.accident_circulation} onChange={(value) => setFormData({...formData, accident_circulation: value})}>
             <Stack direction="row">
               <Checkbox value="Piéton">Piéton</Checkbox>
               <Checkbox value="Deux roues">Deux roues</Checkbox>
@@ -134,7 +205,7 @@ function FicheBilanSUAP() {
 
       <FormControl my={5}>
         <FormLabel>Type de choc:</FormLabel>
-        <CheckboxGroup>
+        <CheckboxGroup value={formData.type_choc} onChange={(value) => setFormData({...formData, type_choc: value})}>
           <Stack direction="row">
             <Checkbox value="Frontal">Frontal</Checkbox>
             <Checkbox value="Latéral">Latéral</Checkbox>
@@ -148,7 +219,7 @@ function FicheBilanSUAP() {
 
       <FormControl my={5}>
         <FormLabel>Position dans le véhicule:</FormLabel>
-        <CheckboxGroup>
+        <CheckboxGroup value={formData.position_vehicule} onChange={(value) => setFormData({...formData, position_vehicule: value})}>
           <Stack direction="row">
             <Checkbox value="Conducteur">Conducteur</Checkbox>
             <Checkbox value="Passager AV">Passager AV</Checkbox>
@@ -159,12 +230,12 @@ function FicheBilanSUAP() {
 
       <FormControl my={5}>
         <FormLabel>Vitesse estimée au moment du choc (Km/h):</FormLabel>
-        <Input type="number" id="vitesseEstimee" />
+        <Input type="number" id="vitesse_estimee" value={formData.vitesse_estimee} onChange={handleChange} />
       </FormControl>
 
       <FormControl my={5}>
         <FormLabel>Équipement de sécurité au port de la victime:</FormLabel>
-        <CheckboxGroup>
+        <CheckboxGroup value={formData.equipement_securite} onChange={(value) => setFormData({...formData, equipement_securite: value})}>
           <Stack direction="row">
             <Checkbox value="Airbag type">Airbag type</Checkbox>
             <Checkbox value="Ceinture">Ceinture</Checkbox>
@@ -175,7 +246,7 @@ function FicheBilanSUAP() {
 
       <FormControl my={5}>
         <FormLabel>Situation à l'arrivée des secours:</FormLabel>
-        <CheckboxGroup>
+        <CheckboxGroup value={formData.situation_arrivee_secours} onChange={(value) => setFormData({...formData, situation_arrivee_secours: value})}>
           <Stack direction="row">
             <Checkbox value="Incarcéré">Incarcéré</Checkbox>
             <Checkbox value="Éjecté, projeté">Éjecté, projeté</Checkbox>
@@ -188,7 +259,7 @@ function FicheBilanSUAP() {
 
       <FormControl my={5}>
         <FormLabel>Intoxication par:</FormLabel>
-        <CheckboxGroup>
+        <CheckboxGroup value={formData.intoxication_par} onChange={(value) => setFormData({...formData, intoxication_par: value})}>
           <Stack direction="row">
             <Checkbox value="Alcool">Alcool</Checkbox>
             <Checkbox value="Fumées d'incendie">Fumées d'incendie</Checkbox>
@@ -200,7 +271,7 @@ function FicheBilanSUAP() {
 
       <FormControl my={5}>
         <FormLabel>Accident divers:</FormLabel>
-        <CheckboxGroup>
+        <CheckboxGroup value={formData.accident_divers} onChange={(value) => setFormData({...formData, accident_divers: value})}>
           <Stack direction="row">
             <Checkbox value="Arme à feu">Arme à feu</Checkbox>
             <Checkbox value="Pendaison-étrangulation">Pendaison-étrangulation</Checkbox>
@@ -213,7 +284,7 @@ function FicheBilanSUAP() {
 
       <FormControl my={5}>
         <FormLabel>Accouchement:</FormLabel>
-        <CheckboxGroup>
+        <CheckboxGroup value={formData.accouchement} onChange={(value) => setFormData({...formData, accouchement: value})}>
           <Stack direction="row">
             <Checkbox value="Début de travail">Début de travail</Checkbox>
             <Checkbox value="Accouchement réalisé">Accouchement réalisé</Checkbox>
@@ -227,7 +298,7 @@ function FicheBilanSUAP() {
         <GridItem>
           <FormControl>
             <FormLabel>Voies aériennes (VA):</FormLabel>
-            <CheckboxGroup>
+            <CheckboxGroup value={formData.voies_aeriennes} onChange={(value) => setFormData({...formData, voies_aeriennes: value})}>
               <Stack direction="column">
                 <Checkbox value="Libres">Libres</Checkbox>
                 <Checkbox value="Obstruction totale des VA">Obstruction totale des VA</Checkbox>
@@ -239,7 +310,7 @@ function FicheBilanSUAP() {
         <GridItem>
           <FormControl>
             <FormLabel>Respiration:</FormLabel>
-            <CheckboxGroup>
+            <CheckboxGroup value={formData.respiration} onChange={(value) => setFormData({...formData, respiration: value})}>
               <Stack direction="column">
                 <Checkbox value="Normale">Normale</Checkbox>
                 <Checkbox value="Arrêt respiratoire ou pause > 6s">Arrêt respiratoire ou pause > 6s</Checkbox>
@@ -250,7 +321,7 @@ function FicheBilanSUAP() {
         <GridItem>
           <FormControl>
             <FormLabel>Circulation:</FormLabel>
-            <CheckboxGroup>
+            <CheckboxGroup value={formData.circulation} onChange={(value) => setFormData({...formData, circulation: value})}>
               <Stack direction="column">
                 <Checkbox value="Normale">Normale</Checkbox>
                 <Checkbox value="Pouls radial non perçu">Pouls radial non perçu</Checkbox>
@@ -265,22 +336,22 @@ function FicheBilanSUAP() {
       <SimpleGrid columns={3} spacing={5} my={5}>
         <FormControl>
           <FormLabel>Localisation:</FormLabel>
-          <Input type="text" id="localisation" />
+          <Input type="text" id="localisation" value={formData.localisation} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>Sensation de soif:</FormLabel>
-          <Input type="text" id="sensationDeSoif" />
+          <Input type="text" id="sensation_de_soif" value={formData.sensation_de_soif} onChange={handleChange} />
         </FormControl>
         <FormControl>
           <FormLabel>Glasgow:</FormLabel>
-          <Input type="text" id="glasgow" />
+          <Input type="text" id="glasgow" value={formData.glasgow} onChange={handleChange} />
         </FormControl>
       </SimpleGrid>
 
       <SimpleGrid columns={2} spacing={5} my={5}>
         <FormControl>
           <FormLabel>Convulsions:</FormLabel>
-          <CheckboxGroup>
+          <CheckboxGroup value={formData.convulsions} onChange={(value) => setFormData({...formData, convulsions: value})}>
             <Stack direction="column">
               <Checkbox value="Convulsions répétitives">Convulsions répétitives</Checkbox>
               <Checkbox value="Pupilles asymétriques">Pupilles asymétriques</Checkbox>
@@ -289,7 +360,7 @@ function FicheBilanSUAP() {
         </FormControl>
         <FormControl>
           <FormLabel>État:</FormLabel>
-          <CheckboxGroup>
+          <CheckboxGroup value={formData.etat} onChange={(value) => setFormData({...formData, etat: value})}>
             <Stack direction="column">
               <Checkbox value="Non réactif">Non réactif</Checkbox>
             </Stack>
@@ -303,7 +374,7 @@ function FicheBilanSUAP() {
         <GridItem>
           <FormControl>
             <FormLabel>Causes:</FormLabel>
-            <CheckboxGroup>
+            <CheckboxGroup value={formData.causes} onChange={(value) => setFormData({...formData, causes: value})}>
               <Stack direction="column">
                 <Checkbox value="Corps étranger">Corps étranger</Checkbox>
                 <Checkbox value="Trauma cervical">Trauma cervical</Checkbox>
@@ -315,13 +386,13 @@ function FicheBilanSUAP() {
         <GridItem>
           <FormControl>
             <FormLabel>Fréquence respiratoire (FR):</FormLabel>
-            <Input type="number" id="frequenceRespiratoire" />
+            <Input type="number" id="frequence_respiratoire" value={formData.frequence_respiratoire} onChange={handleChange} />
           </FormControl>
         </GridItem>
         <GridItem>
           <FormControl>
             <FormLabel>SpO2:</FormLabel>
-            <Input type="text" id="spo2" />
+            <Input type="text" id="spo2" value={formData.spo2} onChange={handleChange} />
           </FormControl>
         </GridItem>
       </Grid>
@@ -330,13 +401,13 @@ function FicheBilanSUAP() {
         <GridItem>
           <FormControl>
             <FormLabel>Fréquence cardiaque (FC):</FormLabel>
-            <Input type="number" id="frequenceCardiaque" />
+            <Input type="number" id="frequence_cardiaque" value={formData.frequence_cardiaque} onChange={handleChange} />
           </FormControl>
         </GridItem>
         <GridItem>
           <FormControl>
             <FormLabel>Pouls:</FormLabel>
-            <CheckboxGroup>
+            <CheckboxGroup value={formData.pouls} onChange={(value) => setFormData({...formData, pouls: value})}>
               <Stack direction="column">
                 <Checkbox value="Régulier">Régulier</Checkbox>
                 <Checkbox value="Irrégulier">Irrégulier</Checkbox>
@@ -351,7 +422,7 @@ function FicheBilanSUAP() {
         <GridItem>
           <FormControl>
             <FormLabel>Pupilles:</FormLabel>
-            <CheckboxGroup>
+            <CheckboxGroup value={formData.pupilles} onChange={(value) => setFormData({...formData, pupilles: value})}>
               <Stack direction="column">
                 <Checkbox value="Normales">Normales</Checkbox>
                 <Checkbox value="Serrées">Serrées</Checkbox>
@@ -367,7 +438,7 @@ function FicheBilanSUAP() {
         <GridItem>
           <FormControl>
             <FormLabel>Motricité:</FormLabel>
-            <CheckboxGroup>
+            <CheckboxGroup value={formData.motricite} onChange={(value) => setFormData({...formData, motricite: value})}>
               <Stack direction="column">
                 <Checkbox value="Normale">Normale</Checkbox>
                 <Checkbox value="Déficit sensitif">Déficit sensitif</Checkbox>
@@ -380,7 +451,7 @@ function FicheBilanSUAP() {
         <GridItem>
           <FormControl>
             <FormLabel>Détection des symptômes:</FormLabel>
-            <CheckboxGroup>
+            <CheckboxGroup value={formData.detection_symptomes} onChange={(value) => setFormData({...formData, detection_symptomes: value})}>
               <Stack direction="column">
                 <Checkbox value="Hypo">Hypo</Checkbox>
                 <Checkbox value="Hypotension">Hypotension</Checkbox>
@@ -393,6 +464,13 @@ function FicheBilanSUAP() {
           </FormControl>
         </GridItem>
       </Grid>
+      
+      <Button onClick={handleSubmit} colorScheme="blue" mt={4}>
+        Soumettre
+      </Button>
+
+      {successMessage && <Box color="green">{successMessage}</Box>}
+      {errorMessage && <Box color="red">{errorMessage}</Box>}
     </Box>
   );
 }
