@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Box, Heading, FormControl, FormLabel, Input, Textarea, CheckboxGroup, Checkbox, SimpleGrid, Stack, Grid, GridItem, Button } from "@chakra-ui/react";
 import { supabase } from './../../../../supabaseClient';
+import { useEvent } from './../../../../EventContext';
 
 function FicheBilanSUAP() {
+    // eslint-disable-next-line no-unused-vars
+  const { setEventId, selectedEventId } = useEvent();
   const initialState = {
     engin_a: '',
     engin_b: '',
@@ -70,6 +73,7 @@ function FicheBilanSUAP() {
 
   const handleSubmit = async () => {
     const dataToSubmit = {
+      event_id: selectedEventId, // Ajout de l'event_id
       engin_a: formData.engin_a || 'N/A',
       engin_b: formData.engin_b || 'N/A',
       date: formData.date || '1970-01-01',
@@ -116,6 +120,7 @@ function FicheBilanSUAP() {
     };
 
     try {
+        // eslint-disable-next-line no-unused-vars
       const { data, error } = await supabase.from('vianney_fiche_bilan_suap').insert([dataToSubmit]);
 
       if (error) {
