@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Text,
   Button,
@@ -27,6 +27,31 @@ const AccidentDetected = () => {
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const videoRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const [recordedChunks, setRecordedChunks] = useState([]);
+
+  const getCurrentLocation = useCallback(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        setLatitude(position.coords.latitude);
+        setLongitude(position.coords.longitude);
+      });
+    } else {
+      alert('Geolocation is not supported by this browser.');
+    }
+  }, []);
+
+  const startRecording = useCallback(() => {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        videoRef.current.srcObject = stream;
+        mediaRecorderRef.current = new MediaRecorder(stream);
+        mediaRecorderRef.current.ondataavailable = handleDataAvailable;
+        mediaRecorderRef.current.start();
+      })
+      .catch(error => console.error('Error accessing media devices.', error));
+  }, []);
 
   useEffect(() => {
     let timer;
@@ -37,9 +62,10 @@ const AccidentDetected = () => {
     } else if (counter === 0) {
       setStep(3);
       getCurrentLocation();
+      startRecording();
     }
     return () => clearInterval(timer);
-  }, [counter, step]);
+  }, [counter, step, getCurrentLocation, startRecording]);
 
   const triggerSOS = () => {
     setStep(2);
@@ -48,27 +74,46 @@ const AccidentDetected = () => {
   const confirmSOS = () => {
     setStep(3);
     getCurrentLocation();
+    startRecording();
   };
 
   const cancelAlert = () => {
     setCounter(30);
     setStep(1);
+    stopRecording();
     onClose();
   };
 
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        setLatitude(position.coords.latitude);
-        setLongitude(position.coords.longitude);
-      });
-    } else {
-      alert('Geolocation is not supported by this browser.');
+  const handleDataAvailable = (event) => {
+    if (event.data.size > 0) {
+      setRecordedChunks(prev => prev.concat(event.data));
     }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+    }
+  };
+
+  const downloadRecording = () => {
+    const blob = new Blob(recordedChunks, {
+      type: 'video/webm',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+    a.style = 'display: none';
+    a.href = url;
+    a.download = 'sos_recording.webm';
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   return (
     <Center height="100vh" bg="gray.50" p={4}>
+      <video ref={videoRef} style={{ display: 'none' }} autoPlay />
       {step === 1 && (
         <VStack spacing={8} bg="white" p={6} rounded="md" shadow="md">
           <Text fontSize="2xl" fontWeight="bold">
@@ -139,6 +184,9 @@ const AccidentDetected = () => {
               )}
             </AlertDescription>
           </Alert>
+          <Button colorScheme="blue" onClick={downloadRecording}>
+            Télécharger l'enregistrement
+          </Button>
         </VStack>
       )}
 
