@@ -1,10 +1,23 @@
-import React from 'react';
-import { Box, Heading, Text, SimpleGrid, Divider, Stack, Badge } from "@chakra-ui/react";
+import React, { useRef } from 'react';
+import { Box, Heading, Text, SimpleGrid, Divider, Stack, Badge, Button } from "@chakra-ui/react";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const RenderFicheBilanSUAP = ({ data }) => {
-  if (!data) {
-    return <Text>Aucune donnée disponible</Text>;
-  }
+  const ficheRef = useRef();
+
+  const handleDownloadPDF = async () => {
+    const input = ficheRef.current;
+    const canvas = await html2canvas(input);
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`fiche_bilan_${data.nom}_${data.prenom}.pdf`);
+  };
 
   const renderBadgeList = (items) => {
     if (Array.isArray(items) && items.length > 0) {
@@ -20,7 +33,7 @@ const RenderFicheBilanSUAP = ({ data }) => {
   };
 
   return (
-    <Box width="80%" margin="auto" border="1px" borderColor="gray.300" borderRadius="md" p={5} boxShadow="md">
+    <Box ref={ficheRef} width="80%" margin="auto" border="1px" borderColor="gray.300" borderRadius="md" p={5} boxShadow="md" mb={10}>
       <Heading as="h1" size="lg" textAlign="center" mb={5}>FICHE BILAN SUAP - N° INTER</Heading>
 
       <SimpleGrid columns={2} spacing={5} my={5}>
@@ -168,6 +181,10 @@ const RenderFicheBilanSUAP = ({ data }) => {
           <Text>{data.position_evacuation}</Text>
         </Box>
       </SimpleGrid>
+
+      <Button onClick={handleDownloadPDF} colorScheme="blue" mt={4}>
+        Télécharger en PDF
+      </Button>
     </Box>
   );
 };
