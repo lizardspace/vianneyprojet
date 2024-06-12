@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, AlertIcon, AlertTitle, Box, Heading, FormControl, FormLabel, Input, Textarea, CheckboxGroup, Checkbox, SimpleGrid, Stack, Grid, GridItem, Button } from "@chakra-ui/react";
+import { Alert, AlertIcon, AlertTitle, Box, Heading, FormControl, FormLabel, Input, Textarea, CheckboxGroup, Checkbox, SimpleGrid, Stack, Grid, GridItem, Button, RadioGroup, Radio } from "@chakra-ui/react";
 import { supabase } from './../../../../supabaseClient';
 import { useEvent } from './../../../../EventContext';
 
@@ -49,7 +49,9 @@ function FicheBilanSUAP() {
     pouls: [],
     pupilles: [],
     motricite: [],
-    detection_symptomes: []
+    detection_symptomes: [],
+    besoin_evacuation: '',
+    position_evacuation: ''
   };
 
   const [formData, setFormData] = useState(initialState);
@@ -116,7 +118,9 @@ function FicheBilanSUAP() {
       pouls: formData.pouls.length > 0 ? formData.pouls : ['N/A'],
       pupilles: formData.pupilles.length > 0 ? formData.pupilles : ['N/A'],
       motricite: formData.motricite.length > 0 ? formData.motricite : ['N/A'],
-      detection_symptomes: formData.detection_symptomes.length > 0 ? formData.detection_symptomes : ['N/A']
+      detection_symptomes: formData.detection_symptomes.length > 0 ? formData.detection_symptomes : ['N/A'],
+      besoin_evacuation: formData.besoin_evacuation || 'N/A',
+      position_evacuation: formData.position_evacuation || 'N/A'
     };
 
     try {
@@ -515,6 +519,29 @@ function FicheBilanSUAP() {
           </FormControl>
         </GridItem>
       </Grid>
+
+      <Box bg="black" color="white" p={2} textAlign="center" my={5}>BESOIN ET POSITION D'ÉVACUATION</Box>
+      <SimpleGrid columns={2} spacing={5} my={5}>
+        <FormControl>
+          <FormLabel>Besoin moyen évacuation ?</FormLabel>
+          <RadioGroup id="besoin_evacuation" value={formData.besoin_evacuation} onChange={(value) => setFormData({ ...formData, besoin_evacuation: value })}>
+            <Stack direction="row">
+              <Radio value="Oui">Oui</Radio>
+              <Radio value="Non">Non</Radio>
+            </Stack>
+          </RadioGroup>
+        </FormControl>
+        <FormControl>
+          <FormLabel>Quelle position d'évacuation:</FormLabel>
+          <RadioGroup id="position_evacuation" value={formData.position_evacuation} onChange={(value) => setFormData({ ...formData, position_evacuation: value })}>
+            <Stack direction="row">
+              <Radio value="assis">Assis</Radio>
+              <Radio value="couché">Couché</Radio>
+              <Radio value="debout">Debout</Radio>
+            </Stack>
+          </RadioGroup>
+        </FormControl>
+      </SimpleGrid>
 
       <Button onClick={handleSubmit} colorScheme="blue" mt={4}>
         Soumettre
