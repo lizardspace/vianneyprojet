@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Box, Heading, Text, SimpleGrid, Divider, Stack, Badge, Button } from "@chakra-ui/react";
+import { Box, Heading, Text, SimpleGrid, Divider, Button } from "@chakra-ui/react";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -19,17 +19,11 @@ const RenderFicheBilanSUAP = ({ data }) => {
     pdf.save(`fiche_bilan_${data.nom}_${data.prenom}_N°INTER_${data.inter_number}.pdf`);
   };
 
-  const renderBadgeList = (items) => {
+  const renderList = (items) => {
     if (Array.isArray(items) && items.length > 0) {
-      return (
-        <Stack direction="row" wrap="wrap">
-          {items.map((item, index) => (
-            <Badge key={index} colorScheme="blue" mr={1} mb={1}>{item}</Badge>
-          ))}
-        </Stack>
-      );
+      return items.join(', ');
     }
-    return <Text>N/A</Text>;
+    return 'N/A';
   };
 
   return (
@@ -126,11 +120,11 @@ const RenderFicheBilanSUAP = ({ data }) => {
       <SimpleGrid columns={2} spacing={5} my={5}>
         <Box>
           <Text fontWeight="bold">Lieu:</Text>
-          {renderBadgeList(data.lieu)}
+          <Text>{renderList(data.lieu)}</Text>
         </Box>
         <Box>
           <Text fontWeight="bold">Accident de Circulation:</Text>
-          {renderBadgeList(data.accident_circulation)}
+          <Text>{renderList(data.accident_circulation)}</Text>
         </Box>
       </SimpleGrid>
 
@@ -140,15 +134,15 @@ const RenderFicheBilanSUAP = ({ data }) => {
       <SimpleGrid columns={3} spacing={5} my={5}>
         <Box>
           <Text fontWeight="bold">Voies Aériennes:</Text>
-          {renderBadgeList(data.voies_aeriennes)}
+          <Text>{renderList(data.voies_aeriennes)}</Text>
         </Box>
         <Box>
           <Text fontWeight="bold">Respiration:</Text>
-          {renderBadgeList(data.respiration)}
+          <Text>{renderList(data.respiration)}</Text>
         </Box>
         <Box>
           <Text fontWeight="bold">Circulation:</Text>
-          {renderBadgeList(data.circulation)}
+          <Text>{renderList(data.circulation)}</Text>
         </Box>
       </SimpleGrid>
 
@@ -158,7 +152,7 @@ const RenderFicheBilanSUAP = ({ data }) => {
       <SimpleGrid columns={3} spacing={5} my={5}>
         <Box>
           <Text fontWeight="bold">Causes:</Text>
-          {renderBadgeList(data.causes)}
+          <Text>{renderList(data.causes)}</Text>
         </Box>
         <Box>
           <Text fontWeight="bold">Fréquence Respiratoire:</Text>
