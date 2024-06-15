@@ -1,9 +1,9 @@
-import React from 'react';
-import { Flex, Text, IconButton } from '@chakra-ui/react';
-import { FiFolder } from 'react-icons/fi';
+import React, { useState } from 'react';
+import { Flex, Text, IconButton, Box, VStack, Button } from '@chakra-ui/react';
+import { FiFolder, FiChevronLeft } from 'react-icons/fi';
 
 // FolderTab component
-const FolderTab = ({ label, isActive, ...rest }) => {
+const FolderTab = ({ label, isActive, onClick, ...rest }) => {
   return (
     <Flex
       direction="column"
@@ -12,6 +12,8 @@ const FolderTab = ({ label, isActive, ...rest }) => {
       borderRadius="lg"
       bg={isActive ? "yellow.300" : "yellow.100"}
       boxShadow={isActive ? "md" : ""}
+      cursor="pointer"
+      onClick={onClick}
       {...rest}
     >
       <IconButton
@@ -31,18 +33,54 @@ const FolderTab = ({ label, isActive, ...rest }) => {
 // Main component
 const BaseDeDonneeMoyens = () => {
   const tabs = ["Matériels", "Effectifs"];
-  const [activeTab, setActiveTab] = React.useState(tabs[0]);
+  const [activeTab, setActiveTab] = useState(null);
+  const [showSubfolders, setShowSubfolders] = useState(false);
+
+  const handleBackClick = () => {
+    setActiveTab(null);
+    setShowSubfolders(false);
+  };
+
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    setShowSubfolders(true);
+  };
 
   return (
-    <Flex direction="row" justify="space-between">
-      {tabs.map(tab => (
-        <FolderTab
-          key={tab}
-          label={tab}
-          isActive={tab === activeTab}
-          onClick={() => setActiveTab(tab)}
-        />
-      ))}
+    <Flex direction="column" align="start" width="100%">
+      {showSubfolders ? (
+        <>
+          <Button leftIcon={<FiChevronLeft />} variant="link" onClick={handleBackClick}>
+            Retour
+          </Button>
+          <VStack align="start" pl={5} mt={2} spacing={2}>
+            {activeTab === "Matériels" && (
+              <>
+                <FolderTab label="Liste matériel enregistré et historique" />
+                <FolderTab label="Fichier importés" />
+              </>
+            )}
+            {activeTab === "Effectifs" && (
+              <>
+                <FolderTab label="Liste Effectifs enregistré et historique" />
+                <FolderTab label="Fichier importés" />
+                <FolderTab label="Emploi du temps" />
+              </>
+            )}
+          </VStack>
+        </>
+      ) : (
+        <Flex direction="row" justify="space-between" width="100%">
+          {tabs.map(tab => (
+            <FolderTab
+              key={tab}
+              label={tab}
+              isActive={tab === activeTab}
+              onClick={() => handleTabClick(tab)}
+            />
+          ))}
+        </Flex>
+      )}
     </Flex>
   );
 };
