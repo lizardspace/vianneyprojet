@@ -7,7 +7,7 @@ function FicheBilanSUAP() {
   // eslint-disable-next-line no-unused-vars
   const { setEventId, selectedEventId } = useEvent();
   const initialState = {
-    inter_number: '', // Add inter_number to initial state
+    inter_number: '',
     engin_a: '',
     engin_b: '',
     date: '',
@@ -84,8 +84,8 @@ function FicheBilanSUAP() {
 
   const handleSubmit = async () => {
     const dataToSubmit = {
-      event_id: selectedEventId, // Ajout de l'event_id
-      inter_number: formData.inter_number, // Include inter_number
+      event_id: selectedEventId,
+      inter_number: formData.inter_number,
       engin_a: formData.engin_a || 'N/A',
       engin_b: formData.engin_b || 'N/A',
       date: formData.date || '1970-01-01',
@@ -153,12 +153,19 @@ function FicheBilanSUAP() {
 
   return (
     <Box width="80%" margin="auto" border="1px" borderColor="black" p={5}>
-      <Heading as="h1" size="lg" textAlign="center">FICHE BILAN SUAP - N° INTER:</Heading>
-
-      <FormControl my={5}>
-        <FormLabel>N° INTER:</FormLabel>
-        <Input type="text" id="inter_number" value={formData.inter_number} isReadOnly />
-      </FormControl>
+      <Heading as="h1" size="lg" textAlign="center">
+        FICHE BILAN SUAP - N° INTER:
+        <Input
+          type="text"
+          id="inter_number"
+          value={formData.inter_number}
+          isReadOnly
+          size="sm"
+          width="auto"
+          ml={2}
+          textAlign="center"
+        />
+      </Heading>
 
       <SimpleGrid columns={2} spacing={5} my={5}>
         <FormControl>
