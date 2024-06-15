@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Alert, AlertIcon, AlertTitle, Box, Heading, FormControl, FormLabel, Input, Textarea, CheckboxGroup, Checkbox, SimpleGrid, Stack, Grid, GridItem, Button, RadioGroup, Radio } from "@chakra-ui/react";
 import { supabase } from './../../../../supabaseClient';
 import { useEvent } from './../../../../EventContext';
@@ -7,6 +7,7 @@ function FicheBilanSUAP() {
   // eslint-disable-next-line no-unused-vars
   const { setEventId, selectedEventId } = useEvent();
   const initialState = {
+    inter_number: '', // Add inter_number to initial state
     engin_a: '',
     engin_b: '',
     date: '',
@@ -58,6 +59,14 @@ function FicheBilanSUAP() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  useEffect(() => {
+    const generateInterNumber = () => {
+      const randomNumber = Math.floor(100000 + Math.random() * 900000);
+      setFormData(prevState => ({ ...prevState, inter_number: randomNumber.toString() }));
+    };
+    generateInterNumber();
+  }, []);
+
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
     if (type === 'checkbox') {
@@ -76,6 +85,7 @@ function FicheBilanSUAP() {
   const handleSubmit = async () => {
     const dataToSubmit = {
       event_id: selectedEventId, // Ajout de l'event_id
+      inter_number: formData.inter_number, // Include inter_number
       engin_a: formData.engin_a || 'N/A',
       engin_b: formData.engin_b || 'N/A',
       date: formData.date || '1970-01-01',
@@ -144,6 +154,11 @@ function FicheBilanSUAP() {
   return (
     <Box width="80%" margin="auto" border="1px" borderColor="black" p={5}>
       <Heading as="h1" size="lg" textAlign="center">FICHE BILAN SUAP - N° INTER:</Heading>
+
+      <FormControl my={5}>
+        <FormLabel>N° INTER:</FormLabel>
+        <Input type="text" id="inter_number" value={formData.inter_number} isReadOnly />
+      </FormControl>
 
       <SimpleGrid columns={2} spacing={5} my={5}>
         <FormControl>
