@@ -34,7 +34,9 @@ const RenderFicheBilanSUAP = ({ data }) => {
 
   return (
     <Box ref={ficheRef} width="80%" margin="auto" border="1px" borderColor="gray.300" borderRadius="md" p={5} boxShadow="md" mb={10}>
-      <Heading as="h1" size="lg" textAlign="center" mb={5}>FICHE BILAN SUAP - N° INTER</Heading>
+      <Heading as="h1" size="lg" textAlign="center" mb={5}>
+        FICHE BILAN SUAP - N° INTER: {data.inter_number}
+      </Heading>
 
       <SimpleGrid columns={2} spacing={5} my={5}>
         <Box>
