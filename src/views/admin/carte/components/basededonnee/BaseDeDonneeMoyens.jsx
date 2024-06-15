@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flex, Text, IconButton, Box, VStack, Button } from '@chakra-ui/react';
+import { Flex, Text, IconButton, VStack, Button } from '@chakra-ui/react';
 import { FiFolder, FiChevronLeft } from 'react-icons/fi';
 
 // FolderTab component
