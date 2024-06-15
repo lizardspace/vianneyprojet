@@ -126,6 +126,38 @@ const RenderFicheBilanSUAP = ({ data }) => {
           <Text fontWeight="bold">Accident de Circulation:</Text>
           <Text>{renderList(data.accident_circulation)}</Text>
         </Box>
+        <Box>
+          <Text fontWeight="bold">Type de choc:</Text>
+          <Text>{renderList(data.type_choc)}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Position dans le véhicule:</Text>
+          <Text>{renderList(data.position_vehicule)}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Vitesse estimée au moment du choc (Km/h):</Text>
+          <Text>{data.vitesse_estimee}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Équipement de sécurité au port de la victime:</Text>
+          <Text>{renderList(data.equipement_securite)}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Situation à l'arrivée des secours:</Text>
+          <Text>{renderList(data.situation_arrivee_secours)}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Intoxication par:</Text>
+          <Text>{renderList(data.intoxication_par)}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Accident divers:</Text>
+          <Text>{renderList(data.accident_divers)}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Accouchement:</Text>
+          <Text>{renderList(data.accouchement)}</Text>
+        </Box>
       </SimpleGrid>
 
       <Divider my={5} />
@@ -146,6 +178,32 @@ const RenderFicheBilanSUAP = ({ data }) => {
         </Box>
       </SimpleGrid>
 
+      <SimpleGrid columns={3} spacing={5} my={5}>
+        <Box>
+          <Text fontWeight="bold">Localisation:</Text>
+          <Text>{data.localisation}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Sensation de soif:</Text>
+          <Text>{data.sensation_de_soif}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Glasgow:</Text>
+          <Text>{data.glasgow}</Text>
+        </Box>
+      </SimpleGrid>
+
+      <SimpleGrid columns={2} spacing={5} my={5}>
+        <Box>
+          <Text fontWeight="bold">Convulsions:</Text>
+          <Text>{renderList(data.convulsions)}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">État:</Text>
+          <Text>{renderList(data.etat)}</Text>
+        </Box>
+      </SimpleGrid>
+
       <Divider my={5} />
 
       <Heading as="h2" size="md" mb={3}>Bilan Secondaire</Heading>
@@ -161,6 +219,26 @@ const RenderFicheBilanSUAP = ({ data }) => {
         <Box>
           <Text fontWeight="bold">SpO2:</Text>
           <Text>{data.spo2}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Fréquence cardiaque:</Text>
+          <Text>{data.frequence_cardiaque}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Pouls:</Text>
+          <Text>{renderList(data.pouls)}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Pupilles:</Text>
+          <Text>{renderList(data.pupilles)}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Motricité:</Text>
+          <Text>{renderList(data.motricite)}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="bold">Détection des symptômes:</Text>
+          <Text>{renderList(data.detection_symptomes)}</Text>
         </Box>
       </SimpleGrid>
 
