@@ -16,7 +16,7 @@ const RenderFicheBilanSUAP = ({ data }) => {
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`fiche_bilan_${data.nom}_${data.prenom}.pdf`);
+    pdf.save(`fiche_bilan_${data.nom}_${data.prenom}_N°INTER_${data.inter_number}.pdf`);
   };
 
   const renderBadgeList = (items) => {
