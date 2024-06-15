@@ -7,7 +7,6 @@ import tableDataTopCreators from "views/admin/carte/variables/tableDataTopCreato
 import { tableColumnsTopCreators } from "views/admin/carte/variables/tableColumnsTopCreators";
 import MeteoBlue from './components/MeteoBlue';
 import MeteoAgricole from './components/MeteoAgricole';
-import BaseDeDonnee from './components/BaseDeDonnee';
 import EquipiersTableSimplify from './components/EquipiersTableSimplify';
 import LiveVideo from './components/tv/LiveVideo';
 import EuronewsLive from './components/tv/EuronewsLive';
@@ -23,6 +22,9 @@ import JSPaintComponent from './components/JSPaintComponent';
 import YandexImage from './components/YandexImage';
 import FluxRssInput from './components/FluxRssInput';
 import FluxRssRssFeed from './components/FluxRssRssFeed';
+import BaseDeDonneeOperationnel from './components/basededonnee/BaseDeDonneeOperationnel';
+import BaseDeDonneeRenseignements from './components/basededonnee/BaseDeDonneeRenseignements';
+import BaseDeDonneeMoyens from './components/basededonnee/BaseDeDonneeMoyens';
 
 export default function Marketplace() {
   // eslint-disable-next-line no-unused-vars
@@ -96,7 +98,7 @@ export default function Marketplace() {
                   <JSPaintComponent />
                 </TabPanel>
                 <TabPanel>
-                  <BaseDeDonnee />
+                  <BaseDeDonneeOperationnel/>
                 </TabPanel>
               </TabPanels>
             </Tabs>
@@ -157,7 +159,7 @@ export default function Marketplace() {
                   </Grid>
                 </TabPanel>
                 <TabPanel>
-                  <BaseDeDonnee />
+                  <BaseDeDonneeRenseignements/>
                 </TabPanel>
               </TabPanels>
             </Tabs>
@@ -179,7 +181,7 @@ export default function Marketplace() {
                   <EquipiersTableSimplify />
                 </TabPanel>
                 <TabPanel>
-                  <BaseDeDonnee />
+                  <BaseDeDonneeMoyens/>
                 </TabPanel>
               </TabPanels>
             </Tabs>
