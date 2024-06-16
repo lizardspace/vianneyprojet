@@ -61,7 +61,7 @@ function FicheBilanSUAP() {
 
   useEffect(() => {
     const generateInterNumber = () => {
-      const randomNumber = Math.floor(100000 + Math.random() * 900000);
+      const randomNumber = Math.floor(1000 + Math.random() * 9000); // 4-digit number
       setFormData(prevState => ({ ...prevState, inter_number: randomNumber.toString() }));
     };
     generateInterNumber();
