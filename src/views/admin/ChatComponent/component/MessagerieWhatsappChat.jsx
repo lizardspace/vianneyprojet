@@ -11,6 +11,7 @@ function MessagerieWhatsappChat() {
     const { selectedTeam, setSelectedTeam, teamData, setTeamData } = useTeam();
     const { selectedEventId } = useEvent();
     const [selectedFile, setSelectedFile] = useState(null);
+    // eslint-disable-next-line
     const [imageUrl, setImageUrl] = useState('');
     const [alerts, setAlerts] = useState([]);
     const [newAlertText, setNewAlertText] = useState('');
@@ -19,6 +20,7 @@ function MessagerieWhatsappChat() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [editingAlert, setEditingAlert] = useState(null);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    // eslint-disable-next-line
     const [alertToDelete, setAlertToDelete] = useState(null);
     const [password, setPassword] = useState('');
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
@@ -270,7 +272,7 @@ function MessagerieWhatsappChat() {
             setImageUrl(imageUrl);
         }
     };
-
+// eslint-disable-next-line
     const toggleImageSize = () => {
         setIsImageEnlarged(!isImageEnlarged);
     };
@@ -297,7 +299,7 @@ function MessagerieWhatsappChat() {
                                             bg="blue.500"
                                             color="white"
                                             size="sm"
-                                            mr={2}
+                                            mr={4}
                                         />
                                     )}
                                     <Box
@@ -312,13 +314,14 @@ function MessagerieWhatsappChat() {
                                             content: '""',
                                             position: 'absolute',
                                             top: '0',
-                                            left: '-12px',
+                                            left: '-12px',  // Décalé de -24px à -12px
                                             width: '0',
                                             height: '0',
                                             borderStyle: 'solid',
                                             borderWidth: '0 12px 12px 0',
                                             borderColor: 'transparent white transparent transparent',
                                         } : {}}
+                                        borderTopLeftRadius={!isOwnMessage ? '0' : 'lg'}
                                     >
                                         {!isOwnMessage && (
                                             <Text fontWeight="bold" fontSize="sm" mb={1}>
