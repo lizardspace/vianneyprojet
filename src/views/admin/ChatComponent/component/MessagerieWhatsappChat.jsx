@@ -148,7 +148,7 @@ function MessagerieWhatsappChat() {
 
     useEffect(() => {
         fetchAlerts();
-        const intervalId = setInterval(fetchAlerts, 3000); // Refresh every 5 seconds
+        const intervalId = setInterval(fetchAlerts, 3000); // Refresh every 3 seconds
         return () => clearInterval(intervalId); // Cleanup on component unmount
     }, [selectedEventId]);
 
@@ -294,7 +294,7 @@ function MessagerieWhatsappChat() {
                 <Box flex='1' overflowY='auto' p={4} bg='#f5f5f5'>
                     <VStack spacing={4} align='stretch'>
                         {alerts.map((alert, index) => {
-                            const isOwnMessage = alert.user_id === 'your-user-id'; // Remplacez par l'ID de l'utilisateur actuel
+                            const isOwnMessage = alert.team_name === selectedTeam;
 
                             return (
                                 <Flex
