@@ -3,9 +3,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { Textarea, Image, Tooltip, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useToast, Badge } from '@chakra-ui/react';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
 import Card from "components/card/Card";
-import { supabase, supabaseUrl } from './supabaseClient'; // Update import path
+import Menu from "components/menu/MainMenuVianneyAlertChat";
+import { useEvent } from '../../../../EventContext';
+import { useTeam } from './../../InterfaceEquipe/TeamContext';
+
+import { supabase, supabaseUrl } from './../../../../supabaseClient';
 
 function MessagerieWhatsappChat() {
+  const { selectedTeam } = useTeam(); 
+  const { selectedEventId } = useEvent();
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [alertStatus, setAlertStatus] = useState('info');
@@ -32,11 +38,13 @@ function MessagerieWhatsappChat() {
     setAlertToDelete(alertId);
     setIsConfirmOpen(true);
   };
+  
   const handlePasswordChange = (event) => {
     const inputPassword = event.target.value;
     setPassword(inputPassword);
     setIsPasswordCorrect(inputPassword === "vianney123");
   };
+  
   const handleAllowScrollingToggle = () => {
     setAllowScrolling(!allowScrolling);
   };
@@ -141,6 +149,7 @@ function MessagerieWhatsappChat() {
         const { data, error } = await supabase
           .from('chat_messages')
           .select('*')
+          .eq('event_id', selectedEventId)
           .order('timestamp', { ascending: true });
 
         if (error) {
@@ -155,7 +164,7 @@ function MessagerieWhatsappChat() {
     };
 
     fetchAlerts();
-  }, []);
+  }, [selectedEventId]);
 
   const handleStatusChange = (event) => {
     setAlertStatus(event.target.value);
@@ -199,7 +208,9 @@ function MessagerieWhatsappChat() {
               user_id: fakeUUID,
               solved_or_not: alertStatus,
               details: details,
+              event_id: selectedEventId,
               image_url: imageUrl,
+              team_name: selectedTeam,
             },
           ]);
   
@@ -306,6 +317,10 @@ function MessagerieWhatsappChat() {
           <Badge colorScheme="orange">
             Messages et Alertes
           </Badge>
+          <Menu
+            onFilterSelect={handleFilterSelect}
+            onAllowScrollingToggle={handleAllowScrollingToggle}
+          />
         </Flex>
         <Button size="sm" colorScheme="blue" onClick={toggleAddAlertForm} mb={1}>
           {showAddAlertForm ? 'Cacher le formulaire' : 'Ajouter une alerte'}
@@ -357,7 +372,7 @@ function MessagerieWhatsappChat() {
               <Alert key={index} status={alertStatus} >
                 <AlertIcon />
                 <Box flex="1">
-                  <Text>{alert.alert_text}</Text>
+                  <Text>{alert.team_name && (<><Badge colorScheme="orange">{alert.team_name}</Badge> dit: </> )} {alert.alert_text}</Text>
                   <Text fontSize="sm" color="gray.500">
                     {new Date(alert.timestamp).toLocaleString()}
                   </Text>
