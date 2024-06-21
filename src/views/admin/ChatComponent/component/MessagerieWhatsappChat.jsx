@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Textarea, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Text, Select, Flex, useToast, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton, Avatar } from '@chakra-ui/react';
+import { Textarea, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Text, Select, Flex, useToast, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton, Avatar, IconButton } from '@chakra-ui/react';
+import { GrSend } from "react-icons/gr";
+import { AiOutlinePlus } from "react-icons/ai";
 import Card from "components/card/Card";
 import { useEvent } from '../../../../EventContext';
 import { useTeam } from './../../InterfaceEquipe/TeamContext';
@@ -28,6 +30,7 @@ function MessagerieWhatsappChat() {
     const [showAlert, setShowAlert] = useState(true);
 
     const messagesEndRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     const handlePasswordChange = (event) => {
         const inputPassword = event.target.value;
@@ -272,7 +275,12 @@ function MessagerieWhatsappChat() {
             setImageUrl(imageUrl);
         }
     };
-// eslint-disable-next-line
+
+    const handlePlusClick = () => {
+        fileInputRef.current.click();
+    };
+
+    // eslint-disable-next-line
     const toggleImageSize = () => {
         setIsImageEnlarged(!isImageEnlarged);
     };
@@ -375,26 +383,39 @@ function MessagerieWhatsappChat() {
 
                 <Box p={4} borderTop='1px solid #e0e0e0' bg='white' width='100%' position="sticky" bottom="0">
                     <Flex width='100%' alignItems='center'>
-                        <Input
-                            placeholder="Tapez votre message..."
-                            value={newAlertText}
-                            onChange={handleInputChange}
+                        <IconButton
+                            icon={<AiOutlinePlus />}
                             mr={2}
-                            flex='3'
+                            flex='1'
+                            variant="outline"
+                            colorScheme="blue"
+                            onClick={handlePlusClick}
                         />
                         <Input
                             type="file"
                             accept="image/*"
+                            ref={fileInputRef}
+                            style={{ display: 'none' }}
                             onChange={(e) => {
                                 setSelectedFile(e.target.files[0]);
                                 handleFileChange(e);
                             }}
-                            mr={2}
-                            flex='1'
                         />
-                        <Button colorScheme="blue" onClick={handleSubmit} flex='1'>
-                            Envoyer
-                        </Button>
+                        <Input
+                            placeholder="Entrez un message..."
+                            value={newAlertText}
+                            onChange={handleInputChange}
+                            mr={2}
+                            flex='3'
+                            borderRadius="full"
+                        />
+                        <IconButton
+                            icon={<GrSend />}
+                            onClick={handleSubmit}
+                            flex='1'
+                            variant="outline"
+                            colorScheme="blue"
+                        />
                     </Flex>
                 </Box>
             </Flex>
