@@ -127,27 +127,29 @@ function MessagerieWhatsappChat() {
         }
     }, [selectedTeam]);
 
-    useEffect(() => {
-        const fetchAlerts = async () => {
-            try {
-                const { data, error } = await supabase
-                    .from('vianney_chat_messages')
-                    .select('*')
-                    .eq('event_id', selectedEventId)
-                    .order('timestamp', { ascending: true });
+    const fetchAlerts = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('vianney_chat_messages')
+                .select('*')
+                .eq('event_id', selectedEventId)
+                .order('timestamp', { ascending: true });
 
-                if (error) {
-                    console.error('Error fetching alerts:', error);
-                    return;
-                }
-
-                setAlerts(data);
-            } catch (error) {
+            if (error) {
                 console.error('Error fetching alerts:', error);
+                return;
             }
-        };
 
+            setAlerts(data);
+        } catch (error) {
+            console.error('Error fetching alerts:', error);
+        }
+    };
+
+    useEffect(() => {
         fetchAlerts();
+        const intervalId = setInterval(fetchAlerts, 3000); // Refresh every 5 seconds
+        return () => clearInterval(intervalId); // Cleanup on component unmount
     }, [selectedEventId]);
 
     useEffect(() => {
