@@ -64,7 +64,7 @@ function MessagerieWhatsappChat() {
 
   const handleSubmitEdit = async () => {
     const { error } = await supabase
-      .from('chat_messages')
+      .from('vianney_chat_messages')
       .update({
         alert_text: editingAlert.alert_text,
         details: editingAlert.details
@@ -81,7 +81,7 @@ function MessagerieWhatsappChat() {
 
   const handleSolveAlert = async (alertId) => {
     const { error } = await supabase
-      .from('chat_messages')
+      .from('vianney_chat_messages')
       .update({ solved_or_not: 'success' })
       .match({ id: alertId });
 
@@ -112,7 +112,7 @@ function MessagerieWhatsappChat() {
 
   const handleDeleteAlert = async () => {
     const { error } = await supabase
-      .from('chat_messages')
+      .from('vianney_chat_messages')
       .delete()
       .match({ id: alertToDelete });
 
@@ -147,7 +147,7 @@ function MessagerieWhatsappChat() {
     const fetchAlerts = async () => {
       try {
         const { data, error } = await supabase
-          .from('chat_messages')
+          .from('vianney_chat_messages')
           .select('*')
           .eq('event_id', selectedEventId)
           .order('timestamp', { ascending: true });
@@ -201,7 +201,7 @@ function MessagerieWhatsappChat() {
         }
   
         const { data, error } = await supabase
-          .from('chat_messages')
+          .from('vianney_chat_messages')
           .insert([
             {
               alert_text: newAlertText,
