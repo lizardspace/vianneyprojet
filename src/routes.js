@@ -25,6 +25,7 @@ import NoteDeFraisComponent from "views/admin/NoteDeFraisComponent";
 import AlerteJeSuisEnDanger from "views/admin/alertejesuisendanger"; // Import the new component
 import Parameters from "views/admin/Parameters";
 import SOSComponent from "views/admin/SOSComponent"; // Assuming you have a new component for the sosroute
+import ChatComponent from "views/admin/ChatComponent"; // Import the new chat component
 
 const routes = [
   {
@@ -125,6 +126,13 @@ const routes = [
     path: "/sosroute",
     icon: <Icon as={MdOutlineSos} width='20px' height='20px' color='red' />, // Set the icon color to red
     component: SOSComponent, // Assuming you have a new component for this route
+  },
+  {
+    name: "Chat",
+    layout: "/admin",
+    path: "/chat",
+    icon: <Icon as={FcSerialTasks} width='20px' height='20px' color='inherit' />, // You can choose another icon if you prefer
+    component: ChatComponent,
   },
 ];
 
