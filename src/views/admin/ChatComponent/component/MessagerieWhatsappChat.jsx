@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Textarea, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Text, Select, Flex, useToast, Badge, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton } from '@chakra-ui/react';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
@@ -13,7 +13,6 @@ function MessagerieWhatsappChat() {
   const { selectedEventId } = useEvent();
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
-  const [alertStatus, setAlertStatus] = useState('info');
   const [alerts, setAlerts] = useState([]);
   const [newAlertText, setNewAlertText] = useState('');
   const toast = useToast();
@@ -26,6 +25,8 @@ function MessagerieWhatsappChat() {
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
+
+  const messagesEndRef = useRef(null);
 
   const openConfirmModal = (alertId) => {
     setAlertToDelete(alertId);
@@ -182,9 +183,9 @@ function MessagerieWhatsappChat() {
     fetchAlerts();
   }, [selectedEventId]);
 
-  const handleStatusChange = (event) => {
-    setAlertStatus(event.target.value);
-  };
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [alerts]);
 
   const handleInputChange = (event) => {
     setNewAlertText(event.target.value);
@@ -239,7 +240,7 @@ function MessagerieWhatsappChat() {
             {
               alert_text: newAlertText,
               user_id: fakeUUID,
-              solved_or_not: alertStatus,
+              solved_or_not: 'info',
               details: details,
               event_id: selectedEventId,
               image_url: imageUrl,
@@ -361,6 +362,7 @@ function MessagerieWhatsappChat() {
                 </Flex>
               );
             })}
+            <div ref={messagesEndRef} />
           </VStack>
         </Box>
         {showAlert && (
@@ -390,11 +392,6 @@ function MessagerieWhatsappChat() {
 
         <Box p={4} borderTop='1px solid #e0e0e0' bg='white' width='100%' position="sticky" bottom="0">
           <Flex width='100%' alignItems='center'>
-            <Select placeholder="Sélectionnez le degrès d'urgence" value={alertStatus} onChange={handleStatusChange} mr={2} flex='1'>
-              <option value="error">Urgence</option>
-              <option value="warning">Avertissement</option>
-              <option value="info">Information</option>
-            </Select>
             <Input
               placeholder="Tapez votre message..."
               value={newAlertText}
