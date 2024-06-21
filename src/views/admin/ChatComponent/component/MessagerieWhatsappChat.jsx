@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Textarea, Image, Tooltip, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, AlertIcon, Text, Select, Flex, useToast, Badge } from '@chakra-ui/react';
+import { Textarea, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, Text, Select, Flex, useToast, Badge } from '@chakra-ui/react';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
 import Card from "components/card/Card";
 import Menu from "components/menu/MainMenuVianneyAlertChat";
@@ -23,7 +23,7 @@ function MessagerieWhatsappChat() {
   const [editingAlert, setEditingAlert] = useState(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [alertToDelete, setAlertToDelete] = useState(null);
-  const [allowScrolling, setAllowScrolling] = useState(false); 
+  const [allowScrolling, setAllowScrolling] = useState(true); 
   const [filter, setFilter] = useState('warning'); 
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
@@ -38,7 +38,7 @@ function MessagerieWhatsappChat() {
     setAlertToDelete(alertId);
     setIsConfirmOpen(true);
   };
-  
+
   const handlePasswordChange = (event) => {
     const inputPassword = event.target.value;
     setPassword(inputPassword);
@@ -255,16 +255,13 @@ function MessagerieWhatsappChat() {
     setFilter(selectedFilter);
   };
 
-  const shouldShowAlert = (alert, index, allAlerts) => {
+  const shouldShowAlert = (alert) => {
     if (filter === 'all') return true;
     if (filter === 'success' && alert.solved_or_not === 'success') return true;
     if (filter === 'error' && alert.solved_or_not === 'error') return true;
     if (filter === 'info' && (alert.solved_or_not === 'warning' || alert.solved_or_not === 'error' || alert.solved_or_not === 'info')) return true;
     if (filter === 'warning') {
-      const unresolvedAlerts = allAlerts.filter(a => ['warning', 'error', 'info'].includes(a.solved_or_not))
-                                         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-                                         .slice(0, 3);
-      return unresolvedAlerts.some(unresolvedAlert => unresolvedAlert.id === alert.id);
+      return ['warning', 'error', 'info'].includes(alert.solved_or_not);
     }
     return false;
   };
@@ -281,7 +278,6 @@ function MessagerieWhatsappChat() {
     const file = e.target.files[0];
     const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
     if (file) {
-
       const formData = new FormData();
       formData.append('file', file);
 
@@ -308,12 +304,9 @@ function MessagerieWhatsappChat() {
   };
 
   return (
-    <Card
-      direction='column'
-      w='100%'
-      overflowX={{ sm: "scroll", lg: "hidden" }}>
-      <Box>
-        <Flex justify='space-between' mb='sm' align='center'>
+    <Card direction='column' w='100%' h='100vh' overflow='hidden'>
+      <Box d='flex' flexDirection='column' h='100%'>
+        <Flex justify='space-between' align='center' p={4} borderBottom='1px solid #e0e0e0'>
           <Badge colorScheme="orange">
             Messages et Alertes
           </Badge>
@@ -322,27 +315,61 @@ function MessagerieWhatsappChat() {
             onAllowScrollingToggle={handleAllowScrollingToggle}
           />
         </Flex>
-        <Button size="sm" colorScheme="blue" onClick={toggleAddAlertForm} mb={1}>
-          {showAddAlertForm ? 'Cacher le formulaire' : 'Ajouter une alerte'}
-        </Button>
-        {showAddAlertForm && (
-          <Box mt={4}>
-            <Select placeholder="Sélectionnez le degrès d'urgence" value={alertStatus} onChange={handleStatusChange}>
+        
+        <Box flex='1' overflowY='auto' p={4} bg='#f5f5f5'>
+          <VStack spacing={4} align='stretch'>
+            {alerts.filter(shouldShowAlert).map((alert, index) => {
+              const isOwnMessage = alert.user_id === 'your-user-id'; // Remplacez par l'ID de l'utilisateur actuel
+              const alertStatus = ['info', 'warning', 'success', 'error'].includes(alert.solved_or_not)
+                ? alert.solved_or_not
+                : 'info';
+
+              return (
+                <Flex
+                  key={index}
+                  alignSelf={isOwnMessage ? 'flex-end' : 'flex-start'}
+                  bg={isOwnMessage ? 'green.100' : 'white'}
+                  p={3}
+                  borderRadius='lg'
+                  boxShadow='md'
+                  maxW='80%'
+                >
+                  <Box flex='1'>
+                    <Text fontWeight='bold'>
+                      {alert.team_name && (<><Badge colorScheme="orange">{alert.team_name}</Badge> </> )}
+                      {alert.alert_text}
+                    </Text>
+                    <Text fontSize="sm" color="gray.500">
+                      {new Date(alert.timestamp).toLocaleString()}
+                    </Text>
+                    {alert.image_url && (
+                      <img src={alert.image_url} alt="image" style={{ maxHeight: isImageEnlarged ? "auto" : "100px", cursor: "pointer" }} onClick={toggleImageSize} />
+                    )}
+                    <Text mt={2}>{alert.details}</Text>
+                  </Box>
+                  <Flex direction='column' ml={2}>
+                    <Button size="xs" onClick={() => handleSolveAlert(alert.id)}><FcOk /></Button>
+                    <Button size="xs" onClick={() => openConfirmModal(alert.id)}><FcDeleteDatabase /></Button>
+                    <Button size="xs" onClick={() => openEditModal(alert)}><FcInfo /></Button>
+                  </Flex>
+                </Flex>
+              );
+            })}
+          </VStack>
+        </Box>
+
+        <Box p={4} borderTop='1px solid #e0e0e0'>
+          <Flex>
+            <Select placeholder="Sélectionnez le degrès d'urgence" value={alertStatus} onChange={handleStatusChange} mr={2}>
               <option value="error">Urgence</option>
               <option value="warning">Avertissement</option>
               <option value="info">Information</option>
             </Select>
             <Input
-              placeholder="Tapez votre alerte..."
+              placeholder="Tapez votre message..."
               value={newAlertText}
               onChange={handleInputChange}
-              mt={2}
-            />
-            <Textarea
-              placeholder="Ajoutez des détails ici..."
-              value={details}
-              onChange={handleDetailsChange}
-              mt={2}
+              mr={2}
             />
             <Input
               type="file"
@@ -351,121 +378,76 @@ function MessagerieWhatsappChat() {
                 setSelectedFile(e.target.files[0]);
                 handleFileChange(e);
               }}
+              mr={2}
+            />
+            <Button colorScheme="blue" onClick={handleSubmit}>
+              Envoyer
+            </Button>
+          </Flex>
+        </Box>
+      </Box>
+      
+      <Modal isOpen={isEditOpen} onClose={closeEditModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Modifier le message</ModalHeader>
+          <ModalBody>
+            <Input
+              name="alert_text"
+              value={editingAlert?.alert_text || ''}
+              onChange={handleEditChange}
+              placeholder="Texte du message"
               mt={2}
             />
-            <Button size="sm" colorScheme="blue" onClick={handleSubmit} mb={1}>
-              Ajouter une alerte
+            <Textarea
+              name="details"
+              value={editingAlert?.details || ''}
+              onChange={handleEditChange}
+              placeholder="Détails du message"
+              mt={2}
+            />
+            <Image
+              src={editingAlert?.image_url || ''}
+              alt="Image"
+              mt={2}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleSubmitEdit}>
+              Enregistrer les modifications
             </Button>
-          </Box>
-        )}
+            <Button variant="ghost" onClick={closeEditModal}>Annuler</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
-        <VStack
-          spacing={4}
-          overflowY={allowScrolling ? "scroll" : "hidden"}
-          maxHeight={allowScrolling ? "200px" : "none"}>
-          {alerts.filter(shouldShowAlert).map((alert, index) => {
-            const alertStatus = ['info', 'warning', 'success', 'error'].includes(alert.solved_or_not)
-              ? alert.solved_or_not
-              : 'info';
-
-            return (
-              <Alert key={index} status={alertStatus} >
-                <AlertIcon />
-                <Box flex="1">
-                  <Text>{alert.team_name && (<><Badge colorScheme="orange">{alert.team_name}</Badge> dit: </> )} {alert.alert_text}</Text>
-                  <Text fontSize="sm" color="gray.500">
-                    {new Date(alert.timestamp).toLocaleString()}
-                  </Text>
-                  {imageUrl && (
-                    <img
-                      src={imageUrl}
-                      alt="essai"
-                      style={{ maxHeight: isImageEnlarged ? "auto" : "100px", cursor: "pointer" }}
-                      onClick={toggleImageSize}
-                    />
-                  )}
-                  {alert.image_url && (
-                    <img src={alert.image_url} alt="essai" style={{ maxHeight: "120px" }} />
-                  )}
-                </Box>
-                <Tooltip label="Marqué comme résolue" hasArrow>
-                  <Button mr="2px" onClick={() => handleSolveAlert(alert.id)}><FcOk /></Button>
-                </Tooltip>
-                <Tooltip label="Supprimer" hasArrow>
-                  <Button mr="2px" onClick={() => openConfirmModal(alert.id)}><FcDeleteDatabase /></Button>
-                </Tooltip>
-                <Tooltip label="Information" hasArrow>
-                  <Button onClick={() => openEditModal(alert)}><FcInfo /></Button>
-                </Tooltip>
-              </Alert>
-            );
-          })}
-        </VStack>
-        
-        <Modal isOpen={isEditOpen} onClose={closeEditModal}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Modifier l'alerte</ModalHeader>
-            <ModalBody>
-              <Input
-                name="alert_text"
-                value={editingAlert?.alert_text || ''}
-                onChange={handleEditChange}
-                placeholder="Texte de l'alerte"
-                mt={2}
-              />
-              <Textarea
-                name="details"
-                value={editingAlert?.details || ''}
-                onChange={handleEditChange}
-                placeholder="Détails de l'alerte"
-                mt={2}
-              />
-              <Image
-                src={editingAlert?.image_url || ''}
-                alt="Image"
-                mt={2}
-              />
-
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={handleSubmitEdit}>
-                Enregistrer les modifications
-              </Button>
-              <Button variant="ghost" onClick={closeEditModal}>Annuler</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-        <Modal isOpen={isConfirmOpen} onClose={() => setIsConfirmOpen(false)}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Supprimer l'alerte</ModalHeader>
-            <ModalBody>
-              Voulez-vous supprimer cette alerte ?
-              <Input
-                placeholder="Entrez votre mot de passe"
-                value={password}
-                onChange={handlePasswordChange}
-                mt={2}
-                type="password"
-              />
-            </ModalBody>
-
-            <ModalFooter>
-              <Button
-                colorScheme="red"
-                mr={3}
-                onClick={handleDeleteAlert}
-                hidden={!isPasswordCorrect}
-              >
-                Supprimer
-              </Button>
-
-              <Button variant="ghost" onClick={() => setIsConfirmOpen(false)}>Annuler</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      </Box>
+      <Modal isOpen={isConfirmOpen} onClose={() => setIsConfirmOpen(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Supprimer le message</ModalHeader>
+          <ModalBody>
+            Voulez-vous supprimer ce message ?
+            <Input
+              placeholder="Entrez votre mot de passe"
+              value={password}
+              onChange={handlePasswordChange}
+              mt={2}
+              type="password"
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="red"
+              mr={3}
+              onClick={handleDeleteAlert}
+              hidden={!isPasswordCorrect}
+            >
+              Supprimer
+            </Button>
+            <Button variant="ghost" onClick={() => setIsConfirmOpen(false)}>Annuler</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Card>
   );
 }
