@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Textarea, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Text, Select, Flex, useToast, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton, Avatar, IconButton } from '@chakra-ui/react';
 import { GrSend } from "react-icons/gr";
@@ -128,7 +128,7 @@ function MessagerieWhatsappChat() {
         }
     }, [selectedTeam]);
 
-    const fetchAlerts = async () => {
+    const fetchAlerts = useCallback(async () => {
         try {
             const { data, error } = await supabase
                 .from('vianney_chat_messages')
@@ -145,13 +145,13 @@ function MessagerieWhatsappChat() {
         } catch (error) {
             console.error('Error fetching alerts:', error);
         }
-    };
+    }, [selectedEventId]);
 
     useEffect(() => {
         fetchAlerts();
-        const intervalId = setInterval(fetchAlerts, 3000); // Refresh every 3 seconds
+        const intervalId = setInterval(fetchAlerts, 6000); // Refresh every 3 seconds
         return () => clearInterval(intervalId); // Cleanup on component unmount
-    }, [selectedEventId]);
+    }, [fetchAlerts]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
