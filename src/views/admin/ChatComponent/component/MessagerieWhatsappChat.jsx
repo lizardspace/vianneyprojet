@@ -149,7 +149,7 @@ function MessagerieWhatsappChat() {
 
     useEffect(() => {
         fetchAlerts();
-        const intervalId = setInterval(fetchAlerts, 6000); // Refresh every 3 seconds
+        const intervalId = setInterval(fetchAlerts, 6000); // Refresh every 6 seconds
         return () => clearInterval(intervalId); // Cleanup on component unmount
     }, [fetchAlerts]);
 
@@ -319,8 +319,19 @@ function MessagerieWhatsappChat() {
                                             borderStyle: 'solid',
                                             borderWidth: '0 12px 12px 0',
                                             borderColor: 'transparent white transparent transparent',
-                                        } : {}}
+                                        } : {
+                                            content: '""',
+                                            position: 'absolute',
+                                            top: '0',
+                                            right: '-12px',  // Position the triangle at the top right
+                                            width: '0',
+                                            height: '0',
+                                            borderStyle: 'solid',
+                                            borderWidth: '12px 12px 0 0',
+                                            borderColor: 'green.100 ',
+                                        }}
                                         borderTopLeftRadius={!isOwnMessage ? '0' : 'lg'}
+                                        borderTopRightRadius={isOwnMessage ? '0' : 'lg'}
                                     >
                                         {!isOwnMessage && (
                                             <Text fontWeight="bold" fontSize="sm" mb={1}>
