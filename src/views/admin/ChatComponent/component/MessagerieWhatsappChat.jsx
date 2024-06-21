@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Textarea, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Text, Select, Flex, useToast, Badge } from '@chakra-ui/react';
+import { Textarea, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Text, Select, Flex, useToast, Badge, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton } from '@chakra-ui/react';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
 import Card from "components/card/Card";
 import { useEvent } from '../../../../EventContext';
@@ -9,7 +9,7 @@ import { useTeam } from './../../InterfaceEquipe/TeamContext';
 import { supabase, supabaseUrl } from './../../../../supabaseClient';
 
 function MessagerieWhatsappChat() {
-  const { selectedTeam } = useTeam(); 
+  const { selectedTeam, setSelectedTeam, teamData, setTeamData } = useTeam(); 
   const { selectedEventId } = useEvent();
   const [selectedFile, setSelectedFile] = useState(null);
     // eslint-disable-next-line no-unused-vars
@@ -28,6 +28,7 @@ function MessagerieWhatsappChat() {
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
+  const [showAlert, setShowAlert] = useState(!selectedTeam);
 
   const openConfirmModal = (alertId) => {
     setAlertToDelete(alertId);
@@ -130,6 +131,28 @@ function MessagerieWhatsappChat() {
     setIsConfirmOpen(false);
   };
 
+  useEffect(() => {
+    async function fetchTeamData() {
+      try {
+        let query = supabase.from('vianney_teams').select('id, name_of_the_team');
+  
+        if (selectedEventId) {
+          query = query.eq('event_id', selectedEventId);
+        }
+  
+        const { data, error } = await query;
+  
+        if (error) {
+          throw error;
+        }
+        setTeamData(data);
+      } catch (error) {
+        console.error('Error fetching team data:', error);
+      }
+    }
+  
+    fetchTeamData();
+  }, [selectedEventId, setTeamData]);
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -162,7 +185,23 @@ function MessagerieWhatsappChat() {
     setNewAlertText(event.target.value);
   };
 
+  const handleTeamSelection = (event) => {
+    setSelectedTeam(event.target.value);
+    setShowAlert(false);
+  };
+
   const handleSubmit = async () => {
+    if (!selectedTeam) {
+      toast({
+        title: "Erreur",
+        description: "Vous devez sélectionner une équipe avant d'envoyer un message.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
     if (newAlertText.trim() !== '') {
       const fakeUUID = uuidv4(); // Use UUID v4 to generate a unique user_id for the demo
   
@@ -239,7 +278,6 @@ function MessagerieWhatsappChat() {
     }
   };
 
-
   const shouldShowAlert = (alert) => {
     if (filter === 'all') return true;
     if (filter === 'success' && alert.solved_or_not === 'success') return true;
@@ -292,7 +330,7 @@ function MessagerieWhatsappChat() {
     <Card direction='column' w='100%' h='100vh' overflow='hidden'>
       <Box d='flex' flexDirection='column' h='100%'>
 
-        <Box flex='1' overflowY='auto' p={4} bg='#f5f5f5'>
+        <Box flex='1' overflowY='auto' p={4} bg='#f5f5f5'>          
           <VStack spacing={4} align='stretch'>
             {alerts.filter(shouldShowAlert).map((alert, index) => {
               const isOwnMessage = alert.user_id === 'your-user-id'; 
@@ -316,7 +354,7 @@ function MessagerieWhatsappChat() {
                       {new Date(alert.timestamp).toLocaleString()}
                     </Text>
                     {alert.image_url && (
-                      <img src={alert.image_url} alt="image" style={{ maxHeight: isImageEnlarged ? "auto" : "100px", cursor: "pointer" }} onClick={toggleImageSize} />
+                      <img alt={alert.details} src={alert.image_url} style={{ maxHeight: isImageEnlarged ? "auto" : "100px", cursor: "pointer" }} onClick={toggleImageSize} />
                     )}
                     <Text mt={2}>{alert.details}</Text>
                   </Box>
@@ -330,6 +368,30 @@ function MessagerieWhatsappChat() {
             })}
           </VStack>
         </Box>
+        {showAlert && (
+            <Alert status="error" mb="4" minHeight="100px">
+              <AlertIcon />
+              <AlertTitle>Attention!</AlertTitle>
+              <AlertDescription>
+                Sélectionnez une équipe est obligatoire
+              </AlertDescription>
+              <CloseButton onClick={() => setShowAlert(false)} position="absolute" right="8px" top="8px" />
+            </Alert>
+          )}
+          {!selectedTeam && (
+            <Select
+              value={selectedTeam}
+              onChange={handleTeamSelection}
+              placeholder="Selectionnez une équipe"
+              mb={4}
+            >
+              {teamData.map((team) => (
+                <option key={team.id} value={team.name_of_the_team}>
+                  {team.name_of_the_team}
+                </option>
+              ))}
+            </Select>
+          )}
 
         <Box p={4} borderTop='1px solid #e0e0e0' bg='white' position='fixed' bottom='0' width='100%'>
           <Flex>
