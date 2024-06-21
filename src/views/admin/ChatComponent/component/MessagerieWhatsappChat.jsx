@@ -292,7 +292,6 @@ function MessagerieWhatsappChat() {
     <Card direction='column' w='100%' h='100vh' overflow='hidden'>
       <Box d='flex' flexDirection='column' h='100%'>
 
-        
         <Box flex='1' overflowY='auto' p={4} bg='#f5f5f5'>
           <VStack spacing={4} align='stretch'>
             {alerts.filter(shouldShowAlert).map((alert, index) => {
@@ -332,7 +331,7 @@ function MessagerieWhatsappChat() {
           </VStack>
         </Box>
 
-        <Box p={4} borderTop='1px solid #e0e0e0'>
+        <Box p={4} borderTop='1px solid #e0e0e0' bg='white' position='fixed' bottom='0' width='100%'>
           <Flex>
             <Select placeholder="Sélectionnez le degrès d'urgence" value={alertStatus} onChange={handleStatusChange} mr={2}>
               <option value="error">Urgence</option>
