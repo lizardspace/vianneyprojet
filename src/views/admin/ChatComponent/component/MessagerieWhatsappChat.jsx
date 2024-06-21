@@ -12,7 +12,6 @@ function MessagerieWhatsappChat() {
   const { selectedTeam, setSelectedTeam, teamData, setTeamData } = useTeam(); 
   const { selectedEventId } = useEvent();
   const [selectedFile, setSelectedFile] = useState(null);
-    // eslint-disable-next-line no-unused-vars
   const [imageUrl, setImageUrl] = useState('');
   const [alertStatus, setAlertStatus] = useState('info');
   const [alerts, setAlerts] = useState([]);
@@ -23,12 +22,10 @@ function MessagerieWhatsappChat() {
   const [editingAlert, setEditingAlert] = useState(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [alertToDelete, setAlertToDelete] = useState(null);
-    // eslint-disable-next-line no-unused-vars
-  const [filter, setFilter] = useState('warning'); 
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
-  const [showAlert, setShowAlert] = useState(!selectedTeam);
+  const [showAlert, setShowAlert] = useState(true);
 
   const openConfirmModal = (alertId) => {
     setAlertToDelete(alertId);
@@ -155,6 +152,14 @@ function MessagerieWhatsappChat() {
   }, [selectedEventId, setTeamData]);
 
   useEffect(() => {
+    if (!selectedTeam) {
+      setShowAlert(true);
+    } else {
+      setShowAlert(false);
+    }
+  }, [selectedTeam]);
+
+  useEffect(() => {
     const fetchAlerts = async () => {
       try {
         const { data, error } = await supabase
@@ -199,6 +204,7 @@ function MessagerieWhatsappChat() {
         duration: 5000,
         isClosable: true,
       });
+      setShowAlert(true);
       return;
     }
 
@@ -278,17 +284,6 @@ function MessagerieWhatsappChat() {
     }
   };
 
-  const shouldShowAlert = (alert) => {
-    if (filter === 'all') return true;
-    if (filter === 'success' && alert.solved_or_not === 'success') return true;
-    if (filter === 'error' && alert.solved_or_not === 'error') return true;
-    if (filter === 'info' && (alert.solved_or_not === 'warning' || alert.solved_or_not === 'error' || alert.solved_or_not === 'info')) return true;
-    if (filter === 'warning') {
-      return ['warning', 'error', 'info'].includes(alert.solved_or_not);
-    }
-    return false;
-  };
-
   const updateImageUrl = (fileUrl) => {
     const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
     const publicUrl = fileUrl
@@ -328,11 +323,11 @@ function MessagerieWhatsappChat() {
 
   return (
     <Card direction='column' w='100%' h='100vh' overflow='hidden'>
-      <Box d='flex' flexDirection='column' h='100%'>
+      <Flex direction='column' h='100%'>
 
         <Box flex='1' overflowY='auto' p={4} bg='#f5f5f5'>          
           <VStack spacing={4} align='stretch'>
-            {alerts.filter(shouldShowAlert).map((alert, index) => {
+            {alerts.map((alert, index) => {
               const isOwnMessage = alert.user_id === 'your-user-id'; 
 
               return (
@@ -378,7 +373,7 @@ function MessagerieWhatsappChat() {
               <CloseButton onClick={() => setShowAlert(false)} position="absolute" right="8px" top="8px" />
             </Alert>
           )}
-          {!selectedTeam && (
+          {showAlert && !selectedTeam && (
             <Select
               value={selectedTeam}
               onChange={handleTeamSelection}
@@ -393,9 +388,9 @@ function MessagerieWhatsappChat() {
             </Select>
           )}
 
-        <Box p={4} borderTop='1px solid #e0e0e0' bg='white' position='fixed' bottom='0' width='100%'>
-          <Flex>
-            <Select placeholder="Sélectionnez le degrès d'urgence" value={alertStatus} onChange={handleStatusChange} mr={2}>
+        <Box p={4} borderTop='1px solid #e0e0e0' bg='white' width='100%' position="sticky" bottom="0">
+          <Flex width='100%' alignItems='center'>
+            <Select placeholder="Sélectionnez le degrès d'urgence" value={alertStatus} onChange={handleStatusChange} mr={2} flex='1'>
               <option value="error">Urgence</option>
               <option value="warning">Avertissement</option>
               <option value="info">Information</option>
@@ -405,6 +400,7 @@ function MessagerieWhatsappChat() {
               value={newAlertText}
               onChange={handleInputChange}
               mr={2}
+              flex='3'
             />
             <Input
               type="file"
@@ -414,13 +410,14 @@ function MessagerieWhatsappChat() {
                 handleFileChange(e);
               }}
               mr={2}
+              flex='1'
             />
-            <Button colorScheme="blue" onClick={handleSubmit}>
+            <Button colorScheme="blue" onClick={handleSubmit} flex='1'>
               Envoyer
             </Button>
           </Flex>
         </Box>
-      </Box>
+      </Flex>
       
       <Modal isOpen={isEditOpen} onClose={closeEditModal}>
         <ModalOverlay />
