@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Textarea, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Text, Select, Flex, useToast, Badge, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton } from '@chakra-ui/react';
-import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
+import { Textarea, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Text, Select, Flex, useToast, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton, Avatar } from '@chakra-ui/react';
 import Card from "components/card/Card";
 import { useEvent } from '../../../../EventContext';
 import { useTeam } from './../../InterfaceEquipe/TeamContext';
@@ -28,20 +27,10 @@ function MessagerieWhatsappChat() {
 
   const messagesEndRef = useRef(null);
 
-  const openConfirmModal = (alertId) => {
-    setAlertToDelete(alertId);
-    setIsConfirmOpen(true);
-  };
-
   const handlePasswordChange = (event) => {
     const inputPassword = event.target.value;
     setPassword(inputPassword);
     setIsPasswordCorrect(inputPassword === "vianney123");
-  };
-
-  const openEditModal = (alert) => {
-    setEditingAlert(alert);
-    setIsEditOpen(true);
   };
 
   const closeEditModal = () => {
@@ -66,33 +55,6 @@ function MessagerieWhatsappChat() {
       closeEditModal();
     } else {
       console.error('Error updating alert:', error);
-    }
-  };
-
-  const handleSolveAlert = async (alertId) => {
-    const { error } = await supabase
-      .from('vianney_chat_messages')
-      .update({ solved_or_not: 'success' })
-      .match({ id: alertId });
-
-    if (error) {
-      console.error('Error updating alert:', error);
-      toast({
-        title: "Erreur",
-        description: "Nous ne sommes pas arrivés à mettre à jour le statut de l'alerte.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    } else {
-      setAlerts(alerts.map(alert => alert.id === alertId ? { ...alert, solved_or_not: 'success' } : alert));
-      toast({
-        title: "Succès",
-        description: "Statut de l'alerte mis à jour avec succès.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
     }
   };
 
@@ -260,7 +222,6 @@ function MessagerieWhatsappChat() {
   
         setNewAlertText('');
         setDetails('');
-        setImageUrl('');
         setSelectedFile(null);
   
         toast({
@@ -285,17 +246,9 @@ function MessagerieWhatsappChat() {
     }
   };
 
-  const updateImageUrl = (fileUrl) => {
-    const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
-    const publicUrl = fileUrl
-      ? `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/chat-images/${fakeUUID}/${fileUrl.split('/').pop()}`
-      : '';
-    setImageUrl(publicUrl);
-  };
-
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
+    const fakeUUID = uuidv4();
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
@@ -314,7 +267,7 @@ function MessagerieWhatsappChat() {
 
       const imageUrl = fileData[0]?.url;
 
-      updateImageUrl(imageUrl);
+      setImageUrl(imageUrl);
     }
   };
 
@@ -329,7 +282,7 @@ function MessagerieWhatsappChat() {
         <Box flex='1' overflowY='auto' p={4} bg='#f5f5f5'>          
           <VStack spacing={4} align='stretch'>
             {alerts.map((alert, index) => {
-              const isOwnMessage = alert.user_id === 'your-user-id'; 
+              const isOwnMessage = alert.user_id === 'your-user-id'; // Remplacez 'your-user-id' par l'ID de l'utilisateur actuel
 
               return (
                 <Flex
@@ -339,26 +292,26 @@ function MessagerieWhatsappChat() {
                   p={3}
                   borderRadius='lg'
                   boxShadow='md'
-                  maxW='80%'
+                  w='66%'
+                  direction="column"
                 >
-                  <Box flex='1'>
-                    <Text fontWeight='bold'>
-                      {alert.team_name && (<><Badge colorScheme="orange">{alert.team_name}</Badge> </> )}
-                      {alert.alert_text}
+                  <Flex alignItems="center" mb={2}>
+                    <Avatar size="sm" name={alert.team_name} src={alert.avatar_url} />
+                    <Text fontWeight='bold' ml={2}>
+                      {alert.team_name}
                     </Text>
-                    <Text fontSize="sm" color="gray.500">
-                      {new Date(alert.timestamp).toLocaleString()}
+                  </Flex>
+                  <Box flex='1'>
+                    <Text>
+                      {alert.alert_text}
                     </Text>
                     {alert.image_url && (
                       <img alt={alert.details} src={alert.image_url} style={{ maxHeight: isImageEnlarged ? "auto" : "100px", cursor: "pointer" }} onClick={toggleImageSize} />
                     )}
-                    <Text mt={2}>{alert.details}</Text>
+                    <Text fontSize="sm" color="gray.500" align="right">
+                      {new Date(alert.timestamp).toLocaleString()}
+                    </Text>
                   </Box>
-                  <Flex direction='column' ml={2}>
-                    <Button size="xs" onClick={() => handleSolveAlert(alert.id)}><FcOk /></Button>
-                    <Button size="xs" onClick={() => openConfirmModal(alert.id)}><FcDeleteDatabase /></Button>
-                    <Button size="xs" onClick={() => openEditModal(alert)}><FcInfo /></Button>
-                  </Flex>
                 </Flex>
               );
             })}
