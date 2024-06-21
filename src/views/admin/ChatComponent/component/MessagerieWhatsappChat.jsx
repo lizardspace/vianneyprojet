@@ -13,6 +13,7 @@ function MessagerieWhatsappChat() {
     const { selectedTeam, setSelectedTeam, teamData, setTeamData } = useTeam();
     const { selectedEventId } = useEvent();
     const [selectedFile, setSelectedFile] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null);
     // eslint-disable-next-line
     const [imageUrl, setImageUrl] = useState('');
     const [alerts, setAlerts] = useState([]);
@@ -230,6 +231,7 @@ function MessagerieWhatsappChat() {
                 setNewAlertText('');
                 setDetails('');
                 setSelectedFile(null);
+                setPreviewImage(null);
 
                 toast({
                     title: "Alerte ajoutée",
@@ -253,28 +255,15 @@ function MessagerieWhatsappChat() {
         }
     };
 
-    const handleFileChange = async (e) => {
+    const handleFileChange = (e) => {
         const file = e.target.files[0];
-        const fakeUUID = uuidv4();
         if (file) {
-            const formData = new FormData();
-            formData.append('file', file);
-
-            const { data: fileData, error: fileError } = await supabase.storage
-                .from('chat-images')
-                .upload(`/${fakeUUID}/${uuidv4()}.png`, formData, {
-                    cacheControl: '3600',
-                    upsert: false,
-                });
-
-            if (fileError) {
-                console.error('Error uploading image:', fileError);
-                return;
-            }
-
-            const imageUrl = fileData[0]?.url;
-
-            setImageUrl(imageUrl);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewImage(reader.result);
+            };
+            reader.readAsDataURL(file);
+            setSelectedFile(file);
         }
     };
 
@@ -384,6 +373,11 @@ function MessagerieWhatsappChat() {
                 )}
 
                 <Box p={4} borderTop='1px solid #e0e0e0' bg='white' width='100%' position="sticky" bottom="0">
+                    {previewImage && (
+                        <Box mb={4}>
+                            <Image src={previewImage} alt="Image Preview" maxH="100px" borderRadius="md" />
+                        </Box>
+                    )}
                     <Flex width='100%' alignItems='center'>
                         <IconButton
                             icon={<AiOutlinePlus />}
