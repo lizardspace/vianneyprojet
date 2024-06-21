@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Textarea, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Alert, Text, Select, Flex, useToast, Badge } from '@chakra-ui/react';
+import { Textarea, Image, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Input, Button, VStack, Text, Select, Flex, useToast, Badge } from '@chakra-ui/react';
 import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
 import Card from "components/card/Card";
-import Menu from "components/menu/MainMenuVianneyAlertChat";
 import { useEvent } from '../../../../EventContext';
 import { useTeam } from './../../InterfaceEquipe/TeamContext';
 
@@ -13,6 +12,7 @@ function MessagerieWhatsappChat() {
   const { selectedTeam } = useTeam(); 
   const { selectedEventId } = useEvent();
   const [selectedFile, setSelectedFile] = useState(null);
+    // eslint-disable-next-line no-unused-vars
   const [imageUrl, setImageUrl] = useState('');
   const [alertStatus, setAlertStatus] = useState('info');
   const [alerts, setAlerts] = useState([]);
@@ -23,16 +23,11 @@ function MessagerieWhatsappChat() {
   const [editingAlert, setEditingAlert] = useState(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [alertToDelete, setAlertToDelete] = useState(null);
-  const [allowScrolling, setAllowScrolling] = useState(true); 
+    // eslint-disable-next-line no-unused-vars
   const [filter, setFilter] = useState('warning'); 
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
-  const [showAddAlertForm, setShowAddAlertForm] = useState(false);
-
-  const toggleAddAlertForm = () => {
-    setShowAddAlertForm(!showAddAlertForm);
-  };
 
   const openConfirmModal = (alertId) => {
     setAlertToDelete(alertId);
@@ -43,10 +38,6 @@ function MessagerieWhatsappChat() {
     const inputPassword = event.target.value;
     setPassword(inputPassword);
     setIsPasswordCorrect(inputPassword === "vianney123");
-  };
-  
-  const handleAllowScrollingToggle = () => {
-    setAllowScrolling(!allowScrolling);
   };
 
   const openEditModal = (alert) => {
@@ -139,9 +130,6 @@ function MessagerieWhatsappChat() {
     setIsConfirmOpen(false);
   };
 
-  const handleDetailsChange = (event) => {
-    setDetails(event.target.value);
-  };
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -251,9 +239,6 @@ function MessagerieWhatsappChat() {
     }
   };
 
-  const handleFilterSelect = (selectedFilter) => {
-    setFilter(selectedFilter);
-  };
 
   const shouldShowAlert = (alert) => {
     if (filter === 'all') return true;
@@ -306,23 +291,12 @@ function MessagerieWhatsappChat() {
   return (
     <Card direction='column' w='100%' h='100vh' overflow='hidden'>
       <Box d='flex' flexDirection='column' h='100%'>
-        <Flex justify='space-between' align='center' p={4} borderBottom='1px solid #e0e0e0'>
-          <Badge colorScheme="orange">
-            Messages et Alertes
-          </Badge>
-          <Menu
-            onFilterSelect={handleFilterSelect}
-            onAllowScrollingToggle={handleAllowScrollingToggle}
-          />
-        </Flex>
+
         
         <Box flex='1' overflowY='auto' p={4} bg='#f5f5f5'>
           <VStack spacing={4} align='stretch'>
             {alerts.filter(shouldShowAlert).map((alert, index) => {
-              const isOwnMessage = alert.user_id === 'your-user-id'; // Remplacez par l'ID de l'utilisateur actuel
-              const alertStatus = ['info', 'warning', 'success', 'error'].includes(alert.solved_or_not)
-                ? alert.solved_or_not
-                : 'info';
+              const isOwnMessage = alert.user_id === 'your-user-id'; 
 
               return (
                 <Flex
