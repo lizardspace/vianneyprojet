@@ -4,6 +4,7 @@ import { FiFolder, FiChevronLeft } from 'react-icons/fi';
 import ListFicheBilanSUAPminiFichier from 'views/admin/alertejesuisendanger/components/ListFicheBilanSUAPminiFichier';
 import OperationnelFichiersFileUploadForm from './OperationnelFichiersFileUploadForm';
 import OperationnelFichiersFichierIconList from './OperationnelFichiersFichierIconList';
+import VianneyAlertChat from 'views/admin/TableauDeBord/components/VianneyAlertChat';
 
 // FolderTab component
 const FolderTab = ({ label, isActive, ...rest }) => {
@@ -48,7 +49,7 @@ const BaseDeDonneeOperationnel = () => {
           <Button leftIcon={<FiChevronLeft />} variant="link" onClick={handleBackClick}>
             Retour
           </Button>
-          <ListFicheBilanSUAPminiFichier/>
+          <ListFicheBilanSUAPminiFichier />
         </Box>
       ) : activeTab === "Fichiers" ? (
         <Box>
@@ -57,6 +58,13 @@ const BaseDeDonneeOperationnel = () => {
           </Button>
           <OperationnelFichiersFileUploadForm />
           <OperationnelFichiersFichierIconList />
+        </Box>
+      ) : activeTab === "Journal officiel" ? (
+        <Box>
+          <Button leftIcon={<FiChevronLeft />} variant="link" onClick={handleBackClick}>
+            Retour
+          </Button>
+          <VianneyAlertChat />
         </Box>
       ) : (
         <Flex direction="row" justify="space-between">
