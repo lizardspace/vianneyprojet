@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Flex, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, useDisclosure, IconButton } from '@chakra-ui/react';
+import { Box, Flex, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, useDisclosure, IconButton, Tooltip } from '@chakra-ui/react';
 import { FcDocument } from 'react-icons/fc';
 import { RiDeleteBin2Line } from 'react-icons/ri';
 import { supabase } from './../../../../../supabaseClient';
@@ -77,18 +77,20 @@ const OperationnelFichiersFichierIconList = () => {
             <Text mt={2} fontSize="sm">
               {file.file_name}
             </Text>
-            <IconButton
-              icon={<RiDeleteBin2Line />}
-              colorScheme="red"
-              position="absolute"
-              bottom={5} // Augmenter cette valeur pour positionner l'icône plus haut
-              right={1}
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteClick(file);
-              }}
-            />
+            <Tooltip label="Supprimer" aria-label="Supprimer">
+              <IconButton
+                icon={<RiDeleteBin2Line />}
+                colorScheme="red"
+                position="absolute"
+                bottom={5} // Augmenter cette valeur pour positionner l'icône plus haut
+                right={1}
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteClick(file);
+                }}
+              />
+            </Tooltip>
           </Box>
         ))}
       </Flex>
