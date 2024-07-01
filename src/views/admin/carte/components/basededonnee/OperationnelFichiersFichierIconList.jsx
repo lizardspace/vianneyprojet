@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Flex, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, useDisclosure } from '@chakra-ui/react';
+import { Box, Flex, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, useDisclosure, IconButton } from '@chakra-ui/react';
 import { FcDocument } from 'react-icons/fc';
+import { RiDeleteBin2Line } from 'react-icons/ri';
 import { supabase } from './../../../../../supabaseClient';
 
 const OperationnelFichiersFichierIconList = () => {
   const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [fileToDelete, setFileToDelete] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure();
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -29,6 +36,25 @@ const OperationnelFichiersFichierIconList = () => {
     onOpen();
   };
 
+  const handleDeleteClick = (file) => {
+    setFileToDelete(file);
+    onDeleteOpen();
+  };
+
+  const handleDeleteConfirm = async () => {
+    const { error } = await supabase
+      .from('vianney_operationnel_fichiers')
+      .delete()
+      .eq('id', fileToDelete.id);
+
+    if (error) {
+      console.error('Error deleting file:', error);
+    } else {
+      setFiles(files.filter(f => f.id !== fileToDelete.id));
+      onDeleteClose();
+    }
+  };
+
   return (
     <Box p={4}>
       <Flex wrap="wrap" justifyContent="center">
@@ -37,6 +63,7 @@ const OperationnelFichiersFichierIconList = () => {
             key={file.id}
             m={4}
             textAlign="center"
+            position="relative"
             cursor="pointer"
             _hover={{ transform: 'scale(1.05)', transition: 'transform 0.2s' }}
             onClick={() => handleFileClick(file)}
@@ -45,6 +72,18 @@ const OperationnelFichiersFichierIconList = () => {
             <Text mt={2} fontSize="sm">
               {file.file_name}
             </Text>
+            <IconButton
+              icon={<RiDeleteBin2Line />}
+              colorScheme="red"
+              position="absolute"
+              bottom={1}
+              right={1}
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteClick(file);
+              }}
+            />
           </Box>
         ))}
       </Flex>
@@ -73,6 +112,23 @@ const OperationnelFichiersFichierIconList = () => {
                 Télécharger
               </Button>
             )}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Confirmez-vous la suppression de votre fichier ?</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            Êtes-vous sûr de vouloir supprimer le fichier <strong>{fileToDelete?.file_name}</strong> ?
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="red" mr={3} onClick={handleDeleteConfirm}>
+              Supprimer
+            </Button>
+            <Button onClick={onDeleteClose}>Annuler</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
