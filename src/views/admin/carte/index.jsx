@@ -25,6 +25,7 @@ import FluxRssRssFeed from './components/FluxRssRssFeed';
 import BaseDeDonneeOperationnel from './components/basededonnee/BaseDeDonneeOperationnel';
 import BaseDeDonneeRenseignements from './components/basededonnee/BaseDeDonneeRenseignements';
 import BaseDeDonneeMoyens from './components/basededonnee/BaseDeDonneeMoyens';
+import VianneyAlertTableEvent from '../TableauExcel/componentsEventContext/VianneyAlertTableEvent';
 
 export default function Marketplace() {
   // eslint-disable-next-line no-unused-vars
@@ -76,6 +77,8 @@ export default function Marketplace() {
                         <MapComponent key={mapKey} ref={mapRef} />
                       </Box>
                       <Box flex="1" ml={{ md: "10px" }} display={isFullScreen ? 'none' : 'block'}>
+                        <VianneyAlertTableEvent />
+                        <Box my={4} />
                         <VianneyAlertChat />
                       </Box>
                     </Flex>
