@@ -5,6 +5,7 @@ import ListFicheBilanSUAPminiFichier from 'views/admin/alertejesuisendanger/comp
 import OperationnelFichiersFileUploadForm from './OperationnelFichiersFileUploadForm';
 import OperationnelFichiersFichierIconList from './OperationnelFichiersFichierIconList';
 import VianneyAlertChat from 'views/admin/TableauDeBord/components/VianneyAlertChat';
+import VianneyAlertTableEvent from 'views/admin/TableauExcel/componentsEventContext/VianneyAlertTableEvent';
 
 // FolderTab component
 const FolderTab = ({ label, isActive, ...rest }) => {
@@ -64,6 +65,8 @@ const BaseDeDonneeOperationnel = () => {
           <Button leftIcon={<FiChevronLeft />} variant="link" onClick={handleBackClick}>
             Retour
           </Button>
+          <VianneyAlertTableEvent />
+          <Box my={4}></Box> {/* Adds space between components */}
           <VianneyAlertChat />
         </Box>
       ) : (
