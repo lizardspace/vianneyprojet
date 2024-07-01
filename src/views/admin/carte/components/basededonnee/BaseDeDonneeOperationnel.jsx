@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Flex, Text, IconButton, Box, Button } from '@chakra-ui/react';
 import { FiFolder, FiChevronLeft } from 'react-icons/fi';
 import ListFicheBilanSUAPminiFichier from 'views/admin/alertejesuisendanger/components/ListFicheBilanSUAPminiFichier';
+import OperationnelFichiersFileUploadForm from './OperationnelFichiersFileUploadForm';
 
 // FolderTab component
 const FolderTab = ({ label, isActive, ...rest }) => {
@@ -47,6 +48,13 @@ const BaseDeDonneeOperationnel = () => {
             Retour
           </Button>
           <ListFicheBilanSUAPminiFichier/>
+        </Box>
+      ) : activeTab === "Fichiers" ? (
+        <Box>
+          <Button leftIcon={<FiChevronLeft />} variant="link" onClick={handleBackClick}>
+            Retour
+          </Button>
+          <OperationnelFichiersFileUploadForm/>
         </Box>
       ) : (
         <Flex direction="row" justify="space-between">
