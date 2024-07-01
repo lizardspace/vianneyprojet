@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Input, FormControl, FormLabel, Badge, Text, VStack, HStack, Icon, Collapse } from '@chakra-ui/react';
+import { Box, Button, Input, FormControl, FormLabel, Badge, Text, VStack, HStack, Icon, Collapse, useToast } from '@chakra-ui/react';
 import { supabase } from './../../../../../supabaseClient';
 import { FiUploadCloud, FiFileText, FiEdit2 } from 'react-icons/fi';
 import { useEvent } from './../../../../../EventContext'; // Assurez-vous que le chemin est correct
@@ -9,6 +9,7 @@ const OperationnelFichiersFileUploadForm = () => {
   const [fileName, setFileName] = useState('');
   const [newFileName, setNewFileName] = useState('');
   const [showComponent, setShowComponent] = useState(false);
+  const toast = useToast();
   const { selectedEventId } = useEvent();
 
   const handleFileChange = (event) => {
@@ -59,7 +60,14 @@ const OperationnelFichiersFileUploadForm = () => {
       return;
     }
 
-    alert('Fichier téléchargé avec succès!');
+    toast({
+      title: "Fichier téléchargé avec succès!",
+      description: "Votre fichier a été téléchargé et enregistré avec succès.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom"
+    });
   };
 
   return (
