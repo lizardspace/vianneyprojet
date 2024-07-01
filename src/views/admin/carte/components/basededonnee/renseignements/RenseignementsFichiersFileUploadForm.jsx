@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Box, Button, Input, FormControl, FormLabel, Badge, Text, VStack, HStack, Icon, Collapse, useToast } from '@chakra-ui/react';
-import { supabase } from './../../../../../supabaseClient';
+import { supabase } from '../../../../../../supabaseClient';
 import { FiUploadCloud, FiFileText, FiEdit2 } from 'react-icons/fi';
-import { useEvent } from './../../../../../EventContext'; // Assurez-vous que le chemin est correct
+import { useEvent } from '../../../../../../EventContext'; // Assurez-vous que le chemin est correct
 
-const OperationnelFichiersFileUploadForm = () => {
+const RenseignementsFichiersFileUploadForm = () => {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState('');
   const [newFileName, setNewFileName] = useState('');
@@ -26,7 +26,7 @@ const OperationnelFichiersFileUploadForm = () => {
     const filePath = `${Math.random()}.${fileExt}`;
 
     let { error: uploadError } = await supabase.storage
-      .from('vianney-operationnel-fichiers')
+      .from('vianney-renseignements-fichiers')
       .upload(filePath, file);
 
     if (uploadError) {
@@ -36,7 +36,7 @@ const OperationnelFichiersFileUploadForm = () => {
 
     const { data: urlData, error: urlError } = supabase
       .storage
-      .from('vianney-operationnel-fichiers')
+      .from('vianney-renseignements-fichiers')
       .getPublicUrl(filePath);
 
     if (urlError) {
@@ -52,7 +52,7 @@ const OperationnelFichiersFileUploadForm = () => {
     }
 
     const { error: dbError } = await supabase
-      .from('vianney_operationnel_fichiers')
+      .from('vianney_renseignements_fichiers')
       .insert([{ file_name: newFileName, url: publicURL, event_id: selectedEventId }]);
 
     if (dbError) {
@@ -137,4 +137,4 @@ const OperationnelFichiersFileUploadForm = () => {
   );
 };
 
-export default OperationnelFichiersFileUploadForm;
+export default RenseignementsFichiersFileUploadForm;

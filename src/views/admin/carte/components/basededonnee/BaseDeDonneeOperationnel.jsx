@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Flex, Text, IconButton, Box, Button } from '@chakra-ui/react';
 import { FiFolder, FiChevronLeft } from 'react-icons/fi';
 import ListFicheBilanSUAPminiFichier from 'views/admin/alertejesuisendanger/components/ListFicheBilanSUAPminiFichier';
-import OperationnelFichiersFileUploadForm from './OperationnelFichiersFileUploadForm';
-import OperationnelFichiersFichierIconList from './OperationnelFichiersFichierIconList';
+import OperationnelFichiersFileUploadForm from './operationnel/OperationnelFichiersFileUploadForm';
+import OperationnelFichiersFichierIconList from './operationnel/OperationnelFichiersFichierIconList';
 import VianneyAlertChat from 'views/admin/TableauDeBord/components/VianneyAlertChat';
 import VianneyAlertTableEvent from 'views/admin/TableauExcel/componentsEventContext/VianneyAlertTableEvent';
 

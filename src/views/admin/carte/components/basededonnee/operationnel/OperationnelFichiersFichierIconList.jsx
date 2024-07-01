@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Box, Flex, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, useDisclosure, IconButton, Tooltip } from '@chakra-ui/react';
 import { FcDocument } from 'react-icons/fc';
 import { RiDeleteBin2Line } from 'react-icons/ri';
-import { supabase } from './../../../../../supabaseClient';
-import { useEvent } from './../../../../../EventContext'; // Assurez-vous que le chemin est correct
+import { supabase } from '../../../../../../supabaseClient';
+import { useEvent } from '../../../../../../EventContext'; // Assurez-vous que le chemin est correct
 
 const OperationnelFichiersFichierIconList = () => {
   const [files, setFiles] = useState([]);
