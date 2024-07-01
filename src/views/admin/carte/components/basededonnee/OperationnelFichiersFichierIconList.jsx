@@ -3,6 +3,7 @@ import { Box, Flex, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalF
 import { FcDocument } from 'react-icons/fc';
 import { RiDeleteBin2Line } from 'react-icons/ri';
 import { supabase } from './../../../../../supabaseClient';
+import { useEvent } from './../../../../../EventContext'; // Assurez-vous que le chemin est correct
 
 const OperationnelFichiersFichierIconList = () => {
   const [files, setFiles] = useState([]);
@@ -14,12 +15,16 @@ const OperationnelFichiersFichierIconList = () => {
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
   } = useDisclosure();
+  const { selectedEventId } = useEvent();
 
   useEffect(() => {
+    if (!selectedEventId) return;
+
     const fetchFiles = async () => {
       const { data, error } = await supabase
         .from('vianney_operationnel_fichiers')
-        .select('*');
+        .select('*')
+        .eq('event_id', selectedEventId);
       
       if (error) {
         console.error('Error fetching files:', error);
@@ -29,7 +34,7 @@ const OperationnelFichiersFichierIconList = () => {
     };
 
     fetchFiles();
-  }, []);
+  }, [selectedEventId]);
 
   const handleFileClick = (file) => {
     setSelectedFile(file);
@@ -57,7 +62,7 @@ const OperationnelFichiersFichierIconList = () => {
 
   return (
     <Box p={4}>
-      <Flex wrap="wrap" justifyContent="center">
+      <Flex wrap="wrap" justifyContent="flex-start">
         {files.map(file => (
           <Box
             key={file.id}
@@ -76,7 +81,7 @@ const OperationnelFichiersFichierIconList = () => {
               icon={<RiDeleteBin2Line />}
               colorScheme="red"
               position="absolute"
-              bottom={1}
+              bottom={5} // Augmenter cette valeur pour positionner l'icône plus haut
               right={1}
               size="sm"
               onClick={(e) => {
