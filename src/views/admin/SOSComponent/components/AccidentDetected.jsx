@@ -18,8 +18,15 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  Input,
 } from '@chakra-ui/react';
 import { PhoneIcon, CheckIcon } from '@chakra-ui/icons';
+import { supabase } from './../../../../supabaseClient'; // Adjust the import according to your project structure
+import { useTeam } from './../../InterfaceEquipe/TeamContext'; // Import the useTeam hook
+import { useEvent } from './../../../../EventContext'; // Import the useEvent hook
+
+const DEFAULT_TEAM_ID = '00000000-0000-0000-0000-000000000000'; // Default team_id for "Aucune équipe"
+const DEFAULT_TEAM_NAME = 'Aucune équipe'; // Default team_name
 
 const AccidentDetected = () => {
   const [counter, setCounter] = useState(30); // 30 seconds countdown
@@ -30,28 +37,108 @@ const AccidentDetected = () => {
   const videoRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const [recordedChunks, setRecordedChunks] = useState([]);
+  const [alertId, setAlertId] = useState(null); // Store the ID of the inserted alert
+  const [videoUrl, setVideoUrl] = useState(''); // Store the video URL
+  const { teamUUID, selectedTeam } = useTeam(); // Use the useTeam hook to get teamUUID and selectedTeam
+  const { selectedEventId } = useEvent(); // Use the useEvent hook to get the selectedEventId
 
   const getCurrentLocation = useCallback(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        setLatitude(position.coords.latitude);
-        setLongitude(position.coords.longitude);
-      });
-    } else {
-      alert('Geolocation is not supported by this browser.');
-    }
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            console.log('Location obtained:', position.coords); // Debug log
+            setLatitude(position.coords.latitude);
+            setLongitude(position.coords.longitude);
+            resolve({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
+          },
+          (error) => {
+            console.error('Error getting location:', error);
+            reject(error);
+          }
+        );
+      } else {
+        alert('Geolocation is not supported by this browser.');
+        reject(new Error('Geolocation not supported'));
+      }
+    });
   }, []);
 
   const startRecording = useCallback(() => {
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then(stream => {
+        console.log('Media stream obtained:', stream); // Debug log
         videoRef.current.srcObject = stream;
         mediaRecorderRef.current = new MediaRecorder(stream);
         mediaRecorderRef.current.ondataavailable = handleDataAvailable;
         mediaRecorderRef.current.start();
+        // Stop recording after 10 seconds (10,000 milliseconds)
+        setTimeout(stopRecording, 10000);
       })
-      .catch(error => console.error('Error accessing media devices.', error));
+      .catch(error => console.error('Error accessing media devices:', error));
   }, []);
+
+  const saveAlertData = useCallback(async (lat, long, timeForUser) => {
+    console.log('Saving alert data:', { lat, long, timeForUser }); // Debug log
+    const { data, error } = await supabase
+      .from('vianney_sos_alerts')
+      .insert([{
+        team_id: teamUUID || DEFAULT_TEAM_ID,
+        latitude: lat,
+        longitude: long,
+        created_at: new Date().toISOString(),
+        time_for_user: timeForUser,
+        url: '', // Empty URL initially
+        team_name: selectedTeam || DEFAULT_TEAM_NAME,
+        event_id: selectedEventId,
+      }])
+      .select();
+
+    if (error) {
+      console.error('Error inserting data:', error);
+    } else {
+      console.log('Data inserted successfully:', data);
+      if (data && data.length > 0) {
+        setAlertId(data[0].id); // Store the ID of the inserted alert
+      }
+    }
+  }, [teamUUID, selectedTeam, selectedEventId]);
+
+  const updateAlertData = async (id, videoUrl) => {
+    console.log('Updating alert data with URL:', { id, videoUrl }); // Debug log
+    const { data, error } = await supabase
+      .from('vianney_sos_alerts')
+      .update({ url: videoUrl })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating data:', error);
+    } else {
+      console.log('Data updated successfully:', data);
+    }
+  };
+
+  const uploadVideoToSupabase = async (blob) => {
+    const fileName = `sos_recording_${new Date().toISOString()}.webm`;
+    console.log('Uploading video:', fileName); // Debug log
+    const { data, error } = await supabase
+      .storage
+      .from('sos-alerts-video')
+      .upload(fileName, blob);
+
+    if (error) {
+      console.error('Error uploading video:', error);
+      return null;
+    } else {
+      const videoUrl = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/sos-alerts-video/${data.path}`;
+      console.log('Video uploaded:', videoUrl); // Debug log
+      setVideoUrl(videoUrl); // Set the video URL state
+      return videoUrl;
+    }
+  };
 
   useEffect(() => {
     let timer;
@@ -60,21 +147,58 @@ const AccidentDetected = () => {
         setCounter((prevCounter) => prevCounter - 1);
       }, 1000);
     } else if (counter === 0) {
-      setStep(3);
-      getCurrentLocation();
-      startRecording();
+      (async () => {
+        setStep(3);
+        try {
+          const location = await getCurrentLocation();
+          const currentTime = new Date().toISOString();
+          await saveAlertData(location.latitude, location.longitude, currentTime);
+          startRecording();
+          // Wait for 10 seconds before uploading video and updating alert data
+          setTimeout(async () => {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const videoUrl = await uploadVideoToSupabase(blob);
+            if (videoUrl && alertId) {
+              await updateAlertData(alertId, videoUrl);
+            }
+          }, 10000);
+        } catch (error) {
+          console.error('Error in location or recording:', error);
+        }
+      })();
     }
     return () => clearInterval(timer);
-  }, [counter, step, getCurrentLocation, startRecording]);
+  }, [counter, step, getCurrentLocation, startRecording, saveAlertData, recordedChunks, alertId]);
+
+  useEffect(() => {
+    // Update the alert data with the video URL once the URL is available
+    if (videoUrl && alertId) {
+      updateAlertData(alertId, videoUrl);
+    }
+  }, [videoUrl, alertId]);
 
   const triggerSOS = () => {
     setStep(2);
   };
 
-  const confirmSOS = () => {
+  const confirmSOS = async () => {
     setStep(3);
-    getCurrentLocation();
-    startRecording();
+    try {
+      const location = await getCurrentLocation();
+      const currentTime = new Date().toISOString();
+      await saveAlertData(location.latitude, location.longitude, currentTime);
+      startRecording();
+      // Wait for 10 seconds before uploading video and updating alert data
+      setTimeout(async () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const videoUrl = await uploadVideoToSupabase(blob);
+        if (videoUrl && alertId) {
+          await updateAlertData(alertId, videoUrl);
+        }
+      }, 10000);
+    } catch (error) {
+      console.error('Error in location or recording:', error);
+    }
   };
 
   const cancelAlert = () => {
@@ -86,6 +210,7 @@ const AccidentDetected = () => {
 
   const handleDataAvailable = (event) => {
     if (event.data.size > 0) {
+      console.log('Data available from media recorder:', event.data); // Debug log
       setRecordedChunks(prev => prev.concat(event.data));
     }
   };
@@ -94,6 +219,7 @@ const AccidentDetected = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      console.log('Recording stopped'); // Debug log
     }
   };
 
@@ -187,6 +313,14 @@ const AccidentDetected = () => {
           <Button colorScheme="blue" onClick={downloadRecording}>
             Télécharger l'enregistrement
           </Button>
+          {videoUrl && (
+            <VStack spacing={4}>
+              <Text fontSize="md" fontWeight="bold">
+                URL de l'enregistrement :
+              </Text>
+              <Input value={videoUrl} isReadOnly />
+            </VStack>
+          )}
         </VStack>
       )}
 
