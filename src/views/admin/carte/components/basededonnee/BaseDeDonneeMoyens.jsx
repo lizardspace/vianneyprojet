@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Flex, Text, IconButton, Box, Button, VStack } from '@chakra-ui/react';
 import { FiFolder, FiChevronLeft } from 'react-icons/fi';
 import MoyensEffectifsFichiersFileUploadForm from './moyenseffectifs/MoyensEffectifsFichiersFileUploadForm';
 import MoyensEffectifsFichierIconList from './moyenseffectifs/MoyensEffectifsFichierIconList';
 import MoyensMaterielsFichiersFileUploadForm from './moyensmateriels/MoyensMaterielsFichiersFileUploadForm';
 import MoyensMaterielsFichierIconList from './moyensmateriels/MoyensMaterielsFichierIconList';
+import { supabase } from '../../../../../supabaseClient';
+import { useEvent } from '../../../../../EventContext';
 
 // FolderTab component
 const FolderTab = ({ label, isActive, onClick, ...rest }) => {
@@ -40,6 +42,27 @@ const BaseDeDonneeMoyens = () => {
   const [activeTab, setActiveTab] = useState(null);
   const [showSubfolders, setShowSubfolders] = useState(false);
   const [subTab, setSubTab] = useState(null);
+  const [files, setFiles] = useState([]);
+  const { selectedEventId } = useEvent();
+
+  useEffect(() => {
+    if (!selectedEventId) return;
+
+    const fetchFiles = async () => {
+      const { data, error } = await supabase
+        .from('vianney_moyens_effectifs_fichiers')
+        .select('*')
+        .eq('event_id', selectedEventId);
+      
+      if (error) {
+        console.error('Error fetching files:', error);
+      } else {
+        setFiles(data);
+      }
+    };
+
+    fetchFiles();
+  }, [selectedEventId]);
 
   const handleBackClick = () => {
     if (subTab) {
@@ -59,6 +82,10 @@ const BaseDeDonneeMoyens = () => {
     setSubTab(subTab);
   };
 
+  const handleFileUpload = (newFile) => {
+    setFiles((prevFiles) => [...prevFiles, newFile]);
+  };
+
   return (
     <Flex direction="column" align="start" width="100%">
       {showSubfolders ? (
@@ -68,13 +95,13 @@ const BaseDeDonneeMoyens = () => {
           </Button>
           {subTab === "Fichiers importés" && activeTab === "Matériels" ? (
             <Box width="100%">
-              <MoyensMaterielsFichiersFileUploadForm />
-              <MoyensMaterielsFichierIconList />
+              <MoyensMaterielsFichiersFileUploadForm onFileUpload={handleFileUpload} />
+              <MoyensMaterielsFichierIconList files={files} setFiles={setFiles} />
             </Box>
           ) : subTab === "Fichiers importés" && activeTab === "Effectifs" ? (
             <Box width="100%">
-              <MoyensEffectifsFichiersFileUploadForm />
-              <MoyensEffectifsFichierIconList />
+              <MoyensEffectifsFichiersFileUploadForm onFileUpload={handleFileUpload} />
+              <MoyensEffectifsFichierIconList files={files} setFiles={setFiles} />
             </Box>
           ) : (
             <VStack align="start" pl={5} mt={2} spacing={2}>

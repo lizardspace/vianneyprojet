@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Box, Button, Input, FormControl, FormLabel, Badge, Text, VStack, HStack, Icon, Collapse, useToast } from '@chakra-ui/react';
 import { supabase } from '../../../../../../supabaseClient';
 import { FiUploadCloud, FiFileText, FiEdit2 } from 'react-icons/fi';
-import { useEvent } from '../../../../../../EventContext'; // Assurez-vous que le chemin est correct
+import { useEvent } from '../../../../../../EventContext'; // Ensure the path is correct
 
-const MoyensMaterielsFichiersFileUploadForm = () => {
+const MoyensEffectifsFichiersFileUploadForm = ({ onFileUpload }) => {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState('');
   const [newFileName, setNewFileName] = useState('');
@@ -26,7 +26,7 @@ const MoyensMaterielsFichiersFileUploadForm = () => {
     const filePath = `${Math.random()}.${fileExt}`;
 
     let { error: uploadError } = await supabase.storage
-      .from('vianney-moyens-materiels-fichiers')
+      .from('vianney-moyens-effectifs-fichiers')
       .upload(filePath, file);
 
     if (uploadError) {
@@ -36,7 +36,7 @@ const MoyensMaterielsFichiersFileUploadForm = () => {
 
     const { data: urlData, error: urlError } = supabase
       .storage
-      .from('vianney-moyens-materiels-fichiers')
+      .from('vianney-moyens-effectifs-fichiers')
       .getPublicUrl(filePath);
 
     if (urlError) {
@@ -51,9 +51,10 @@ const MoyensMaterielsFichiersFileUploadForm = () => {
       return;
     }
 
-    const { error: dbError } = await supabase
-      .from('vianney_moyens_materiels_fichiers')
-      .insert([{ file_name: newFileName, url: publicURL, event_id: selectedEventId }]);
+    const { data: insertedData, error: dbError } = await supabase
+      .from('vianney_moyens_effectifs_fichiers')
+      .insert([{ file_name: newFileName, url: publicURL, event_id: selectedEventId }])
+      .select('*');
 
     if (dbError) {
       console.error('Erreur lors de l\'insertion dans la base de données:', dbError);
@@ -68,6 +69,8 @@ const MoyensMaterielsFichiersFileUploadForm = () => {
       isClosable: true,
       position: "bottom"
     });
+
+    onFileUpload(insertedData[0]);
   };
 
   return (
@@ -137,4 +140,4 @@ const MoyensMaterielsFichiersFileUploadForm = () => {
   );
 };
 
-export default MoyensMaterielsFichiersFileUploadForm;
+export default MoyensEffectifsFichiersFileUploadForm;
