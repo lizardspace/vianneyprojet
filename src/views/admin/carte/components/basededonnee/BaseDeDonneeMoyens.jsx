@@ -7,6 +7,7 @@ import MoyensMaterielsFichiersFileUploadForm from './moyensmateriels/MoyensMater
 import MoyensMaterielsFichierIconList from './moyensmateriels/MoyensMaterielsFichierIconList';
 import { supabase } from '../../../../../supabaseClient';
 import { useEvent } from '../../../../../EventContext';
+import MaterialComponent from './../../../MaterialComponent/index'; // Importez le composant
 
 // FolderTab component
 const FolderTab = ({ label, isActive, onClick, ...rest }) => {
@@ -103,11 +104,15 @@ const BaseDeDonneeMoyens = () => {
               <MoyensEffectifsFichiersFileUploadForm onFileUpload={handleFileUpload} />
               <MoyensEffectifsFichierIconList files={files} setFiles={setFiles} />
             </Box>
+          ) : subTab === "Liste matériel enregistré et historique" && activeTab === "Matériels" ? (
+            <Box width="100%">
+              <MaterialComponent />
+            </Box>
           ) : (
             <VStack align="start" pl={5} mt={2} spacing={2}>
               {activeTab === "Matériels" && (
                 <>
-                  <FolderTab label="Liste matériel enregistré et historique" />
+                  <FolderTab label="Liste matériel enregistré et historique" onClick={() => handleSubTabClick("Liste matériel enregistré et historique")} />
                   <FolderTab label="Fichiers importés" onClick={() => handleSubTabClick("Fichiers importés")} />
                 </>
               )}
