@@ -37,19 +37,17 @@ const SOSAlertsView = () => {
   const { selectedEventId } = useEvent(); // Obtenir l'ID de l'événement sélectionné à partir du contexte
 
   useEffect(() => {
+    let interval;
     if (selectedEventId) {
       fetchAlerts(selectedEventId);
-      const subscription = supabase
-        .channel('public:vianney_sos_alerts')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'vianney_sos_alerts', filter: `event_id=eq.${selectedEventId}` }, payload => {
-          setAlerts(alerts => [payload.new, ...alerts]);
-        })
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(subscription);
-      };
+      interval = setInterval(() => {
+        fetchAlerts(selectedEventId);
+      }, 20000); // 20 secondes
     }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [selectedEventId]);
 
   const fetchAlerts = async (eventId) => {
