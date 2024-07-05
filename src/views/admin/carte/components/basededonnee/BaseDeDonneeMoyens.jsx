@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Flex, Text, IconButton, VStack, Button } from '@chakra-ui/react';
+import { Flex, Text, IconButton, Box, Button, VStack } from '@chakra-ui/react';
 import { FiFolder, FiChevronLeft } from 'react-icons/fi';
+import MoyensEffectifsFichiersFileUploadForm from './moyenseffectifs/MoyensEffectifsFichiersFileUploadForm';
+import MoyensEffectifsFichierIconList from './moyenseffectifs/MoyensEffectifsFichierIconList';
 
 // FolderTab component
 const FolderTab = ({ label, isActive, onClick, ...rest }) => {
@@ -35,15 +37,24 @@ const BaseDeDonneeMoyens = () => {
   const tabs = ["Matériels", "Effectifs"];
   const [activeTab, setActiveTab] = useState(null);
   const [showSubfolders, setShowSubfolders] = useState(false);
+  const [subTab, setSubTab] = useState(null);
 
   const handleBackClick = () => {
-    setActiveTab(null);
-    setShowSubfolders(false);
+    if (subTab) {
+      setSubTab(null);
+    } else {
+      setActiveTab(null);
+      setShowSubfolders(false);
+    }
   };
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     setShowSubfolders(true);
+  };
+
+  const handleSubTabClick = (subTab) => {
+    setSubTab(subTab);
   };
 
   return (
@@ -53,21 +64,28 @@ const BaseDeDonneeMoyens = () => {
           <Button leftIcon={<FiChevronLeft />} variant="link" onClick={handleBackClick}>
             Retour
           </Button>
-          <VStack align="start" pl={5} mt={2} spacing={2}>
-            {activeTab === "Matériels" && (
-              <>
-                <FolderTab label="Liste matériel enregistré et historique" />
-                <FolderTab label="Fichier importés" />
-              </>
-            )}
-            {activeTab === "Effectifs" && (
-              <>
-                <FolderTab label="Liste Effectifs enregistré et historique" />
-                <FolderTab label="Fichier importés" />
-                <FolderTab label="Emploi du temps" />
-              </>
-            )}
-          </VStack>
+          {subTab === "Fichiers importés" ? (
+            <Box width="100%">
+              <MoyensEffectifsFichiersFileUploadForm />
+              <MoyensEffectifsFichierIconList />
+            </Box>
+          ) : (
+            <VStack align="start" pl={5} mt={2} spacing={2}>
+              {activeTab === "Matériels" && (
+                <>
+                  <FolderTab label="Liste matériel enregistré et historique" />
+                  <FolderTab label="Fichiers importés" />
+                </>
+              )}
+              {activeTab === "Effectifs" && (
+                <>
+                  <FolderTab label="Liste Effectifs enregistré et historique" />
+                  <FolderTab label="Fichiers importés" onClick={() => handleSubTabClick("Fichiers importés")} />
+                  <FolderTab label="Emploi du temps" />
+                </>
+              )}
+            </VStack>
+          )}
         </>
       ) : (
         <Flex direction="row" justify="space-between" width="100%">
