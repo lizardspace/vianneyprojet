@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure } from "@chakra-ui/react";
+import { FiAlertCircle } from "react-icons/fi";
 import AccidentDetected from "./components/AccidentDetected";
 import SOSAlertsView from "./components/SOSAlertsView";
 
@@ -9,7 +10,7 @@ export default function Settings() {
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <SOSAlertsView />
-      <Button onClick={onOpen} mt={4}>
+      <Button onClick={onOpen} mt={4} colorScheme="red" leftIcon={<FiAlertCircle />}>
         Déclencher un SOS
       </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
