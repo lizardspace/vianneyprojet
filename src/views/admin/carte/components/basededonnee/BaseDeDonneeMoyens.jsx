@@ -3,6 +3,8 @@ import { Flex, Text, IconButton, Box, Button, VStack } from '@chakra-ui/react';
 import { FiFolder, FiChevronLeft } from 'react-icons/fi';
 import MoyensEffectifsFichiersFileUploadForm from './moyenseffectifs/MoyensEffectifsFichiersFileUploadForm';
 import MoyensEffectifsFichierIconList from './moyenseffectifs/MoyensEffectifsFichierIconList';
+import MoyensMaterielsFichiersFileUploadForm from './moyensmateriels/MoyensMaterielsFichiersFileUploadForm';
+import MoyensMaterielsFichierIconList from './moyensmateriels/MoyensMaterielsFichierIconList';
 
 // FolderTab component
 const FolderTab = ({ label, isActive, onClick, ...rest }) => {
@@ -64,7 +66,12 @@ const BaseDeDonneeMoyens = () => {
           <Button leftIcon={<FiChevronLeft />} variant="link" onClick={handleBackClick}>
             Retour
           </Button>
-          {subTab === "Fichiers importés" ? (
+          {subTab === "Fichiers importés" && activeTab === "Matériels" ? (
+            <Box width="100%">
+              <MoyensMaterielsFichiersFileUploadForm />
+              <MoyensMaterielsFichierIconList />
+            </Box>
+          ) : subTab === "Fichiers importés" && activeTab === "Effectifs" ? (
             <Box width="100%">
               <MoyensEffectifsFichiersFileUploadForm />
               <MoyensEffectifsFichierIconList />
@@ -74,7 +81,7 @@ const BaseDeDonneeMoyens = () => {
               {activeTab === "Matériels" && (
                 <>
                   <FolderTab label="Liste matériel enregistré et historique" />
-                  <FolderTab label="Fichiers importés" />
+                  <FolderTab label="Fichiers importés" onClick={() => handleSubTabClick("Fichiers importés")} />
                 </>
               )}
               {activeTab === "Effectifs" && (
