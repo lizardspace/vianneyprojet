@@ -5,8 +5,7 @@ import { RiDeleteBin2Line } from 'react-icons/ri';
 import { supabase } from '../../../../../../supabaseClient';
 import { useEvent } from '../../../../../../EventContext'; // Assurez-vous que le chemin est correct
 
-const MoyensEffectifsFichierIconList = () => {
-  const [files, setFiles] = useState([]);
+const MoyensEffectifsFichierIconList = ({ files, setFiles }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileToDelete, setFileToDelete] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -34,7 +33,7 @@ const MoyensEffectifsFichierIconList = () => {
     };
 
     fetchFiles();
-  }, [selectedEventId]);
+  }, [selectedEventId, setFiles]);
 
   const handleFileClick = (file) => {
     setSelectedFile(file);
