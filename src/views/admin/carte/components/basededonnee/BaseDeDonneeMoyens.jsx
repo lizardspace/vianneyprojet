@@ -8,6 +8,7 @@ import MoyensMaterielsFichierIconList from './moyensmateriels/MoyensMaterielsFic
 import { supabase } from '../../../../../supabaseClient';
 import { useEvent } from '../../../../../EventContext';
 import MaterialComponent from './../../../MaterialComponent/index'; // Importez le composant
+import EquipiersTableSimplify from './../../components/EquipiersTableSimplify'; // Importez le composant
 
 // FolderTab component
 const FolderTab = ({ label, isActive, onClick, ...rest }) => {
@@ -108,6 +109,10 @@ const BaseDeDonneeMoyens = () => {
             <Box width="100%">
               <MaterialComponent />
             </Box>
+          ) : subTab === "Liste Effectifs enregistré et historique" && activeTab === "Effectifs" ? (
+            <Box width="100%">
+              <EquipiersTableSimplify />
+            </Box>
           ) : (
             <VStack align="start" pl={5} mt={2} spacing={2}>
               {activeTab === "Matériels" && (
@@ -118,7 +123,7 @@ const BaseDeDonneeMoyens = () => {
               )}
               {activeTab === "Effectifs" && (
                 <>
-                  <FolderTab label="Liste Effectifs enregistré et historique" />
+                  <FolderTab label="Liste Effectifs enregistré et historique" onClick={() => handleSubTabClick("Liste Effectifs enregistré et historique")} />
                   <FolderTab label="Fichiers importés" onClick={() => handleSubTabClick("Fichiers importés")} />
                   <FolderTab label="Emploi du temps" />
                 </>
