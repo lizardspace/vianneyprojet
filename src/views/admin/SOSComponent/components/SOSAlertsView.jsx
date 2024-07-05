@@ -39,6 +39,16 @@ const SOSAlertsView = () => {
   useEffect(() => {
     if (selectedEventId) {
       fetchAlerts(selectedEventId);
+      const subscription = supabase
+        .channel('public:vianney_sos_alerts')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'vianney_sos_alerts', filter: `event_id=eq.${selectedEventId}` }, payload => {
+          setAlerts(alerts => [payload.new, ...alerts]);
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(subscription);
+      };
     }
   }, [selectedEventId]);
 
