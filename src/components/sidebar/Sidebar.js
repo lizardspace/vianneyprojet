@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Box, Flex, Drawer, DrawerBody, Icon, useColorModeValue, DrawerOverlay, useDisclosure, DrawerContent, DrawerCloseButton } from "@chakra-ui/react";
-import Content from "components/sidebar/components/Content";
+import SidebarContent from "components/sidebar/components/Content";
 import { renderThumb, renderTrack, renderView } from "components/scrollbar/Scrollbar";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { IoMenuOutline } from "react-icons/io5";
@@ -14,14 +14,30 @@ function Sidebar(props) {
   let sidebarBg = useColorModeValue("white", "navy.800");
   let sidebarMargins = "0px";
 
-  // Filter out the hidden routes
   const filteredRoutes = routes.filter(route => route.name !== "Carte zoomée" && route.name !== "Matériel");
 
   return (
-    <Box display={{ sm: "none", xl: "block" }} w="100%" position="fixed" minH="100%">
-      <Box bg={sidebarBg} transition={variantChange} w="300px" h="100vh" m={sidebarMargins} minH="100%" overflowX="hidden" boxShadow={shadow}>
-        <Scrollbars autoHide renderTrackVertical={renderTrack} renderThumbVertical={renderThumb} renderView={renderView}>
-          <Content routes={filteredRoutes} />
+    <Box display={{ sm: "none", xl: "block" }} w="100%" position="fixed" minH="100vh" bg={sidebarBg}>
+      <Box
+        bg={sidebarBg}
+        transition={variantChange}
+        w="300px"
+        h="100vh"
+        m={sidebarMargins}
+        minH="100vh"
+        overflow="hidden"
+        boxShadow={shadow}
+        display="flex"
+        flexDirection="column"
+      >
+        <Scrollbars
+          autoHide
+          renderTrackVertical={renderTrack}
+          renderThumbVertical={renderThumb}
+          renderView={renderView}
+          style={{ flex: 1 }}
+        >
+          <SidebarContent routes={filteredRoutes} />
         </Scrollbars>
       </Box>
     </Box>
@@ -36,7 +52,6 @@ export function SidebarResponsive(props) {
 
   const { routes } = props;
 
-  // Filter out the hidden routes
   const filteredRoutes = routes.filter(route => route.name !== "Carte zoomée" && route.name !== "Matériel");
 
   return (
@@ -46,11 +61,18 @@ export function SidebarResponsive(props) {
       </Flex>
       <Drawer isOpen={isOpen} onClose={onClose} placement={document.documentElement.dir === "rtl" ? "right" : "left"} finalFocusRef={btnRef}>
         <DrawerOverlay />
-        <DrawerContent w="285px" maxW="285px" bg={sidebarBackgroundColor}>
-          <DrawerCloseButton zIndex="3" onClose={onClose} _focus={{ boxShadow: "none" }} _hover={{ boxShadow: "none" }} />
-          <DrawerBody maxW="285px" px="0rem" pb="0">
-            <Scrollbars autoHide renderTrackVertical={renderTrack} renderThumbVertical={renderThumb} renderView={renderView}>
-              <Content routes={filteredRoutes} />
+
+        <DrawerContent w="285px" maxW="285px" bg={sidebarBackgroundColor} display="flex" flexDirection="column" minH="100vh">
+          <DrawerCloseButton zIndex="3" _focus={{ boxShadow: "none" }} _hover={{ boxShadow: "none" }} />
+          <DrawerBody px="0rem" pb="0" bg={sidebarBackgroundColor} display="flex" flexDirection="column" flex="1">
+            <Scrollbars
+              autoHide
+              renderTrackVertical={renderTrack}
+              renderThumbVertical={renderThumb}
+              renderView={renderView}
+              style={{ flex: 1 }}
+            >
+              <SidebarContent routes={filteredRoutes} />
             </Scrollbars>
           </DrawerBody>
         </DrawerContent>

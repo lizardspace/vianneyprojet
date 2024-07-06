@@ -1,6 +1,5 @@
-import { Box } from "@chakra-ui/react";
-
 import React from "react";
+import { Box } from "@chakra-ui/react";
 
 export const renderTrack = ({ style, ...props }) => {
   const trackStyle = {
@@ -17,6 +16,7 @@ export const renderTrack = ({ style, ...props }) => {
   };
   return <div style={{ ...style, ...trackStyle }} {...props} />;
 };
+
 export const renderThumb = ({ style, ...props }) => {
   const thumbStyle = {
     borderRadius: 15,
@@ -24,6 +24,7 @@ export const renderThumb = ({ style, ...props }) => {
   };
   return <div style={{ ...style, ...thumbStyle }} {...props} />;
 };
+
 export const renderView = ({ style, ...props }) => {
   const viewStyle = {
     marginBottom: -22,
@@ -31,7 +32,7 @@ export const renderView = ({ style, ...props }) => {
   return (
     <Box
       me={{ base: "0px !important", lg: "-16px !important" }}
-      style={{ ...style, ...viewStyle }}
+      style={{ ...style, ...viewStyle, backgroundColor: "#465f8b" }}
       {...props}
     />
   );
