@@ -24,6 +24,7 @@ import { PhoneIcon, CheckIcon } from '@chakra-ui/icons';
 import { supabase } from './../../../../supabaseClient'; // Adjust the import according to your project structure
 import { useTeam } from './../../InterfaceEquipe/TeamContext'; // Import the useTeam hook
 import { useEvent } from './../../../../EventContext'; // Import the useEvent hook
+import RecordRTC from 'recordrtc';
 
 const DEFAULT_TEAM_ID = '00000000-0000-0000-0000-000000000000'; // Default team_id for "Aucune équipe"
 const DEFAULT_TEAM_NAME = 'Aucune équipe'; // Default team_name
@@ -35,8 +36,7 @@ const AccidentDetected = () => {
   const [longitude, setLongitude] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const videoRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-  const [recordedChunks, setRecordedChunks] = useState([]);
+  const recorderRef = useRef(null);
   const [alertId, setAlertId] = useState(null); // Store the ID of the inserted alert
   const [videoUrl, setVideoUrl] = useState(''); // Store the video URL
   const { teamUUID, selectedTeam } = useTeam(); // Use the useTeam hook to get teamUUID and selectedTeam
@@ -72,9 +72,8 @@ const AccidentDetected = () => {
       .then(stream => {
         console.log('Media stream obtained:', stream); // Debug log
         videoRef.current.srcObject = stream;
-        mediaRecorderRef.current = new MediaRecorder(stream);
-        mediaRecorderRef.current.ondataavailable = handleDataAvailable;
-        mediaRecorderRef.current.start();
+        recorderRef.current = new RecordRTC(stream, { type: 'video', mimeType: 'video/mp4' });
+        recorderRef.current.startRecording();
         // Stop recording after 10 seconds (10,000 milliseconds)
         setTimeout(stopRecording, 10000);
       })
@@ -122,7 +121,7 @@ const AccidentDetected = () => {
   };
 
   const uploadVideoToSupabase = async (blob) => {
-    const fileName = `sos_recording_${new Date().toISOString()}.webm`;
+    const fileName = `sos_recording_${new Date().toISOString()}.mp4`;
     console.log('Uploading video:', fileName); // Debug log
     const { data, error } = await supabase
       .storage
@@ -156,10 +155,14 @@ const AccidentDetected = () => {
           startRecording();
           // Wait for 10 seconds before uploading video and updating alert data
           setTimeout(async () => {
-            const blob = new Blob(recordedChunks, { type: 'video/webm' });
-            const videoUrl = await uploadVideoToSupabase(blob);
-            if (videoUrl && alertId) {
-              await updateAlertData(alertId, videoUrl);
+            if (recorderRef.current) {
+              recorderRef.current.stopRecording(async () => {
+                const blob = recorderRef.current.getBlob();
+                const videoUrl = await uploadVideoToSupabase(blob);
+                if (videoUrl && alertId) {
+                  await updateAlertData(alertId, videoUrl);
+                }
+              });
             }
           }, 10000);
         } catch (error) {
@@ -168,7 +171,7 @@ const AccidentDetected = () => {
       })();
     }
     return () => clearInterval(timer);
-  }, [counter, step, getCurrentLocation, startRecording, saveAlertData, recordedChunks, alertId]);
+  }, [counter, step, getCurrentLocation, startRecording, saveAlertData, alertId]);
 
   useEffect(() => {
     // Update the alert data with the video URL once the URL is available
@@ -190,10 +193,14 @@ const AccidentDetected = () => {
       startRecording();
       // Wait for 10 seconds before uploading video and updating alert data
       setTimeout(async () => {
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        const videoUrl = await uploadVideoToSupabase(blob);
-        if (videoUrl && alertId) {
-          await updateAlertData(alertId, videoUrl);
+        if (recorderRef.current) {
+          recorderRef.current.stopRecording(async () => {
+            const blob = recorderRef.current.getBlob();
+            const videoUrl = await uploadVideoToSupabase(blob);
+            if (videoUrl && alertId) {
+              await updateAlertData(alertId, videoUrl);
+            }
+          });
         }
       }, 10000);
     } catch (error) {
@@ -208,33 +215,28 @@ const AccidentDetected = () => {
     onClose();
   };
 
-  const handleDataAvailable = (event) => {
-    if (event.data.size > 0) {
-      console.log('Data available from media recorder:', event.data); // Debug log
-      setRecordedChunks(prev => prev.concat(event.data));
-    }
-  };
-
   const stopRecording = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-      console.log('Recording stopped'); // Debug log
+    if (recorderRef.current) {
+      recorderRef.current.stopRecording(() => {
+        const tracks = videoRef.current.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+        console.log('Recording stopped'); // Debug log
+      });
     }
   };
 
   const downloadRecording = () => {
-    const blob = new Blob(recordedChunks, {
-      type: 'video/webm',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    document.body.appendChild(a);
-    a.style = 'display: none';
-    a.href = url;
-    a.download = 'sos_recording.webm';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    if (recorderRef.current) {
+      const blob = recorderRef.current.getBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      document.body.appendChild(a);
+      a.style = 'display: none';
+      a.href = url;
+      a.download = 'sos_recording.mp4';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
   };
 
   return (
