@@ -32,14 +32,14 @@ const routes = [
     name: "Ecran principal",
     layout: "/admin",
     path: "/default",
-    icon: <Icon as={FcSurvey} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={FcSurvey} width="20px" height="20px" color="inherit" />,
     component: MainDashboard,
   },
   {
     name: "Gestion opérationnelle",
     layout: "/admin",
     path: "/map",
-    icon: <Icon as={FcMindMap} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={FcMindMap} width="20px" height="20px" color="inherit" />,
     component: NFTMarketplace,
     secondary: true,
   },
@@ -47,7 +47,7 @@ const routes = [
     name: "Emploi du temps",
     layout: "/admin",
     path: "/data-tables",
-    icon: <Icon as={FcSerialTasks} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={FcSerialTasks} width="20px" height="20px" color="inherit" />,
     component: TableauDeBord,
   },
   {
@@ -75,63 +75,63 @@ const routes = [
     name: "Paramètres",
     layout: "/admin",
     path: "/parameters",
-    icon: <Icon as={FcSettings} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={FcSettings} width="20px" height="20px" color="inherit" />,
     component: Parameters,
   },
   {
     name: "Interface Equipe",
     layout: "/admin",
     path: "/interface-equipe",
-    icon: <Icon as={FcSelfie} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={FcSelfie} width="20px" height="20px" color="inherit" />,
     component: InterfaceEquipe,
   },
   {
     name: "Tableau Excel",
     layout: "/admin",
     path: "/tableau-excel",
-    icon: <Icon as={FcGrid} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={FcGrid} width="20px" height="20px" color="inherit" />,
     component: TableauExcel,
   },
   {
     name: "Alerte à une équipe",
     layout: "/admin",
     path: "/alerte-equipe",
-    icon: <Icon as={FcHighPriority} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={FcHighPriority} width="20px" height="20px" color="inherit" />,
     component: AlerteEquipe,
   },
   {
     name: "Matériel",
     layout: "/admin",
     path: "/material",
-    icon: <Icon as={MdQrCodeScanner} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={MdQrCodeScanner} width="20px" height="20px" color="inherit" />,
     component: MaterialComponent,
   },
   {
     name: "Note de frais",
     layout: "/admin",
     path: "/note-de-frais",
-    icon: <Icon as={FcDiploma2} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={FcDiploma2} width="20px" height="20px" color="inherit" />,
     component: NoteDeFraisComponent,
   },
   {
     name: "Secours",
     layout: "/admin",
     path: "/alertejesuisendanger",
-    icon: <Icon as={LuCross} width='20px' height='20px' color='red' />, // Set the icon color to red
+    icon: <Icon as={LuCross} width="20px" height="20px" color="red" />, // Set the icon color to red
     component: AlerteJeSuisEnDanger,
   },
   {
     name: "SOS Route",
     layout: "/admin",
     path: "/sosroute",
-    icon: <Icon as={MdOutlineSos} width='20px' height='20px' color='red' />, // Set the icon color to red
+    icon: <Icon as={MdOutlineSos} width="20px" height="20px" color="red" />, // Set the icon color to red
     component: SOSComponent, // Assuming you have a new component for this route
   },
   {
     name: "Chat",
     layout: "/admin",
     path: "/chat",
-    icon: <Icon as={FcSerialTasks} width='20px' height='20px' color='inherit' />, // You can choose another icon if you prefer
+    icon: <Icon as={FcSerialTasks} width="20px" height="20px" color="inherit" />, // You can choose another icon if you prefer
     component: ChatComponent,
   },
 ];

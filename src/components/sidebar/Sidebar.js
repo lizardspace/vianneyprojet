@@ -14,8 +14,8 @@ function Sidebar(props) {
   let sidebarBg = useColorModeValue("white", "navy.800");
   let sidebarMargins = "0px";
 
-// Filter out the hidden routes
-const filteredRoutes = routes.filter(route => route.name !== "Carte zoomée" && route.name !== "Matériel");
+  // Filter out the hidden routes
+  const filteredRoutes = routes.filter(route => route.name !== "Carte zoomée" && route.name !== "Matériel");
 
   return (
     <Box display={{ sm: "none", xl: "block" }} w="100%" position="fixed" minH="100%">
@@ -36,6 +36,9 @@ export function SidebarResponsive(props) {
 
   const { routes } = props;
 
+  // Filter out the hidden routes
+  const filteredRoutes = routes.filter(route => route.name !== "Carte zoomée" && route.name !== "Matériel");
+
   return (
     <Flex display={{ sm: "flex", xl: "none" }} alignItems="center">
       <Flex ref={btnRef} w="max-content" h="max-content" onClick={onOpen}>
@@ -47,7 +50,7 @@ export function SidebarResponsive(props) {
           <DrawerCloseButton zIndex="3" onClose={onClose} _focus={{ boxShadow: "none" }} _hover={{ boxShadow: "none" }} />
           <DrawerBody maxW="285px" px="0rem" pb="0">
             <Scrollbars autoHide renderTrackVertical={renderTrack} renderThumbVertical={renderThumb} renderView={renderView}>
-              <Content routes={routes} />
+              <Content routes={filteredRoutes} />
             </Scrollbars>
           </DrawerBody>
         </DrawerContent>
