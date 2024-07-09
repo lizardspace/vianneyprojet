@@ -71,7 +71,7 @@ const DropdownMenu = () => {
     fetchAlerts(); // Initial fetch
 
     // Check for unresolved alerts every 10 seconds
-    const intervalId = setInterval(fetchAlerts, 10000); // 10 seconds in milliseconds
+    const intervalId = setInterval(fetchAlerts, 60000); // 60 seconds in milliseconds
 
     // Clear the interval when the component unmounts
     return () => clearInterval(intervalId);
