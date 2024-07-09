@@ -19,6 +19,7 @@ import {
 import { createClient } from '@supabase/supabase-js';
 import { FcExpand, FcCollapse, FcAdvance } from 'react-icons/fc';
 import { useEvent } from './../../../EventContext';
+import AlertModal from 'components/AlertModal';
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
@@ -30,6 +31,7 @@ const DropdownMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isEventSelected, setIsEventSelected] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(true);
+  const [unresolvedAlert, setUnresolvedAlert] = useState(null);
 
   const { setEventId, selectedEventId } = useEvent();
 
@@ -46,7 +48,23 @@ const DropdownMenu = () => {
       }
     };
 
+    const fetchAlerts = async () => {
+      try {
+        const { data, error } = await supabase.from('vianney_sos_alerts').select('*').eq('resolved', false);
+        if (error) {
+          throw error;
+        }
+        if (data.length > 0) {
+          setUnresolvedAlert(data[0]); // Show the first unresolved alert
+          setIsModalOpen(true);
+        }
+      } catch (error) {
+        console.error('Error fetching alerts:', error.message);
+      }
+    };
+
     fetchData();
+    fetchAlerts();
   }, []);
 
   const handleSelect = (event) => {
@@ -60,8 +78,22 @@ const DropdownMenu = () => {
     setIsOpen(!isOpen);
   };
 
+  const resolveAlert = async (id) => {
+    const { error } = await supabase
+      .from('vianney_sos_alerts')
+      .update({ resolved: true })
+      .eq('id', id);
+
+    if (!error) {
+      setUnresolvedAlert(null);
+      setIsModalOpen(false);
+    } else {
+      console.error('Error resolving alert:', error);
+    }
+  };
+
   useEffect(() => {
-    // Check if an event is selected every 10 seconds
+    // Check if an event is selected every 30 seconds
     const intervalId = setInterval(() => {
       if (!isEventSelected) {
         // Reload the page if no event is selected
@@ -118,6 +150,13 @@ const DropdownMenu = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <AlertModal
+        isOpen={!!unresolvedAlert}
+        onClose={() => setUnresolvedAlert(null)}
+        alert={unresolvedAlert}
+        onResolve={resolveAlert}
+      />
     </Box>
   );
 };

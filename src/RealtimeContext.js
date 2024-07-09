@@ -1,17 +1,26 @@
 // src/RealtimeContext.js
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState, useContext } from 'react';
 import supabase from './supabaseClient';
+import AlertModal from './components/AlertModal';
+import { useDisclosure } from '@chakra-ui/react';
 
 export const RealtimeContext = createContext();
 
 export const RealtimeProvider = ({ children }) => {
   const [data, setData] = useState([]);
+  const [unresolvedAlert, setUnresolvedAlert] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     // Function to handle real-time updates
     const handleRealTimeUpdate = (event, payload) => {
       console.log(`Change in ${event.table}:`, payload);
-      setData((prevData) => [...prevData, payload.new]);
+      const newData = payload.new;
+      setData((prevData) => [...prevData, newData]);
+      if (event.table === 'vianney_sos_alerts' && !newData.resolved) {
+        setUnresolvedAlert(newData);
+        onOpen();
+      }
     };
 
     // Subscriptions array to keep track of all subscriptions
@@ -68,11 +77,35 @@ export const RealtimeProvider = ({ children }) => {
     return () => {
       subscriptions.forEach((subscription) => supabase.removeChannel(subscription));
     };
-  }, []);
+  }, [onOpen]); // Include onOpen in the dependency array
+
+  const resolveAlert = async (id) => {
+    const { error } = await supabase
+      .from('vianney_sos_alerts')
+      .update({ resolved: true })
+      .eq('id', id);
+
+    if (!error) {
+      setUnresolvedAlert(null);
+      onClose();
+    } else {
+      console.error('Error resolving alert:', error);
+    }
+  };
+
+  const unresolvedAlerts = data.filter(alert => alert.table === 'vianney_sos_alerts' && !alert.resolved);
 
   return (
-    <RealtimeContext.Provider value={data}>
+    <RealtimeContext.Provider value={{ data, unresolvedAlerts, resolveAlert }}>
       {children}
+      <AlertModal
+        isOpen={isOpen}
+        onClose={onClose}
+        alert={unresolvedAlert}
+        onResolve={resolveAlert}
+      />
     </RealtimeContext.Provider>
   );
 };
+
+export const useRealtimeContext = () => useContext(RealtimeContext);
