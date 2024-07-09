@@ -30,8 +30,9 @@ const DropdownMenu = () => {
   const [eventList, setEventList] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isEventSelected, setIsEventSelected] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(true);
   const [unresolvedAlert, setUnresolvedAlert] = useState(null);
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
   const { setEventId, selectedEventId } = useEvent();
 
@@ -48,6 +49,10 @@ const DropdownMenu = () => {
       }
     };
 
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     const fetchAlerts = async () => {
       try {
         const { data, error } = await supabase.from('vianney_sos_alerts').select('*').eq('resolved', false);
@@ -56,22 +61,27 @@ const DropdownMenu = () => {
         }
         if (data.length > 0) {
           setUnresolvedAlert(data[0]); // Show the first unresolved alert
-          setIsModalOpen(true);
+          setIsAlertModalOpen(true);
         }
       } catch (error) {
         console.error('Error fetching alerts:', error.message);
       }
     };
 
-    fetchData();
-    fetchAlerts();
+    fetchAlerts(); // Initial fetch
+
+    // Check for unresolved alerts every 10 seconds
+    const intervalId = setInterval(fetchAlerts, 10000); // 10 seconds in milliseconds
+
+    // Clear the interval when the component unmounts
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleSelect = (event) => {
     setSelectedItem(event.event_name);
     setEventId(event.event_id);
     setIsEventSelected(true);
-    setIsModalOpen(false);
+    setIsEventModalOpen(false);
   };
 
   const toggleMenu = () => {
@@ -86,7 +96,7 @@ const DropdownMenu = () => {
 
     if (!error) {
       setUnresolvedAlert(null);
-      setIsModalOpen(false);
+      setIsAlertModalOpen(false);
     } else {
       console.error('Error resolving alert:', error);
     }
@@ -130,21 +140,21 @@ const DropdownMenu = () => {
       {!isEventSelected && (
         <Alert status="warning" mt={2}>
           <AlertIcon />
-          Merci de sélectionner un évênement.
+          Merci de sélectionner un événement.
         </Alert>
       )}
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal isOpen={isEventModalOpen && !isEventSelected} onClose={() => setIsEventModalOpen(false)}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Sélectionnez un évênement</ModalHeader>
+          <ModalHeader>Sélectionnez un événement</ModalHeader>
           <ModalBody>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               Veuillez sélectionner un événement pour continuer.&nbsp;   <FcAdvance />
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" onClick={() => setIsModalOpen(false)}>
+            <Button colorScheme="blue" onClick={() => setIsEventModalOpen(false)}>
               Fermer
             </Button>
           </ModalFooter>
@@ -152,8 +162,8 @@ const DropdownMenu = () => {
       </Modal>
 
       <AlertModal
-        isOpen={!!unresolvedAlert}
-        onClose={() => setUnresolvedAlert(null)}
+        isOpen={isAlertModalOpen}
+        onClose={() => setIsAlertModalOpen(false)}
         alert={unresolvedAlert}
         onResolve={resolveAlert}
       />
