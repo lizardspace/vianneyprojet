@@ -160,7 +160,7 @@ const AlertModal = ({ isOpen, onClose, alert, onResolve, teams }) => {
         </ModalBody>
         <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={sendNotification}>
-            Envoyer la notification
+            Envoyer la notification aux équipes séléctionnées
           </Button>
           <Button colorScheme="blue" mr={3} onClick={() => onResolve(alert.id)}>
             Marquer comme résolue
