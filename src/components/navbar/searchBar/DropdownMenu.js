@@ -15,6 +15,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  useToast,
 } from '@chakra-ui/react';
 import { createClient } from '@supabase/supabase-js';
 import { FcExpand, FcCollapse, FcAdvance } from 'react-icons/fc';
@@ -36,6 +37,7 @@ const DropdownMenu = () => {
   const [teams, setTeams] = useState([]);
 
   const { setEventId, selectedEventId } = useEvent();
+  const toast = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -120,6 +122,13 @@ const DropdownMenu = () => {
     if (!error) {
       setUnresolvedAlert(null);
       setIsAlertModalOpen(false);
+      toast({
+        title: "Alerte résolue.",
+        description: "L'alerte a été marquée comme résolue avec succès.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
     } else {
       console.error('Error resolving alert:', error);
     }

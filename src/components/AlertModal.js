@@ -14,6 +14,7 @@ import {
   HStack,
   Checkbox,
   VStack,
+  useToast,
 } from '@chakra-ui/react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -30,6 +31,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const AlertModal = ({ isOpen, onClose, alert, onResolve, teams }) => {
   const [selectedTeams, setSelectedTeams] = useState([]);
+  const toast = useToast();
 
   if (!alert) return null;
 
@@ -72,6 +74,14 @@ const AlertModal = ({ isOpen, onClose, alert, onResolve, teams }) => {
       if (error) {
         throw error;
       }
+
+      toast({
+        title: "Notification envoyée.",
+        description: "La notification a été envoyée avec succès aux équipes sélectionnées.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
 
       // Optionally, you could add some feedback to the user here
     } catch (error) {
