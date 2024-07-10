@@ -56,7 +56,10 @@ const DropdownMenu = () => {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const { data, error } = await supabase.from('vianney_sos_alerts').select('*').eq('resolved', false);
+        const { data, error } = await supabase
+          .from('vianney_sos_alerts')
+          .select('*')
+          .or('resolved.is.false,resolved.is.null');
         if (error) {
           throw error;
         }
