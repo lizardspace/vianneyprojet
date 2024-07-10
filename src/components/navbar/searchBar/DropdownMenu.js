@@ -33,6 +33,7 @@ const DropdownMenu = () => {
   const [isEventModalOpen, setIsEventModalOpen] = useState(true);
   const [unresolvedAlert, setUnresolvedAlert] = useState(null);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+  const [teams, setTeams] = useState([]);
 
   const { setEventId, selectedEventId } = useEvent();
 
@@ -70,19 +71,38 @@ const DropdownMenu = () => {
 
     fetchAlerts(); // Initial fetch
 
-    // Check for unresolved alerts every 10 seconds
+    // Check for unresolved alerts every 60 seconds
     const intervalId = setInterval(fetchAlerts, 60000); // 60 seconds in milliseconds
 
     // Clear the interval when the component unmounts
     return () => clearInterval(intervalId);
   }, []);
 
-  const handleSelect = (event) => {
+  const handleSelect = async (event) => {
     setSelectedItem(event.event_name);
     setEventId(event.event_id);
     setIsEventSelected(true);
     setIsEventModalOpen(false);
-  };
+  
+    try {
+      const { data, error } = await supabase.from('vianney_teams').select('*').eq('event_id', event.event_id);
+      if (error) {
+        throw error;
+      }
+      setTeams(data);
+  
+      // Update the unresolved alert with the list of team IDs
+      if (unresolvedAlert) {
+        const teamIds = data.map(team => team.id);
+        await supabase
+          .from('vianney_sos_alerts')
+          .update({ teams_to_which_send_a_notification: teamIds })
+          .eq('id', unresolvedAlert.id);
+      }
+    } catch (error) {
+      console.error('Error fetching teams:', error.message);
+    }
+  };  
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -166,6 +186,7 @@ const DropdownMenu = () => {
         onClose={() => setIsAlertModalOpen(false)}
         alert={unresolvedAlert}
         onResolve={resolveAlert}
+        teams={teams} // Pass teams to AlertModal
       />
     </Box>
   );

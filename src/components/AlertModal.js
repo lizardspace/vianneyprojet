@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -12,6 +12,8 @@ import {
   Box,
   Badge,
   HStack,
+  Checkbox,
+  VStack,
 } from '@chakra-ui/react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -20,8 +22,15 @@ import { RiMapPinUserFill } from "react-icons/ri";
 import { MdOutlineAccessTime, MdSos } from 'react-icons/md';
 import { FaUserShield } from 'react-icons/fa';
 import ReactDOMServer from 'react-dom/server';
+import { createClient } from '@supabase/supabase-js';
 
-const AlertModal = ({ isOpen, onClose, alert, onResolve }) => {
+const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2anplbXZmc3R3d2hoYWhlY3d1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MTQ4Mjc3MCwiZXhwIjoyMDA3MDU4NzcwfQ.6jThCX2eaUjl2qt4WE3ykPbrh6skE8drYcmk-UCNDSw';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+const AlertModal = ({ isOpen, onClose, alert, onResolve, teams }) => {
+  const [selectedTeams, setSelectedTeams] = useState([]);
+
   if (!alert) return null;
 
   const createCustomIcon = () => {
@@ -43,6 +52,31 @@ const AlertModal = ({ isOpen, onClose, alert, onResolve }) => {
       minute: '2-digit',
       second: '2-digit',
     });
+  };
+
+  const handleTeamSelect = (teamId) => {
+    setSelectedTeams(prevSelected =>
+      prevSelected.includes(teamId)
+        ? prevSelected.filter(id => id !== teamId)
+        : [...prevSelected, teamId]
+    );
+  };
+
+  const sendNotification = async () => {
+    try {
+      const { error } = await supabase
+        .from('vianney_sos_alerts')
+        .update({ teams_to_which_send_a_notification: selectedTeams })
+        .eq('id', alert.id);
+
+      if (error) {
+        throw error;
+      }
+
+      // Optionally, you could add some feedback to the user here
+    } catch (error) {
+      console.error('Error sending notification:', error.message);
+    }
   };
 
   return (
@@ -97,8 +131,27 @@ const AlertModal = ({ isOpen, onClose, alert, onResolve }) => {
               </MapContainer>
             </Box>
           )}
+          {teams.length > 0 && (
+            <Box mt={4}>
+              <Text fontSize="lg" mb={2}>Équipes de l'événement:</Text>
+              <VStack align="start">
+                {teams.map(team => (
+                  <Checkbox
+                    key={team.id}
+                    isChecked={selectedTeams.includes(team.id)}
+                    onChange={() => handleTeamSelect(team.id)}
+                  >
+                    {team.name_of_the_team} - {team.specialite}
+                  </Checkbox>
+                ))}
+              </VStack>
+            </Box>
+          )}
         </ModalBody>
         <ModalFooter>
+          <Button colorScheme="blue" mr={3} onClick={sendNotification}>
+            Envoyer la notification
+          </Button>
           <Button colorScheme="blue" mr={3} onClick={() => onResolve(alert.id)}>
             Marquer comme résolue
           </Button>
