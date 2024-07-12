@@ -103,7 +103,7 @@ const AlertModal = ({ isOpen, onClose, alert, onResolve, teams }) => {
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <HStack spacing={4}>
+          <HStack spacing={4} mt={4}>
             <FaUserShield />
             <Badge colorScheme="blue">{alert.team_name}</Badge>
           </HStack>
@@ -159,13 +159,32 @@ const AlertModal = ({ isOpen, onClose, alert, onResolve, teams }) => {
           )}
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={sendNotification}>
-            Envoyer la notification aux équipes séléctionnées
+          <Button 
+            colorScheme="blue" 
+            mr={3} 
+            onClick={sendNotification} 
+            whiteSpace="normal" 
+            maxWidth="300px"
+          >
+            Envoyer la notification aux équipes sélectionnées
           </Button>
-          <Button colorScheme="blue" mr={3} onClick={() => onResolve(alert.id)}>
+          <Button 
+            colorScheme="green" 
+            mr={3} 
+            onClick={() => onResolve(alert.id)} 
+            whiteSpace="normal" 
+            maxWidth="200px"
+          >
             Marquer comme résolue
           </Button>
-          <Button variant="ghost" onClick={onClose}>Fermer</Button>
+          <Button 
+            variant="ghost" 
+            onClick={onClose} 
+            whiteSpace="normal" 
+            maxWidth="100px"
+          >
+            Fermer
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
