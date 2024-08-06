@@ -11,15 +11,20 @@ import PlageDuSillonThermesMarinsLive from './PlageDuSillonThermesMarinsLive';
 import SaintMaloLesMursLive from './SaintMaloLesMursLive';
 import TunnelDeFourviereLive from './TunnelDeFourviereLive';
 import TunnelDeFourviereBisLive from './TunnelDeFourviereBisLive';
+import { useEvent } from './../../../../../EventContext'; // Import du contexte de l'événement
 
 const LiveStreamsPage = () => {
   const [videos, setVideos] = useState([]);
+  const { selectedEventId } = useEvent(); // Récupère l'ID de l'événement à partir du contexte
 
   useEffect(() => {
     const fetchVideos = async () => {
+      if (!selectedEventId) return; // Ne rien faire si aucun événement n'est sélectionné
+
       const { data, error } = await supabase
         .from('vianney_videos_streaming_live')
-        .select('*');
+        .select('*')
+        .eq('event_id', selectedEventId); // Filtre par event_id
 
       if (error) {
         console.error('Error fetching videos:', error.message);
@@ -29,7 +34,7 @@ const LiveStreamsPage = () => {
     };
 
     fetchVideos();
-  }, []);
+  }, [selectedEventId]); // Récupère les vidéos lorsque l'event_id change
 
   const addVideo = (video) => {
     setVideos([...videos, video]);
@@ -58,8 +63,8 @@ const LiveStreamsPage = () => {
         <IenaVueTourEiffelLive />
         <PlageDuSillonThermesMarinsLive />
         <SaintMaloLesMursLive />
-        <TunnelDeFourviereLive/>
-        <TunnelDeFourviereBisLive/>
+        <TunnelDeFourviereLive />
+        <TunnelDeFourviereBisLive />
         <VideoList videos={videos} />
       </Grid>
     </Box>
