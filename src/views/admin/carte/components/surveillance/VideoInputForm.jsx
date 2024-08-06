@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Box, Button, FormControl, FormLabel, Input, Heading, useToast } from '@chakra-ui/react';
 import { supabase } from './../../../../../supabaseClient'; // Assurez-vous que le chemin est correct
+import { useEvent } from './../../../../../EventContext'; // Assurez-vous que le chemin est correct
 
 const VideoInputForm = () => {
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
+  const { selectedEventId } = useEvent(); // Récupère l'ID de l'événement à partir du contexte
   const toast = useToast();
 
   const handleSubmit = async (e) => {
@@ -13,7 +15,7 @@ const VideoInputForm = () => {
     const { data, error } = await supabase
       .from('vianney_videos_streaming_live')
       .insert([
-        { title: title, url: url },
+        { title: title, url: url, event_id: selectedEventId }, // Inclure l'event_id
       ]);
 
     if (error) {
@@ -72,7 +74,7 @@ const VideoInputForm = () => {
             placeholder="Entrez l'URL de la vidéo"
           />
         </FormControl>
-        <Button colorScheme="blue" type="submit" width="full" mt={4}>
+        <Button colorScheme="blue" type="submit" width="full" mt={4} disabled={!selectedEventId}>
           Ajouter la vidéo
         </Button>
       </form>
