@@ -1,53 +1,53 @@
-import { useState } from 'react';
-import { Box, Input, Button, FormControl, FormLabel } from '@chakra-ui/react';
-import { supabase } from './../../../../../supabaseClient';
+import React, { useState } from 'react';
+import { supabase } from './../../../../../supabaseClient'; // Assurez-vous que le chemin est correct
 
-const VideoInputForm = ({ onAddVideo }) => {
+const VideoInputForm = () => {
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (title && url) {
-      const { data, error } = await supabase
-        .from('vianney_videos_streaming_live.videos')
-        .insert([{ title, url }]);
 
-      if (error) {
-        console.error('Error adding video:', error.message);
-      } else {
-        // Notifie le parent pour mettre à jour la liste des vidéos
-        onAddVideo(data[0]); // Ajoute la nouvelle vidéo à l'état
-        setTitle('');
-        setUrl('');
-      }
+    const { data, error } = await supabase
+      .from('vianney_videos_streaming_live')
+      .insert([
+        { title: title, url: url },
+      ]);
+
+    if (error) {
+      console.error('Erreur lors de l\'insertion:', error);
+      alert('Erreur lors de l\'ajout de la vidéo');
+    } else {
+      alert('Vidéo ajoutée avec succès !');
+      setTitle('');
+      setUrl('');
     }
   };
 
   return (
-    <Box as="form" onSubmit={handleSubmit} mb={8}>
-      <FormControl id="title" mb={4}>
-        <FormLabel>Titre de la vidéo</FormLabel>
-        <Input
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="title">Titre:</label>
+        <input
           type="text"
+          id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Entrez le titre de la vidéo"
+          required
         />
-      </FormControl>
-      <FormControl id="url" mb={4}>
-        <FormLabel>URL de la vidéo</FormLabel>
-        <Input
+      </div>
+      <div>
+        <label htmlFor="url">URL:</label>
+        <input
           type="text"
+          id="url"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="Entrez l'URL de la vidéo"
+          required
         />
-      </FormControl>
-      <Button type="submit" colorScheme="blue">
-        Ajouter la vidéo
-      </Button>
-    </Box>
+      </div>
+      <button type="submit">Ajouter la vidéo</button>
+    </form>
   );
 };
 

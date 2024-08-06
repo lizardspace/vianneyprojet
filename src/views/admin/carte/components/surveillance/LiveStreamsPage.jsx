@@ -18,7 +18,7 @@ const LiveStreamsPage = () => {
   useEffect(() => {
     const fetchVideos = async () => {
       const { data, error } = await supabase
-        .from('vianney_videos_streaming_live.videos')
+        .from('vianney_videos_streaming_live')
         .select('*');
 
       if (error) {
