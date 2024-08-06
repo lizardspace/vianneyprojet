@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
+import { Box, Button, FormControl, FormLabel, Input, Heading, useToast } from '@chakra-ui/react';
 import { supabase } from './../../../../../supabaseClient'; // Assurez-vous que le chemin est correct
 
 const VideoInputForm = () => {
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
+  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  // eslint-disable-next-line no-unused-vars
     const { data, error } = await supabase
       .from('vianney_videos_streaming_live')
       .insert([
@@ -16,38 +18,65 @@ const VideoInputForm = () => {
 
     if (error) {
       console.error('Erreur lors de l\'insertion:', error);
-      alert('Erreur lors de l\'ajout de la vidéo');
+      toast({
+        title: 'Erreur',
+        description: "Erreur lors de l'ajout de la vidéo",
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     } else {
-      alert('Vidéo ajoutée avec succès !');
+      toast({
+        title: 'Succès',
+        description: "Vidéo ajoutée avec succès !",
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
       setTitle('');
       setUrl('');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="title">Titre:</label>
-        <input
-          type="text"
-          id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="url">URL:</label>
-        <input
-          type="text"
-          id="url"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          required
-        />
-      </div>
-      <button type="submit">Ajouter la vidéo</button>
-    </form>
+    <Box
+      maxWidth="500px"
+      mx="auto"
+      mt={10}
+      p={6}
+      borderWidth={1}
+      borderRadius="lg"
+      boxShadow="lg"
+      bg="white"
+      _dark={{ bg: 'gray.700' }}
+    >
+      <Heading as="h2" size="lg" mb={6} textAlign="center">
+        Ajouter un flux vidéo
+      </Heading>
+      <form onSubmit={handleSubmit}>
+        <FormControl id="title" mb={4} isRequired>
+          <FormLabel>Titre de la vidéo</FormLabel>
+          <Input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Entrez le titre de la vidéo"
+          />
+        </FormControl>
+        <FormControl id="url" mb={4} isRequired>
+          <FormLabel>URL de la vidéo</FormLabel>
+          <Input
+            type="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="Entrez l'URL de la vidéo"
+          />
+        </FormControl>
+        <Button colorScheme="blue" type="submit" width="full" mt={4}>
+          Ajouter la vidéo
+        </Button>
+      </form>
+    </Box>
   );
 };
 
