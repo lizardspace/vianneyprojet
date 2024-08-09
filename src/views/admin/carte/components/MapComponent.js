@@ -413,45 +413,50 @@ const MapComponent = () => {
   useEffect(() => {
     const fetchAndDisplayTeams = async () => {
       if (!selectedEventId) return;
-
+  
       const { data: teams, error } = await supabase
         .from('vianney_teams')
         .select('*')
         .eq('event_id', selectedEventId);
-
+  
       if (error) {
         console.error('Erreur lors de la récupération des équipes:', error);
         return;
       }
-
+  
       let mapInstance = mapRef.current;
       if (!mapInstance) return;
-
+  
       // Nettoyage des marqueurs des équipes existants
       mapInstance.eachLayer(layer => {
         if (layer instanceof L.Marker || (layer.options && layer.options.team)) {
           mapInstance.removeLayer(layer);
         }
       });
-
+  
       teams.forEach(team => {
         const teamIcon = createCustomIcon(); // Assurez-vous que cela génère un icône approprié pour les équipes
         const deleteIconHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-
+  
+        // Génération du lien vers Waze avec les coordonnées GPS
+        const wazeUrl = `https://www.waze.com/ul?ll=${team.latitude},${team.longitude}&navigate=yes`;
+        const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Aller vers Waze</a>`;
+  
         const popupContent = `
           <div>
             <strong>${team.name_of_the_team}</strong>
             ${team.photo_profile_url ? `<br/><img src="${team.photo_profile_url}" alt="${team.name_of_the_team}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-top: 5px;"/>` : ''}
             <div onclick="window.deleteTeam(${team.id})" style="margin-top: 10px;">${deleteIconHtml}</div>
+            ${wazeButtonHtml}
           </div>
         `;
-
+  
         const tooltipContent = `
-        <div>
-          <strong>${team.name_of_the_team}</strong>
-        </div>
-      `;
-
+          <div>
+            <strong>${team.name_of_the_team}</strong>
+          </div>
+        `;
+  
         L.marker([team.latitude, team.longitude], { icon: teamIcon, team: true })
           .addTo(mapInstance)
           .bindPopup(popupContent, {
@@ -466,9 +471,9 @@ const MapComponent = () => {
           });
       });
     };
-
+  
     fetchAndDisplayTeams();
-  }, [selectedEventId]); // Inclure les dépendances nécessaires
+  }, [selectedEventId]); // Inclure les dépendances nécessaires  
 
 
   useEffect(() => {
