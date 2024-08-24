@@ -3,7 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { renderToString } from "react-dom/server";
-import { Box, Button, useToast, CloseButton } from '@chakra-ui/react';
+import { Box, Button, useToast, CloseButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay } from '@chakra-ui/react';
 import { MdPlace, MdOutlineZoomInMap, MdOutlineZoomOutMap, MdDeleteForever } from "react-icons/md";
 import { useEvent } from './../../../../EventContext';
 import { supabase } from './../../../../supabaseClient';
@@ -17,7 +17,18 @@ const createTeamIcon = () => {
     className: 'custom-leaflet-icon',
     iconSize: L.point(30, 30),
     iconAnchor: [15, 30],
-    popupAnchor: [0, -30]
+    popupAnchor: [0, -30],
+  });
+};
+
+const createCustomIcon = () => {
+  const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: '#34A853' }} />); // Vert Google
+  return L.divIcon({
+    html: placeIconHtml,
+    className: 'custom-leaflet-icon',
+    iconSize: L.point(30, 30),
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30],
   });
 };
 
@@ -28,6 +39,10 @@ const MapComponent = () => {
   const history = useHistory();
   const location = useLocation();
   const toast = useToast();
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [elementToDelete, setElementToDelete] = useState(null);
+  const cancelRef = useRef();
 
   const buttonText = location.pathname === "/admin/zoomed-map" ?
     <MdOutlineZoomInMap /> :
@@ -45,6 +60,53 @@ const MapComponent = () => {
   const closeModal = () => {
     if (location.pathname === "/admin/zoomed-map") {
       history.push("/admin/map");
+    }
+  };
+
+  const openDeleteDialog = (layer, type, id) => {
+    setElementToDelete({ layer, type, id });
+    setIsDialogOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setIsDialogOpen(false);
+    setElementToDelete(null);
+  };
+
+  const confirmDelete = async () => {
+    const { layer, type, id } = elementToDelete;
+    try {
+      let tableName = '';
+      if (type === 'marker') tableName = 'vianney_drawn_markers';
+      if (type === 'polyline') tableName = 'vianney_drawn_polylines';
+      if (type === 'polygon') tableName = 'vianney_drawn_polygons';
+
+      const { error } = await supabase
+        .from(tableName)
+        .delete()
+        .match({ id, event_id: selectedEventId });
+
+      if (error) throw error;
+
+      mapRef.current.removeLayer(layer);
+      toast({
+        title: 'Élément supprimé',
+        description: 'L\'élément a été supprimé avec succès.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'élément:', error.message);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de supprimer l\'élément. Veuillez réessayer.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      closeDeleteDialog();
     }
   };
 
@@ -114,14 +176,19 @@ const MapComponent = () => {
         };
 
         try {
+          let insertedItem;
           if (type === 'marker') {
             payload = {
               ...payload,
               latitude: layer.getLatLng().lat,
               longitude: layer.getLatLng().lng,
             };
-            const { error } = await supabase.from('vianney_drawn_markers').insert(payload);
+            const { data, error } = await supabase.from('vianney_drawn_markers').insert(payload).select().single();
             if (error) throw error;
+            insertedItem = data;
+
+            // Appliquez une icône uniquement aux marqueurs
+            layer.setIcon(createCustomIcon());
           } else if (type === 'polyline') {
             const points = layer.getLatLngs().map(latlng => ({
               latitude: latlng.lat,
@@ -131,8 +198,9 @@ const MapComponent = () => {
               ...payload,
               points,
             };
-            const { error } = await supabase.from('vianney_drawn_polylines').insert(payload);
+            const { data, error } = await supabase.from('vianney_drawn_polylines').insert(payload).select().single();
             if (error) throw error;
+            insertedItem = data;
           } else if (type === 'polygon') {
             const points = layer.getLatLngs()[0].map(latlng => ({
               latitude: latlng.lat,
@@ -142,9 +210,13 @@ const MapComponent = () => {
               ...payload,
               points,
             };
-            const { error } = await supabase.from('vianney_drawn_polygons').insert(payload);
+            const { data, error } = await supabase.from('vianney_drawn_polygons').insert(payload).select().single();
             if (error) throw error;
+            insertedItem = data;
           }
+
+          // Ajoutez l'événement de suppression après ajout réussi
+          layer.on('click', () => openDeleteDialog(layer, type, insertedItem.id));
 
           mapRef.current.addLayer(layer);
           toast({
@@ -264,17 +336,23 @@ const MapComponent = () => {
       }
 
       markers.forEach(marker => {
-        L.marker([marker.latitude, marker.longitude]).addTo(mapRef.current);
+        const layer = L.marker([marker.latitude, marker.longitude], { icon: createCustomIcon() });
+        layer.on('click', () => openDeleteDialog(layer, 'marker', marker.id));
+        layer.addTo(mapRef.current);
       });
 
       polylines.forEach(polyline => {
         const points = polyline.points.map(point => [point.latitude, point.longitude]);
-        L.polyline(points, { color: 'blue' }).addTo(mapRef.current);
+        const layer = L.polyline(points, { color: 'blue' });
+        layer.on('click', () => openDeleteDialog(layer, 'polyline', polyline.id));
+        layer.addTo(mapRef.current);
       });
 
       polygons.forEach(polygon => {
         const points = polygon.points.map(point => [point.latitude, point.longitude]);
-        L.polygon(points, { color: 'red' }).addTo(mapRef.current);
+        const layer = L.polygon(points, { color: 'red' });
+        layer.on('click', () => openDeleteDialog(layer, 'polygon', polygon.id));
+        layer.addTo(mapRef.current);
       });
     };
 
@@ -307,7 +385,35 @@ const MapComponent = () => {
           zIndex="1000" // Assurez que le bouton est bien au-dessus de la carte
         />
       )}
+
       <div id="map" style={{ height: mapHeight, width: '100%', zIndex: '0' }}></div>
+
+      <AlertDialog
+        isOpen={isDialogOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={closeDeleteDialog}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Supprimer l'élément
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Voulez-vous vraiment supprimer cet élément ?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={closeDeleteDialog}>
+                Annuler
+              </Button>
+              <Button colorScheme="red" onClick={confirmDelete} ml={3}>
+                Supprimer
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   );
 };
