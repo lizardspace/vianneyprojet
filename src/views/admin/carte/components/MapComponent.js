@@ -1,447 +1,207 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { SlTarget } from "react-icons/sl";
-import { MdDeleteForever, MdOutlineZoomInMap, MdOutlineZoomOutMap } from "react-icons/md"; // Import des icônes MdOutlineZoomInMap et MdOutlineZoomOutMap
+import 'leaflet-draw/dist/leaflet.draw.css';
 import { renderToString } from "react-dom/server";
-import { Box, Button, IconButton, Tooltip, useToast } from '@chakra-ui/react';
-import { MdPlace } from "react-icons/md";
-import { FcAutomotive, FcAddRow, FcCollect } from "react-icons/fc";
-import CreateItineraryForm from './CreateItineraryForm';
-import AddPointOfInterestForm from './AddPointOfInterestForm';
+import { Box, Button, useToast } from '@chakra-ui/react';
+import { MdPlace, MdOutlineZoomInMap, MdOutlineZoomOutMap, MdDeleteForever } from "react-icons/md";
 import { useEvent } from './../../../../EventContext';
 import { supabase } from './../../../../supabaseClient';
-import AreaCreationMap from './AreaCreationMap';
 import { useHistory, useLocation } from "react-router-dom";
+import 'leaflet-draw';
 
-const createCustomIcon = () => {
+const createTeamIcon = () => {
   const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: 'red' }} />);
   return L.divIcon({
     html: placeIconHtml,
     className: 'custom-leaflet-icon',
     iconSize: L.point(30, 30),
     iconAnchor: [15, 30],
-    popupAnchor: [0, -50]
+    popupAnchor: [0, -30]
   });
 };
-
-const createPoiIcon = () => {
-  const poiIconHtml = renderToString(<SlTarget style={{ fontSize: '24px', color: 'blue' }} />);
-  return L.divIcon({
-    html: poiIconHtml,
-    className: 'custom-leaflet-icon',
-    iconSize: L.point(30, 30),
-    iconAnchor: [15, 30],
-    popupAnchor: [0, -30] // Ajustez selon le besoin
-  });
-};
-
 
 const MapComponent = () => {
-  const [showForm, setShowForm] = useState(false);
-  const [showFormBis, setShowFormBis] = useState(false);
-  const [showFormBisBis, setShowFormBisBis] = useState(false);
   const mapRef = useRef(null);
-  const [itineraries, setItineraries] = useState([]);
-  const { selectedEventId } = useEvent();
-  const [areas] = useState([]);
   const [mapHeight, setMapHeight] = useState('800px');
-  // Suppression des états inutilisés : showForm, showFormBis, showFormBisBis
-  const [activeForm, setActiveForm] = useState('');
-  // Autres états et hooks restent inchangés...
-  const history = useHistory(); // Créez une instance de useHistory
+  const { selectedEventId } = useEvent(); // Assurez-vous que selectedEventId est bien un UUID si vous utilisez UUID dans la base de données
+  const history = useHistory();
   const location = useLocation();
+  const toast = useToast();
 
   const buttonText = location.pathname === "/admin/zoomed-map" ?
-    <MdOutlineZoomInMap /> : // Utilisation de l'icône MdOutlineZoomOutMap si l'URL correspond
-    <MdOutlineZoomOutMap />; // Utilisation de l'icône MdOutlineZoomInMap sinon
-
-  // Autres parties du code inchangées...
+    <MdOutlineZoomInMap /> :
+    <MdOutlineZoomOutMap />;
+  const isButtonVisible = location.pathname !== "/admin/zoomed-map";
 
   const toggleMapView = () => {
     if (location.pathname === "/admin/zoomed-map") {
-      history.push("/admin/map"); // Si nous sommes sur la carte zoomée, retournez à la carte dézoomée
+      history.push("/admin/map");
     } else {
-      history.push("/admin/zoomed-map"); // Sinon, allez à la carte zoomée
+      history.push("/admin/zoomed-map");
     }
   };
-  // Déterminez le texte du bouton en fonction de l'URL actuelle
-  const mapiszoomed = location.pathname === "/admin/zoomed-map";
-  const isButtonVisible = !mapiszoomed;
-  const toggleFormAndSetVisibility = (formName) => {
-    // Basculer le formulaire actif
-    toggleForm(formName);
-
-    // Alternativement, ajuster la visibilité basée sur le formulaire actif
-    // Cela suppose que vous ne voulez pas gérer indépendamment les états de visibilité
-    // mais plutôt lier la visibilité au formulaire actif
-    setShowForm(formName === 'itinerary');
-    setShowFormBis(formName === 'poi');
-    setShowFormBisBis(formName === 'area');
-  };
-
-  const toggleForm = (formName) => {
-    if (activeForm === formName) {
-      setActiveForm(''); // Si le formulaire est déjà ouvert, le fermer.
-    } else {
-      setActiveForm(formName); // Sinon, ouvrir le formulaire demandé.
-    }
-  };
-  const toast = useToast();
 
   useEffect(() => {
-    // Fonction pour mettre à jour la hauteur
     const updateMapHeight = () => {
-      const newHeight = `${window.innerHeight - 60}px`; // Hauteur de l'écran moins 100 pixels
+      const newHeight = `${window.innerHeight - 60}px`;
       setMapHeight(newHeight);
     };
-
-    // Mettre à jour la hauteur au montage du composant
     updateMapHeight();
-
-    // Ajouter un écouteur d'événement pour mettre à jour la hauteur lors du redimensionnement de la fenêtre
     window.addEventListener('resize', updateMapHeight);
-
-    // Nettoyer l'écouteur d'événement lors du démontage du composant
     return () => window.removeEventListener('resize', updateMapHeight);
   }, []);
 
-
   useEffect(() => {
-    const deleteArea = async (areaId) => {
-      try {
-        const { error } = await supabase
-          .from('vianney_areas')
-          .delete()
-          .match({ id: areaId });
-
-        if (error) throw error;
-
-        // Afficher un toast de succès
-        toast({
-          title: 'Aire supprimée',
-          description: `L'aire avec l'ID ${areaId} a été supprimée avec succès.`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'bottom',
-        });
-
-      } catch (error) {
-        console.error('Erreur lors de la suppression de l\'aire:', error.message);
-
-        // Afficher un toast d'échec
-        toast({
-          title: 'Échec de la suppression',
-          description: "Impossible de supprimer l'aire. Veuillez réessayer.",
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'bottom',
-        });
-      }
-    };
-    window.deleteArea = deleteArea; // Expose la fonction pour l'utiliser dans le onClick HTML
-    return () => {
-      delete window.deleteArea; // Nettoyage pour éviter des fuites de mémoire
-    };
-  }, [toast]);
-
-  useEffect(() => {
-    const fetchItineraries = async () => {
-      try {
-        const { data: fetchedItineraries, error } = await supabase
-          .from('vianney_itineraries')
-          .select('*')
-          .eq('event_id', selectedEventId); // Assurez-vous que selectedEventId est correctement défini
-
-        if (error) {
-          throw error;
-        }
-
-        setItineraries(fetchedItineraries); // Met à jour l'état des itinéraires
-      } catch (error) {
-        console.error('Erreur lors de la récupération des itinéraires:', error.message);
-        // Vous pouvez aussi utiliser un toast pour afficher l'erreur
-      }
-    };
-    const deleteItinerary = async (itineraryId) => {
-      try {
-        const { error } = await supabase
-          .from('vianney_itineraries')
-          .delete()
-          .match({ id: itineraryId });
-
-        if (error) throw error;
-
-        toast({
-          title: 'Itinéraire supprimé',
-          description: `L'itinéraire avec l'ID ${itineraryId} a été supprimé avec succès.`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'bottom',
-        });
-
-        // Re-fetch les itinéraires pour mettre à jour l'affichage
-        fetchItineraries();
-      } catch (error) {
-        console.error('Erreur lors de la suppression de l\'itinéraire:', error.message);
-
-        toast({
-          title: 'Échec de la suppression',
-          description: "Impossible de supprimer l'itinéraire. Veuillez réessayer.",
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'bottom',
-        });
-      }
-    };
-
-    window.deleteItinerary = deleteItinerary;
-
-    return () => {
-      delete window.deleteItinerary;
-    };
-  }, [toast, selectedEventId]);
-
-  // Utilisez toggleFormAndSetVisibility à la place de toggleForm dans onClick
-  useEffect(() => {
-    const fetchAndDisplayAreas = async () => {
-      if (!selectedEventId) {
-        console.log('Aucun event_id sélectionné.');
-        return;
-      }
-
-      const { data: fetchedAreas, error } = await supabase
-        .from('vianney_areas')
-        .select('*')
-        .eq('event_id', selectedEventId);
-
-      if (error) {
-        console.error('Erreur lors de la récupération des aires:', error);
-        return;
-      }
-
-      let mapInstance = mapRef.current;
-      if (!mapInstance) {
-        console.log('Instance de carte non initialisée.');
-        return;
-      }
-
-      // Nettoyage des couches de polygones précédentes
-      mapInstance.eachLayer(layer => {
-        if (layer instanceof L.Polygon) {
-          mapInstance.removeLayer(layer);
-        }
+    console.log("selectedEventId:", selectedEventId);  // Ajoutez ceci pour voir si l'ID est bien défini
+    if (!selectedEventId) {
+      toast({
+        title: 'Erreur',
+        description: "L'ID de l'événement est manquant. Impossible d'ajouter l'objet.",
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
       });
-
-      fetchedAreas.forEach(area => {
-        const points = [
-          [area.point1_lat, area.point1_lon],
-          [area.point2_lat, area.point2_lon],
-          [area.point3_lat, area.point3_lon],
-          [area.point4_lat, area.point4_lon],
-        ];
-
-        const centroid = calculateCentroid(points);
-        const sortedPoints = sortPointsByAngle(points, centroid);
-
-        const polygon = L.polygon(sortedPoints, { color: 'red' }).addTo(mapInstance);
-
-        // Icône de suppression rendue en tant que string HTML
-        const deleteIconHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-
-        // Ajouter un attribut onclick pour gérer la suppression, en passant l'ID de l'aire
-        const popupContent = `
-            <div>
-              <strong>${area.name}</strong>
-              <p>${area.description}</p>
-              <div onclick="deleteArea(${area.id})">${deleteIconHtml}</div>
-            </div>
-          `;
-        const tooltipContent = `
-            <div>
-              <strong>${area.name}</strong>
-              <p>${area.description}</p>
-            </div>
-          `;
-
-        polygon.bindPopup(popupContent);
-        polygon.bindTooltip(tooltipContent, { permanent: false, direction: 'top' });
-      });
-    };
-
-    fetchAndDisplayAreas();
-  }, [selectedEventId]);
-
-
-  const calculateCentroid = (points) => {
-    const centroid = points.reduce((acc, val) => {
-      return [acc[0] + val[0] / points.length, acc[1] + val[1] / points.length];
-    }, [0, 0]);
-    return centroid;
-  };
-
-  const sortPointsByAngle = (points, centroid) => {
-    return points.sort((a, b) => {
-      const angleA = Math.atan2(a[0] - centroid[0], a[1] - centroid[1]);
-      const angleB = Math.atan2(b[0] - centroid[0], b[1] - centroid[1]);
-      return angleA - angleB;
-    });
-  };
-
-  useEffect(() => {
-    let mapInstance = mapRef.current;
-
-    // Dessin des aires sur la carte
-    areas.forEach(area => {
-      const points = [
-        [area.point1_lat, area.point1_lon],
-        [area.point2_lat, area.point2_lon],
-        [area.point3_lat, area.point3_lon],
-        [area.point4_lat, area.point4_lon],
-      ];
-
-      // Calcul du centre géométrique des points
-      const centroid = calculateCentroid(points);
-
-      // Tri des points par leur angle par rapport au centre
-      const sortedPoints = sortPointsByAngle(points, centroid);
-
-      // Dessin du polygone avec les points triés
-      L.polygon(sortedPoints, { color: 'red' }).addTo(mapInstance);
-    });
-  }, [areas]);
-
-
-  useEffect(() => {
-    const fetchItineraries = async () => {
-      const { data: fetchedItineraries, error } = await supabase
-        .from('vianney_itineraries')
-        .select('*')
-        .eq('event_id', selectedEventId); // Filter by event_id
-
-      if (error) {
-        console.error('Error fetching itineraries:', error);
-      } else {
-        setItineraries(fetchedItineraries);
-      }
-    };
-
-    if (selectedEventId) {
-      fetchItineraries();
+      return;
     }
-  }, [selectedEventId]); // Depend on selectedEventId to re-fetch when it changes
-  useEffect(() => {
+    
+    // ... reste du code pour l'initialisation de la carte
     let mapInstance = mapRef.current;
-
     if (!mapInstance) {
       mapInstance = L.map('map').setView([45, 4.7], 7);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: ''
       }).addTo(mapInstance);
+
+      // Configuration de Leaflet Draw
+      const drawControl = new L.Control.Draw({
+        draw: {
+          polygon: true,
+          polyline: true,
+          marker: true,
+          circle: false,
+          rectangle: false,
+        },
+        edit: {
+          featureGroup: new L.FeatureGroup().addTo(mapInstance),
+        },
+      });
+      mapInstance.addControl(drawControl);
       mapRef.current = mapInstance;
+
+      // Événement de création pour persister les données dans la base de données
+      mapInstance.on(L.Draw.Event.CREATED, async (event) => {
+        const layer = event.layer;
+        const type = event.layerType;
+
+        // Vérifiez si selectedEventId est valide
+        if (!selectedEventId) {
+          toast({
+            title: 'Erreur',
+            description: "L'ID de l'événement est manquant. Impossible d'ajouter l'objet.",
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+          return;
+        }
+
+        let payload = {
+          event_id: selectedEventId,  // UUID ou Integer attendu ici selon votre configuration
+        };
+
+        try {
+          if (type === 'marker') {
+            payload = {
+              ...payload,
+              latitude: layer.getLatLng().lat,
+              longitude: layer.getLatLng().lng,
+            };
+            const { error } = await supabase.from('vianney_drawn_markers').insert(payload);
+            if (error) throw error;
+          } else if (type === 'polyline') {
+            const points = layer.getLatLngs().map(latlng => ({
+              latitude: latlng.lat,
+              longitude: latlng.lng,
+            }));
+            payload = {
+              ...payload,
+              points,
+            };
+            const { error } = await supabase.from('vianney_drawn_polylines').insert(payload);
+            if (error) throw error;
+          } else if (type === 'polygon') {
+            const points = layer.getLatLngs()[0].map(latlng => ({
+              latitude: latlng.lat,
+              longitude: latlng.lng,
+            }));
+            payload = {
+              ...payload,
+              points,
+            };
+            const { error } = await supabase.from('vianney_drawn_polygons').insert(payload);
+            if (error) throw error;
+          }
+
+          mapRef.current.addLayer(layer);
+          toast({
+            title: 'Objet ajouté',
+            description: `L'objet a été ajouté avec succès.`,
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+          });
+        } catch (error) {
+          console.error('Erreur lors de l\'ajout de l\'objet:', error.message);
+          toast({
+            title: 'Erreur',
+            description: "Impossible d'ajouter l'objet. Veuillez réessayer.",
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+        }
+      });
     }
-
-    itineraries.forEach(itinerary => {
-      const points = itinerary.points.map(point => [point.latitude, point.longitude]);
-      const polyline = L.polyline(points, { color: 'blue' }).addTo(mapInstance);
-
-      const deleteIconHtml = renderToString(
-        <MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />
-      );
-
-      const popupContent = `
-        <div>
-          <strong>${itinerary.name}</strong>
-          <p>${itinerary.description}</p>
-          <div onclick="deleteItinerary(${itinerary.id})">${deleteIconHtml}</div>
-        </div>
-      `;
-
-      polyline.bindPopup(popupContent);
-    });
-
-
-  }, [itineraries]);
+  }, [selectedEventId, toast]);
 
   useEffect(() => {
-    const deleteTeam = async (teamId) => {
-      try {
-        const { error } = await supabase
-          .from('vianney_teams')
-          .delete()
-          .match({ id: teamId });
-
-        if (error) throw error;
-
-        toast({
-          title: 'Équipe supprimée',
-          description: `L'équipe avec l'ID ${teamId} a été supprimée avec succès.`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'bottom',
-        });
-
-      } catch (error) {
-        console.error('Erreur lors de la suppression de l\'équipe:', error.message);
-
-        toast({
-          title: 'Échec de la suppression',
-          description: "Impossible de supprimer l'équipe. Veuillez réessayer.",
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'bottom',
-        });
-      }
-    };
-
-    window.deleteTeam = deleteTeam;
-
-    return () => {
-      delete window.deleteTeam;
-    };
-  }, [toast]);
-
-
-
-  useEffect(() => {
+    if (!selectedEventId) {
+      console.error('selectedEventId is not defined.');
+      return;
+    }
+    
+    console.log("Using selectedEventId:", selectedEventId);
+    
     const fetchAndDisplayTeams = async () => {
       if (!selectedEventId) return;
-  
+
       const { data: teams, error } = await supabase
         .from('vianney_teams')
         .select('*')
         .eq('event_id', selectedEventId);
-  
+
       if (error) {
         console.error('Erreur lors de la récupération des équipes:', error);
         return;
       }
-  
-      let mapInstance = mapRef.current;
-      if (!mapInstance) return;
-  
+
       // Nettoyage des marqueurs des équipes existants
-      mapInstance.eachLayer(layer => {
+      mapRef.current.eachLayer(layer => {
         if (layer instanceof L.Marker || (layer.options && layer.options.team)) {
-          mapInstance.removeLayer(layer);
+          mapRef.current.removeLayer(layer);
         }
       });
-  
+
       teams.forEach(team => {
-        const teamIcon = createCustomIcon(); // Assurez-vous que cela génère un icône approprié pour les équipes
+        const teamIcon = createTeamIcon();
         const deleteIconHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-  
+
         // Génération du lien vers Waze avec les coordonnées GPS
         const wazeUrl = `https://www.waze.com/ul?ll=${team.latitude},${team.longitude}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Aller vers Waze</a>`;
-  
+
         const popupContent = `
           <div>
             <strong>${team.name_of_the_team}</strong>
@@ -450,15 +210,15 @@ const MapComponent = () => {
             ${wazeButtonHtml}
           </div>
         `;
-  
+
         const tooltipContent = `
           <div>
             <strong>${team.name_of_the_team}</strong>
           </div>
         `;
-  
+
         L.marker([team.latitude, team.longitude], { icon: teamIcon, team: true })
-          .addTo(mapInstance)
+          .addTo(mapRef.current)
           .bindPopup(popupContent, {
             permanent: false,
             direction: 'top',
@@ -471,144 +231,65 @@ const MapComponent = () => {
           });
       });
     };
-  
-    fetchAndDisplayTeams();
-  }, [selectedEventId]); // Inclure les dépendances nécessaires  
 
-
-  useEffect(() => {
-    const fetchAndDisplayPointsOfInterest = async () => {
-      if (!selectedEventId) {
-        console.log('Aucun event_id sélectionné.');
-        return;
-      }
-
-      const { data: pointsOfInterest, error } = await supabase
-        .from('vianney_points_of_interest')
+    const fetchAndDisplayDrawnItems = async () => {
+      const { data: markers, error: markerError } = await supabase
+        .from('vianney_drawn_markers')
         .select('*')
         .eq('event_id', selectedEventId);
 
-      if (error) {
-        console.error('Erreur lors de la récupération des points d\'intérêt:', error);
+      if (markerError) {
+        console.error('Erreur lors de la récupération des marqueurs:', markerError);
         return;
       }
 
-      let mapInstance = mapRef.current;
-      if (!mapInstance) {
-        console.log('Instance de carte non initialisée.');
+      const { data: polylines, error: polylineError } = await supabase
+        .from('vianney_drawn_polylines')
+        .select('*')
+        .eq('event_id', selectedEventId);
+
+      if (polylineError) {
+        console.error('Erreur lors de la récupération des polylignes:', polylineError);
         return;
       }
 
-      // Nettoyage des marqueurs existants liés aux points d'intérêt
-      mapInstance.eachLayer(layer => {
-        if (layer.options && layer.options.poi) {
-          mapInstance.removeLayer(layer);
-        }
-      });
+      const { data: polygons, error: polygonError } = await supabase
+        .from('vianney_drawn_polygons')
+        .select('*')
+        .eq('event_id', selectedEventId);
 
-      pointsOfInterest.forEach(poi => {
-        const poiIcon = createPoiIcon();
-        const deleteIconHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-
-        const popupContent = `
-          <div>
-            <strong>${poi.title}</strong>
-            <p>${poi.description}</p>
-            <div onclick="window.deletePointOfInterest(${poi.id})">${deleteIconHtml}</div>
-          </div>
-        `;
-        const tooltipContent = `<strong>${poi.title}</strong><p>${poi.description}</p>`;
-
-        L.marker([poi.latitude, poi.longitude], { icon: poiIcon, poi: true })
-          .addTo(mapInstance)
-          .bindPopup(popupContent)
-          .bindTooltip(tooltipContent, {
-            permanent: false,
-            direction: 'top',
-            offset: L.point(0, -20)
-          });
-      });
-    };
-
-    fetchAndDisplayPointsOfInterest();
-  }, [selectedEventId]);
-
-  useEffect(() => {
-    const deletePointOfInterest = async (poiId) => {
-      try {
-        const { error } = await supabase
-          .from('vianney_points_of_interest')
-          .delete()
-          .match({ id: poiId });
-
-        if (error) throw error;
-
-        toast({
-          title: 'Point d\'intérêt supprimé',
-          description: `Le point d'intérêt avec l'ID ${poiId} a été supprimé avec succès.`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'bottom',
-        });
-
-      } catch (error) {
-        console.error('Erreur lors de la suppression du point d\'intérêt:', error.message);
-
-        toast({
-          title: 'Échec de la suppression',
-          description: "Impossible de supprimer le point d'intérêt. Veuillez réessayer.",
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'bottom',
-        });
+      if (polygonError) {
+        console.error('Erreur lors de la récupération des polygones:', polygonError);
+        return;
       }
+
+      // Ajouter les marqueurs depuis la base de données
+      markers.forEach(marker => {
+        L.marker([marker.latitude, marker.longitude]).addTo(mapRef.current);
+      });
+
+      // Ajouter les polylignes depuis la base de données
+      polylines.forEach(polyline => {
+        const points = polyline.points.map(point => [point.latitude, point.longitude]);
+        L.polyline(points, { color: 'blue' }).addTo(mapRef.current);
+      });
+
+      // Ajouter les polygones depuis la base de données
+      polygons.forEach(polygon => {
+        const points = polygon.points.map(point => [point.latitude, point.longitude]);
+        L.polygon(points, { color: 'red' }).addTo(mapRef.current);
+      });
     };
 
-    window.deletePointOfInterest = deletePointOfInterest;
-
-    return () => {
-      delete window.deletePointOfInterest;
-    };
-  }, [toast]);
-
-
+    fetchAndDisplayTeams();
+    fetchAndDisplayDrawnItems();
+  }, [selectedEventId, toast]);
 
   return (
     <Box pt="10px">
-      <Tooltip label={showForm ? "Masquer le formulaire d'itinéraire" : "Formulaire d'itinéraire"} hasArrow>
-        <IconButton
-          m={1}
-          colorScheme="orange"
-          icon={<FcAutomotive />}
-          onClick={() => toggleFormAndSetVisibility('itinerary')}
-          aria-label="Formulaire d'itinéraire"
-        />
-      </Tooltip>
-
-      <Tooltip label={showFormBis ? "Masquer le formulaire de point d'intérêt" : "Formulaire de point d'intérêt"} hasArrow>
-        <IconButton
-          m={1}
-          colorScheme="orange"
-          icon={<FcCollect />}
-          onClick={() => toggleFormAndSetVisibility('poi')}
-          aria-label="Formulaire de point d'intérêt"
-        />
-      </Tooltip>
-
-      <Tooltip label={showFormBisBis ? "Masquer le formulaire de l'aire" : "Formulaire de l'aire"} hasArrow>
-        <IconButton
-          m={1}
-          colorScheme="orange"
-          icon={<FcAddRow />}
-          onClick={() => toggleFormAndSetVisibility('area')}
-          aria-label="Formulaire de l'aire"
-        />
-      </Tooltip>
       {isButtonVisible && (
         <Button
-          onClick={toggleMapView} // Utilisez toggleMapView lors du clic
+          onClick={toggleMapView}
           bg="red.500"
           color="white"
           _hover={{ bg: "red.600" }}
@@ -617,11 +298,6 @@ const MapComponent = () => {
           {buttonText}
         </Button>
       )}
-
-      {activeForm === 'itinerary' && <CreateItineraryForm />}
-      {activeForm === 'poi' && <AddPointOfInterestForm />}
-      {activeForm === 'area' && <AreaCreationMap />}
-
       <div id="map" style={{ height: mapHeight, width: '100%', zIndex: '0' }}></div>
     </Box>
   );
