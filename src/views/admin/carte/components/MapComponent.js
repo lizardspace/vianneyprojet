@@ -3,7 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { renderToString } from "react-dom/server";
-import { Box, Button, useToast } from '@chakra-ui/react';
+import { Box, Button, useToast, CloseButton } from '@chakra-ui/react';
 import { MdPlace, MdOutlineZoomInMap, MdOutlineZoomOutMap, MdDeleteForever } from "react-icons/md";
 import { useEvent } from './../../../../EventContext';
 import { supabase } from './../../../../supabaseClient';
@@ -24,7 +24,7 @@ const createTeamIcon = () => {
 const MapComponent = () => {
   const mapRef = useRef(null);
   const [mapHeight, setMapHeight] = useState('800px');
-  const { selectedEventId } = useEvent(); // Assurez-vous que selectedEventId est bien un UUID si vous utilisez UUID dans la base de données
+  const { selectedEventId } = useEvent();
   const history = useHistory();
   const location = useLocation();
   const toast = useToast();
@@ -42,6 +42,12 @@ const MapComponent = () => {
     }
   };
 
+  const closeModal = () => {
+    if (location.pathname === "/admin/zoomed-map") {
+      history.push("/admin/map");
+    }
+  };
+
   useEffect(() => {
     const updateMapHeight = () => {
       const newHeight = `${window.innerHeight - 60}px`;
@@ -53,7 +59,7 @@ const MapComponent = () => {
   }, []);
 
   useEffect(() => {
-    console.log("selectedEventId:", selectedEventId);  // Ajoutez ceci pour voir si l'ID est bien défini
+    console.log("selectedEventId:", selectedEventId);
     if (!selectedEventId) {
       toast({
         title: 'Erreur',
@@ -64,8 +70,7 @@ const MapComponent = () => {
       });
       return;
     }
-    
-    // ... reste du code pour l'initialisation de la carte
+
     let mapInstance = mapRef.current;
     if (!mapInstance) {
       mapInstance = L.map('map').setView([45, 4.7], 7);
@@ -74,7 +79,6 @@ const MapComponent = () => {
         attribution: ''
       }).addTo(mapInstance);
 
-      // Configuration de Leaflet Draw
       const drawControl = new L.Control.Draw({
         draw: {
           polygon: true,
@@ -90,12 +94,10 @@ const MapComponent = () => {
       mapInstance.addControl(drawControl);
       mapRef.current = mapInstance;
 
-      // Événement de création pour persister les données dans la base de données
       mapInstance.on(L.Draw.Event.CREATED, async (event) => {
         const layer = event.layer;
         const type = event.layerType;
 
-        // Vérifiez si selectedEventId est valide
         if (!selectedEventId) {
           toast({
             title: 'Erreur',
@@ -108,7 +110,7 @@ const MapComponent = () => {
         }
 
         let payload = {
-          event_id: selectedEventId,  // UUID ou Integer attendu ici selon votre configuration
+          event_id: selectedEventId,
         };
 
         try {
@@ -171,9 +173,9 @@ const MapComponent = () => {
       console.error('selectedEventId is not defined.');
       return;
     }
-    
+
     console.log("Using selectedEventId:", selectedEventId);
-    
+
     const fetchAndDisplayTeams = async () => {
       if (!selectedEventId) return;
 
@@ -187,7 +189,6 @@ const MapComponent = () => {
         return;
       }
 
-      // Nettoyage des marqueurs des équipes existants
       mapRef.current.eachLayer(layer => {
         if (layer instanceof L.Marker || (layer.options && layer.options.team)) {
           mapRef.current.removeLayer(layer);
@@ -198,7 +199,6 @@ const MapComponent = () => {
         const teamIcon = createTeamIcon();
         const deleteIconHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
 
-        // Génération du lien vers Waze avec les coordonnées GPS
         const wazeUrl = `https://www.waze.com/ul?ll=${team.latitude},${team.longitude}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Aller vers Waze</a>`;
 
@@ -263,18 +263,15 @@ const MapComponent = () => {
         return;
       }
 
-      // Ajouter les marqueurs depuis la base de données
       markers.forEach(marker => {
         L.marker([marker.latitude, marker.longitude]).addTo(mapRef.current);
       });
 
-      // Ajouter les polylignes depuis la base de données
       polylines.forEach(polyline => {
         const points = polyline.points.map(point => [point.latitude, point.longitude]);
         L.polyline(points, { color: 'blue' }).addTo(mapRef.current);
       });
 
-      // Ajouter les polygones depuis la base de données
       polygons.forEach(polygon => {
         const points = polygon.points.map(point => [point.latitude, point.longitude]);
         L.polygon(points, { color: 'red' }).addTo(mapRef.current);
@@ -286,7 +283,7 @@ const MapComponent = () => {
   }, [selectedEventId, toast]);
 
   return (
-    <Box pt="10px">
+    <Box pt="10px" position="relative">
       {isButtonVisible && (
         <Button
           onClick={toggleMapView}
@@ -297,6 +294,18 @@ const MapComponent = () => {
         >
           {buttonText}
         </Button>
+      )}
+      {location.pathname === "/admin/zoomed-map" && (
+        <CloseButton 
+          position="absolute" 
+          top="10px" 
+          right="10px" 
+          onClick={closeModal} 
+          bg="white" 
+          color="black" 
+          _hover={{ bg: "gray.300" }}
+          zIndex="1000" // Assurez que le bouton est bien au-dessus de la carte
+        />
       )}
       <div id="map" style={{ height: mapHeight, width: '100%', zIndex: '0' }}></div>
     </Box>
