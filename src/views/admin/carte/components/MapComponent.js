@@ -316,10 +316,10 @@ const MapComponent = () => {
       teams.forEach(team => {
         const teamIcon = createTeamIcon();
         const deleteIconHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-
+    
         const wazeUrl = `https://www.waze.com/ul?ll=${team.latitude},${team.longitude}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Aller vers Waze</a>`;
-
+    
         const popupContent = `
           <div>
             <strong>${team.name_of_the_team}</strong>
@@ -328,20 +328,22 @@ const MapComponent = () => {
             ${wazeButtonHtml}
           </div>
         `;
-
-        L.marker([team.latitude, team.longitude], { icon: teamIcon, team: true })
-          .addTo(mapRef.current)
-          .bindPopup(popupContent, {
-            permanent: false,
-            direction: 'top',
-            offset: L.point(0, 40)
-          })
-          .bindTooltip(team.name_of_the_team, {
-            permanent: false,
-            direction: 'top',
-            offset: L.point(0, -10)
-          });
-      });
+    
+        const tooltipContent = team.name_of_the_team;
+    
+        const marker = L.marker([team.latitude, team.longitude], { icon: teamIcon, team: true });
+    
+        marker.addTo(mapRef.current)
+            .bindPopup(popupContent, {
+                offset: L.point(0,-30), // Aligner le popup légèrement au-dessus du marqueur
+                direction: 'top'
+            })
+            .bindTooltip(tooltipContent, {
+                permanent: false,
+                direction: 'top',
+                offset: L.point(0, -30) // Ajustez cette valeur pour que le tooltip soit correctement aligné
+            });
+    });    
     };
 
     const fetchAndDisplayDrawnItems = async () => {
