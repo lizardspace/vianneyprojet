@@ -247,7 +247,19 @@ const MapComponent = () => {
             if (error) throw error;
             insertedItem = data;
 
-            layer.bindTooltip(nameElement || 'Cercle').on('click', () => openDeleteDialog(layer, type, insertedItem.id));
+            const wazeUrl = `https://www.waze.com/ul?ll=${layer.getLatLng().lat},${layer.getLatLng().lng}&navigate=yes`;
+            const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
+            const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
+            
+            const popupContent = `
+              <div>
+                <strong>${nameElement || 'Cercle'}</strong>
+                <div onclick="window.deleteItem('${type}', '${insertedItem.id}')">${deleteButtonHtml}</div>
+                ${wazeButtonHtml}
+              </div>
+            `;
+
+            layer.bindPopup(popupContent).bindTooltip(nameElement || 'Cercle');
           }
 
           window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
@@ -314,12 +326,6 @@ const MapComponent = () => {
             ${team.photo_profile_url ? `<br/><img src="${team.photo_profile_url}" alt="${team.name_of_the_team}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-top: 5px;"/>` : ''}
             <div onclick="window.deleteTeam(${team.id})" style="margin-top: 10px;">${deleteIconHtml}</div>
             ${wazeButtonHtml}
-          </div>
-        `;
-
-        const tooltipContent = `
-          <div>
-            <strong>${team.name_of_the_team}</strong>
           </div>
         `;
 
@@ -421,8 +427,22 @@ const MapComponent = () => {
           radius: circleMarker.radius,
           color: '#34A853',
         });
-        const nameElement = circleMarker.name_element || 'CircleMarker';
-        layer.bindTooltip(nameElement).on('click', () => openDeleteDialog(layer, 'circlemarker', circleMarker.id));
+
+        const wazeUrl = `https://www.waze.com/ul?ll=${circleMarker.latitude},${circleMarker.longitude}&navigate=yes`;
+        const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
+        const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
+        
+        const popupContent = `
+          <div>
+            <strong>${circleMarker.name_element || 'CircleMarker'}</strong>
+            <div onclick="window.deleteItem('circlemarker', '${circleMarker.id}')">${deleteButtonHtml}</div>
+            ${wazeButtonHtml}
+          </div>
+        `;
+
+        layer.bindPopup(popupContent).bindTooltip(circleMarker.name_element || 'CircleMarker');
+        window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
+
         layer.addTo(mapRef.current);
       });
     };
