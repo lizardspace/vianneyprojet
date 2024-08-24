@@ -80,6 +80,7 @@ const MapComponent = () => {
       if (type === 'marker') tableName = 'vianney_drawn_markers';
       if (type === 'polyline') tableName = 'vianney_drawn_polylines';
       if (type === 'polygon') tableName = 'vianney_drawn_polygons';
+      if (type === 'circlemarker') tableName = 'vianney_drawn_circle_markers';
 
       const { error } = await supabase
         .from(tableName)
@@ -148,6 +149,7 @@ const MapComponent = () => {
           marker: true,
           circle: false,
           rectangle: false,
+          circlemarker: true,
         },
         edit: {
           featureGroup: new L.FeatureGroup().addTo(mapInstance),
@@ -172,7 +174,7 @@ const MapComponent = () => {
         }
 
         let payload = {
-          event_id: selectedEventId,
+          event_id: selectedEventId, // Assurez-vous que c'est un UUID
         };
 
         try {
@@ -187,7 +189,6 @@ const MapComponent = () => {
             if (error) throw error;
             insertedItem = data;
 
-            // Appliquez une icône uniquement aux marqueurs
             layer.setIcon(createCustomIcon());
           } else if (type === 'polyline') {
             const points = layer.getLatLngs().map(latlng => ({
@@ -213,11 +214,19 @@ const MapComponent = () => {
             const { data, error } = await supabase.from('vianney_drawn_polygons').insert(payload).select().single();
             if (error) throw error;
             insertedItem = data;
+          } else if (type === 'circlemarker') {
+            payload = {
+              ...payload,
+              latitude: layer.getLatLng().lat,
+              longitude: layer.getLatLng().lng,
+              radius: layer.getRadius(),
+            };
+            const { data, error } = await supabase.from('vianney_drawn_circle_markers').insert(payload).select().single();
+            if (error) throw error;
+            insertedItem = data;
           }
 
-          // Ajoutez l'événement de suppression après ajout réussi
           layer.on('click', () => openDeleteDialog(layer, type, insertedItem.id));
-
           mapRef.current.addLayer(layer);
           toast({
             title: 'Objet ajouté',
@@ -335,6 +344,16 @@ const MapComponent = () => {
         return;
       }
 
+      const { data: circleMarkers, error: circleMarkerError } = await supabase
+        .from('vianney_drawn_circle_markers')
+        .select('*')
+        .eq('event_id', selectedEventId);
+
+      if (circleMarkerError) {
+        console.error('Erreur lors de la récupération des cercles:', circleMarkerError);
+        return;
+      }
+
       markers.forEach(marker => {
         const layer = L.marker([marker.latitude, marker.longitude], { icon: createCustomIcon() });
         layer.on('click', () => openDeleteDialog(layer, 'marker', marker.id));
@@ -352,6 +371,15 @@ const MapComponent = () => {
         const points = polygon.points.map(point => [point.latitude, point.longitude]);
         const layer = L.polygon(points, { color: 'red' });
         layer.on('click', () => openDeleteDialog(layer, 'polygon', polygon.id));
+        layer.addTo(mapRef.current);
+      });
+
+      circleMarkers.forEach(circleMarker => {
+        const layer = L.circleMarker([circleMarker.latitude, circleMarker.longitude], {
+          radius: circleMarker.radius,
+          color: '#34A853',
+        });
+        layer.on('click', () => openDeleteDialog(layer, 'circlemarker', circleMarker.id));
         layer.addTo(mapRef.current);
       });
     };
