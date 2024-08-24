@@ -3,7 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { renderToString } from "react-dom/server";
-import { Box, Button, useToast, CloseButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay } from '@chakra-ui/react';
+import { Box, Button, useToast, CloseButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Input } from '@chakra-ui/react';
 import { MdPlace, MdOutlineZoomInMap, MdOutlineZoomOutMap, MdDeleteForever } from "react-icons/md";
 import { useEvent } from './../../../../EventContext';
 import { supabase } from './../../../../supabaseClient';
@@ -43,6 +43,11 @@ const MapComponent = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [elementToDelete, setElementToDelete] = useState(null);
   const cancelRef = useRef();
+
+  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
+  const [newElementName, setNewElementName] = useState('');
+  const [pendingLayer, setPendingLayer] = useState(null);
+  const [pendingType, setPendingType] = useState(null);
 
   const buttonText = location.pathname === "/admin/zoomed-map" ?
     <MdOutlineZoomInMap /> :
@@ -111,6 +116,121 @@ const MapComponent = () => {
     }
   };
 
+  const openNameModal = (layer, type) => {
+    setPendingLayer(layer);
+    setPendingType(type);
+    setIsNameModalOpen(true);
+  };
+
+  const handleAddElement = async (layer, type, nameElement) => {
+    let payload = {
+      event_id: selectedEventId,
+      name_element: nameElement || null,
+    };
+
+    try {
+      let insertedItem;
+      if (type === 'marker') {
+        payload = {
+          ...payload,
+          latitude: layer.getLatLng().lat,
+          longitude: layer.getLatLng().lng,
+        };
+        const { data, error } = await supabase.from('vianney_drawn_markers').insert(payload).select().single();
+        if (error) throw error;
+        insertedItem = data;
+
+        layer.setIcon(createCustomIcon());
+
+        const wazeUrl = `https://www.waze.com/ul?ll=${layer.getLatLng().lat},${layer.getLatLng().lng}&navigate=yes`;
+        const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
+        const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
+        
+        const popupContent = `
+          <div>
+            <strong>${nameElement || 'Élément'}</strong>
+            <div onclick="window.deleteItem('${type}', '${insertedItem.id}')">${deleteButtonHtml}</div>
+            ${wazeButtonHtml}
+          </div>
+        `;
+
+        layer.bindPopup(popupContent).bindTooltip(nameElement || 'Élément');
+      } else if (type === 'polyline') {
+        const points = layer.getLatLngs().map(latlng => ({
+          latitude: latlng.lat,
+          longitude: latlng.lng,
+        }));
+        payload = {
+          ...payload,
+          points,
+        };
+        const { data, error } = await supabase.from('vianney_drawn_polylines').insert(payload).select().single();
+        if (error) throw error;
+        insertedItem = data;
+
+        layer.bindTooltip(nameElement || 'Ligne').on('click', () => openDeleteDialog(layer, type, insertedItem.id));
+      } else if (type === 'polygon') {
+        const points = layer.getLatLngs()[0].map(latlng => ({
+          latitude: latlng.lat,
+          longitude: latlng.lng,
+        }));
+        payload = {
+          ...payload,
+          points,
+        };
+        const { data, error } = await supabase.from('vianney_drawn_polygons').insert(payload).select().single();
+        if (error) throw error;
+        insertedItem = data;
+
+        layer.bindTooltip(nameElement || 'Polygone').on('click', () => openDeleteDialog(layer, type, insertedItem.id));
+      } else if (type === 'circlemarker') {
+        payload = {
+          ...payload,
+          latitude: layer.getLatLng().lat,
+          longitude: layer.getLatLng().lng,
+          radius: layer.getRadius(),
+        };
+        const { data, error } = await supabase.from('vianney_drawn_circle_markers').insert(payload).select().single();
+        if (error) throw error;
+        insertedItem = data;
+
+        const wazeUrl = `https://www.waze.com/ul?ll=${layer.getLatLng().lat},${layer.getLatLng().lng}&navigate=yes`;
+        const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
+        const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
+        
+        const popupContent = `
+          <div>
+            <strong>${nameElement || 'Cercle'}</strong>
+            <div onclick="window.deleteItem('${type}', '${insertedItem.id}')">${deleteButtonHtml}</div>
+            ${wazeButtonHtml}
+          </div>
+        `;
+
+        layer.bindPopup(popupContent).bindTooltip(nameElement || 'Cercle');
+      }
+
+      window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
+
+      mapRef.current.addLayer(layer);
+      toast({
+        title: 'Objet ajouté',
+        description: `L'objet a été ajouté avec succès.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de l\'objet:', error.message);
+      toast({
+        title: 'Erreur',
+        description: "Impossible d'ajouter l'objet. Veuillez réessayer.",
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
   useEffect(() => {
     const updateMapHeight = () => {
       const newHeight = `${window.innerHeight - 60}px`;
@@ -158,10 +278,10 @@ const MapComponent = () => {
       mapInstance.addControl(drawControl);
       mapRef.current = mapInstance;
 
-      mapInstance.on(L.Draw.Event.CREATED, async (event) => {
+      mapInstance.on(L.Draw.Event.CREATED, (event) => {
         const layer = event.layer;
         const type = event.layerType;
-
+        
         if (!selectedEventId) {
           toast({
             title: 'Erreur',
@@ -172,116 +292,8 @@ const MapComponent = () => {
           });
           return;
         }
-
-        const nameElement = prompt("Entrez le nom de l'élément :");
-
-        let payload = {
-          event_id: selectedEventId,
-          name_element: nameElement || null,
-        };
-
-        try {
-          let insertedItem;
-          if (type === 'marker') {
-            payload = {
-              ...payload,
-              latitude: layer.getLatLng().lat,
-              longitude: layer.getLatLng().lng,
-            };
-            const { data, error } = await supabase.from('vianney_drawn_markers').insert(payload).select().single();
-            if (error) throw error;
-            insertedItem = data;
-
-            layer.setIcon(createCustomIcon());
-
-            // Ajouter un popup pour les marqueurs
-            const wazeUrl = `https://www.waze.com/ul?ll=${layer.getLatLng().lat},${layer.getLatLng().lng}&navigate=yes`;
-            const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
-            const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-            
-            const popupContent = `
-              <div>
-                <strong>${nameElement || 'Élément'}</strong>
-                <div onclick="window.deleteItem('${type}', '${insertedItem.id}')">${deleteButtonHtml}</div>
-                ${wazeButtonHtml}
-              </div>
-            `;
-
-            layer.bindPopup(popupContent).bindTooltip(nameElement || 'Élément');
-          } else if (type === 'polyline') {
-            const points = layer.getLatLngs().map(latlng => ({
-              latitude: latlng.lat,
-              longitude: latlng.lng,
-            }));
-            payload = {
-              ...payload,
-              points,
-            };
-            const { data, error } = await supabase.from('vianney_drawn_polylines').insert(payload).select().single();
-            if (error) throw error;
-            insertedItem = data;
-
-            layer.bindTooltip(nameElement || 'Ligne').on('click', () => openDeleteDialog(layer, type, insertedItem.id));
-          } else if (type === 'polygon') {
-            const points = layer.getLatLngs()[0].map(latlng => ({
-              latitude: latlng.lat,
-              longitude: latlng.lng,
-            }));
-            payload = {
-              ...payload,
-              points,
-            };
-            const { data, error } = await supabase.from('vianney_drawn_polygons').insert(payload).select().single();
-            if (error) throw error;
-            insertedItem = data;
-
-            layer.bindTooltip(nameElement || 'Polygone').on('click', () => openDeleteDialog(layer, type, insertedItem.id));
-          } else if (type === 'circlemarker') {
-            payload = {
-              ...payload,
-              latitude: layer.getLatLng().lat,
-              longitude: layer.getLatLng().lng,
-              radius: layer.getRadius(),
-            };
-            const { data, error } = await supabase.from('vianney_drawn_circle_markers').insert(payload).select().single();
-            if (error) throw error;
-            insertedItem = data;
-
-            const wazeUrl = `https://www.waze.com/ul?ll=${layer.getLatLng().lat},${layer.getLatLng().lng}&navigate=yes`;
-            const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
-            const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-            
-            const popupContent = `
-              <div>
-                <strong>${nameElement || 'Cercle'}</strong>
-                <div onclick="window.deleteItem('${type}', '${insertedItem.id}')">${deleteButtonHtml}</div>
-                ${wazeButtonHtml}
-              </div>
-            `;
-
-            layer.bindPopup(popupContent).bindTooltip(nameElement || 'Cercle');
-          }
-
-          window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
-
-          mapRef.current.addLayer(layer);
-          toast({
-            title: 'Objet ajouté',
-            description: `L'objet a été ajouté avec succès.`,
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-          });
-        } catch (error) {
-          console.error('Erreur lors de l\'ajout de l\'objet:', error.message);
-          toast({
-            title: 'Erreur',
-            description: "Impossible d'ajouter l'objet. Veuillez réessayer.",
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-          });
-        }
+      
+        openNameModal(layer, type);
       });
     }
   }, [selectedEventId, toast]);
@@ -453,6 +465,16 @@ const MapComponent = () => {
     fetchAndDisplayDrawnItems();
   }, [selectedEventId, toast]);
 
+  const handleNameSubmit = () => {
+    if (pendingLayer && pendingType) {
+      handleAddElement(pendingLayer, pendingType, newElementName);
+    }
+    setIsNameModalOpen(false);
+    setNewElementName('');
+    setPendingLayer(null);
+    setPendingType(null);
+  };
+
   return (
     <Box pt="10px" position="relative">
       {isButtonVisible && (
@@ -502,6 +524,37 @@ const MapComponent = () => {
               </Button>
               <Button colorScheme="red" onClick={confirmDelete} ml={3}>
                 Supprimer
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+
+      <AlertDialog
+        isOpen={isNameModalOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setIsNameModalOpen(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Entrez le nom de l'élément
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              <Input
+                placeholder="Nom de l'élément"
+                value={newElementName}
+                onChange={(e) => setNewElementName(e.target.value)}
+              />
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button onClick={() => setIsNameModalOpen(false)}>
+                Annuler
+              </Button>
+              <Button colorScheme="green" onClick={handleNameSubmit} ml={3}>
+                Enregistrer
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
