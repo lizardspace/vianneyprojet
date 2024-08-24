@@ -226,7 +226,23 @@ const MapComponent = () => {
             insertedItem = data;
           }
 
-          layer.on('click', () => openDeleteDialog(layer, type, insertedItem.id));
+          // Ajouter les boutons de popup pour les markers
+          if (type === 'marker') {
+            const wazeUrl = `https://www.waze.com/ul?ll=${layer.getLatLng().lat},${layer.getLatLng().lng}&navigate=yes`;
+            const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
+            const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
+            
+            const popupContent = `
+              <div>
+                <div onclick="window.deleteItem('${type}', '${insertedItem.id}')">${deleteButtonHtml}</div>
+                ${wazeButtonHtml}
+              </div>
+            `;
+
+            layer.bindPopup(popupContent);
+            window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
+          }
+
           mapRef.current.addLayer(layer);
           toast({
             title: 'Objet ajouté',
@@ -356,7 +372,21 @@ const MapComponent = () => {
 
       markers.forEach(marker => {
         const layer = L.marker([marker.latitude, marker.longitude], { icon: createCustomIcon() });
-        layer.on('click', () => openDeleteDialog(layer, 'marker', marker.id));
+
+        const wazeUrl = `https://www.waze.com/ul?ll=${marker.latitude},${marker.longitude}&navigate=yes`;
+        const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
+        const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
+        
+        const popupContent = `
+          <div>
+            <div onclick="window.deleteItem('marker', '${marker.id}')">${deleteButtonHtml}</div>
+            ${wazeButtonHtml}
+          </div>
+        `;
+
+        layer.bindPopup(popupContent);
+        window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
+
         layer.addTo(mapRef.current);
       });
 
