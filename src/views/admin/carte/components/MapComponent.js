@@ -173,8 +173,11 @@ const MapComponent = () => {
           return;
         }
 
+        const nameElement = prompt("Entrez le nom de l'élément :");
+
         let payload = {
-          event_id: selectedEventId, // Assurez-vous que c'est un UUID
+          event_id: selectedEventId,
+          name_element: nameElement || null,
         };
 
         try {
@@ -190,6 +193,21 @@ const MapComponent = () => {
             insertedItem = data;
 
             layer.setIcon(createCustomIcon());
+
+            // Ajouter un popup pour les marqueurs
+            const wazeUrl = `https://www.waze.com/ul?ll=${layer.getLatLng().lat},${layer.getLatLng().lng}&navigate=yes`;
+            const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
+            const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
+            
+            const popupContent = `
+              <div>
+                <strong>${nameElement || 'Élément'}</strong>
+                <div onclick="window.deleteItem('${type}', '${insertedItem.id}')">${deleteButtonHtml}</div>
+                ${wazeButtonHtml}
+              </div>
+            `;
+
+            layer.bindPopup(popupContent).bindTooltip(nameElement || 'Élément');
           } else if (type === 'polyline') {
             const points = layer.getLatLngs().map(latlng => ({
               latitude: latlng.lat,
@@ -202,6 +220,8 @@ const MapComponent = () => {
             const { data, error } = await supabase.from('vianney_drawn_polylines').insert(payload).select().single();
             if (error) throw error;
             insertedItem = data;
+
+            layer.bindTooltip(nameElement || 'Ligne').on('click', () => openDeleteDialog(layer, type, insertedItem.id));
           } else if (type === 'polygon') {
             const points = layer.getLatLngs()[0].map(latlng => ({
               latitude: latlng.lat,
@@ -214,6 +234,8 @@ const MapComponent = () => {
             const { data, error } = await supabase.from('vianney_drawn_polygons').insert(payload).select().single();
             if (error) throw error;
             insertedItem = data;
+
+            layer.bindTooltip(nameElement || 'Polygone').on('click', () => openDeleteDialog(layer, type, insertedItem.id));
           } else if (type === 'circlemarker') {
             payload = {
               ...payload,
@@ -224,24 +246,11 @@ const MapComponent = () => {
             const { data, error } = await supabase.from('vianney_drawn_circle_markers').insert(payload).select().single();
             if (error) throw error;
             insertedItem = data;
+
+            layer.bindTooltip(nameElement || 'Cercle').on('click', () => openDeleteDialog(layer, type, insertedItem.id));
           }
 
-          // Ajouter les boutons de popup pour les markers
-          if (type === 'marker') {
-            const wazeUrl = `https://www.waze.com/ul?ll=${layer.getLatLng().lat},${layer.getLatLng().lng}&navigate=yes`;
-            const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
-            const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-            
-            const popupContent = `
-              <div>
-                <div onclick="window.deleteItem('${type}', '${insertedItem.id}')">${deleteButtonHtml}</div>
-                ${wazeButtonHtml}
-              </div>
-            `;
-
-            layer.bindPopup(popupContent);
-            window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
-          }
+          window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
 
           mapRef.current.addLayer(layer);
           toast({
@@ -321,7 +330,7 @@ const MapComponent = () => {
             direction: 'top',
             offset: L.point(0, 40)
           })
-          .bindTooltip(tooltipContent, {
+          .bindTooltip(team.name_of_the_team, {
             permanent: false,
             direction: 'top',
             offset: L.point(0, -10)
@@ -379,12 +388,13 @@ const MapComponent = () => {
         
         const popupContent = `
           <div>
+            <strong>${marker.name_element || 'Marker'}</strong>
             <div onclick="window.deleteItem('marker', '${marker.id}')">${deleteButtonHtml}</div>
             ${wazeButtonHtml}
           </div>
         `;
 
-        layer.bindPopup(popupContent);
+        layer.bindPopup(popupContent).bindTooltip(marker.name_element || 'Marker');
         window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
 
         layer.addTo(mapRef.current);
@@ -393,14 +403,16 @@ const MapComponent = () => {
       polylines.forEach(polyline => {
         const points = polyline.points.map(point => [point.latitude, point.longitude]);
         const layer = L.polyline(points, { color: 'blue' });
-        layer.on('click', () => openDeleteDialog(layer, 'polyline', polyline.id));
+        const nameElement = polyline.name_element || 'Polyline';
+        layer.bindTooltip(nameElement).on('click', () => openDeleteDialog(layer, 'polyline', polyline.id));
         layer.addTo(mapRef.current);
       });
 
       polygons.forEach(polygon => {
         const points = polygon.points.map(point => [point.latitude, point.longitude]);
         const layer = L.polygon(points, { color: 'red' });
-        layer.on('click', () => openDeleteDialog(layer, 'polygon', polygon.id));
+        const nameElement = polygon.name_element || 'Polygon';
+        layer.bindTooltip(nameElement).on('click', () => openDeleteDialog(layer, 'polygon', polygon.id));
         layer.addTo(mapRef.current);
       });
 
@@ -409,7 +421,8 @@ const MapComponent = () => {
           radius: circleMarker.radius,
           color: '#34A853',
         });
-        layer.on('click', () => openDeleteDialog(layer, 'circlemarker', circleMarker.id));
+        const nameElement = circleMarker.name_element || 'CircleMarker';
+        layer.bindTooltip(nameElement).on('click', () => openDeleteDialog(layer, 'circlemarker', circleMarker.id));
         layer.addTo(mapRef.current);
       });
     };
