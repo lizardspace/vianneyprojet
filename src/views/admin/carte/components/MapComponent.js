@@ -560,41 +560,74 @@ const MapComponent = () => {
     fetchAndDisplayDrawnItems();
   }, [selectedEventId, toast]);
 
-  useEffect(() => {
-    if (mapRef.current) {
-      const handleStartSelection = (e) => {
-        if (selectingStart) {
-          setStartLat(e.latlng.lat);
-          setStartLng(e.latlng.lng);
-          setSelectingStart(false); // Désactiver la sélection après la mise à jour
+  // Création d'une icône personnalisée pour le point de départ/arrivée
+const createBlueIcon = () => {
+  const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: 'blue' }} />);
+  return L.divIcon({
+    html: placeIconHtml,
+    className: 'custom-leaflet-icon',
+    iconSize: L.point(30, 30),
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30],
+  });
+};
+
+const [startMarker, setStartMarker] = useState(null);
+const [endMarker, setEndMarker] = useState(null);
+
+// Fonction pour gérer la sélection du point de départ
+useEffect(() => {
+  if (mapRef.current) {
+    const handleStartSelection = (e) => {
+      if (selectingStart) {
+        setStartLat(e.latlng.lat);
+        setStartLng(e.latlng.lng);
+
+        if (startMarker) {
+          mapRef.current.removeLayer(startMarker);
         }
-      };
 
-      mapRef.current.on('click', handleStartSelection);
+        const marker = L.marker([e.latlng.lat, e.latlng.lng], { icon: createBlueIcon() }).addTo(mapRef.current);
+        setStartMarker(marker);
 
-      return () => {
-        mapRef.current.off('click', handleStartSelection);
-      };
-    }
-  }, [selectingStart]);
+        setSelectingStart(false); // Désactiver la sélection après la mise à jour
+      }
+    };
 
-  useEffect(() => {
-    if (mapRef.current) {
-      const handleEndSelection = (e) => {
-        if (selectingEnd) {
-          setEndLat(e.latlng.lat);
-          setEndLng(e.latlng.lng);
-          setSelectingEnd(false); // Désactiver la sélection après la mise à jour
+    mapRef.current.on('click', handleStartSelection);
+
+    return () => {
+      mapRef.current.off('click', handleStartSelection);
+    };
+  }
+}, [selectingStart, startMarker]);
+
+// Fonction pour gérer la sélection du point d'arrivée
+useEffect(() => {
+  if (mapRef.current) {
+    const handleEndSelection = (e) => {
+      if (selectingEnd) {
+        setEndLat(e.latlng.lat);
+        setEndLng(e.latlng.lng);
+
+        if (endMarker) {
+          mapRef.current.removeLayer(endMarker);
         }
-      };
 
-      mapRef.current.on('click', handleEndSelection);
+        const marker = L.marker([e.latlng.lat, e.latlng.lng], { icon: createBlueIcon() }).addTo(mapRef.current);
+        setEndMarker(marker);
 
-      return () => {
-        mapRef.current.off('click', handleEndSelection);
-      };
-    }
-  }, [selectingEnd]);
+        setSelectingEnd(false); // Désactiver la sélection après la mise à jour
+      }
+    };
+
+    mapRef.current.on('click', handleEndSelection);
+
+    return () => {
+      mapRef.current.off('click', handleEndSelection);
+    };
+  }
+}, [selectingEnd, endMarker]);
 
   const handleNameSubmit = () => {
     if (pendingLayer && pendingType) {
