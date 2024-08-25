@@ -5,7 +5,6 @@ import {
   FcSerialTasks,
   FcSurvey,
   FcSettings,
-  FcSelfie,
   FcGrid,
   FcHighPriority,
   FcDiploma2,
@@ -16,7 +15,7 @@ import { LuCross } from "react-icons/lu"; // Import the new icon
 import MainDashboard from "views/admin/default";
 import NFTMarketplace from "views/admin/carte";
 import TableauDeBord from "views/admin/TableauDeBord";
-import InterfaceEquipe from "views/admin/InterfaceEquipe";
+//import InterfaceEquipe from "views/admin/InterfaceEquipe";
 import TableauExcel from "views/admin/TableauExcel";
 import AlerteEquipe from "views/admin/AlerteEquipe";
 import MaterialComponent from "views/admin/MaterialComponent";
@@ -78,13 +77,13 @@ const routes = [
     icon: <Icon as={FcSettings} width="20px" height="20px" color="inherit" />,
     component: Parameters,
   },
-  {
-    name: "Interface Equipe",
-    layout: "/admin",
-    path: "/interface-equipe",
-    icon: <Icon as={FcSelfie} width="20px" height="20px" color="inherit" />,
-    component: InterfaceEquipe,
-  },
+ // {
+ //   name: "Interface Equipe",
+ //   layout: "/admin",
+ //   path: "/interface-equipe",
+ //   icon: <Icon as={FcSelfie} width="20px" height="20px" color="inherit" />,
+ //   component: InterfaceEquipe,
+ // },
   {
     name: "Tableau Excel",
     layout: "/admin",
