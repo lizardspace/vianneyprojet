@@ -8,6 +8,7 @@ import {
   FcGrid,
   FcHighPriority,
   FcDiploma2,
+  FcDocument,
 } from "react-icons/fc";
 import { MdQrCodeScanner, MdOutlineSos } from "react-icons/md"; // Import the new icon
 import { LuCross } from "react-icons/lu"; // Import the new icon
@@ -25,6 +26,7 @@ import AlerteJeSuisEnDanger from "views/admin/alertejesuisendanger"; // Import t
 import Parameters from "views/admin/Parameters";
 import SOSComponent from "views/admin/SOSComponent"; // Assuming you have a new component for the sosroute
 import ChatComponent from "views/admin/ChatComponent"; // Import the new chat component
+import IncidentReportForm from "views/admin/IncidentReportForm"; 
 
 const routes = [
   {
@@ -132,6 +134,13 @@ const routes = [
     path: "/chat",
     icon: <Icon as={FcSerialTasks} width="20px" height="20px" color="inherit" />, // You can choose another icon if you prefer
     component: ChatComponent,
+  },
+  {
+    name: "Rapport d'incident",
+    layout: "/admin",
+    path: "/rapport-incident",
+    icon: <Icon as={FcDocument} width='20px' height='20px' color='inherit' />,
+    component: IncidentReportForm,
   },
 ];
 
