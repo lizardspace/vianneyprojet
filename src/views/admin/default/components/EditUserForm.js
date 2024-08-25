@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-
+import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { FaTrash } from 'react-icons/fa';
@@ -143,11 +143,23 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
         map.flyTo(e.latlng, map.getZoom());
       },
     });
-
+  
+    const customIcon = L.divIcon({
+      className: "custom-icon",
+      html: `
+        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="red">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5z"/>
+          <path d="M0 0h24v24H0z" fill="none"/>
+        </svg>
+      `,
+      iconSize: [24, 24], // Keeping the size small and appropriate
+      iconAnchor: [12, 24], // Centering the icon so it points correctly
+    });
+  
     return lat !== 0 ? (
-      <Marker position={[lat, lng]}></Marker>
+      <Marker position={[lat, lng]} icon={customIcon}></Marker>
     ) : null;
-  };
+  };  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
