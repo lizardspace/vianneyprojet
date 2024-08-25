@@ -288,31 +288,39 @@ const MapComponent = () => {
     if (!mapRef.current) return;
 
     if (routingControlRef.current) {
-      mapRef.current.removeControl(routingControlRef.current);
+        mapRef.current.removeControl(routingControlRef.current);
     }
 
     const startPoint = L.latLng(parseFloat(startLat), parseFloat(startLng));
     const endPoint = L.latLng(parseFloat(endLat), parseFloat(endLng));
 
     routingControlRef.current = L.Routing.control({
-      waypoints: [startPoint, endPoint],
-      routeWhileDragging: true,
-      show: showRouteDetails, // Contrôle l'affichage des détails
-      createMarker: function() { return null; }, // Désactive les marqueurs par défaut
-      lineOptions: {
-        styles: [{ color: '#6FA1EC', weight: 4 }]
-      }
+        waypoints: [startPoint, endPoint],
+        routeWhileDragging: true,
+        show: showRouteDetails, // Contrôle l'affichage des détails
+        createMarker: function() { return null; }, // Désactive les marqueurs par défaut
+        lineOptions: {
+            styles: [{ color: '#6FA1EC', weight: 4 }]
+        },
+        language: 'fr', // Définit la langue sur le français
+        router: new L.Routing.OSRMv1({
+            language: 'fr', // Définit la langue du service de routage sur le français
+            profile: 'car', // Profil de routage (ici pour la voiture)
+        }),
+        formatter: new L.Routing.Formatter({
+            language: 'fr' // Définit la langue du formatteur sur le français
+        })
     })
     .on('routesfound', function(e) {
-      const routes = e.routes;
-      const summary = routes[0].summary;
-      const instructions = routes[0].instructions.map(instr => instr.text).join(' -> ');
+        const routes = e.routes;
+        const summary = routes[0].summary;
+        const instructions = routes[0].instructions.map(instr => instr.text).join(' -> ');
 
-      const fullItineraryText = `Distance: ${summary.totalDistance} m, Durée: ${summary.totalTime} s. Instructions: ${instructions}`;
-      setItineraryText(fullItineraryText);
+        const fullItineraryText = `Distance: ${summary.totalDistance} m, Durée: ${summary.totalTime} s. Instructions: ${instructions}`;
+        setItineraryText(fullItineraryText);
 
-      // Passer directement fullItineraryText à saveItinerary
-      saveItinerary(startLat, startLng, endLat, endLng, fullItineraryText);
+        // Passer directement fullItineraryText à saveItinerary
+        saveItinerary(startLat, startLng, endLat, endLng, fullItineraryText);
     })
     .addTo(mapRef.current);
 };
