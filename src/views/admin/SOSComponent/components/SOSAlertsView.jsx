@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from './../../../../supabaseClient'; // Ajustez l'importation selon la structure de votre projet
 import {
   Box,
@@ -12,6 +12,7 @@ import {
   Heading,
   Text,
   Button,
+  IconButton,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -20,11 +21,19 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  useToast,
 } from '@chakra-ui/react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { RiMapPinUserFill } from "react-icons/ri";
+import { MdDeleteForever } from "react-icons/md"; // Import the delete icon
 import { useEvent } from './../../../../EventContext'; // Importer le hook useEvent
 import ReactDOMServer from 'react-dom/server'; // Importer ReactDOMServer
 
@@ -35,6 +44,11 @@ const SOSAlertsView = () => {
   const { isOpen: isMapOpen, onOpen: onMapOpen, onClose: onMapClose } = useDisclosure(); // Contrôle du modal pour la carte
   const { isOpen: isVideoOpen, onOpen: onVideoOpen, onClose: onVideoClose } = useDisclosure(); // Contrôle du modal pour la vidéo
   const { selectedEventId } = useEvent(); // Obtenir l'ID de l'événement sélectionné à partir du contexte
+
+  const [alertToDelete, setAlertToDelete] = useState(null);
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+  const cancelRef = useRef();
+  const toast = useToast();
 
   useEffect(() => {
     let interval;
@@ -74,6 +88,40 @@ const SOSAlertsView = () => {
     onVideoOpen();
   };
 
+  const confirmDeleteAlert = (alert) => {
+    setAlertToDelete(alert);
+    onDeleteOpen();
+  };
+
+  const deleteAlert = async () => {
+    const { error } = await supabase
+      .from('vianney_sos_alerts')
+      .delete()
+      .eq('id', alertToDelete.id);
+
+    if (error) {
+      console.error('Erreur lors de la suppression de l\'alerte :', error);
+      toast({
+        title: "Erreur",
+        description: "La suppression de l'alerte a échoué.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      setAlerts(alerts.filter((alert) => alert.id !== alertToDelete.id));
+      toast({
+        title: "Succès",
+        description: "L'alerte a été supprimée avec succès.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+
+    onDeleteClose();
+  };
+
   const createCustomIcon = () => {
     return L.divIcon({
       html: ReactDOMServer.renderToString(<RiMapPinUserFill style={{ color: 'red', fontSize: '24px' }} />),
@@ -102,6 +150,7 @@ const SOSAlertsView = () => {
               <Th>Créé à</Th>
               <Th>Enregistrement</Th>
               <Th>Carte</Th>
+              <Th>Supprimer</Th> {/* New column for the delete button */}
             </Tr>
           </Thead>
           <Tbody>
@@ -128,6 +177,14 @@ const SOSAlertsView = () => {
                   >
                     Voir la carte
                   </Button>
+                </Td>
+                <Td>
+                  <IconButton
+                    aria-label="Supprimer l'alerte"
+                    icon={<MdDeleteForever />}
+                    colorScheme="red"
+                    onClick={() => confirmDeleteAlert(alert)}
+                  />
                 </Td>
               </Tr>
             ))}
@@ -194,6 +251,33 @@ const SOSAlertsView = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <AlertDialog
+        isOpen={isDeleteOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onDeleteClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Confirmer la suppression
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Êtes-vous sûr de vouloir supprimer cette alerte ? Cette action est irréversible.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onDeleteClose}>
+                Annuler
+              </Button>
+              <Button colorScheme="red" onClick={deleteAlert} ml={3}>
+                Supprimer
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </VStack>
   );
 };
