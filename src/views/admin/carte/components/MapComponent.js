@@ -59,6 +59,8 @@ const MapComponent = () => {
   const [startLng, setStartLng] = useState('');
   const [endLat, setEndLat] = useState('');
   const [endLng, setEndLng] = useState('');
+  const [selectingStart, setSelectingStart] = useState(false);
+  const [selectingEnd, setSelectingEnd] = useState(false);
 
   const buttonText = location.pathname === "/admin/zoomed-map" ?
     <MdOutlineZoomInMap /> :
@@ -156,7 +158,7 @@ const MapComponent = () => {
         const wazeUrl = `https://www.waze.com/ul?ll=${layer.getLatLng().lat},${layer.getLatLng().lng}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
         const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-        
+
         const popupContent = `
           <div>
             <strong>${nameElement || 'Élément'}</strong>
@@ -208,7 +210,7 @@ const MapComponent = () => {
         const wazeUrl = `https://www.waze.com/ul?ll=${layer.getLatLng().lat},${layer.getLatLng().lng}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
         const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-        
+
         const popupContent = `
           <div>
             <strong>${nameElement || 'Cercle'}</strong>
@@ -292,7 +294,7 @@ const MapComponent = () => {
       mapInstance.on(L.Draw.Event.CREATED, (event) => {
         const layer = event.layer;
         const type = event.layerType;
-        
+
         if (!selectedEventId) {
           toast({
             title: 'Erreur',
@@ -303,7 +305,7 @@ const MapComponent = () => {
           });
           return;
         }
-      
+
         openNameModal(layer, type);
       });
     }
@@ -339,10 +341,10 @@ const MapComponent = () => {
       teams.forEach(team => {
         const teamIcon = createTeamIcon();
         const deleteIconHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-    
+
         const wazeUrl = `https://www.waze.com/ul?ll=${team.latitude},${team.longitude}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Aller vers Waze</a>`;
-    
+
         const popupContent = `
           <div>
             <strong>${team.name_of_the_team}</strong>
@@ -351,22 +353,22 @@ const MapComponent = () => {
             ${wazeButtonHtml}
           </div>
         `;
-    
+
         const tooltipContent = team.name_of_the_team;
-    
+
         const marker = L.marker([team.latitude, team.longitude], { icon: teamIcon, team: true });
-    
+
         marker.addTo(mapRef.current)
-            .bindPopup(popupContent, {
-                offset: L.point(0,-30), // Aligner le popup légèrement au-dessus du marqueur
-                direction: 'top'
-            })
-            .bindTooltip(tooltipContent, {
-                permanent: false,
-                direction: 'top',
-                offset: L.point(0, -30) // Ajustez cette valeur pour que le tooltip soit correctement aligné
-            });
-    });    
+          .bindPopup(popupContent, {
+            offset: L.point(0, -30), // Aligner le popup légèrement au-dessus du marqueur
+            direction: 'top'
+          })
+          .bindTooltip(tooltipContent, {
+            permanent: false,
+            direction: 'top',
+            offset: L.point(0, -30) // Ajustez cette valeur pour que le tooltip soit correctement aligné
+          });
+      });
     };
 
     const fetchAndDisplayDrawnItems = async () => {
@@ -416,7 +418,7 @@ const MapComponent = () => {
         const wazeUrl = `https://www.waze.com/ul?ll=${marker.latitude},${marker.longitude}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
         const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-        
+
         const popupContent = `
           <div>
             <strong>${marker.name_element || 'Marker'}</strong>
@@ -456,7 +458,7 @@ const MapComponent = () => {
         const wazeUrl = `https://www.waze.com/ul?ll=${circleMarker.latitude},${circleMarker.longitude}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
         const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-        
+
         const popupContent = `
           <div>
             <strong>${circleMarker.name_element || 'CircleMarker'}</strong>
@@ -475,6 +477,41 @@ const MapComponent = () => {
     fetchAndDisplayTeams();
     fetchAndDisplayDrawnItems();
   }, [selectedEventId, toast]);
+  useEffect(() => {
+    if (mapRef.current) {
+      const handleStartSelection = (e) => {
+        if (selectingStart) {
+          setStartLat(e.latlng.lat);
+          setStartLng(e.latlng.lng);
+          setSelectingStart(false); // Désactiver la sélection après la mise à jour
+        }
+      };
+
+      mapRef.current.on('click', handleStartSelection);
+
+      return () => {
+        mapRef.current.off('click', handleStartSelection);
+      };
+    }
+  }, [selectingStart]);
+
+  useEffect(() => {
+    if (mapRef.current) {
+      const handleEndSelection = (e) => {
+        if (selectingEnd) {
+          setEndLat(e.latlng.lat);
+          setEndLng(e.latlng.lng);
+          setSelectingEnd(false); // Désactiver la sélection après la mise à jour
+        }
+      };
+
+      mapRef.current.on('click', handleEndSelection);
+
+      return () => {
+        mapRef.current.off('click', handleEndSelection);
+      };
+    }
+  }, [selectingEnd]);
 
   const handleNameSubmit = () => {
     if (pendingLayer && pendingType) {
@@ -553,6 +590,26 @@ const MapComponent = () => {
           Calculer l'itinéraire
         </Button>
       </VStack>
+      <HStack spacing={4}>
+        <Button
+          colorScheme={selectingStart ? "green" : "blue"}
+          onClick={() => {
+            setSelectingStart(true);
+            setSelectingEnd(false); // S'assurer que seul le point de départ est en cours de sélection
+          }}
+        >
+          Sélectionner le point de départ sur la carte
+        </Button>
+        <Button
+          colorScheme={selectingEnd ? "green" : "blue"}
+          onClick={() => {
+            setSelectingStart(false); // S'assurer que seul le point d'arrivée est en cours de sélection
+            setSelectingEnd(true);
+          }}
+        >
+          Sélectionner le point d'arrivée sur la carte
+        </Button>
+      </HStack>
 
       {isButtonVisible && (
         <Button
@@ -567,15 +624,15 @@ const MapComponent = () => {
         </Button>
       )}
       {location.pathname === "/admin/zoomed-map" && (
-        <CloseButton 
-          position="absolute" 
-          top="10px" 
-          right="10px" 
-          onClick={closeModal} 
-          bg="white" 
-          color="black" 
+        <CloseButton
+          position="absolute"
+          top="10px"
+          right="10px"
+          onClick={closeModal}
+          bg="white"
+          color="black"
           _hover={{ bg: "gray.300" }}
-          zIndex="1000" 
+          zIndex="1000"
         />
       )}
 
