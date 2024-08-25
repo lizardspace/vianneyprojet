@@ -6,7 +6,7 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import { renderToString } from "react-dom/server";
 import {
   Box, Button, useToast, CloseButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader,
-  AlertDialogContent, AlertDialogOverlay, Input, VStack, HStack, FormControl, FormLabel
+  AlertDialogContent, AlertDialogOverlay, Input, VStack, HStack, FormControl, FormLabel, Textarea
 } from '@chakra-ui/react';
 import { MdPlace, MdOutlineZoomInMap, MdOutlineZoomOutMap, MdDeleteForever } from "react-icons/md";
 import { useEvent } from './../../../../EventContext';
@@ -59,6 +59,7 @@ const MapComponent = () => {
   const [startLng, setStartLng] = useState('');
   const [endLat, setEndLat] = useState('');
   const [endLng, setEndLng] = useState('');
+  const [itineraryText, setItineraryText] = useState('');
   const [selectingStart, setSelectingStart] = useState(false);
   const [selectingEnd, setSelectingEnd] = useState(false);
   const [showRouteDetails, setShowRouteDetails] = useState(false);
@@ -244,6 +245,78 @@ const MapComponent = () => {
       });
     }
   };
+
+  const saveItinerary = async (startLat, startLng, endLat, endLng, itineraryText) => {
+    try {
+        // eslint-disable-next-line no-unused-vars
+      const { data, error } = await supabase
+        .from('vianney_itineraire_carte')
+        .insert([
+          {
+            event_id: selectedEventId,
+            start_latitude: startLat,
+            start_longitude: startLng,
+            end_latitude: endLat,
+            end_longitude: endLng,
+            itinerary_text: itineraryText
+          }
+        ])
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: 'Itinéraire enregistré',
+        description: 'L\'itinéraire a été enregistré avec succès dans la base de données.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement de l\'itinéraire:', error.message);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'enregistrer l\'itinéraire. Veuillez réessayer.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleRouteCalculation = () => {
+    if (!mapRef.current) return;
+
+    if (routingControlRef.current) {
+      mapRef.current.removeControl(routingControlRef.current);
+    }
+
+    const startPoint = L.latLng(parseFloat(startLat), parseFloat(startLng));
+    const endPoint = L.latLng(parseFloat(endLat), parseFloat(endLng));
+
+    routingControlRef.current = L.Routing.control({
+      waypoints: [startPoint, endPoint],
+      routeWhileDragging: true,
+      show: showRouteDetails, // Contrôle l'affichage des détails
+      createMarker: function() { return null; }, // Désactive les marqueurs par défaut
+      lineOptions: {
+        styles: [{ color: '#6FA1EC', weight: 4 }]
+      }
+    })
+    .on('routesfound', function(e) {
+      const routes = e.routes;
+      const summary = routes[0].summary;
+      const instructions = routes[0].instructions.map(instr => instr.text).join(' -> ');
+
+      const fullItineraryText = `Distance: ${summary.totalDistance} m, Durée: ${summary.totalTime} s. Instructions: ${instructions}`;
+      setItineraryText(fullItineraryText);
+
+      // Passer directement fullItineraryText à saveItinerary
+      saveItinerary(startLat, startLng, endLat, endLng, fullItineraryText);
+    })
+    .addTo(mapRef.current);
+};
+
 
   useEffect(() => {
     const updateMapHeight = () => {
@@ -478,6 +551,7 @@ const MapComponent = () => {
     fetchAndDisplayTeams();
     fetchAndDisplayDrawnItems();
   }, [selectedEventId, toast]);
+
   useEffect(() => {
     if (mapRef.current) {
       const handleStartSelection = (e) => {
@@ -524,22 +598,6 @@ const MapComponent = () => {
     setPendingType(null);
   };
 
-  const handleRouteCalculation = () => {
-    if (!mapRef.current) return;
-  
-    if (routingControlRef.current) {
-      mapRef.current.removeControl(routingControlRef.current);
-    }
-  
-    const startPoint = L.latLng(parseFloat(startLat), parseFloat(startLng));
-    const endPoint = L.latLng(parseFloat(endLat), parseFloat(endLng));
-  
-    routingControlRef.current = L.Routing.control({
-      waypoints: [startPoint, endPoint],
-      routeWhileDragging: true,
-      show: showRouteDetails, // Contrôle l'affichage des détails
-    }).addTo(mapRef.current);
-  };  
 
   return (
     <Box pt="10px" position="relative">
@@ -591,6 +649,12 @@ const MapComponent = () => {
         <Button colorScheme="blue" onClick={handleRouteCalculation}>
           Calculer l'itinéraire
         </Button>
+        <Textarea
+          placeholder="Détails de l'itinéraire"
+          value={itineraryText}
+          onChange={(e) => setItineraryText(e.target.value)}
+          readOnly
+        />
       </VStack>
       <HStack spacing={4}>
         <Button
@@ -613,11 +677,11 @@ const MapComponent = () => {
         </Button>
       </HStack>
       <Button
-  colorScheme={showRouteDetails ? "red" : "green"}
-  onClick={() => setShowRouteDetails(prev => !prev)}
->
-  {showRouteDetails ? "Masquer les détails" : "Afficher les détails"}
-</Button>
+        colorScheme={showRouteDetails ? "red" : "green"}
+        onClick={() => setShowRouteDetails(prev => !prev)}
+      >
+        {showRouteDetails ? "Masquer les détails" : "Afficher les détails"}
+      </Button>
 
       {isButtonVisible && (
         <Button
