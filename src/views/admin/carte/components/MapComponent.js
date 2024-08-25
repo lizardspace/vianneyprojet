@@ -61,6 +61,7 @@ const MapComponent = () => {
   const [endLng, setEndLng] = useState('');
   const [selectingStart, setSelectingStart] = useState(false);
   const [selectingEnd, setSelectingEnd] = useState(false);
+  const [showRouteDetails, setShowRouteDetails] = useState(false);
 
   const buttonText = location.pathname === "/admin/zoomed-map" ?
     <MdOutlineZoomInMap /> :
@@ -525,19 +526,20 @@ const MapComponent = () => {
 
   const handleRouteCalculation = () => {
     if (!mapRef.current) return;
-
+  
     if (routingControlRef.current) {
       mapRef.current.removeControl(routingControlRef.current);
     }
-
+  
     const startPoint = L.latLng(parseFloat(startLat), parseFloat(startLng));
     const endPoint = L.latLng(parseFloat(endLat), parseFloat(endLng));
-
+  
     routingControlRef.current = L.Routing.control({
       waypoints: [startPoint, endPoint],
       routeWhileDragging: true,
+      show: showRouteDetails, // Contrôle l'affichage des détails
     }).addTo(mapRef.current);
-  };
+  };  
 
   return (
     <Box pt="10px" position="relative">
@@ -610,6 +612,12 @@ const MapComponent = () => {
           Sélectionner le point d'arrivée sur la carte
         </Button>
       </HStack>
+      <Button
+  colorScheme={showRouteDetails ? "red" : "green"}
+  onClick={() => setShowRouteDetails(prev => !prev)}
+>
+  {showRouteDetails ? "Masquer les détails" : "Afficher les détails"}
+</Button>
 
       {isButtonVisible && (
         <Button
