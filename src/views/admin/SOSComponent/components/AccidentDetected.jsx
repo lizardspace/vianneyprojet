@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Text,
   Button,
@@ -19,12 +19,13 @@ import {
   AlertTitle,
   AlertDescription,
   Input,
+  Box
 } from '@chakra-ui/react';
 import { PhoneIcon, CheckIcon } from '@chakra-ui/icons';
 import { supabase } from './../../../../supabaseClient'; // Adjust the import according to your project structure
 import { useTeam } from './../../InterfaceEquipe/TeamContext'; // Import the useTeam hook
 import { useEvent } from './../../../../EventContext'; // Import the useEvent hook
-import RecordRTC from 'recordrtc';
+import VideoRecorder from './VideoRecorder'; // Adjust the import according to your project structure
 
 const DEFAULT_TEAM_ID = '00000000-0000-0000-0000-000000000000'; // Default team_id for "Aucune équipe"
 const DEFAULT_TEAM_NAME = 'Aucune équipe'; // Default team_name
@@ -35,10 +36,8 @@ const AccidentDetected = () => {
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const videoRef = useRef(null);
-  const recorderRef = useRef(null);
   const [alertId, setAlertId] = useState(null); // Store the ID of the inserted alert
-  const [videoUrl, setVideoUrl] = useState(''); // Store the video URL
+  const [supabaseURL, setSupabaseURL] = useState(''); // State for Supabase URL
   const { teamUUID, selectedTeam } = useTeam(); // Use the useTeam hook to get teamUUID and selectedTeam
   const { selectedEventId } = useEvent(); // Use the useEvent hook to get the selectedEventId
 
@@ -67,19 +66,6 @@ const AccidentDetected = () => {
     });
   }, []);
 
-  const startRecording = useCallback(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        console.log('Media stream obtained:', stream); // Debug log
-        videoRef.current.srcObject = stream;
-        recorderRef.current = new RecordRTC(stream, { type: 'video', mimeType: 'video/mp4' });
-        recorderRef.current.startRecording();
-        // Stop recording after 100 seconds (100,000 milliseconds)
-        setTimeout(stopRecording, 100000);
-      })
-      .catch(error => console.error('Error accessing media devices:', error));
-  }, []);
-
   const saveAlertData = useCallback(async (lat, long, timeForUser) => {
     console.log('Saving alert data:', { lat, long, timeForUser }); // Debug log
     const { data, error } = await supabase
@@ -106,7 +92,7 @@ const AccidentDetected = () => {
     }
   }, [teamUUID, selectedTeam, selectedEventId]);
 
-  const updateAlertData = async (id, videoUrl) => {
+  const updateAlertData = useCallback(async (id, videoUrl) => {
     console.log('Updating alert data with URL:', { id, videoUrl }); // Debug log
     const { data, error } = await supabase
       .from('vianney_sos_alerts')
@@ -118,26 +104,7 @@ const AccidentDetected = () => {
     } else {
       console.log('Data updated successfully:', data);
     }
-  };
-
-  const uploadVideoToSupabase = async (blob) => {
-    const fileName = `sos_recording_${new Date().toISOString()}.mp4`;
-    console.log('Uploading video:', fileName); // Debug log
-    const { data, error } = await supabase
-      .storage
-      .from('sos-alerts-video')
-      .upload(fileName, blob);
-
-    if (error) {
-      console.error('Error uploading video:', error);
-      return null;
-    } else {
-      const videoUrl = `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/sos-alerts-video/${data.path}`;
-      console.log('Video uploaded:', videoUrl); // Debug log
-      setVideoUrl(videoUrl); // Set the video URL state
-      return videoUrl;
-    }
-  };
+  }, []);
 
   useEffect(() => {
     let timer;
@@ -145,43 +112,23 @@ const AccidentDetected = () => {
       timer = setInterval(() => {
         setCounter((prevCounter) => prevCounter - 1);
       }, 1000);
-    } else if (counter === 0) {
-      (async () => {
-        setStep(3);
-        try {
-          const location = await getCurrentLocation();
-          const currentTime = new Date().toISOString();
-          await saveAlertData(location.latitude, location.longitude, currentTime);
-          startRecording();
-          // Wait for 10 seconds before uploading video and updating alert data
-          setTimeout(async () => {
-            if (recorderRef.current) {
-              recorderRef.current.stopRecording(async () => {
-                const blob = recorderRef.current.getBlob();
-                const videoUrl = await uploadVideoToSupabase(blob);
-                if (videoUrl && alertId) {
-                  await updateAlertData(alertId, videoUrl);
-                }
-              });
-            }
-          }, 10000);
-        } catch (error) {
-          console.error('Error in location or recording:', error);
-        }
-      })();
+    } else if (counter === 0 && step === 2) {
+      confirmSOS();
     }
     return () => clearInterval(timer);
-  }, [counter, step, getCurrentLocation, startRecording, saveAlertData, alertId]);
+    // eslint-disable-next-line
+  }, [counter, step]);
 
   useEffect(() => {
-    // Update the alert data with the video URL once the URL is available
-    if (videoUrl && alertId) {
-      updateAlertData(alertId, videoUrl);
+    // Update the alert data with the Supabase URL once it's available
+    if (supabaseURL && alertId) {
+      updateAlertData(alertId, supabaseURL);
     }
-  }, [videoUrl, alertId]);
+  }, [supabaseURL, alertId, updateAlertData]);
 
   const triggerSOS = () => {
     setStep(2);
+    setCounter(30); // Reset the counter to 30 seconds when SOS is triggered
   };
 
   const confirmSOS = async () => {
@@ -190,19 +137,6 @@ const AccidentDetected = () => {
       const location = await getCurrentLocation();
       const currentTime = new Date().toISOString();
       await saveAlertData(location.latitude, location.longitude, currentTime);
-      startRecording();
-      // Wait for 10 seconds before uploading video and updating alert data
-      setTimeout(async () => {
-        if (recorderRef.current) {
-          recorderRef.current.stopRecording(async () => {
-            const blob = recorderRef.current.getBlob();
-            const videoUrl = await uploadVideoToSupabase(blob);
-            if (videoUrl && alertId) {
-              await updateAlertData(alertId, videoUrl);
-            }
-          });
-        }
-      }, 10000);
     } catch (error) {
       console.error('Error in location or recording:', error);
     }
@@ -211,37 +145,11 @@ const AccidentDetected = () => {
   const cancelAlert = () => {
     setCounter(30);
     setStep(1);
-    stopRecording();
     onClose();
-  };
-
-  const stopRecording = () => {
-    if (recorderRef.current) {
-      recorderRef.current.stopRecording(() => {
-        const tracks = videoRef.current.srcObject.getTracks();
-        tracks.forEach(track => track.stop());
-        console.log('Recording stopped'); // Debug log
-      });
-    }
-  };
-
-  const downloadRecording = () => {
-    if (recorderRef.current) {
-      const blob = recorderRef.current.getBlob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      document.body.appendChild(a);
-      a.style = 'display: none';
-      a.href = url;
-      a.download = 'sos_recording.mp4';
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
   };
 
   return (
     <Center height="100vh" bg="gray.50" p={4}>
-      <video ref={videoRef} style={{ display: 'none' }} autoPlay />
       {step === 1 && (
         <VStack spacing={8} bg="white" p={6} rounded="md" shadow="md">
           <Text fontSize="2xl" fontWeight="bold">
@@ -312,17 +220,20 @@ const AccidentDetected = () => {
               )}
             </AlertDescription>
           </Alert>
-          <Button colorScheme="blue" onClick={downloadRecording}>
-            Télécharger l'enregistrement
-          </Button>
-          {videoUrl && (
+          {supabaseURL && (
+            <Box display="none">
             <VStack spacing={4}>
               <Text fontSize="md" fontWeight="bold">
-                URL de l'enregistrement :
+                Supabase URL :
               </Text>
-              <Input value={videoUrl} isReadOnly />
+              <Input value={supabaseURL} isReadOnly />
             </VStack>
+            </Box>
           )}
+          {/* Hidden VideoRecorder component */}
+          <Box display="none">
+            <VideoRecorder uuid={alertId} setSupabaseURL={setSupabaseURL} />
+          </Box>
         </VStack>
       )}
 

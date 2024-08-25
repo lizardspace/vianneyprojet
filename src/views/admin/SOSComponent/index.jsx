@@ -1,33 +1,22 @@
-import React from "react";
-import { Box, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure } from "@chakra-ui/react";
-import { FiAlertCircle } from "react-icons/fi";
+import React, { useState } from "react";
+import { Box, Button } from "@chakra-ui/react";
 import AccidentDetected from "./components/AccidentDetected";
 import SOSAlertsView from "./components/SOSAlertsView";
 
 export default function Settings() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [showAccidentDetected, setShowAccidentDetected] = useState(false);
 
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <SOSAlertsView />
-      <Button onClick={onOpen} mt={4} colorScheme="red" leftIcon={<FiAlertCircle />}>
-        Déclencher un SOS
+      <Button 
+        mt={4} 
+        onClick={() => setShowAccidentDetected(!showAccidentDetected)}
+        colorScheme="teal"
+      >
+        {showAccidentDetected ? "Masquer SOS Alerte silencieuse" : "Montrer SOS Alerte silencieuse"}
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader></ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <AccidentDetected />
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Fermer
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      {showAccidentDetected && <AccidentDetected />}
     </Box>
   );
 }
