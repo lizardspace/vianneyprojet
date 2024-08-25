@@ -2,13 +2,18 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import { renderToString } from "react-dom/server";
-import { Box, Button, useToast, CloseButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Input } from '@chakra-ui/react';
+import {
+  Box, Button, useToast, CloseButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader,
+  AlertDialogContent, AlertDialogOverlay, Input, VStack, HStack, FormControl, FormLabel
+} from '@chakra-ui/react';
 import { MdPlace, MdOutlineZoomInMap, MdOutlineZoomOutMap, MdDeleteForever } from "react-icons/md";
 import { useEvent } from './../../../../EventContext';
 import { supabase } from './../../../../supabaseClient';
 import { useHistory, useLocation } from "react-router-dom";
 import 'leaflet-draw';
+import 'leaflet-routing-machine';
 
 const createTeamIcon = () => {
   const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: 'red' }} />);
@@ -22,7 +27,7 @@ const createTeamIcon = () => {
 };
 
 const createCustomIcon = () => {
-  const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: '#34A853' }} />); // Vert Google
+  const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: '#34A853' }} />);
   return L.divIcon({
     html: placeIconHtml,
     className: 'custom-leaflet-icon',
@@ -34,6 +39,7 @@ const createCustomIcon = () => {
 
 const MapComponent = () => {
   const mapRef = useRef(null);
+  const routingControlRef = useRef(null);
   const [mapHeight, setMapHeight] = useState('800px');
   const { selectedEventId } = useEvent();
   const history = useHistory();
@@ -48,6 +54,11 @@ const MapComponent = () => {
   const [newElementName, setNewElementName] = useState('');
   const [pendingLayer, setPendingLayer] = useState(null);
   const [pendingType, setPendingType] = useState(null);
+
+  const [startLat, setStartLat] = useState('');
+  const [startLng, setStartLng] = useState('');
+  const [endLat, setEndLat] = useState('');
+  const [endLng, setEndLng] = useState('');
 
   const buttonText = location.pathname === "/admin/zoomed-map" ?
     <MdOutlineZoomInMap /> :
@@ -475,8 +486,74 @@ const MapComponent = () => {
     setPendingType(null);
   };
 
+  const handleRouteCalculation = () => {
+    if (!mapRef.current) return;
+
+    if (routingControlRef.current) {
+      mapRef.current.removeControl(routingControlRef.current);
+    }
+
+    const startPoint = L.latLng(parseFloat(startLat), parseFloat(startLng));
+    const endPoint = L.latLng(parseFloat(endLat), parseFloat(endLng));
+
+    routingControlRef.current = L.Routing.control({
+      waypoints: [startPoint, endPoint],
+      routeWhileDragging: true,
+    }).addTo(mapRef.current);
+  };
+
   return (
     <Box pt="10px" position="relative">
+      <VStack spacing={4} p={4} bg="gray.100" borderRadius="md" boxShadow="md">
+        <HStack spacing={4}>
+          <FormControl>
+            <FormLabel>Latitude de départ</FormLabel>
+            <Input
+              placeholder="Latitude de départ"
+              value={startLat}
+              onChange={(e) => setStartLat(e.target.value)}
+              type="number"
+              step="any"
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Longitude de départ</FormLabel>
+            <Input
+              placeholder="Longitude de départ"
+              value={startLng}
+              onChange={(e) => setStartLng(e.target.value)}
+              type="number"
+              step="any"
+            />
+          </FormControl>
+        </HStack>
+        <HStack spacing={4}>
+          <FormControl>
+            <FormLabel>Latitude d'arrivée</FormLabel>
+            <Input
+              placeholder="Latitude d'arrivée"
+              value={endLat}
+              onChange={(e) => setEndLat(e.target.value)}
+              type="number"
+              step="any"
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Longitude d'arrivée</FormLabel>
+            <Input
+              placeholder="Longitude d'arrivée"
+              value={endLng}
+              onChange={(e) => setEndLng(e.target.value)}
+              type="number"
+              step="any"
+            />
+          </FormControl>
+        </HStack>
+        <Button colorScheme="blue" onClick={handleRouteCalculation}>
+          Calculer l'itinéraire
+        </Button>
+      </VStack>
+
       {isButtonVisible && (
         <Button
           onClick={toggleMapView}
@@ -484,6 +561,7 @@ const MapComponent = () => {
           color="white"
           _hover={{ bg: "red.600" }}
           _active={{ bg: "red.700" }}
+          mt={4}
         >
           {buttonText}
         </Button>
@@ -497,7 +575,7 @@ const MapComponent = () => {
           bg="white" 
           color="black" 
           _hover={{ bg: "gray.300" }}
-          zIndex="1000" // Assurez que le bouton est bien au-dessus de la carte
+          zIndex="1000" 
         />
       )}
 
