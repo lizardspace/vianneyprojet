@@ -283,47 +283,137 @@ const MapComponent = () => {
       });
     }
   };
+// eslint-disable-next-line
+  const [savedRoutes, setSavedRoutes] = useState(null);
 
   const handleRouteCalculation = () => {
     if (!mapRef.current) return;
-
+  
     if (routingControlRef.current) {
-        mapRef.current.removeControl(routingControlRef.current);
+      mapRef.current.removeControl(routingControlRef.current);
     }
-
+  
     const startPoint = L.latLng(parseFloat(startLat), parseFloat(startLng));
     const endPoint = L.latLng(parseFloat(endLat), parseFloat(endLng));
-
+  
     routingControlRef.current = L.Routing.control({
+      waypoints: [startPoint, endPoint],
+      routeWhileDragging: true,
+      show: showRouteDetails,
+      createMarker: function () { return null; },
+      lineOptions: {
+        styles: [{ color: '#6FA1EC', weight: 4 }]
+      },
+      language: 'fr',
+      router: new L.Routing.OSRMv1({
+        language: 'fr',
+        profile: 'car',
+      }),
+      formatter: new L.Routing.Formatter({
+        language: 'fr'
+      })
+    }).addTo(mapRef.current);
+  
+    routingControlRef.current.on('routesfound', function(e) {
+      const routes = e.routes;
+      const summary = routes[0].summary;
+      const instructions = routes[0].instructions.map(instr => instr.text).join(' -> ');
+  
+      const fullItineraryText = `Distance: ${summary.totalDistance} m, Durée: ${summary.totalTime} s. Instructions: ${instructions}`;
+      setItineraryText(fullItineraryText);
+  
+      saveItinerary(startLat, startLng, endLat, endLng, fullItineraryText);
+  
+      // Après 2 secondes, remplacer par les itinéraires sauvegardés
+      setTimeout(() => {
+        if (routingControlRef.current) {
+          mapRef.current.removeControl(routingControlRef.current);
+        }
+        loadAndDisplaySavedRoutes();
+      }, 2000);
+    });
+  };  
+
+  const loadAndDisplaySavedRoutes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('vianney_itineraire_carte')
+        .select('*')
+        .eq('event_id', selectedEventId)
+        .order('created_at', { ascending: false }) // Trier par date de création pour obtenir le plus récent en premier
+        .limit(1); // Limiter les résultats à un seul itinéraire
+    
+      if (error) {
+        throw error;
+      }
+    
+      if (data.length === 0) {
+        console.log("Aucun itinéraire trouvé pour cet événement.");
+        toast({
+          title: 'Aucun itinéraire trouvé',
+          description: 'Aucun itinéraire n\'a été trouvé pour cet événement.',
+          status: 'info',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+    
+      // Afficher le dernier itinéraire récupéré
+      const lastRoute = data[0];
+      await displayRoute(lastRoute);
+    
+      setSavedRoutes(data); // Stocker l'itinéraire récupéré
+    
+    } catch (error) {
+      console.error('Erreur lors du chargement des itinéraires depuis la base de données:', error.message);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger les itinéraires depuis la base de données. Veuillez réessayer.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };  
+  
+  // Fonction pour afficher un itinéraire spécifique
+  const displayRoute = (route) => {
+    return new Promise((resolve) => {
+      const startPoint = L.latLng(route.start_latitude, route.start_longitude);
+      const endPoint = L.latLng(route.end_latitude, route.end_longitude);
+  
+      const routingControl = L.Routing.control({
         waypoints: [startPoint, endPoint],
-        routeWhileDragging: true,
-        show: showRouteDetails, // Contrôle l'affichage des détails
-        createMarker: function() { return null; }, // Désactive les marqueurs par défaut
+        routeWhileDragging: false,
+        show: showRouteDetails,
+        createMarker: function () { return null; }, // Désactiver les marqueurs par défaut
         lineOptions: {
-            styles: [{ color: '#6FA1EC', weight: 4 }]
+          styles: [{ color: '#34A853', weight: 4 }]
         },
-        language: 'fr', // Définit la langue sur le français
+        language: 'fr',
         router: new L.Routing.OSRMv1({
-            language: 'fr', // Définit la langue du service de routage sur le français
-            profile: 'car', // Profil de routage (ici pour la voiture)
+          language: 'fr',
+          profile: 'car',
         }),
         formatter: new L.Routing.Formatter({
-            language: 'fr' // Définit la langue du formatteur sur le français
+          language: 'fr'
         })
-    })
-    .on('routesfound', function(e) {
+      }).addTo(mapRef.current);
+  
+      routingControl.on('routesfound', function(e) {
         const routes = e.routes;
         const summary = routes[0].summary;
         const instructions = routes[0].instructions.map(instr => instr.text).join(' -> ');
-
+  
         const fullItineraryText = `Distance: ${summary.totalDistance} m, Durée: ${summary.totalTime} s. Instructions: ${instructions}`;
-        setItineraryText(fullItineraryText);
-
-        // Passer directement fullItineraryText à saveItinerary
-        saveItinerary(startLat, startLng, endLat, endLng, fullItineraryText);
-    })
-    .addTo(mapRef.current);
-};
+        console.log(fullItineraryText);
+  
+        // Résoudre la promesse pour passer à l'itinéraire suivant
+        resolve();
+      });
+    });
+  };  
 
 
   useEffect(() => {
