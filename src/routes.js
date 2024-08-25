@@ -120,7 +120,7 @@ const routes = [
     component: AlerteJeSuisEnDanger,
   },
   {
-    name: "SOS Route",
+    name: "SOS Alerte Silencieuse",
     layout: "/admin",
     path: "/sosroute",
     icon: <Icon as={MdOutlineSos} width="20px" height="20px" color="red" />, // Set the icon color to red
