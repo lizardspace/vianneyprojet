@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -246,9 +246,124 @@ const MapComponent = () => {
     }
   };
 
-  const saveItinerary = async (startLat, startLng, endLat, endLng, itineraryText) => {
+  const displayRoute = useCallback((route) => {
+    return new Promise((resolve) => {
+      if (routingControlRef.current) {
+        mapRef.current.removeControl(routingControlRef.current);
+      }
+
+      const startPoint = L.latLng(route.start_latitude, route.start_longitude);
+      const endPoint = L.latLng(route.end_latitude, route.end_longitude);
+
+      routingControlRef.current = L.Routing.control({
+        waypoints: [startPoint, endPoint],
+        routeWhileDragging: false,
+        show: showRouteDetails,
+        createMarker: function () { return null; },
+        lineOptions: {
+          styles: [{ color: '#34A853', weight: 4 }]
+        },
+        language: 'fr',
+        router: new L.Routing.OSRMv1({
+          language: 'fr',
+          profile: 'car',
+        }),
+        formatter: new L.Routing.Formatter({
+          language: 'fr'
+        })
+      }).addTo(mapRef.current);
+
+      routingControlRef.current.on('routesfound', function (e) {
+        const routes = e.routes;
+        const summary = routes[0].summary;
+        const instructions = routes[0].instructions.map(instr => instr.text).join(' -> ');
+
+        const fullItineraryText = `Distance: ${summary.totalDistance} m, Durée: ${summary.totalTime} s. Instructions: ${instructions}`;
+        console.log(fullItineraryText);
+
+        resolve();
+      });
+    });
+  }, [showRouteDetails]);
+
+  const loadAndDisplaySavedRoutes = useCallback(async () => {
     try {
-        // eslint-disable-next-line no-unused-vars
+      const { data, error } = await supabase
+        .from('vianney_itineraire_carte')
+        .select('*')
+        .eq('event_id', selectedEventId)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.length === 0) {
+        console.log("Aucun itinéraire trouvé pour cet événement.");
+        return;
+      }
+
+      const lastRoute = data[0];
+      await displayRoute(lastRoute);
+
+    } catch (error) {
+      console.error('Erreur lors du chargement des itinéraires depuis la base de données:', error.message);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger les itinéraires depuis la base de données. Veuillez réessayer.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, [displayRoute, selectedEventId, toast]);
+
+  const handleRouteCalculation = () => {
+    if (!mapRef.current) return;
+
+    if (routingControlRef.current) {
+      mapRef.current.removeControl(routingControlRef.current);
+    }
+
+    const startPoint = L.latLng(parseFloat(startLat), parseFloat(startLng));
+    const endPoint = L.latLng(parseFloat(endLat), parseFloat(endLng));
+
+    routingControlRef.current = L.Routing.control({
+      waypoints: [startPoint, endPoint],
+      routeWhileDragging: true,
+      show: showRouteDetails,
+      createMarker: function () { return null; },
+      lineOptions: {
+        styles: [{ color: '#6FA1EC', weight: 4 }]
+      },
+      language: 'fr',
+      router: new L.Routing.OSRMv1({
+        language: 'fr',
+        profile: 'car',
+      }),
+      formatter: new L.Routing.Formatter({
+        language: 'fr'
+      })
+    }).addTo(mapRef.current);
+
+    routingControlRef.current.on('routesfound', async function (e) {
+      const routes = e.routes;
+      const summary = routes[0].summary;
+      const instructions = routes[0].instructions.map(instr => instr.text).join(' -> ');
+
+      const fullItineraryText = `Distance: ${summary.totalDistance} m, Durée: ${summary.totalTime} s. Instructions: ${instructions}`;
+      setItineraryText(fullItineraryText);
+
+      await saveItinerary(startLat, startLng, endLat, endLng, fullItineraryText);
+
+      loadAndDisplaySavedRoutes();
+    });
+  };
+
+  const saveItinerary = async (startLat, startLng, endLat, endLng, itineraryText) => {
+    console.log("Saving itinerary...");
+    try {
       const { data, error } = await supabase
         .from('vianney_itineraire_carte')
         .insert([
@@ -264,6 +379,8 @@ const MapComponent = () => {
         .single();
 
       if (error) throw error;
+
+      console.log("Itinerary saved:", data);
 
       toast({
         title: 'Itinéraire enregistré',
@@ -283,138 +400,6 @@ const MapComponent = () => {
       });
     }
   };
-// eslint-disable-next-line
-  const [savedRoutes, setSavedRoutes] = useState(null);
-
-  const handleRouteCalculation = () => {
-    if (!mapRef.current) return;
-  
-    if (routingControlRef.current) {
-      mapRef.current.removeControl(routingControlRef.current);
-    }
-  
-    const startPoint = L.latLng(parseFloat(startLat), parseFloat(startLng));
-    const endPoint = L.latLng(parseFloat(endLat), parseFloat(endLng));
-  
-    routingControlRef.current = L.Routing.control({
-      waypoints: [startPoint, endPoint],
-      routeWhileDragging: true,
-      show: showRouteDetails,
-      createMarker: function () { return null; },
-      lineOptions: {
-        styles: [{ color: '#6FA1EC', weight: 4 }]
-      },
-      language: 'fr',
-      router: new L.Routing.OSRMv1({
-        language: 'fr',
-        profile: 'car',
-      }),
-      formatter: new L.Routing.Formatter({
-        language: 'fr'
-      })
-    }).addTo(mapRef.current);
-  
-    routingControlRef.current.on('routesfound', function(e) {
-      const routes = e.routes;
-      const summary = routes[0].summary;
-      const instructions = routes[0].instructions.map(instr => instr.text).join(' -> ');
-  
-      const fullItineraryText = `Distance: ${summary.totalDistance} m, Durée: ${summary.totalTime} s. Instructions: ${instructions}`;
-      setItineraryText(fullItineraryText);
-  
-      saveItinerary(startLat, startLng, endLat, endLng, fullItineraryText);
-  
-      // Après 2 secondes, remplacer par les itinéraires sauvegardés
-      setTimeout(() => {
-        if (routingControlRef.current) {
-          mapRef.current.removeControl(routingControlRef.current);
-        }
-        loadAndDisplaySavedRoutes();
-      }, 2000);
-    });
-  };  
-
-  const loadAndDisplaySavedRoutes = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('vianney_itineraire_carte')
-        .select('*')
-        .eq('event_id', selectedEventId)
-        .order('created_at', { ascending: false }) // Trier par date de création pour obtenir le plus récent en premier
-        .limit(1); // Limiter les résultats à un seul itinéraire
-    
-      if (error) {
-        throw error;
-      }
-    
-      if (data.length === 0) {
-        console.log("Aucun itinéraire trouvé pour cet événement.");
-        toast({
-          title: 'Aucun itinéraire trouvé',
-          description: 'Aucun itinéraire n\'a été trouvé pour cet événement.',
-          status: 'info',
-          duration: 5000,
-          isClosable: true,
-        });
-        return;
-      }
-    
-      // Afficher le dernier itinéraire récupéré
-      const lastRoute = data[0];
-      await displayRoute(lastRoute);
-    
-      setSavedRoutes(data); // Stocker l'itinéraire récupéré
-    
-    } catch (error) {
-      console.error('Erreur lors du chargement des itinéraires depuis la base de données:', error.message);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de charger les itinéraires depuis la base de données. Veuillez réessayer.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  };  
-  
-  // Fonction pour afficher un itinéraire spécifique
-  const displayRoute = (route) => {
-    return new Promise((resolve) => {
-      const startPoint = L.latLng(route.start_latitude, route.start_longitude);
-      const endPoint = L.latLng(route.end_latitude, route.end_longitude);
-  
-      const routingControl = L.Routing.control({
-        waypoints: [startPoint, endPoint],
-        routeWhileDragging: false,
-        show: showRouteDetails,
-        createMarker: function () { return null; }, // Désactiver les marqueurs par défaut
-        lineOptions: {
-          styles: [{ color: '#34A853', weight: 4 }]
-        },
-        language: 'fr',
-        router: new L.Routing.OSRMv1({
-          language: 'fr',
-          profile: 'car',
-        }),
-        formatter: new L.Routing.Formatter({
-          language: 'fr'
-        })
-      }).addTo(mapRef.current);
-  
-      routingControl.on('routesfound', function(e) {
-        const routes = e.routes;
-        const summary = routes[0].summary;
-        const instructions = routes[0].instructions.map(instr => instr.text).join(' -> ');
-  
-        const fullItineraryText = `Distance: ${summary.totalDistance} m, Durée: ${summary.totalTime} s. Instructions: ${instructions}`;
-        console.log(fullItineraryText);
-  
-        // Résoudre la promesse pour passer à l'itinéraire suivant
-        resolve();
-      });
-    });
-  };  
-
 
   useEffect(() => {
     const updateMapHeight = () => {
@@ -481,7 +466,10 @@ const MapComponent = () => {
         openNameModal(layer, type);
       });
     }
-  }, [selectedEventId, toast]);
+
+    loadAndDisplaySavedRoutes();
+
+  }, [selectedEventId, toast, loadAndDisplaySavedRoutes]);
 
   useEffect(() => {
     if (!selectedEventId) {
@@ -532,13 +520,13 @@ const MapComponent = () => {
 
         marker.addTo(mapRef.current)
           .bindPopup(popupContent, {
-            offset: L.point(0, -30), // Aligner le popup légèrement au-dessus du marqueur
+            offset: L.point(0, -30),
             direction: 'top'
           })
           .bindTooltip(tooltipContent, {
             permanent: false,
             direction: 'top',
-            offset: L.point(0, -30) // Ajustez cette valeur pour que le tooltip soit correctement aligné
+            offset: L.point(0, -30)
           });
       });
     };
@@ -651,73 +639,73 @@ const MapComponent = () => {
   }, [selectedEventId, toast]);
 
   // Création d'une icône personnalisée pour le point de départ/arrivée
-const createBlueIcon = () => {
-  const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: 'blue' }} />);
-  return L.divIcon({
-    html: placeIconHtml,
-    className: 'custom-leaflet-icon',
-    iconSize: L.point(30, 30),
-    iconAnchor: [15, 30],
-    popupAnchor: [0, -30],
-  });
-};
+  const createBlueIcon = () => {
+    const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: 'blue' }} />);
+    return L.divIcon({
+      html: placeIconHtml,
+      className: 'custom-leaflet-icon',
+      iconSize: L.point(30, 30),
+      iconAnchor: [15, 30],
+      popupAnchor: [0, -30],
+    });
+  };
 
-const [startMarker, setStartMarker] = useState(null);
-const [endMarker, setEndMarker] = useState(null);
+  const [startMarker, setStartMarker] = useState(null);
+  const [endMarker, setEndMarker] = useState(null);
 
-// Fonction pour gérer la sélection du point de départ
-useEffect(() => {
-  if (mapRef.current) {
-    const handleStartSelection = (e) => {
-      if (selectingStart) {
-        setStartLat(e.latlng.lat);
-        setStartLng(e.latlng.lng);
+  // Fonction pour gérer la sélection du point de départ
+  useEffect(() => {
+    if (mapRef.current) {
+      const handleStartSelection = (e) => {
+        if (selectingStart) {
+          setStartLat(e.latlng.lat);
+          setStartLng(e.latlng.lng);
 
-        if (startMarker) {
-          mapRef.current.removeLayer(startMarker);
+          if (startMarker) {
+            mapRef.current.removeLayer(startMarker);
+          }
+
+          const marker = L.marker([e.latlng.lat, e.latlng.lng], { icon: createBlueIcon() }).addTo(mapRef.current);
+          setStartMarker(marker);
+
+          setSelectingStart(false);
         }
+      };
 
-        const marker = L.marker([e.latlng.lat, e.latlng.lng], { icon: createBlueIcon() }).addTo(mapRef.current);
-        setStartMarker(marker);
+      mapRef.current.on('click', handleStartSelection);
 
-        setSelectingStart(false); // Désactiver la sélection après la mise à jour
-      }
-    };
+      return () => {
+        mapRef.current.off('click', handleStartSelection);
+      };
+    }
+  }, [selectingStart, startMarker]);
 
-    mapRef.current.on('click', handleStartSelection);
+  // Fonction pour gérer la sélection du point d'arrivée
+  useEffect(() => {
+    if (mapRef.current) {
+      const handleEndSelection = (e) => {
+        if (selectingEnd) {
+          setEndLat(e.latlng.lat);
+          setEndLng(e.latlng.lng);
 
-    return () => {
-      mapRef.current.off('click', handleStartSelection);
-    };
-  }
-}, [selectingStart, startMarker]);
+          if (endMarker) {
+            mapRef.current.removeLayer(endMarker);
+          }
 
-// Fonction pour gérer la sélection du point d'arrivée
-useEffect(() => {
-  if (mapRef.current) {
-    const handleEndSelection = (e) => {
-      if (selectingEnd) {
-        setEndLat(e.latlng.lat);
-        setEndLng(e.latlng.lng);
+          const marker = L.marker([e.latlng.lat, e.latlng.lng], { icon: createBlueIcon() }).addTo(mapRef.current);
+          setEndMarker(marker);
 
-        if (endMarker) {
-          mapRef.current.removeLayer(endMarker);
+          setSelectingEnd(false);
         }
+      };
 
-        const marker = L.marker([e.latlng.lat, e.latlng.lng], { icon: createBlueIcon() }).addTo(mapRef.current);
-        setEndMarker(marker);
+      mapRef.current.on('click', handleEndSelection);
 
-        setSelectingEnd(false); // Désactiver la sélection après la mise à jour
-      }
-    };
-
-    mapRef.current.on('click', handleEndSelection);
-
-    return () => {
-      mapRef.current.off('click', handleEndSelection);
-    };
-  }
-}, [selectingEnd, endMarker]);
+      return () => {
+        mapRef.current.off('click', handleEndSelection);
+      };
+    }
+  }, [selectingEnd, endMarker]);
 
   const handleNameSubmit = () => {
     if (pendingLayer && pendingType) {
@@ -792,7 +780,7 @@ useEffect(() => {
           colorScheme={selectingStart ? "green" : "blue"}
           onClick={() => {
             setSelectingStart(true);
-            setSelectingEnd(false); // S'assurer que seul le point de départ est en cours de sélection
+            setSelectingEnd(false);
           }}
         >
           Sélectionner le point de départ sur la carte
@@ -800,7 +788,7 @@ useEffect(() => {
         <Button
           colorScheme={selectingEnd ? "green" : "blue"}
           onClick={() => {
-            setSelectingStart(false); // S'assurer que seul le point d'arrivée est en cours de sélection
+            setSelectingStart(false);
             setSelectingEnd(true);
           }}
         >
