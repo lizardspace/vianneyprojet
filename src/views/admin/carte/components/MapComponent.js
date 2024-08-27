@@ -60,6 +60,7 @@ const MapComponent = () => {
   const [endLat, setEndLat] = useState('');
   const [endLng, setEndLng] = useState('');
   const [itineraryText, setItineraryText] = useState('');
+  const [latestItineraryText, setLatestItineraryText] = useState(''); // Nouvel état pour stocker le texte de l'itinéraire
   const [selectingStart, setSelectingStart] = useState(false);
   const [selectingEnd, setSelectingEnd] = useState(false);
   const [showRouteDetails, setShowRouteDetails] = useState(false);
@@ -197,7 +198,6 @@ const MapComponent = () => {
         if (error) throw error;
         insertedItem = data;
 
-        // Utilisez le premier point du polygone pour l'URL Waze
         const firstPoint = points[0];
         const wazeUrl = `https://www.waze.com/ul?ll=${firstPoint.latitude},${firstPoint.longitude}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
@@ -319,6 +319,7 @@ const MapComponent = () => {
       }
 
       const lastRoute = data[0];
+      setLatestItineraryText(lastRoute.itinerary_text); // Mettre à jour l'état avec le texte de l'itinéraire
       await displayRoute(lastRoute);
 
     } catch (error) {
@@ -801,6 +802,11 @@ const MapComponent = () => {
           placeholder="Détails de l'itinéraire"
           value={itineraryText}
           onChange={(e) => setItineraryText(e.target.value)}
+          readOnly
+        />
+        <Textarea
+          placeholder="Itinéraire le plus récent"
+          value={latestItineraryText}
           readOnly
         />
       </VStack>
