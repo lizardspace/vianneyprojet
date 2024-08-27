@@ -60,7 +60,7 @@ const MapComponent = () => {
   const [endLat, setEndLat] = useState('');
   const [endLng, setEndLng] = useState('');
   const [itineraryText, setItineraryText] = useState('');
-  const [latestItineraryText, setLatestItineraryText] = useState(''); // Nouvel état pour stocker le texte de l'itinéraire
+  const [latestItineraryText, setLatestItineraryText] = useState('');
   const [selectingStart, setSelectingStart] = useState(false);
   const [selectingEnd, setSelectingEnd] = useState(false);
   const [showRouteDetails, setShowRouteDetails] = useState(false);
@@ -260,6 +260,23 @@ const MapComponent = () => {
     }
   };
 
+  const formatItineraryText = (itineraryText) => {
+    if (!itineraryText) return '';
+
+    const instructions = itineraryText.split('Instructions: ')[1];
+
+    if (!instructions) return itineraryText;
+
+    const steps = instructions.split(' -> ');
+
+    const formattedSteps = steps.map((step, index) => {
+      return `${index + 1}. ${step}`;
+    }).join('\n');
+
+    const [distanceDuration] = itineraryText.split('. Instructions:');
+    return `${distanceDuration}.\n\n${formattedSteps}`;
+  };
+
   const displayRoute = useCallback((route) => {
     return new Promise((resolve) => {
       if (routingControlRef.current) {
@@ -319,7 +336,7 @@ const MapComponent = () => {
       }
 
       const lastRoute = data[0];
-      setLatestItineraryText(lastRoute.itinerary_text); // Mettre à jour l'état avec le texte de l'itinéraire
+      setLatestItineraryText(lastRoute.itinerary_text);
       await displayRoute(lastRoute);
 
     } catch (error) {
@@ -368,9 +385,11 @@ const MapComponent = () => {
       const instructions = routes[0].instructions.map(instr => instr.text).join(' -> ');
 
       const fullItineraryText = `Distance: ${summary.totalDistance} m, Durée: ${summary.totalTime} s. Instructions: ${instructions}`;
-      setItineraryText(fullItineraryText);
+      const formattedItinerary = formatItineraryText(fullItineraryText);
 
-      await saveItinerary(startLat, startLng, endLat, endLng, fullItineraryText);
+      setItineraryText(formattedItinerary);
+
+      await saveItinerary(startLat, startLng, endLat, endLng, formattedItinerary);
 
       loadAndDisplaySavedRoutes();
     });
@@ -621,7 +640,6 @@ const MapComponent = () => {
         const layer = L.polygon(points, { color: 'red' });
         const nameElement = polygon.name_element || 'Polygon';
 
-        // Utiliser le premier point pour le bouton "Se rendre sur place"
         const firstPoint = points[0];
         const wazeUrl = `https://www.waze.com/ul?ll=${firstPoint[0]},${firstPoint[1]}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
@@ -668,7 +686,6 @@ const MapComponent = () => {
     fetchAndDisplayDrawnItems();
   }, [selectedEventId, toast]);
 
-  // Création d'une icône personnalisée pour le point de départ/arrivée
   const createBlueIcon = () => {
     const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: 'blue' }} />);
     return L.divIcon({
@@ -683,7 +700,6 @@ const MapComponent = () => {
   const [startMarker, setStartMarker] = useState(null);
   const [endMarker, setEndMarker] = useState(null);
 
-  // Fonction pour gérer la sélection du point de départ
   useEffect(() => {
     if (mapRef.current) {
       const handleStartSelection = (e) => {
@@ -710,7 +726,6 @@ const MapComponent = () => {
     }
   }, [selectingStart, startMarker]);
 
-  // Fonction pour gérer la sélection du point d'arrivée
   useEffect(() => {
     if (mapRef.current) {
       const handleEndSelection = (e) => {
@@ -746,7 +761,6 @@ const MapComponent = () => {
     setPendingLayer(null);
     setPendingType(null);
   };
-
 
   return (
     <Box pt="10px" position="relative">
@@ -806,7 +820,7 @@ const MapComponent = () => {
         />
         <Textarea
           placeholder="Itinéraire le plus récent"
-          value={latestItineraryText}
+          value={formatItineraryText(latestItineraryText)}
           readOnly
         />
       </VStack>
