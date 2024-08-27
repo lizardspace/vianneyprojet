@@ -75,6 +75,7 @@ const MapComponent = () => {
   const [selectingStart, setSelectingStart] = useState(false);
   const [selectingEnd, setSelectingEnd] = useState(false);
   const [showRouteDetails, setShowRouteDetails] = useState(false);
+  const [showItineraryDetails, setShowItineraryDetails] = useState(true); // New state to control itinerary visibility
 
   const buttonText = location.pathname === "/admin/zoomed-map" ?
     <MdOutlineZoomInMap /> :
@@ -794,35 +795,26 @@ return (
       <Text fontSize="xl" mb={4} fontWeight="bold" color="black">
         Itinéraire
       </Text>
-      <Button
-      colorScheme={showRouteDetails ? "red" : "green"}
-      onClick={() => setShowRouteDetails(prev => !prev)}
-      mt={4}
-    >
-      {showRouteDetails ? "Masquer les détails de l'itinéraire en texte" : "Afficher les détails de l'itinéraire en texte"}
-    </Button>
       <HStack spacing={4} mt={4}>
-      <Button
-        colorScheme={selectingStart ? "green" : "blue"}
-        onClick={() => {
-          setSelectingStart(true);
-          setSelectingEnd(false);
-        }}
-      >
-        Sélectionner le point de départ sur la carte
-      </Button>
-      <Button
-        colorScheme={selectingEnd ? "green" : "blue"}
-        onClick={() => {
-          setSelectingStart(false);
-          setSelectingEnd(true);
-        }}
-      >
-        Sélectionner le point d'arrivée sur la carte
-      </Button>
-    </HStack>
-    
-
+        <Button
+          colorScheme={selectingStart ? "green" : "blue"}
+          onClick={() => {
+            setSelectingStart(true);
+            setSelectingEnd(false);
+          }}
+        >
+          Sélectionner le point de départ sur la carte
+        </Button>
+        <Button
+          colorScheme={selectingEnd ? "green" : "blue"}
+          onClick={() => {
+            setSelectingStart(false);
+            setSelectingEnd(true);
+          }}
+        >
+          Sélectionner le point d'arrivée sur la carte
+        </Button>
+      </HStack>
       <VStack spacing={4}>
         <HStack spacing={4} display="none">
           <FormControl>
@@ -871,24 +863,41 @@ return (
         <Button colorScheme="blue" onClick={handleRouteCalculation} mt="10px">
           Ajouter l'itinéraire
         </Button>
-        <VStack spacing={2} align="stretch">
-          {latestItineraryText.map(step => (
-            <Box 
-              key={step.id} 
-              p={2} 
-              bg="blue.100" 
-              borderRadius="md" 
-              borderWidth={1} 
-              borderColor="blue.200"
-              fontSize="sm" 
-              lineHeight="1.25"
-              maxW="600px" 
-              textAlign="left"
-            >
-              <Text>{step.step}</Text>
-            </Box>
-          ))}
-        </VStack>
+        <Button
+        colorScheme={showRouteDetails ? "red" : "green"}
+        onClick={() => setShowRouteDetails(prev => !prev)}
+        mt={4}
+      >
+        {showRouteDetails ? "Masquer les détails de l'itinéraire en texte" : "Afficher les détails de l'itinéraire en texte"}
+      </Button>
+        
+      <Button
+        colorScheme={showItineraryDetails ? "red" : "green"} // New button to toggle itinerary visibility
+        onClick={() => setShowItineraryDetails(prev => !prev)}
+        mt={4}
+      >
+        {showItineraryDetails ? "Masquer les détails" : "Montrer les détails"}
+      </Button>
+        {showItineraryDetails && ( // Conditional rendering based on showItineraryDetails
+          <VStack spacing={2} align="stretch">
+            {latestItineraryText.map(step => (
+              <Box
+                key={step.id}
+                p={2}
+                bg="blue.100"
+                borderRadius="md"
+                borderWidth={1}
+                borderColor="blue.200"
+                fontSize="sm"
+                lineHeight="1.25"
+                maxW="600px"
+                textAlign="left"
+              >
+                <Text>{step.step}</Text>
+              </Box>
+            ))}
+          </VStack>
+        )}
       </VStack>
     </Box>
 
