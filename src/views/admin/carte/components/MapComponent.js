@@ -6,7 +6,7 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import { renderToString } from "react-dom/server";
 import {
   Box, Button, useToast, CloseButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader,
-  AlertDialogContent, AlertDialogOverlay, Input, VStack, HStack, FormControl, FormLabel, Textarea
+  AlertDialogContent, AlertDialogOverlay, Input, VStack, HStack, FormControl, FormLabel, Text
 } from '@chakra-ui/react';
 import { MdPlace, MdOutlineZoomInMap, MdOutlineZoomOutMap, MdDeleteForever } from "react-icons/md";
 import { useEvent } from './../../../../EventContext';
@@ -37,6 +37,16 @@ const createCustomIcon = () => {
   });
 };
 
+const formatItineraryText = (itineraryText) => {
+  if (!itineraryText) return [];
+
+  const [distance, duration, ...steps] = itineraryText.split(/Instructions:|\s->\s/);
+  return steps.map((step, index) => ({
+    id: index + 1,
+    step,
+  }));
+};
+
 const MapComponent = () => {
   const mapRef = useRef(null);
   const routingControlRef = useRef(null);
@@ -60,7 +70,7 @@ const MapComponent = () => {
   const [endLat, setEndLat] = useState('');
   const [endLng, setEndLng] = useState('');
   const [itineraryText, setItineraryText] = useState('');
-  const [latestItineraryText, setLatestItineraryText] = useState('');
+  const [latestItineraryText, setLatestItineraryText] = useState([]);
   const [selectingStart, setSelectingStart] = useState(false);
   const [selectingEnd, setSelectingEnd] = useState(false);
   const [showRouteDetails, setShowRouteDetails] = useState(false);
@@ -260,23 +270,6 @@ const MapComponent = () => {
     }
   };
 
-  const formatItineraryText = (itineraryText) => {
-    if (!itineraryText) return '';
-
-    const instructions = itineraryText.split('Instructions: ')[1];
-
-    if (!instructions) return itineraryText;
-
-    const steps = instructions.split(' -> ');
-
-    const formattedSteps = steps.map((step, index) => {
-      return `${index + 1}. ${step}`;
-    }).join('\n');
-
-    const [distanceDuration] = itineraryText.split('. Instructions:');
-    return `${distanceDuration}.\n\n${formattedSteps}`;
-  };
-
   const displayRoute = useCallback((route) => {
     return new Promise((resolve) => {
       if (routingControlRef.current) {
@@ -336,7 +329,7 @@ const MapComponent = () => {
       }
 
       const lastRoute = data[0];
-      setLatestItineraryText(lastRoute.itinerary_text);
+      setLatestItineraryText(formatItineraryText(lastRoute.itinerary_text));
       await displayRoute(lastRoute);
 
     } catch (error) {
@@ -385,11 +378,9 @@ const MapComponent = () => {
       const instructions = routes[0].instructions.map(instr => instr.text).join(' -> ');
 
       const fullItineraryText = `Distance: ${summary.totalDistance} m, Durée: ${summary.totalTime} s. Instructions: ${instructions}`;
-      const formattedItinerary = formatItineraryText(fullItineraryText);
+      setItineraryText(fullItineraryText);
 
-      setItineraryText(formattedItinerary);
-
-      await saveItinerary(startLat, startLng, endLat, endLng, formattedItinerary);
+      await saveItinerary(startLat, startLng, endLat, endLng, fullItineraryText);
 
       loadAndDisplaySavedRoutes();
     });
@@ -812,17 +803,13 @@ const MapComponent = () => {
         <Button colorScheme="blue" onClick={handleRouteCalculation}>
           Calculer l'itinéraire
         </Button>
-        <Textarea
-          placeholder="Détails de l'itinéraire"
-          value={itineraryText}
-          onChange={(e) => setItineraryText(e.target.value)}
-          readOnly
-        />
-        <Textarea
-          placeholder="Itinéraire le plus récent"
-          value={formatItineraryText(latestItineraryText)}
-          readOnly
-        />
+        <VStack spacing={2} align="stretch">
+          {latestItineraryText.map(step => (
+            <Box key={step.id} p={4} bg="blue.100" borderRadius="md" borderWidth={1} borderColor="blue.200">
+              <Text>{step.step}</Text>
+            </Box>
+          ))}
+        </VStack>
       </VStack>
       <HStack spacing={4}>
         <Button
