@@ -39,7 +39,7 @@ const createCustomIcon = () => {
 
 const formatItineraryText = (itineraryText) => {
   if (!itineraryText) return [];
-
+  // eslint-disable-next-line
   const [distance, duration, ...steps] = itineraryText.split(/Instructions:|\s->\s/);
   return steps.map((step, index) => ({
     id: index + 1,
@@ -69,6 +69,7 @@ const MapComponent = () => {
   const [startLng, setStartLng] = useState('');
   const [endLat, setEndLat] = useState('');
   const [endLng, setEndLng] = useState('');
+  // eslint-disable-next-line
   const [itineraryText, setItineraryText] = useState('');
   const [latestItineraryText, setLatestItineraryText] = useState([]);
   const [selectingStart, setSelectingStart] = useState(false);
@@ -805,7 +806,18 @@ const MapComponent = () => {
         </Button>
         <VStack spacing={2} align="stretch">
           {latestItineraryText.map(step => (
-            <Box key={step.id} p={4} bg="blue.100" borderRadius="md" borderWidth={1} borderColor="blue.200">
+            <Box 
+              key={step.id} 
+              p={2} 
+              bg="blue.100" 
+              borderRadius="md" 
+              borderWidth={1} 
+              borderColor="blue.200"
+              fontSize="sm" 
+              lineHeight="1.25"
+              maxW="600px" 
+              textAlign="left"
+            >
               <Text>{step.step}</Text>
             </Box>
           ))}
