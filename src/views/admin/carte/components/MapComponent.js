@@ -756,8 +756,36 @@ const MapComponent = () => {
 
   return (
     <Box pt="10px" position="relative">
+
+      {isButtonVisible && (
+        <Button
+          onClick={toggleMapView}
+          bg="red.500"
+          color="white"
+          _hover={{ bg: "red.600" }}
+          _active={{ bg: "red.700" }}
+          mt={4}
+        >
+          {buttonText}
+        </Button>
+      )}
+      {location.pathname === "/admin/zoomed-map" && (
+        <CloseButton
+          position="absolute"
+          top="10px"
+          right="10px"
+          onClick={closeModal}
+          bg="white"
+          color="black"
+          _hover={{ bg: "gray.300" }}
+          zIndex="1000"
+        />
+      )}
+
+      <div id="map" style={{ height: mapHeight, width: '100%', zIndex: '0' }}></div>
+
       <VStack spacing={4} p={4} bg="gray.100" borderRadius="md" boxShadow="md">
-        <HStack spacing={4}>
+        <HStack spacing={4} display="none">
           <FormControl>
             <FormLabel>Latitude de départ</FormLabel>
             <Input
@@ -779,7 +807,7 @@ const MapComponent = () => {
             />
           </FormControl>
         </HStack>
-        <HStack spacing={4}>
+        <HStack spacing={4} display="none">
           <FormControl>
             <FormLabel>Latitude d'arrivée</FormLabel>
             <Input
@@ -849,33 +877,6 @@ const MapComponent = () => {
       >
         {showRouteDetails ? "Masquer les détails" : "Afficher les détails"}
       </Button>
-
-      {isButtonVisible && (
-        <Button
-          onClick={toggleMapView}
-          bg="red.500"
-          color="white"
-          _hover={{ bg: "red.600" }}
-          _active={{ bg: "red.700" }}
-          mt={4}
-        >
-          {buttonText}
-        </Button>
-      )}
-      {location.pathname === "/admin/zoomed-map" && (
-        <CloseButton
-          position="absolute"
-          top="10px"
-          right="10px"
-          onClick={closeModal}
-          bg="white"
-          color="black"
-          _hover={{ bg: "gray.300" }}
-          zIndex="1000"
-        />
-      )}
-
-      <div id="map" style={{ height: mapHeight, width: '100%', zIndex: '0' }}></div>
 
       <AlertDialog
         isOpen={isDialogOpen}
