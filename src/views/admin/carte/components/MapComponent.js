@@ -197,7 +197,21 @@ const MapComponent = () => {
         if (error) throw error;
         insertedItem = data;
 
-        layer.bindTooltip(nameElement || 'Polygone').on('click', () => openDeleteDialog(layer, type, insertedItem.id));
+        // Utilisez le premier point du polygone pour l'URL Waze
+        const firstPoint = points[0];
+        const wazeUrl = `https://www.waze.com/ul?ll=${firstPoint.latitude},${firstPoint.longitude}&navigate=yes`;
+        const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
+        const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
+
+        const popupContent = `
+          <div>
+            <strong>${nameElement || 'Polygone'}</strong>
+            <div onclick="window.deleteItem('${type}', '${insertedItem.id}')">${deleteButtonHtml}</div>
+            ${wazeButtonHtml}
+          </div>
+        `;
+
+        layer.bindPopup(popupContent).bindTooltip(nameElement || 'Polygone').on('click', () => openDeleteDialog(layer, type, insertedItem.id));
       } else if (type === 'circlemarker') {
         payload = {
           ...payload,
@@ -605,7 +619,22 @@ const MapComponent = () => {
         const points = polygon.points.map(point => [point.latitude, point.longitude]);
         const layer = L.polygon(points, { color: 'red' });
         const nameElement = polygon.name_element || 'Polygon';
-        layer.bindTooltip(nameElement).on('click', () => openDeleteDialog(layer, 'polygon', polygon.id));
+
+        // Utiliser le premier point pour le bouton "Se rendre sur place"
+        const firstPoint = points[0];
+        const wazeUrl = `https://www.waze.com/ul?ll=${firstPoint[0]},${firstPoint[1]}&navigate=yes`;
+        const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
+        const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
+
+        const popupContent = `
+          <div>
+            <strong>${nameElement}</strong>
+            <div onclick="window.deleteItem('polygon', '${polygon.id}')">${deleteButtonHtml}</div>
+            ${wazeButtonHtml}
+          </div>
+        `;
+
+        layer.bindPopup(popupContent).bindTooltip(nameElement).on('click', () => openDeleteDialog(layer, 'polygon', polygon.id));
         layer.addTo(mapRef.current);
       });
 
