@@ -6,7 +6,7 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import { renderToString } from "react-dom/server";
 import {
   Box, Button, useToast, CloseButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader,
-  AlertDialogContent, AlertDialogOverlay, Input, VStack, HStack, FormControl, FormLabel, Text
+  AlertDialogContent, AlertDialogOverlay, Input, VStack, HStack, FormControl, FormLabel, Text, Tooltip
 } from '@chakra-ui/react';
 import { MdPlace, MdOutlineZoomInMap, MdOutlineZoomOutMap, MdDeleteForever } from "react-icons/md";
 import { useEvent } from './../../../../EventContext';
@@ -758,28 +758,32 @@ const MapComponent = () => {
   return (
     <Box pt="10px" position="relative">
       {isButtonVisible && (
-        <Button
-          onClick={toggleMapView}
-          bg="red.500"
-          color="white"
-          _hover={{ bg: "red.600" }}
-          _active={{ bg: "red.700" }}
-          mt={4}
-        >
-          {buttonText}
-        </Button>
+        <Tooltip label="Basculer entre vue zoomée et vue complète de la carte" aria-label="Toggle map view tooltip">
+          <Button
+            onClick={toggleMapView}
+            bg="red.500"
+            color="white"
+            _hover={{ bg: "red.600" }}
+            _active={{ bg: "red.700" }}
+            mt={4}
+          >
+            {buttonText}
+          </Button>
+        </Tooltip>
       )}
       {location.pathname === "/admin/zoomed-map" && (
-        <CloseButton
-          position="absolute"
-          top="10px"
-          right="10px"
-          onClick={closeModal}
-          bg="white"
-          color="black"
-          _hover={{ bg: "gray.300" }}
-          zIndex="1000"
-        />
+        <Tooltip label="Fermer la vue zoomée et retourner à la carte complète" aria-label="Close zoomed map tooltip">
+          <CloseButton
+            position="absolute"
+            top="10px"
+            right="10px"
+            onClick={closeModal}
+            bg="white"
+            color="black"
+            _hover={{ bg: "gray.300" }}
+            zIndex="1000"
+          />
+        </Tooltip>
       )}
 
       <div id="map" style={{ height: mapHeight, width: '100%', zIndex: '0' }}></div>
@@ -798,24 +802,28 @@ const MapComponent = () => {
           </Text>
         </Box>
         <HStack spacing={4} mt={4}>
-          <Button
-            colorScheme={selectingStart ? "green" : "blue"}
-            onClick={() => {
-              setSelectingStart(true);
-              setSelectingEnd(false);
-            }}
-          >
-            Sélectionner le point de départ sur la carte
-          </Button>
-          <Button
-            colorScheme={selectingEnd ? "green" : "blue"}
-            onClick={() => {
-              setSelectingStart(false);
-              setSelectingEnd(true);
-            }}
-          >
-            Sélectionner le point d'arrivée sur la carte
-          </Button>
+          <Tooltip label="Sélectionner le point de départ de l'itinéraire sur la carte" aria-label="Select start point tooltip">
+            <Button
+              colorScheme={selectingStart ? "green" : "blue"}
+              onClick={() => {
+                setSelectingStart(true);
+                setSelectingEnd(false);
+              }}
+            >
+              Sélectionner le point de départ sur la carte
+            </Button>
+          </Tooltip>
+          <Tooltip label="Sélectionner le point d'arrivée de l'itinéraire sur la carte" aria-label="Select end point tooltip">
+            <Button
+              colorScheme={selectingEnd ? "green" : "blue"}
+              onClick={() => {
+                setSelectingStart(false);
+                setSelectingEnd(true);
+              }}
+            >
+              Sélectionner le point d'arrivée sur la carte
+            </Button>
+          </Tooltip>
         </HStack>
         <VStack spacing={4}>
           <HStack spacing={4} display="none">
@@ -862,25 +870,31 @@ const MapComponent = () => {
               />
             </FormControl>
           </HStack>
-          <Button colorScheme="blue" onClick={handleRouteCalculation} mt="10px">
-            Ajouter l'itinéraire
-          </Button>
-          <Button
-            colorScheme={showRouteDetails ? "red" : "green"}
-            onClick={() => setShowRouteDetails(prev => !prev)}
-            mt={4}
-          >
-            {showRouteDetails ? "Masquer les détails de l'itinéraire en texte" : "Afficher les détails de l'itinéraire en texte"}
-          </Button>
+          <Tooltip label="Calculer et ajouter l'itinéraire sélectionné" aria-label="Add route tooltip">
+            <Button colorScheme="blue" onClick={handleRouteCalculation} mt="10px">
+              Ajouter l'itinéraire
+            </Button>
+          </Tooltip>
+          <Tooltip label="Afficher ou masquer les détails textuels de l'itinéraire" aria-label="Toggle route details tooltip">
+            <Button
+              colorScheme={showRouteDetails ? "red" : "green"}
+              onClick={() => setShowRouteDetails(prev => !prev)}
+              mt={4}
+            >
+              {showRouteDetails ? "Masquer les détails de l'itinéraire en texte" : "Afficher les détails de l'itinéraire en texte"}
+            </Button>
+          </Tooltip>
 
-          <Button
-            colorScheme={showItineraryDetails ? "red" : "green"} // New button to toggle itinerary visibility
-            onClick={() => setShowItineraryDetails(prev => !prev)}
-            mt={4}
-          >
-            {showItineraryDetails ? "Masquer les détails" : "Montrer les détails"}
-          </Button>
-          {showItineraryDetails && ( // Conditional rendering based on showItineraryDetails
+          <Tooltip label="Afficher ou masquer les étapes détaillées de l'itinéraire" aria-label="Toggle itinerary details tooltip">
+            <Button
+              colorScheme={showItineraryDetails ? "red" : "green"}
+              onClick={() => setShowItineraryDetails(prev => !prev)}
+              mt={4}
+            >
+              {showItineraryDetails ? "Masquer les détails" : "Montrer les détails"}
+            </Button>
+          </Tooltip>
+          {showItineraryDetails && (
             <VStack spacing={2} align="stretch">
               {latestItineraryText.map(step => (
                 <Box
