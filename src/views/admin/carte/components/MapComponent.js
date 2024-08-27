@@ -754,37 +754,76 @@ const MapComponent = () => {
     setPendingType(null);
   };
 
-  return (
-    <Box pt="10px" position="relative">
+return (
+  <Box pt="10px" position="relative">
+    {isButtonVisible && (
+      <Button
+        onClick={toggleMapView}
+        bg="red.500"
+        color="white"
+        _hover={{ bg: "red.600" }}
+        _active={{ bg: "red.700" }}
+        mt={4}
+      >
+        {buttonText}
+      </Button>
+    )}
+    {location.pathname === "/admin/zoomed-map" && (
+      <CloseButton
+        position="absolute"
+        top="10px"
+        right="10px"
+        onClick={closeModal}
+        bg="white"
+        color="black"
+        _hover={{ bg: "gray.300" }}
+        zIndex="1000"
+      />
+    )}
 
-      {isButtonVisible && (
-        <Button
-          onClick={toggleMapView}
-          bg="red.500"
-          color="white"
-          _hover={{ bg: "red.600" }}
-          _active={{ bg: "red.700" }}
-          mt={4}
-        >
-          {buttonText}
-        </Button>
-      )}
-      {location.pathname === "/admin/zoomed-map" && (
-        <CloseButton
-          position="absolute"
-          top="10px"
-          right="10px"
-          onClick={closeModal}
-          bg="white"
-          color="black"
-          _hover={{ bg: "gray.300" }}
-          zIndex="1000"
-        />
-      )}
+    <div id="map" style={{ height: mapHeight, width: '100%', zIndex: '0' }}></div>
 
-      <div id="map" style={{ height: mapHeight, width: '100%', zIndex: '0' }}></div>
+    <Box
+      mt={4}
+      p={4}
+      bg="gray.100"
+      borderRadius="md"
+      boxShadow="md"
+      border="1px solid black"
+    >
+      <Text fontSize="xl" mb={4} fontWeight="bold" color="black">
+        Itinéraire
+      </Text>
+      <Button
+      colorScheme={showRouteDetails ? "red" : "green"}
+      onClick={() => setShowRouteDetails(prev => !prev)}
+      mt={4}
+    >
+      {showRouteDetails ? "Masquer les détails de l'itinéraire en texte" : "Afficher les détails de l'itinéraire en texte"}
+    </Button>
+      <HStack spacing={4} mt={4}>
+      <Button
+        colorScheme={selectingStart ? "green" : "blue"}
+        onClick={() => {
+          setSelectingStart(true);
+          setSelectingEnd(false);
+        }}
+      >
+        Sélectionner le point de départ sur la carte
+      </Button>
+      <Button
+        colorScheme={selectingEnd ? "green" : "blue"}
+        onClick={() => {
+          setSelectingStart(false);
+          setSelectingEnd(true);
+        }}
+      >
+        Sélectionner le point d'arrivée sur la carte
+      </Button>
+    </HStack>
+    
 
-      <VStack spacing={4} p={4} bg="gray.100" borderRadius="md" boxShadow="md">
+      <VStack spacing={4}>
         <HStack spacing={4} display="none">
           <FormControl>
             <FormLabel>Latitude de départ</FormLabel>
@@ -829,8 +868,8 @@ const MapComponent = () => {
             />
           </FormControl>
         </HStack>
-        <Button colorScheme="blue" onClick={handleRouteCalculation}>
-          Calculer l'itinéraire
+        <Button colorScheme="blue" onClick={handleRouteCalculation} mt="10px">
+          Ajouter l'itinéraire
         </Button>
         <VStack spacing={2} align="stretch">
           {latestItineraryText.map(step => (
@@ -851,92 +890,67 @@ const MapComponent = () => {
           ))}
         </VStack>
       </VStack>
-      <HStack spacing={4}>
-        <Button
-          colorScheme={selectingStart ? "green" : "blue"}
-          onClick={() => {
-            setSelectingStart(true);
-            setSelectingEnd(false);
-          }}
-        >
-          Sélectionner le point de départ sur la carte
-        </Button>
-        <Button
-          colorScheme={selectingEnd ? "green" : "blue"}
-          onClick={() => {
-            setSelectingStart(false);
-            setSelectingEnd(true);
-          }}
-        >
-          Sélectionner le point d'arrivée sur la carte
-        </Button>
-      </HStack>
-      <Button
-        colorScheme={showRouteDetails ? "red" : "green"}
-        onClick={() => setShowRouteDetails(prev => !prev)}
-      >
-        {showRouteDetails ? "Masquer les détails" : "Afficher les détails"}
-      </Button>
-
-      <AlertDialog
-        isOpen={isDialogOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={closeDeleteDialog}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Supprimer l'élément
-            </AlertDialogHeader>
-
-            <AlertDialogBody>
-              Voulez-vous vraiment supprimer cet élément ?
-            </AlertDialogBody>
-
-            <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={closeDeleteDialog}>
-                Annuler
-              </Button>
-              <Button colorScheme="red" onClick={confirmDelete} ml={3}>
-                Supprimer
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
-
-      <AlertDialog
-        isOpen={isNameModalOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={() => setIsNameModalOpen(false)}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Entrez le nom de l'élément
-            </AlertDialogHeader>
-
-            <AlertDialogBody>
-              <Input
-                placeholder="Nom de l'élément"
-                value={newElementName}
-                onChange={(e) => setNewElementName(e.target.value)}
-              />
-            </AlertDialogBody>
-
-            <AlertDialogFooter>
-              <Button onClick={() => setIsNameModalOpen(false)}>
-                Annuler
-              </Button>
-              <Button colorScheme="green" onClick={handleNameSubmit} ml={3}>
-                Enregistrer
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
     </Box>
-  );
+
+    <AlertDialog
+      isOpen={isDialogOpen}
+      leastDestructiveRef={cancelRef}
+      onClose={closeDeleteDialog}
+    >
+      <AlertDialogOverlay>
+        <AlertDialogContent>
+          <AlertDialogHeader fontSize="lg" fontWeight="bold">
+            Supprimer l'élément
+          </AlertDialogHeader>
+
+          <AlertDialogBody>
+            Voulez-vous vraiment supprimer cet élément ?
+          </AlertDialogBody>
+
+          <AlertDialogFooter>
+            <Button ref={cancelRef} onClick={closeDeleteDialog}>
+              Annuler
+            </Button>
+            <Button colorScheme="red" onClick={confirmDelete} ml={3}>
+              Supprimer
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialogOverlay>
+    </AlertDialog>
+
+    <AlertDialog
+      isOpen={isNameModalOpen}
+      leastDestructiveRef={cancelRef}
+      onClose={() => setIsNameModalOpen(false)}
+    >
+      <AlertDialogOverlay>
+        <AlertDialogContent>
+          <AlertDialogHeader fontSize="lg" fontWeight="bold">
+            Entrez le nom de l'élément
+          </AlertDialogHeader>
+
+          <AlertDialogBody>
+            <Input
+              placeholder="Nom de l'élément"
+              value={newElementName}
+              onChange={(e) => setNewElementName(e.target.value)}
+            />
+          </AlertDialogBody>
+
+          <AlertDialogFooter>
+            <Button onClick={() => setIsNameModalOpen(false)}>
+              Annuler
+            </Button>
+            <Button colorScheme="green" onClick={handleNameSubmit} ml={3}>
+              Enregistrer
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialogOverlay>
+    </AlertDialog>
+  </Box>
+);
 };
 
 export default MapComponent;
