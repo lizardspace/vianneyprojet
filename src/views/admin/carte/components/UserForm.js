@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -39,24 +39,20 @@ const UserForm = () => {
   }]);
 
   // Fonction pour générer un mot de passe sécurisé
-  const generatePassword = () => {
+  const generatePassword = useCallback(() => {
     const length = 12;
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
     let password = '';
     while (true) {
       password = Array.from({ length }, () => charset.charAt(Math.floor(Math.random() * charset.length))).join('');
-      if (
-        /[a-z]/.test(password) && // au moins une minuscule
-        /[A-Z]/.test(password) && // au moins une majuscule
-        /\d/.test(password) &&    // au moins un chiffre
-        /[!@#$%^&*()_+~`|}{[\]:;?><,./-=]/.test(password) // au moins un caractère spécial
-      ) break;
+      if (validatePassword(password)) break;
     }
     return password;
-  };
+  }, []); // UseCallback mémorise la fonction pour éviter la recréation à chaque rendu
 
   const validatePassword = (password) => {
     return (
+      password.length >= 8 &&  // longueur minimale de 8 caractères
       /[a-z]/.test(password) &&  // au moins une minuscule
       /[A-Z]/.test(password) &&  // au moins une majuscule
       /\d/.test(password) &&     // au moins un chiffre
@@ -67,7 +63,7 @@ const UserForm = () => {
   useEffect(() => {
     // Générer un mot de passe au montage du composant
     setPassword(generatePassword());
-  }, []);
+  }, [generatePassword]); // Ajoutez generatePassword comme dépendance
 
   const generateRandomColor = () => {
     const randomColor = Math.floor(Math.random() * 16777215).toString(16);
@@ -257,7 +253,7 @@ const UserForm = () => {
               Mot de passe invalide
             </AlertTitle>
             <AlertDescription maxWidth="sm">
-              Le mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial.
+              Le mot de passe doit contenir au moins 8 caractères, incluant une minuscule, une majuscule, un chiffre, et un caractère spécial.
             </AlertDescription>
             <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowErrorAlert(false)} />
           </Alert>
