@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Box, Button, Text } from '@chakra-ui/react';
+import { Box, Button, Text, UnorderedList, ListItem } from '@chakra-ui/react';
 import * as cocoSsd from '@tensorflow-models/coco-ssd';
 import '@tensorflow/tfjs';
 
@@ -8,7 +8,8 @@ const VideoStream = () => {
   const streamRef = useRef(null);
   const [error, setError] = useState(null);
   const [model, setModel] = useState(null);
-  const [predictions, setPredictions] = useState([]);
+  const [stablePredictions, setStablePredictions] = useState([]);
+  const predictionAccumulator = useRef({});
 
   useEffect(() => {
     const startVideoStream = async () => {
@@ -49,7 +50,30 @@ const VideoStream = () => {
       const detectObjects = async () => {
         if (videoRef.current.readyState === 4) {
           const predictions = await model.detect(videoRef.current);
-          setPredictions(predictions);
+
+          // Accumulate predictions
+          predictions.forEach(prediction => {
+            const { class: objectClass } = prediction;
+            if (!predictionAccumulator.current[objectClass]) {
+              predictionAccumulator.current[objectClass] = {
+                count: 0,
+                lastDetected: new Date(),
+              };
+            }
+            predictionAccumulator.current[objectClass].count += 1;
+            predictionAccumulator.current[objectClass].lastDetected = new Date();
+          });
+
+          // Filter stable predictions
+          const now = new Date();
+          const stable = Object.entries(predictionAccumulator.current)
+            .filter(([_, value]) => {
+              // Keep only objects detected multiple times and recently
+              return value.count > 2 && (now - value.lastDetected) < 1000;
+            })
+            .map(([key]) => key);
+
+          setStablePredictions(stable);
         }
         requestAnimationFrame(detectObjects);
       };
@@ -76,12 +100,17 @@ const VideoStream = () => {
           <Button onClick={() => { if (videoRef.current) videoRef.current.srcObject = null }} colorScheme="red">
             Stop Video
           </Button>
-          <Box>
-            {predictions.map((prediction, index) => (
-              <Text key={index}>
-                {`${prediction.class}: ${Math.round(prediction.score * 100)}%`}
-              </Text>
-            ))}
+          <Box mt={4} width="100%" textAlign="left">
+            <Text fontWeight="bold">Objects detected:</Text>
+            <UnorderedList>
+              {stablePredictions.length > 0 ? (
+                stablePredictions.map((prediction, index) => (
+                  <ListItem key={index}>{prediction}</ListItem>
+                ))
+              ) : (
+                <Text>No objects detected.</Text>
+              )}
+            </UnorderedList>
           </Box>
         </>
       )}
