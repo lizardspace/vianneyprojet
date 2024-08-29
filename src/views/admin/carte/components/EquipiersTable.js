@@ -23,6 +23,11 @@ import {
   Image,
   Badge,
   Tooltip,
+  Button,
+  InputGroup,
+  Input,
+  InputRightElement,
+  useToast,
 } from '@chakra-ui/react';
 import { FcPhone } from "react-icons/fc";
 import L from 'leaflet';
@@ -39,10 +44,14 @@ const EquipiersTable = ({ showAll }) => {
   const [equipiers, setEquipiers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEquipier, setSelectedEquipier] = useState(null);
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [newPassword, setNewPassword] = useState(""); // State to hold the new password
   const { selectedEventId } = useEvent();
+  const toast = useToast();
 
   const onRowClick = (equipier) => {
     setSelectedEquipier(equipier);
+    setNewPassword(equipier.password); // Initialize with current password
     setIsModalOpen(true);
   };
 
@@ -52,13 +61,12 @@ const EquipiersTable = ({ showAll }) => {
     color: useColorModeValue('gray.600', 'gray.200'),
   };
   const headerGradientStyle = {
-    background: 'linear-gradient(to right, #ff914d, #ff7730)', // Updated to use orange gradient
+    background: 'linear-gradient(to right, #ff914d, #ff7730)',
     color: 'white',
     textTransform: 'none',
     fontSize: '16px',
     fontWeight: 'bold',
   };
-  
 
   const tableRowStyle = {
     borderBottom: '1px solid',
@@ -71,28 +79,36 @@ const EquipiersTable = ({ showAll }) => {
   };
 
   useEffect(() => {
-    if (selectedEquipier && isModalOpen) {
+    if (selectedEquipier && isModalOpen && selectedEquipier.latitude && selectedEquipier.longitude) {
       const mapId = `map-${selectedEquipier.id}`;
-
+  
       requestAnimationFrame(() => {
         const mapContainer = document.getElementById(mapId);
-        if (mapContainer && !mapContainer._leaflet) {
+        
+        // Check if the map container already has a map instance
+        if (mapContainer && !mapContainer._leaflet_map) {
           const map = L.map(mapId).setView([selectedEquipier.latitude, selectedEquipier.longitude], 13);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
+  
+          mapContainer._leaflet_map = map;  // Mark the container as initialized
+  
           equipiers.forEach(team => {
-            // Use a different color for the selected team
-            const icon = team.id === selectedEquipier.id ? createCustomIcon('blue') : createCustomIcon();
-            L.marker([team.latitude, team.longitude], { icon }).addTo(map);
+            if (team.latitude && team.longitude) {
+              const icon = team.id === selectedEquipier.id ? createCustomIcon('blue', team.name_of_the_team) : createCustomIcon('red', team.name_of_the_team);
+              const marker = L.marker([team.latitude, team.longitude], { icon }).addTo(map);
+              
+              // Add tooltip to marker
+              marker.bindTooltip(team.name_of_the_team, {permanent: false, direction: "top"});
+            }
           });
         }
       });
-
+  
       return () => {
         // Cleanup code
       };
     }
-  }, [selectedEquipier, isModalOpen, equipiers]);
+  }, [selectedEquipier, isModalOpen, equipiers]);  
 
   useEffect(() => {
     const fetchEquipiers = async () => {
@@ -112,6 +128,7 @@ const EquipiersTable = ({ showAll }) => {
               last_updated
             )
           `)
+          .eq('event_id', selectedEventId) // Filter by the selected event
           .order('name_of_the_team', { ascending: true });
 
         if (teamsError) {
@@ -144,7 +161,6 @@ const EquipiersTable = ({ showAll }) => {
     fetchEquipiers();
   }, [selectedEventId]);
 
-
   const getLeaderNameAndPhone = (teamMembers) => {
     const leader = teamMembers.find(member => member.isLeader);
     if (!leader) {
@@ -170,7 +186,7 @@ const EquipiersTable = ({ showAll }) => {
     );
   };
 
-  const createCustomIcon = (color = 'red') => {
+  const createCustomIcon = (color = 'red', teamName) => {
     const iconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color }} />);
     return L.divIcon({
       html: iconHtml,
@@ -179,6 +195,41 @@ const EquipiersTable = ({ showAll }) => {
       iconAnchor: [15, 30],
       popupAnchor: [0, -30]
     });
+  };
+
+  const handleSavePassword = async () => {
+    if (!selectedEquipier) return;
+
+    try {
+      // eslint-disable-next-line
+      const { data, error } = await supabase
+        .from('vianney_teams')
+        .update({ password: newPassword })
+        .eq('id', selectedEquipier.id);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Mot de passe mis à jour.",
+        description: "Le mot de passe de l'équipe a été mis à jour avec succès.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+
+      setSelectedEquipier({ ...selectedEquipier, password: newPassword });
+    } catch (error) {
+      console.error('Error updating password:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la mise à jour du mot de passe.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   const renderTeamDetails = () => {
@@ -200,6 +251,8 @@ const EquipiersTable = ({ showAll }) => {
       latitude,
       longitude,
       team_members,
+      // eslint-disable-next-line
+      password,
     } = selectedEquipier;
 
     const teamMembersList = team_members?.map(member => (
@@ -239,9 +292,30 @@ const EquipiersTable = ({ showAll }) => {
         <Text><strong>Email :</strong> {mail}</Text>
         <Text><strong>Type de véhicule :</strong> {type_de_vehicule}</Text>
         <Text><strong>Numéro d'immatriculation :</strong> {immatriculation}</Text>
-        <Text><strong>Localisation :</strong> Latitude: {latitude}, Longitude: {longitude}</Text>
+        {latitude && longitude ? (
+          <Text><strong>Localisation :</strong> Latitude: {latitude}, Longitude: {longitude}</Text>
+        ) : (
+          <Text><strong>Localisation :</strong> Non disponible</Text>
+        )}
         <Heading size="sm">Membres de l'équipe :</Heading>
         <ul>{teamMembersList}</ul>
+        <Heading size="sm">Modifier le mot de passe :</Heading>
+        <InputGroup>
+          <Input
+            type={showPassword ? "text" : "password"}
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)} // Update newPassword state
+          />
+          <InputRightElement width="4.5rem">
+            <Button h="1.75rem" size="sm" onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? "Cacher" : "Voir"}
+            </Button>
+          </InputRightElement>
+        </InputGroup>
+        <Button mt={4} colorScheme="blue" onClick={handleSavePassword}>
+          Sauvegarder
+        </Button>
+        <Box id={`map-${selectedEquipier?.id}`} h='500px' w='100%' mt={4} />
       </Stack>
     );
   };
@@ -253,8 +327,16 @@ const EquipiersTable = ({ showAll }) => {
 
   const TableRow = ({ equipier, onClick }) => (
     <Tr _hover={hoverStyle} onClick={() => onClick(equipier)} style={tableRowStyle}>
-      <Td><Avatar size="md" src={equipier.photo_profile_url} style={avatarStyle} /></Td>
-      <Td>{equipier.name_of_the_team}</Td>
+      <Td>
+        <Tooltip label={equipier.name_of_the_team} placement="top" hasArrow>
+          <Avatar size="md" src={equipier.photo_profile_url} style={avatarStyle} />
+        </Tooltip>
+      </Td>
+      <Td>
+        <Tooltip label={equipier.name_of_the_team} placement="top" hasArrow>
+          <Text>{equipier.name_of_the_team}</Text>
+        </Tooltip>
+      </Td>
       <Td>{getLeaderNameAndPhone(equipier.team_members)}</Td>
       <Td>{equipier.mission}</Td>
       <Td>
@@ -296,7 +378,7 @@ const EquipiersTable = ({ showAll }) => {
               <Th><Text style={headerStyle}>nom de l'équipe</Text></Th>
               <Th><Text style={headerStyle}>nom du responsable</Text></Th>
               <Th><Text style={headerStyle}>mission</Text></Th>
-              <Th><Text style={headerStyle}>Actions</Text></Th> {/* New column header */}
+              <Th><Text style={headerStyle}>Actions</Text></Th>
             </Tr>
           </Thead>
           <Tbody>
