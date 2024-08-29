@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-
 import {
   FormControl,
   FormLabel,
@@ -28,19 +26,54 @@ const UserForm = () => {
   const [typeDeVehicule, setTypeDeVehicule] = useState('');
   const [immatriculation, setImmatriculation] = useState('');
   const [specialite, setSpecialite] = useState('');
+  const [password, setPassword] = useState(''); // État pour le mot de passe
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [teamMembers, setTeamMembers] = useState([{
-    id: uuidv4(), // Generate unique ID for the first team member
+    id: uuidv4(), 
     familyname: '',
     firstname: '',
     mail: '',
     phone: '',
-    isLeader: false, // Added isLeader property
+    isLeader: false, 
   }]);
+
+  // Fonction pour générer un mot de passe sécurisé
+  const generatePassword = () => {
+    const length = 12;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+    let password = '';
+    while (true) {
+      password = Array.from({ length }, () => charset.charAt(Math.floor(Math.random() * charset.length))).join('');
+      if (
+        /[a-z]/.test(password) && // au moins une minuscule
+        /[A-Z]/.test(password) && // au moins une majuscule
+        /\d/.test(password) &&    // au moins un chiffre
+        /[!@#$%^&*()_+~`|}{[\]:;?><,./-=]/.test(password) // au moins un caractère spécial
+      ) break;
+    }
+    return password;
+  };
+
+  const validatePassword = (password) => {
+    return (
+      /[a-z]/.test(password) &&  // au moins une minuscule
+      /[A-Z]/.test(password) &&  // au moins une majuscule
+      /\d/.test(password) &&     // au moins un chiffre
+      /[!@#$%^&*()_+~`|}{[\]:;?><,./-=]/.test(password) // au moins un caractère spécial
+    );
+  };
+
+  useEffect(() => {
+    // Générer un mot de passe au montage du composant
+    setPassword(generatePassword());
+  }, []);
+
   const generateRandomColor = () => {
     const randomColor = Math.floor(Math.random() * 16777215).toString(16);
     return `#${randomColor}`;
   };
+
   const handleFileChange = (e) => {
     setProfilePhoto(e.target.files[0]);
   };
@@ -49,9 +82,7 @@ const UserForm = () => {
     let values = [...teamMembers];
 
     if (event.target.name === 'isLeader') {
-      // Set all isLeader properties to false
       values = values.map(member => ({ ...member, isLeader: false }));
-      // Set isLeader to true for the selected member
       values[index][event.target.name] = event.target.checked;
     } else {
       values[index][event.target.name] = event.target.value;
@@ -60,10 +91,9 @@ const UserForm = () => {
     setTeamMembers(values);
   };
 
-
   const handleAddTeamMember = () => {
     setTeamMembers([...teamMembers, {
-      id: uuidv4(), // Generate unique ID for new team member
+      id: uuidv4(), 
       familyname: '',
       firstname: '',
       mail: '',
@@ -71,7 +101,6 @@ const UserForm = () => {
     }]);
   };
 
-  // Map events
   const LocationMarker = () => {
     const map = useMapEvents({
       click(e) {
@@ -88,6 +117,11 @@ const UserForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validatePassword(password)) {
+      setShowErrorAlert(true);
+      return;
+    }
 
     const teamColor = generateRandomColor();
     const timestamp = new Date().toISOString();
@@ -128,6 +162,7 @@ const UserForm = () => {
           immatriculation: immatriculation,
           specialite: specialite,
           event_id: selectedEventId,
+          password: password, // Ajouter le mot de passe généré ou modifié
         },
       ]);
 
@@ -135,6 +170,9 @@ const UserForm = () => {
       console.error('Error inserting data:', insertError);
       return;
     }
+
+    // Hide error alert if successful
+    setShowErrorAlert(false);
 
     // Show the success alert
     setShowSuccessAlert(true);
@@ -161,6 +199,7 @@ const UserForm = () => {
           <FormLabel htmlFor='profile-photo'>Photo de profil</FormLabel>
           <Input id='profile-photo' type="file" onChange={handleFileChange} />
         </FormControl>
+
         <FormControl>
           <FormLabel htmlFor='mission'>Mission</FormLabel>
           <Input
@@ -170,6 +209,7 @@ const UserForm = () => {
             onChange={(e) => setMission(e.target.value)}
           />
         </FormControl>
+
         <FormControl>
           <FormLabel htmlFor='typeDeVehicule'>Type de Véhicule</FormLabel>
           <Input
@@ -200,32 +240,55 @@ const UserForm = () => {
           />
         </FormControl>
 
+        <FormControl isRequired>
+          <FormLabel htmlFor='password'>Mot de passe (modifiable)</FormLabel>
+          <Input
+            id='password'
+            type="text"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)} // Permettre la modification du mot de passe
+          />
+        </FormControl>
+
+        {showErrorAlert && (
+          <Alert status="error" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" mt={4}>
+            <AlertIcon boxSize="40px" mr={0} />
+            <AlertTitle mt={4} mb={1} fontSize="lg">
+              Mot de passe invalide
+            </AlertTitle>
+            <AlertDescription maxWidth="sm">
+              Le mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial.
+            </AlertDescription>
+            <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowErrorAlert(false)} />
+          </Alert>
+        )}
+
         {teamMembers.map((teamMember, index) => (
           <HStack key={index} spacing={2}>
             <Input
               type="text"
-              name="familyname" // Add this line
+              name="familyname"
               placeholder="Nom de famille"
               value={teamMember.familyname}
               onChange={(e) => handleTeamMemberChange(index, e)}
             />
             <Input
               type="text"
-              name="firstname" // Add this line
+              name="firstname"
               placeholder="Prénom"
               value={teamMember.firstname}
               onChange={(e) => handleTeamMemberChange(index, e)}
             />
             <Input
               type="text"
-              name="mail" // Add this line
+              name="mail"
               placeholder="Email"
               value={teamMember.mail}
               onChange={(e) => handleTeamMemberChange(index, e)}
             />
             <Input
               type="text"
-              name="phone" // Add this line
+              name="phone"
               placeholder="Téléphone"
               value={teamMember.phone}
               onChange={(e) => handleTeamMemberChange(index, e)}
@@ -246,7 +309,7 @@ const UserForm = () => {
               Equipe créée avec succès
             </AlertTitle>
             <AlertDescription maxWidth="sm">
-              Les données ont été ajouté avec succès.
+              Les données ont été ajoutées avec succès.
             </AlertDescription>
             <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowSuccessAlert(false)} />
           </Alert>
