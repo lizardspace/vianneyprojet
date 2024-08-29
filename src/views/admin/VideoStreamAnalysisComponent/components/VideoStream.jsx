@@ -1,42 +1,42 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Box, Button, Text, UnorderedList, ListItem } from '@chakra-ui/react';
+import { Box, Button, Text } from '@chakra-ui/react';
 import * as cocoSsd from '@tensorflow-models/coco-ssd';
 import '@tensorflow/tfjs';
 
 const VideoStream = () => {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
-  const [error, setError] = useState(null);
-  const [model, setModel] = useState(null);
-  const [stablePredictions, setStablePredictions] = useState([]);
-  const predictionAccumulator = useRef({});
+  const [erreur, setErreur] = useState(null);
+  const [modele, setModele] = useState(null);
+  const [predictionsStables, setPredictionsStables] = useState([]);
+  const accumulateurDePredictions = useRef({});
 
   useEffect(() => {
-    const startVideoStream = async () => {
+    const demarrerFluxVideo = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        streamRef.current = stream;
+        const flux = await navigator.mediaDevices.getUserMedia({ video: true });
+        streamRef.current = flux;
         if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+          videoRef.current.srcObject = flux;
         }
-      } catch (error) {
-        console.error('Error accessing webcam: ', error);
-        setError('Error accessing webcam. Please check your device and browser settings.');
+      } catch (erreur) {
+        console.error('Erreur d\'accès à la webcam : ', erreur);
+        setErreur('Erreur d\'accès à la webcam. Veuillez vérifier votre appareil et les paramètres de votre navigateur.');
       }
     };
 
-    const loadModel = async () => {
+    const chargerModele = async () => {
       try {
-        const loadedModel = await cocoSsd.load();
-        setModel(loadedModel);
-      } catch (error) {
-        console.error('Error loading TensorFlow model: ', error);
-        setError('Error loading model. Please try again later.');
+        const modeleCharge = await cocoSsd.load();
+        setModele(modeleCharge);
+      } catch (erreur) {
+        console.error('Erreur de chargement du modèle TensorFlow : ', erreur);
+        setErreur('Erreur de chargement du modèle. Veuillez réessayer plus tard.');
       }
     };
 
-    startVideoStream();
-    loadModel();
+    demarrerFluxVideo();
+    chargerModele();
 
     return () => {
       if (streamRef.current) {
@@ -46,71 +46,82 @@ const VideoStream = () => {
   }, []);
 
   useEffect(() => {
-    if (model && videoRef.current) {
-      const detectObjects = async () => {
+    if (modele && videoRef.current) {
+      const detecterObjets = async () => {
         if (videoRef.current.readyState === 4) {
-          const predictions = await model.detect(videoRef.current);
+          const predictions = await modele.detect(videoRef.current);
 
-          // Accumulate predictions
+          // Accumuler les prédictions
           predictions.forEach(prediction => {
-            const { class: objectClass } = prediction;
-            if (!predictionAccumulator.current[objectClass]) {
-              predictionAccumulator.current[objectClass] = {
+            const { class: objetClasse } = prediction;
+            if (!accumulateurDePredictions.current[objetClasse]) {
+              accumulateurDePredictions.current[objetClasse] = {
                 count: 0,
                 lastDetected: new Date(),
               };
             }
-            predictionAccumulator.current[objectClass].count += 1;
-            predictionAccumulator.current[objectClass].lastDetected = new Date();
+            accumulateurDePredictions.current[objetClasse].count += 1;
+            accumulateurDePredictions.current[objetClasse].lastDetected = new Date();
           });
 
-          // Filter stable predictions
-          const now = new Date();
-          const stable = Object.entries(predictionAccumulator.current)
+          // Filtrer les prédictions stables
+          const maintenant = new Date();
+          const stables = Object.entries(accumulateurDePredictions.current)
             .filter(([_, value]) => {
-              // Keep only objects detected multiple times and recently
-              return value.count > 2 && (now - value.lastDetected) < 1000;
+              // Garder uniquement les objets détectés plusieurs fois et récemment
+              return value.count > 2 && (maintenant - value.lastDetected) < 1000;
             })
             .map(([key]) => key);
 
-          setStablePredictions(stable);
+          setPredictionsStables(stables);
         }
-        requestAnimationFrame(detectObjects);
+        requestAnimationFrame(detecterObjets);
       };
-      detectObjects();
+      detecterObjets();
     }
-  }, [model]);
+  }, [modele]);
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" mt={4}>
-      {error ? (
-        <Text color="red">{error}</Text>
+      {erreur ? (
+        <Text color="red">{erreur}</Text>
       ) : (
         <>
           <Box 
             as="video" 
             ref={videoRef} 
             autoPlay 
-            width="100%" 
+            width="80%" // Ajuster la largeur pour rendre la vidéo plus petite
+            maxWidth="500px" // Définir une largeur maximale pour la vidéo
             height="auto" 
             borderRadius="md" 
             boxShadow="md" 
             mb={4}
+            mx="auto" // Centrer la vidéo horizontalement
           />
           <Button onClick={() => { if (videoRef.current) videoRef.current.srcObject = null }} colorScheme="red">
-            Stop Video
+            Arrêter la vidéo
           </Button>
           <Box mt={4} width="100%" textAlign="left">
-            <Text fontWeight="bold">Objects detected:</Text>
-            <UnorderedList>
-              {stablePredictions.length > 0 ? (
-                stablePredictions.map((prediction, index) => (
-                  <ListItem key={index}>{prediction}</ListItem>
+            <Text fontWeight="bold" mb={2}>Objets détectés :</Text>
+            <Box display="flex" flexDirection="column" gap={2}>
+              {predictionsStables.length > 0 ? (
+                predictionsStables.map((prediction, index) => (
+                  <Box
+                    key={index}
+                    bg="blue.50"
+                    border="1px solid"
+                    borderColor="blue.500"
+                    borderRadius="md"
+                    p={2}
+                  >
+                    <Text color="blue.700" fontWeight="bold">{prediction}</Text>
+                  </Box>
                 ))
               ) : (
-                <Text>No objects detected.</Text>
+                <Text>Aucun objet détecté.</Text>
               )}
-            </UnorderedList>
+            </Box>
           </Box>
         </>
       )}
