@@ -39,6 +39,7 @@ const VideoStream = () => {
     chargerModele();
 
     return () => {
+      // Arrêter le flux vidéo lors du démontage du composant
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
@@ -46,9 +47,13 @@ const VideoStream = () => {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
     if (modele && videoRef.current) {
       const detecterObjets = async () => {
-        if (videoRef.current.readyState === 4) {
+        if (!isMounted) return; // Arrêter la fonction si le composant est démonté
+
+        if (videoRef.current && videoRef.current.readyState === 4) {
           const predictions = await modele.detect(videoRef.current);
 
           // Accumuler les prédictions
@@ -75,10 +80,18 @@ const VideoStream = () => {
 
           setPredictionsStables(stables);
         }
-        requestAnimationFrame(detecterObjets);
+
+        if (isMounted) {
+          requestAnimationFrame(detecterObjets);
+        }
       };
+
       detecterObjets();
     }
+
+    return () => {
+      isMounted = false; // Indiquer que le composant est démonté
+    };
   }, [modele]);
 
   return (
