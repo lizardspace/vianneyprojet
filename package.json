@@ -20,6 +20,8 @@
     "@react-pdf/renderer": "^3.4.4",
     "@spacemen1000/react-scheduler": "^0.1.2",
     "@supabase/supabase-js": "^2.39.6",
+    "@tensorflow-models/coco-ssd": "^2.2.3",
+    "@tensorflow/tfjs": "^4.20.0",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
