@@ -3,16 +3,17 @@ import { Icon } from "@chakra-ui/react";
 import {
   FcMindMap,
   FcVideoCall,
-  FcSerialTasks,
+  FcPlanner,
   FcSurvey,
   FcSettings,
   FcGrid,
   FcHighPriority,
   FcDiploma2,
   FcDocument,
+  FcAbout,
+  FcOpenedFolder,
 } from "react-icons/fc";
 import { MdQrCodeScanner, MdOutlineSos } from "react-icons/md"; // Import the new icon
-import { LuCross } from "react-icons/lu"; // Import the new icon
 
 import MainDashboard from "views/admin/default";
 import NFTMarketplace from "views/admin/carte";
@@ -49,7 +50,7 @@ const routes = [
     name: "Emploi du temps",
     layout: "/admin",
     path: "/data-tables",
-    icon: <Icon as={FcSerialTasks} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={FcPlanner} width="20px" height="20px" color="inherit" />,
     component: TableauDeBord,
   },
   {
@@ -73,12 +74,26 @@ const routes = [
   //  icon: <Icon as={FcLock} width='20px' height='20px' color='inherit' />,
   //  component: SignInCentered,
  // },
+ {
+  name: "Chat",
+  layout: "/admin",
+  path: "/chat",
+  icon: <Icon as={FcAbout} width="20px" height="20px" color="inherit" />, 
+  component: ChatComponent,
+},
   {
     name: "Paramètres",
     layout: "/admin",
     path: "/parameters",
     icon: <Icon as={FcSettings} width="20px" height="20px" color="inherit" />,
     component: Parameters,
+  },
+  {
+    name: "Documents",
+    layout: "/admin",
+    path: "/alertejesuisendanger",
+    icon: <Icon as={FcOpenedFolder} width="20px" height="20px" color="red" />, 
+    component: AlerteJeSuisEnDanger,
   },
  // {
  //   name: "Interface Equipe",
@@ -95,13 +110,6 @@ const routes = [
     component: TableauExcel,
   },
   {
-    name: "Alerte à une équipe",
-    layout: "/admin",
-    path: "/alerte-equipe",
-    icon: <Icon as={FcHighPriority} width="20px" height="20px" color="inherit" />,
-    component: AlerteEquipe,
-  },
-  {
     name: "Matériel",
     layout: "/admin",
     path: "/material",
@@ -109,18 +117,11 @@ const routes = [
     component: MaterialComponent,
   },
   {
-    name: "Note de frais",
+    name: "Comptabilité",
     layout: "/admin",
     path: "/note-de-frais",
     icon: <Icon as={FcDiploma2} width="20px" height="20px" color="inherit" />,
     component: NoteDeFraisComponent,
-  },
-  {
-    name: "Secours",
-    layout: "/admin",
-    path: "/alertejesuisendanger",
-    icon: <Icon as={LuCross} width="20px" height="20px" color="red" />, 
-    component: AlerteJeSuisEnDanger,
   },
   {
     name: "SOS Alerte Silencieuse",
@@ -128,13 +129,6 @@ const routes = [
     path: "/sosroute",
     icon: <Icon as={MdOutlineSos} width="20px" height="20px" color="red" />, 
     component: SOSComponent, 
-  },
-  {
-    name: "Chat",
-    layout: "/admin",
-    path: "/chat",
-    icon: <Icon as={FcSerialTasks} width="20px" height="20px" color="inherit" />, 
-    component: ChatComponent,
   },
   {
     name: "Rapport d'incident",
@@ -149,6 +143,13 @@ const routes = [
     path: "/video-stream-analysis",
     icon: <Icon as={FcVideoCall} width="20px" height="20px" color="inherit" />, // You can choose a more relevant icon
     component: VideoStreamAnalysisComponent,
+  },
+  {
+    name: "Alerte à une équipe",
+    layout: "/admin",
+    path: "/alerte-equipe",
+    icon: <Icon as={FcHighPriority} width="20px" height="20px" color="inherit" />,
+    component: AlerteEquipe,
   },
 ];
 

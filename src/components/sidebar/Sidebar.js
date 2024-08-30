@@ -14,7 +14,14 @@ function Sidebar(props) {
   let sidebarBg = useColorModeValue("white", "navy.800");
   let sidebarMargins = "0px";
 
-  const filteredRoutes = routes.filter(route => route.name !== "Carte zoomée" && route.name !== "Matériel");
+  const filteredRoutes = routes.filter(
+    route =>
+      route.name !== "Carte zoomée" &&
+      route.name !== "Matériel" &&
+      route.name !== "Rapport d'incident" &&
+      route.name !== "Tableau Excel"
+  );
+  
 
   return (
     <Box display={{ sm: "none", xl: "block" }} w="100%" position="fixed" minH="100vh" bg={sidebarBg}>
