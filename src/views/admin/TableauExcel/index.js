@@ -19,6 +19,7 @@ import VianneyPdfDocumentsSalleDeCriseTableEvent from './componentsEventContext/
 import VianneyTextareaTableEvent from './componentsEventContext/VianneyTextareaTableEvent'; // Replace with the actual import path
 import VianneyTextareaSalleDeCriseTableEvent from './componentsEventContext/VianneyTextareaSalleDeCriseTableEvent'; // Replace with the actual import path
 import VianneyActionsTableEventDate from './componentsEventContext/VianneyActionsTableEventDate';
+import DocumentTabs from '../alertejesuisendanger/components/DocumentTabs';
 
 const InterfaceEquipe = () => {
   const [showRawData, setShowRawData] = useState(false);
@@ -30,6 +31,7 @@ const InterfaceEquipe = () => {
   return (
     <>
     <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
+      <DocumentTabs/>
       <Box p={{ base: 4, md: 8, xl: 12 }}>
 
         <Button onClick={toggleRawDataVisibility} mb={4} leftIcon={showRawData ? <FcUnlock /> : <FcLock />}>

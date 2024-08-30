@@ -19,8 +19,9 @@ import IncidentReportForm from './components/IncidentReportForm';
 import TeamMembersDisplay from '../InterfaceEquipe/components/TeamMembersDisplay';
 import UrgentAlerts from '../InterfaceEquipe/components/UrgentAlerts';
 import IncidentReportsList from './components/IncidentReportsList';
+import DocumentTabs from '../alertejesuisendanger/components/DocumentTabs';
 
-const NoteDeFraisComponent = () => {
+const IncidentReport = () => {
     const { teamMembers, selectedTeam, setSelectedTeam, teamData, setTeamData } = useTeam();
     const { selectedEventId } = useEvent(); // Get selected event ID from useEvent context
     const leaders = teamMembers.filter(member => member.isLeader);
@@ -62,6 +63,7 @@ const NoteDeFraisComponent = () => {
     };
     return (
         <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
+            <DocumentTabs/>
             <UrgentAlerts />
             {showAlert && (
                 <Alert status="error" mb="4" minHeight="100px">
@@ -109,4 +111,4 @@ const NoteDeFraisComponent = () => {
     );
 };
 
-export default NoteDeFraisComponent;
+export default IncidentReport;
