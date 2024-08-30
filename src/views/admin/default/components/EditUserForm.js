@@ -34,7 +34,9 @@ import {
   Badge,
   Grid,
   GridItem,
-  Tooltip
+  Tooltip,
+  InputGroup,
+  InputRightElement
 } from '@chakra-ui/react';
 import { PhoneIcon, EmailIcon } from '@chakra-ui/icons';
 import { supabase } from './../../../../supabaseClient';
@@ -64,6 +66,8 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
     isLeader: false,
   }]);
   const [leaderName, setLeaderName] = useState({ firstname: '', familyname: '', phone: '', mail: '' });
+  const [currentPassword, setCurrentPassword] = useState(''); // State to hold the current password
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -95,7 +99,17 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
     }
   };
 
+  const isValidPassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleModifyAndPushData = async () => {
+    if (currentPassword && !isValidPassword(currentPassword)) {
+      alert("Le mot de passe doit comporter au moins 8 caractères, avec des majuscules, des minuscules, des chiffres et des caractères spéciaux.");
+      return;
+    }
+
     const updatedTeamData = {
       name_of_the_team: nameOfTheTeam,
       latitude: lat,
@@ -106,6 +120,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       specialite: specialite,
       team_members: teamMembers,
       photo_profile_url: profilePhotoUrl,
+      password: currentPassword, // Include the modified password
     };
 
     try {
@@ -173,6 +188,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       immatriculation: immatriculation,
       specialite: specialite,
       team_members: teamMembers,
+      password: currentPassword, // Include the modified password
     };
 
     onSave(updatedTeamData);
@@ -223,6 +239,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       setSpecialite(teamData.specialite || '');
       setProfilePhotoUrl(teamData.photo_profile_url || '');
       setTeamMembers(teamData.team_members || []);
+      setCurrentPassword(teamData.password || ''); // Load the current password
       updateLeaderName(teamData.team_members || []);
     }
   }, [teamData]);
@@ -335,6 +352,22 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                       value={immatriculation}
                       onChange={(e) => setImmatriculation(e.target.value)}
                     />
+                  </FormControl>
+                  <FormControl mt={4}>
+                    <FormLabel htmlFor='current-password'>Mot de Passe</FormLabel>
+                    <InputGroup>
+                      <Input
+                        id="current-password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                      />
+                      <InputRightElement width="4.5rem">
+                        <Button h="1.75rem" size="sm" onClick={() => setShowPassword(!showPassword)}>
+                          {showPassword ? 'Cacher' : 'Voir'}
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
                   </FormControl>
                 </VStack>
               </GridItem>
