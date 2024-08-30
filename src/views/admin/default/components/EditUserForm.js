@@ -36,7 +36,8 @@ import {
   GridItem,
   Tooltip,
   InputGroup,
-  InputRightElement
+  InputRightElement,
+  useToast,
 } from '@chakra-ui/react';
 import { PhoneIcon, EmailIcon } from '@chakra-ui/icons';
 import { supabase } from './../../../../supabaseClient';
@@ -68,6 +69,8 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
   const [leaderName, setLeaderName] = useState({ firstname: '', familyname: '', phone: '', mail: '' });
   const [currentPassword, setCurrentPassword] = useState(''); // State to hold the current password
   const [showPassword, setShowPassword] = useState(false);
+
+  const toast = useToast(); // Initialize the useToast hook
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -106,7 +109,14 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
 
   const handleModifyAndPushData = async () => {
     if (currentPassword && !isValidPassword(currentPassword)) {
-      alert("Le mot de passe doit comporter au moins 8 caractères, avec des majuscules, des minuscules, des chiffres et des caractères spéciaux.");
+      toast({
+        title: "Mot de passe invalide.",
+        description: "Le mot de passe doit comporter au moins 8 caractères, avec des majuscules, des minuscules, des chiffres et des caractères spéciaux.",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+        position: "top",
+      });
       return;
     }
 
