@@ -199,8 +199,25 @@ const EquipiersTable = ({ showAll }) => {
     });
   };
 
+  // Function to validate the password
+  const isValidPassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleSavePassword = async () => {
     if (!selectedEquipier) return;
+
+    if (!isValidPassword(newPassword)) {
+      toast({
+        title: 'Mot de passe invalide',
+        description: "Le mot de passe doit comporter au moins 8 caractères, avec des majuscules, des minuscules, des chiffres et des caractères spéciaux.",
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
 
     try {
       // eslint-disable-next-line
