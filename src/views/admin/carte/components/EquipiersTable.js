@@ -79,36 +79,38 @@ const EquipiersTable = ({ showAll }) => {
   };
 
   useEffect(() => {
-    if (selectedEquipier && isModalOpen && selectedEquipier.latitude && selectedEquipier.longitude) {
-      const mapId = `map-${selectedEquipier.id}`;
-  
+    const mapId = `map-${selectedEquipier?.id}`;
+
+    if (isModalOpen && equipiers.length > 0 && selectedEquipier?.latitude && selectedEquipier?.longitude) {
       requestAnimationFrame(() => {
         const mapContainer = document.getElementById(mapId);
-        
-        // Check if the map container already has a map instance
+
         if (mapContainer && !mapContainer._leaflet_map) {
-          const map = L.map(mapId).setView([selectedEquipier.latitude, selectedEquipier.longitude], 13);
+          const map = L.map(mapId).setView(
+            [selectedEquipier.latitude, selectedEquipier.longitude],
+            13
+          );
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-  
-          mapContainer._leaflet_map = map;  // Mark the container as initialized
-  
-          equipiers.forEach(team => {
+
+          mapContainer._leaflet_map = map;
+
+          equipiers.forEach((team) => {
             if (team.latitude && team.longitude) {
-              const icon = team.id === selectedEquipier.id ? createCustomIcon('blue', team.name_of_the_team) : createCustomIcon('red', team.name_of_the_team);
+              const iconColor = team.id === selectedEquipier.id ? 'blue' : 'red';
+              const icon = createCustomIcon(iconColor, team.name_of_the_team);
               const marker = L.marker([team.latitude, team.longitude], { icon }).addTo(map);
-              
-              // Add tooltip to marker
-              marker.bindTooltip(team.name_of_the_team, {permanent: false, direction: "top"});
+
+              marker.bindTooltip(team.name_of_the_team, { permanent: false, direction: 'top' });
             }
           });
         }
       });
-  
-      return () => {
-        // Cleanup code
-      };
     }
-  }, [selectedEquipier, isModalOpen, equipiers]);  
+
+    return () => {
+      // Optional cleanup if needed
+    };
+  }, [selectedEquipier, isModalOpen, equipiers]);
 
   useEffect(() => {
     const fetchEquipiers = async () => {
@@ -137,14 +139,14 @@ const EquipiersTable = ({ showAll }) => {
         }
 
         // Filter actions for each team to only include those happening now
-        const teamsWithCurrentActions = teams.map(team => ({
+        const teamsWithCurrentActions = teams.map((team) => ({
           ...team,
-          vianney_actions: team.vianney_actions.filter(action => {
+          vianney_actions: team.vianney_actions.filter((action) => {
             const start = new Date(action.starting_date).getTime();
             const end = new Date(action.ending_date).getTime();
             const currentTime = new Date(now).getTime();
             return currentTime >= start && currentTime <= end;
-          })
+          }),
         }));
 
         // Sort teams to move those with current actions to the top
@@ -162,7 +164,7 @@ const EquipiersTable = ({ showAll }) => {
   }, [selectedEventId]);
 
   const getLeaderNameAndPhone = (teamMembers) => {
-    const leader = teamMembers.find(member => member.isLeader);
+    const leader = teamMembers.find((member) => member.isLeader);
     if (!leader) {
       return 'No Leader';
     }
@@ -193,7 +195,7 @@ const EquipiersTable = ({ showAll }) => {
       className: 'custom-leaflet-icon',
       iconSize: L.point(30, 30),
       iconAnchor: [15, 30],
-      popupAnchor: [0, -30]
+      popupAnchor: [0, -30],
     });
   };
 
@@ -212,9 +214,9 @@ const EquipiersTable = ({ showAll }) => {
       }
 
       toast({
-        title: "Mot de passe mis à jour.",
+        title: 'Mot de passe mis à jour.',
         description: "Le mot de passe de l'équipe a été mis à jour avec succès.",
-        status: "success",
+        status: 'success',
         duration: 5000,
         isClosable: true,
       });
@@ -223,9 +225,9 @@ const EquipiersTable = ({ showAll }) => {
     } catch (error) {
       console.error('Error updating password:', error);
       toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la mise à jour du mot de passe.",
-        status: "error",
+        title: 'Erreur',
+        description: 'Une erreur est survenue lors de la mise à jour du mot de passe.',
+        status: 'error',
         duration: 5000,
         isClosable: true,
       });
@@ -255,7 +257,7 @@ const EquipiersTable = ({ showAll }) => {
       password,
     } = selectedEquipier;
 
-    const teamMembersList = team_members?.map(member => (
+    const teamMembersList = team_members?.map((member) => (
       <li key={member.id}>
         <Flex align="center">
           {`${member.firstname} ${member.familyname}`}
@@ -274,48 +276,68 @@ const EquipiersTable = ({ showAll }) => {
     return (
       <Stack spacing={4} p={5} align="start">
         {photo_profile_url && (
-          <Image
-            borderRadius="full"
-            boxSize="100px"
-            src={photo_profile_url}
-            alt="l'équipe"
-          />
+          <Image borderRadius="full" boxSize="100px" src={photo_profile_url} alt="l'équipe" />
         )}
         <Heading size="md">{name_of_the_team}</Heading>
-        <Text><strong>Statut :</strong> <Badge colorScheme={status ? 'green' : 'red'}>{status ? 'Actif' : 'Inactif'}</Badge></Text>
-        <Text><strong>Dernière activité :</strong> {new Date(last_active).toLocaleDateString('fr-FR')}</Text>
-        <Text><strong>Type d'équipe :</strong> {type_d_equipe}</Text>
-        <Text><strong>Numéro de membre :</strong> {numero_d_equipier}</Text>
-        <Text><strong>Spécialité :</strong> {specialite}</Text>
-        <Text><strong>Rôle :</strong> {role_de_l_equipier}</Text>
-        <Text><strong>Numéro de téléphone :</strong> {numero_de_telephone}</Text>
-        <Text><strong>Email :</strong> {mail}</Text>
-        <Text><strong>Type de véhicule :</strong> {type_de_vehicule}</Text>
-        <Text><strong>Numéro d'immatriculation :</strong> {immatriculation}</Text>
+        <Text>
+          <strong>Statut :</strong>{' '}
+          <Badge colorScheme={status ? 'green' : 'red'}>{status ? 'Actif' : 'Inactif'}</Badge>
+        </Text>
+        <Text>
+          <strong>Dernière activité :</strong> {new Date(last_active).toLocaleDateString('fr-FR')}
+        </Text>
+        <Text>
+          <strong>Type d'équipe :</strong> {type_d_equipe}
+        </Text>
+        <Text>
+          <strong>Numéro de membre :</strong> {numero_d_equipier}
+        </Text>
+        <Text>
+          <strong>Spécialité :</strong> {specialite}
+        </Text>
+        <Text>
+          <strong>Rôle :</strong> {role_de_l_equipier}
+        </Text>
+        <Text>
+          <strong>Numéro de téléphone :</strong> {numero_de_telephone}
+        </Text>
+        <Text>
+          <strong>Email :</strong> {mail}
+        </Text>
+        <Text>
+          <strong>Type de véhicule :</strong> {type_de_vehicule}
+        </Text>
+        <Text>
+          <strong>Numéro d'immatriculation :</strong> {immatriculation}
+        </Text>
         {latitude && longitude ? (
-          <Text><strong>Localisation :</strong> Latitude: {latitude}, Longitude: {longitude}</Text>
+          <Text>
+            <strong>Localisation :</strong> Latitude: {latitude}, Longitude: {longitude}
+          </Text>
         ) : (
-          <Text><strong>Localisation :</strong> Non disponible</Text>
+          <Text>
+            <strong>Localisation :</strong> Non disponible
+          </Text>
         )}
         <Heading size="sm">Membres de l'équipe :</Heading>
         <ul>{teamMembersList}</ul>
         <Heading size="sm">Modifier le mot de passe :</Heading>
         <InputGroup>
           <Input
-            type={showPassword ? "text" : "password"}
+            type={showPassword ? 'text' : 'password'}
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)} // Update newPassword state
           />
           <InputRightElement width="4.5rem">
             <Button h="1.75rem" size="sm" onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? "Cacher" : "Voir"}
+              {showPassword ? 'Cacher' : 'Voir'}
             </Button>
           </InputRightElement>
         </InputGroup>
         <Button mt={4} colorScheme="blue" onClick={handleSavePassword}>
           Sauvegarder
         </Button>
-        <Box id={`map-${selectedEquipier?.id}`} h='500px' w='100%' mt={4} />
+        <Box id={`map-${selectedEquipier?.id}`} h="500px" w="100%" mt={4} />
       </Stack>
     );
   };
@@ -337,24 +359,35 @@ const EquipiersTable = ({ showAll }) => {
       <Td>{equipier.mission}</Td>
       <Td>
         {equipier.vianney_actions.length > 0 ? (
-          equipier.vianney_actions.map(action => (
+          equipier.vianney_actions.map((action) => (
             <Tooltip
               key={action.id}
               label={
                 <Box>
-                  <Text><strong>Nom :</strong> {action.action_name}</Text>
-                  <Text><strong>Début :</strong> {new Date(action.starting_date).toLocaleString()}</Text>
-                  <Text><strong>Fin :</strong> {new Date(action.ending_date).toLocaleString()}</Text>
-                  <Text><strong>Commentaire :</strong> {action.action_comment || 'Aucun commentaire'}</Text>
-                  <Text><strong>Dernière mise à jour :</strong> {new Date(action.last_updated).toLocaleString()}</Text>
+                  <Text>
+                    <strong>Nom :</strong> {action.action_name}
+                  </Text>
+                  <Text>
+                    <strong>Début :</strong> {new Date(action.starting_date).toLocaleString()}
+                  </Text>
+                  <Text>
+                    <strong>Fin :</strong> {new Date(action.ending_date).toLocaleString()}
+                  </Text>
+                  <Text>
+                    <strong>Commentaire :</strong> {action.action_comment || 'Aucun commentaire'}
+                  </Text>
+                  <Text>
+                    <strong>Dernière mise à jour :</strong>{' '}
+                    {new Date(action.last_updated).toLocaleString()}
+                  </Text>
                 </Box>
               }
               placement="top"
               hasArrow
             >
               <Badge mx={1} colorScheme="green" cursor="pointer">
-              {action.action_name}
-            </Badge>
+                {action.action_name}
+              </Badge>
             </Tooltip>
           ))
         ) : (
@@ -366,15 +399,27 @@ const EquipiersTable = ({ showAll }) => {
 
   return (
     <>
-      <TableContainer style={{ maxHeight: showAll ? '300px' : 'auto', overflowY: 'auto', overflowX: 'hidden' }}>
-        <Table variant='simple'>
+      <TableContainer
+        style={{ maxHeight: showAll ? '300px' : 'auto', overflowY: 'auto', overflowX: 'hidden' }}
+      >
+        <Table variant="simple">
           <Thead style={{ ...headerGradientStyle, position: 'sticky', top: 0, zIndex: 1 }}>
             <Tr>
-              <Th><Text style={headerStyle}>photo</Text></Th>
-              <Th><Text style={headerStyle}>nom de l'équipe</Text></Th>
-              <Th><Text style={headerStyle}>nom du responsable</Text></Th>
-              <Th><Text style={headerStyle}>mission</Text></Th>
-              <Th><Text style={headerStyle}>Actions</Text></Th>
+              <Th>
+                <Text style={headerStyle}>photo</Text>
+              </Th>
+              <Th>
+                <Text style={headerStyle}>nom de l'équipe</Text>
+              </Th>
+              <Th>
+                <Text style={headerStyle}>nom du responsable</Text>
+              </Th>
+              <Th>
+                <Text style={headerStyle}>mission</Text>
+              </Th>
+              <Th>
+                <Text style={headerStyle}>Actions</Text>
+              </Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -397,14 +442,11 @@ const EquipiersTable = ({ showAll }) => {
           >
             Détails sur l'équipe
           </ModalHeader>
-          <ModalCloseButton
-            size="lg"
-            color="purple.600"
-          />
+          <ModalCloseButton size="lg" color="purple.600" />
 
           <ModalBody>
             {renderTeamDetails()}
-            <Box id={`map-${selectedEquipier?.id}`} h='500px' w='100%' mt={4} />
+            <Box id={`map-${selectedEquipier?.id}`} h="500px" w="100%" mt={4} />
           </ModalBody>
         </ModalContent>
       </Modal>
