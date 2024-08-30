@@ -3,6 +3,8 @@ import { Flex, Text, IconButton, Box, Button } from '@chakra-ui/react';
 import { FiFolder, FiChevronLeft } from 'react-icons/fi';
 import RenseignementsFichiersFileUploadForm from './renseignements/RenseignementsFichiersFileUploadForm';
 import RenseignementsFichiersFichierIconList from './renseignements/RenseignementsFichiersFichierIconList';
+import InformationsFileUploadForm from './informations/InformationsFileUploadForm'; // Vérifiez ce chemin et la syntaxe
+import InformationsFichierIconList from './informations/InformationsFichierIconList';
 
 // FolderTab component
 const FolderTab = ({ label, isActive, ...rest }) => {
@@ -42,13 +44,23 @@ const BaseDeDonneeRenseignements = () => {
 
   return (
     <Box width="100%">
-      {activeTab === "Fichiers de renseignements" ? (
+      {activeTab ? (
         <Box>
           <Button leftIcon={<FiChevronLeft />} variant="link" onClick={handleBackClick}>
             Retour
           </Button>
-          <RenseignementsFichiersFileUploadForm />
-          <RenseignementsFichiersFichierIconList />
+          {activeTab === "Fichiers de renseignements" && (
+            <>
+              <RenseignementsFichiersFileUploadForm />
+              <RenseignementsFichiersFichierIconList />
+            </>
+          )}
+          {activeTab === "Informations" && (
+            <>
+              <InformationsFileUploadForm />
+              <InformationsFichierIconList />
+            </>
+          )}
         </Box>
       ) : (
         <Flex direction="row" justify="space-between">
