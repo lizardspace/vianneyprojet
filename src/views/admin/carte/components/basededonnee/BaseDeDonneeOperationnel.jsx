@@ -70,13 +70,14 @@ const BaseDeDonneeOperationnel = () => {
           <VianneyAlertChat />
         </Box>
       ) : (
-        <Flex direction="row" justify="space-between">
+        <Flex direction="row" align="center">
           {tabs.map(tab => (
             <FolderTab
               key={tab}
               label={tab}
               isActive={tab === activeTab}
               onClick={() => setActiveTab(tab)}
+              mr={4} // Adds margin between tabs
             />
           ))}
         </Flex>
