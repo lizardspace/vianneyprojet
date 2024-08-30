@@ -10,7 +10,7 @@ import { useTeam } from './../../InterfaceEquipe/TeamContext';
 import { supabase, supabaseUrl } from './../../../../supabaseClient';
 
 function VianneyAlertChat() {
-  const { selectedTeam } = useTeam(); 
+  const { selectedTeam } = useTeam();
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const { selectedEventId } = useEvent();
@@ -23,8 +23,8 @@ function VianneyAlertChat() {
   const [editingAlert, setEditingAlert] = useState(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [alertToDelete, setAlertToDelete] = useState(null);
-  const [allowScrolling, setAllowScrolling] = useState(false); 
-  const [filter, setFilter] = useState('warning'); 
+  const [allowScrolling, setAllowScrolling] = useState(false);
+  const [filter, setFilter] = useState('warning');
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
@@ -199,15 +199,15 @@ function VianneyAlertChat() {
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
       const fakeUUID = uuidv4(); // Use UUID v4 to generate a unique user_id for the demo
-  
+
       try {
         let imageUrl = ''; // Initialize imageUrl variable
-  
+
         if (selectedFile) {
           const fileExtension = selectedFile.name.split('.').pop();
           const fileName = `${uuidv4()}.${fileExtension}`;
           const filePath = `${fakeUUID}/${fileName}`;
-  
+
           // Upload the file if it exists
           let { error: uploadError } = await supabase.storage
             .from('alert-images')
@@ -215,14 +215,14 @@ function VianneyAlertChat() {
               cacheControl: '3600',
               upsert: false,
             });
-  
+
           if (uploadError) {
             throw new Error(`Failed to upload image: ${uploadError.message}`);
           }
-  
+
           imageUrl = `${supabaseUrl.replace('.co', '.in')}/storage/v1/object/public/alert-images/${filePath}`;
         }
-  
+
         // Insert the alert into the database with or without imageUrl
         const { data, error } = await supabase
           .from('vianney_alert')
@@ -237,22 +237,22 @@ function VianneyAlertChat() {
               team_name: selectedTeam,
             },
           ]);
-  
+
         if (error) {
           throw new Error(`Failed to insert alert: ${error.message}`);
         }
-  
+
         if (data && data.length > 0) {
           setAlerts([...alerts, { ...data[0], timestamp: new Date().toISOString() }]);
         } else {
           console.error('No data returned from the insert operation.');
         }
-  
+
         setNewAlertText('');
         setDetails('');
         setImageUrl('');
         setSelectedFile(null);
-  
+
         toast({
           title: "Alerte ajoutée",
           description: "Votre alerte a été ajoutée avec succès.",
@@ -287,14 +287,14 @@ function VianneyAlertChat() {
     if (filter === 'warning') {
       // Find the last 3 unresolved alerts (warning, error, info)
       const unresolvedAlerts = allAlerts.filter(a => ['warning', 'error', 'info'].includes(a.solved_or_not))
-                                         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Sort by timestamp, newest first
-                                         .slice(0, 3); // Take only the last 3 items
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Sort by timestamp, newest first
+        .slice(0, 3); // Take only the last 3 items
       return unresolvedAlerts.some(unresolvedAlert => unresolvedAlert.id === alert.id); // Check if the current alert is one of the last 3 unresolved
     }
     return false;
   };
-  
-  
+
+
 
   const updateImageUrl = (fileUrl) => {
     const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
@@ -343,7 +343,7 @@ function VianneyAlertChat() {
       overflowX={{ sm: "scroll", lg: "hidden" }}>
       <Box>
         <Flex justify='space-between' mb='sm' align='center'>
-        <Badge colorScheme="orange">
+          <Badge colorScheme="orange">
             Messages et Alertes
           </Badge>
           <Menu
@@ -352,7 +352,13 @@ function VianneyAlertChat() {
           />
         </Flex>
         {/* Button to toggle the visibility of the add alert form */}
-        <Button size="sm" colorScheme="blue" onClick={toggleAddAlertForm} mb={1}>
+        <Button
+          size="lg"           
+          colorScheme="blue"
+          onClick={toggleAddAlertForm}
+          mt={4}               
+          mb={4}               
+        >
           {showAddAlertForm ? 'Cacher le formulaire' : 'Ajouter une alerte'}
         </Button>
         {/* Conditionally render the add alert form based on the state */}
@@ -384,7 +390,13 @@ function VianneyAlertChat() {
               }}
               mt={2}
             />
-            <Button size="sm" colorScheme="blue" onClick={handleSubmit} mb={1}>
+            <Button
+              size="lg"            
+              colorScheme="blue"
+              onClick={handleSubmit}
+              mt={4}             
+              mb={4}              
+            >
               Ajouter une alerte
             </Button>
           </Box>
@@ -432,7 +444,7 @@ function VianneyAlertChat() {
             );
           })}
         </VStack>
-        
+
         <Modal isOpen={isEditOpen} onClose={closeEditModal}>
           <ModalOverlay />
           <ModalContent>
