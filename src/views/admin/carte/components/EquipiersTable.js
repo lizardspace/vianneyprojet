@@ -328,14 +328,10 @@ const EquipiersTable = ({ showAll }) => {
   const TableRow = ({ equipier, onClick }) => (
     <Tr _hover={hoverStyle} onClick={() => onClick(equipier)} style={tableRowStyle}>
       <Td>
-        <Tooltip label={equipier.name_of_the_team} placement="top" hasArrow>
-          <Avatar size="md" src={equipier.photo_profile_url} style={avatarStyle} />
-        </Tooltip>
+        <Avatar size="md" src={equipier.photo_profile_url} style={avatarStyle} />
       </Td>
       <Td>
-        <Tooltip label={equipier.name_of_the_team} placement="top" hasArrow>
-          <Text>{equipier.name_of_the_team}</Text>
-        </Tooltip>
+        <Text>{equipier.name_of_the_team}</Text>
       </Td>
       <Td>{getLeaderNameAndPhone(equipier.team_members)}</Td>
       <Td>{equipier.mission}</Td>
@@ -357,8 +353,8 @@ const EquipiersTable = ({ showAll }) => {
               hasArrow
             >
               <Badge mx={1} colorScheme="green" cursor="pointer">
-                {action.action_name}
-              </Badge>
+              {action.action_name}
+            </Badge>
             </Tooltip>
           ))
         ) : (
