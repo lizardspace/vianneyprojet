@@ -7,9 +7,9 @@ import MoyensMaterielsFichiersFileUploadForm from './moyensmateriels/MoyensMater
 import MoyensMaterielsFichierIconList from './moyensmateriels/MoyensMaterielsFichierIconList';
 import { supabase } from '../../../../../supabaseClient';
 import { useEvent } from '../../../../../EventContext';
-import MaterialComponent from './../../../MaterialComponent/index'; // Importez le composant
-import EquipiersTableSimplify from './../../components/EquipiersTableSimplify'; // Importez le composant
-import TeamScheduleMadeMySelf from './../../../TableauDeBord/components/TeamScheduleMadeMySelf'; // Importez le composant
+import MaterialComponent from './../../../MaterialComponent/index'; 
+import EquipiersTableSimplify from './../../components/EquipiersTableSimplify'; 
+import TeamScheduleMadeMySelf from './../../../TableauDeBord/components/TeamScheduleMadeMySelf'; 
 
 // FolderTab component
 const FolderTab = ({ label, isActive, onClick, ...rest }) => {
@@ -137,13 +137,14 @@ const BaseDeDonneeMoyens = () => {
           )}
         </>
       ) : (
-        <Flex direction="row" justify="space-between" width="100%">
+        <Flex direction="row" justify="flex-start" width="100%">
           {tabs.map(tab => (
             <FolderTab
               key={tab}
               label={tab}
               isActive={tab === activeTab}
               onClick={() => handleTabClick(tab)}
+              mr={4} // Adds margin between tabs to avoid them being too close
             />
           ))}
         </Flex>

@@ -63,13 +63,14 @@ const BaseDeDonneeRenseignements = () => {
           )}
         </Box>
       ) : (
-        <Flex direction="row" justify="space-between">
+        <Flex direction="row" justify="flex-start" align="center">
           {tabs.map(tab => (
             <FolderTab
               key={tab}
               label={tab}
               isActive={tab === activeTab}
               onClick={() => setActiveTab(tab)}
+              mr={4} // Adds margin between tabs
             />
           ))}
         </Flex>
