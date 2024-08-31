@@ -1,125 +1,163 @@
-import React from 'react';
-import { Box, Text, Stack, Heading, Divider, Button } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { Box, Text, Stack, Heading, Divider, Grid, GridItem, Button, Table, Tbody, Tr, Td, Thead, Th, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
 import jsPDF from 'jspdf';
+import { supabase } from './../../../../supabaseClient';  // Ensure you have the correct path to your Supabase client
 
-const InvoicePreview = ({ invoice = {} }) => {
+const InvoicePreview = ({ invoiceNumber }) => {
+  const [invoice, setInvoice] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchInvoice = async () => {
+      setLoading(true); // Start loading state
+      try {
+        const { data, error } = await supabase
+          .from('vianney_factures')
+          .select('*')
+          .eq('invoice_number', invoiceNumber)
+          .maybeSingle(); // Use maybeSingle() to allow handling no rows or multiple rows
+
+        if (error) {
+          throw error;
+        }
+
+        if (!data) {
+          throw new Error('No invoice found with the provided invoice number.');
+        }
+
+        setInvoice(data); // Set the retrieved invoice data
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false); // Stop loading state
+      }
+    };
+
+    fetchInvoice();
+  }, [invoiceNumber]);
+
   const downloadPdf = () => {
+    if (!invoice) return;
+
     const doc = new jsPDF('p', 'pt', 'a4');
 
-    // Define some general styles
-    doc.setFontSize(12);
+    // Add PDF generation logic here using the invoice data
 
-    // Company Name
-    doc.setFontSize(18);
-    doc.text("Le nom de votre société", 40, 40);
-
-    // Company Information
-    doc.setFontSize(12);
-    doc.text(`Adresse`, 40, 80);
-    doc.text(`Code postale ville`, 40, 95);
-    doc.text(`Téléphone`, 40, 110);
-    doc.text(`Email`, 40, 125);
-    doc.text(`Site web`, 40, 140);
-
-    // Invoice Information
-    doc.text(`Facture`, 400, 80);
-    doc.text(`Numéro de client : ${invoice.client_number || ''}`, 400, 95);
-    doc.text(`Numéro de facture : ${invoice.invoice_number || ''}`, 400, 110);
-    doc.text(`Date de facture : ${invoice.invoice_date ? new Date(invoice.invoice_date).toLocaleDateString() : ''}`, 400, 125);
-    doc.text(`Date de livraison : ${invoice.delivery_date ? new Date(invoice.delivery_date).toLocaleDateString() : ''}`, 400, 140);
-    doc.text(`Échéance de paiement : ${invoice.payment_due_date ? new Date(invoice.payment_due_date).toLocaleDateString() : ''}`, 400, 155);
-
-    // Bill To Section
-    doc.text(`Facturer à :`, 40, 180);
-    doc.text(invoice.buyer_name || '', 40, 195);
-    doc.text(invoice.buyer_address || '', 40, 210);
-
-    // Ship To Section
-    doc.text(`Expédier à :`, 400, 180);
-    doc.text(invoice.shipping_name || '', 400, 195);
-    doc.text(invoice.shipping_address || '', 400, 210);
-
-    // Table Header
-    doc.text(`Description`, 40, 250);
-    doc.text(`Quantité`, 250, 250);
-    doc.text(`Prix unitaire HT`, 350, 250);
-    doc.text(`Prix total HT`, 450, 250);
-
-    // Table Content
-    let yPos = 270;
-    if (invoice.product_descriptions && invoice.product_descriptions.length > 0) {
-      invoice.product_descriptions.forEach((desc, index) => {
-        doc.text(desc, 40, yPos);
-        doc.text(`${invoice.product_quantities[index] || ''}`, 250, yPos);
-        doc.text(`${invoice.product_unit_prices[index] || ''} €`, 350, yPos);
-        doc.text(`${(invoice.product_unit_prices[index] * invoice.product_quantities[index] || 0).toFixed(2)} €`, 450, yPos);
-        yPos += 20;
-      });
-    }
-
-    // Totals
-    yPos += 20;
-    if (invoice.discount) doc.text(`Remise : ${invoice.discount} €`, 10, yPos);
-    yPos += 20;
-    doc.text(`Total HT : ${invoice.total_ht || 0} €`, 10, yPos);
-    yPos += 10;
-    doc.text(`Total TTC : ${invoice.total_ttc || 0} €`, 10, yPos);
-
-    // Save the PDF
     doc.save(`Facture_${invoice.invoice_number}.pdf`);
   };
 
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <Spinner size="xl" />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={4}>
+        <Alert status="error">
+          <AlertIcon />
+          {error}
+        </Alert>
+      </Box>
+    );
+  }
+
+  if (!invoice) {
+    return (
+      <Box p={4}>
+        <Alert status="error">
+          <AlertIcon />
+          Facture non trouvée.
+        </Alert>
+      </Box>
+    );
+  }
+
   return (
-    <Box p={6} maxW="800px" mx="auto" borderWidth={1} borderRadius={8} boxShadow="lg">
-      <Heading as="h2" size="lg" mb={6}>
-        Aperçu de la Facture
-      </Heading>
-      <Box mb={6}>
-        <Text fontSize="lg" fontWeight="bold">Le nom de votre société</Text>
-        <Text>Adresse</Text>
-        <Text>Code postale ville</Text>
-        <Text>Téléphone</Text>
-        <Text>Email | Site web</Text>
-      </Box>
-      <Box mb={6}>
-        <Text fontSize="lg" fontWeight="bold">Facture</Text>
-        <Text>Numéro de client: {invoice.client_number || ''}</Text>
-        <Text>Numéro de facture: {invoice.invoice_number || ''}</Text>
-        <Text>Date de facture: {invoice.invoice_date ? new Date(invoice.invoice_date).toLocaleDateString() : ''}</Text>
-        <Text>Date de livraison: {invoice.delivery_date ? new Date(invoice.delivery_date).toLocaleDateString() : ''}</Text>
-        <Text>Échéance de paiement: {invoice.payment_due_date ? new Date(invoice.payment_due_date).toLocaleDateString() : ''}</Text>
-      </Box>
-      <Box mb={6}>
-        <Text fontWeight="bold">Facturer à :</Text>
-        <Text>{invoice.buyer_name || ''}</Text>
-        <Text>{invoice.buyer_address || ''}</Text>
-      </Box>
-      <Box mb={6}>
-        <Text fontWeight="bold">Expédier à :</Text>
-        <Text>{invoice.shipping_name || ''}</Text>
-        <Text>{invoice.shipping_address || ''}</Text>
-      </Box>
-      <Divider mb={6} />
-      <Stack direction="row" spacing={10} mb={6}>
-        <Text>Description</Text>
-        <Text>Quantité</Text>
-        <Text>Prix unitaire HT</Text>
-        <Text>Prix total HT</Text>
-      </Stack>
-      {(invoice.product_descriptions || []).map((desc, index) => (
-        <Stack direction="row" spacing={10} key={index} mb={2}>
-          <Text>{desc || ''}</Text>
-          <Text>{invoice.product_quantities[index] || ''}</Text>
-          <Text>{invoice.product_unit_prices[index] || ''} €</Text>
-          <Text>{(invoice.product_unit_prices[index] * invoice.product_quantities[index] || 0).toFixed(2)} €</Text>
-        </Stack>
-      ))}
+    <Box p={6} maxW="900px" mx="auto" borderWidth={1} borderRadius={8} boxShadow="lg">
+      <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+        <GridItem>
+          <Heading color="blue.500">{invoice.seller_name}</Heading>
+          <Text mt={4}>{invoice.seller_address}</Text>
+          <Text>SIREN: {invoice.seller_siren || 'N/A'}</Text>
+          <Text>SIRET: {invoice.seller_siret || 'N/A'}</Text>
+          <Text>Forme juridique: {invoice.seller_legal_form || 'N/A'}</Text>
+          <Text>Capital: {invoice.seller_capital ? `${invoice.seller_capital.toFixed(2)} €` : 'N/A'}</Text>
+          <Text>RCS: {invoice.seller_rcs || 'N/A'}</Text>
+          <Text>Greffe: {invoice.seller_greffe || 'N/A'}</Text>
+          <Text>RM: {invoice.seller_rm || 'N/A'}</Text>
+        </GridItem>
+        <GridItem textAlign="right">
+          <Heading color="blue.500">Facture</Heading>
+          <Text mt={4}>Numéro de facture : {invoice.invoice_number}</Text>
+          <Text>Date de facture : {new Date(invoice.invoice_date).toLocaleDateString()}</Text>
+          <Text>Date de vente/prestation : {invoice.sale_date ? new Date(invoice.sale_date).toLocaleDateString() : 'N/A'}</Text>
+          <Text>Date de livraison : {invoice.delivery_address ? new Date(invoice.delivery_address).toLocaleDateString() : 'N/A'}</Text>
+          <Text>Échéance de paiement : {new Date(invoice.payment_due_date).toLocaleDateString()}</Text>
+        </GridItem>
+      </Grid>
+
+      <Grid templateColumns="repeat(2, 1fr)" gap={6} mt={6}>
+        <GridItem>
+          <Text bg="blue.500" color="white" p={2} borderRadius={4}>Facturer à :</Text>
+          <Text mt={2}>{invoice.buyer_name}</Text>
+          <Text>{invoice.buyer_address}</Text>
+        </GridItem>
+        <GridItem>
+          <Text bg="blue.500" color="white" p={2} borderRadius={4}>Expédier à :</Text>
+          <Text mt={2}>{invoice.delivery_address || 'Adresse de livraison non spécifiée'}</Text>
+        </GridItem>
+      </Grid>
+
+      <Table variant="simple" mt={6}>
+        <Thead bg="blue.500">
+          <Tr>
+            <Th color="white">Description</Th>
+            <Th color="white">Quantité</Th>
+            <Th color="white">Prix unitaire HT</Th>
+            <Th color="white">Prix total HT</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {(invoice.product_descriptions || []).map((desc, index) => (
+            <Tr key={index}>
+              <Td>{desc}</Td>
+              <Td>{invoice.product_quantities[index] || 0}</Td>
+              <Td>{invoice.product_unit_prices[index]?.toFixed(2)} €</Td>
+              <Td>{(invoice.product_unit_prices[index] * invoice.product_quantities[index]).toFixed(2)} €</Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+
+      <Grid templateColumns="repeat(2, 1fr)" gap={6} mt={6}>
+        <GridItem>
+          <Text bg="blue.500" color="white" p={2} borderRadius={4}>Remarques et instructions de paiement :</Text>
+          <Text mt={2}>{invoice.discount_conditions || 'Aucune condition de remise spécifiée.'}</Text>
+          <Text>{invoice.late_payment_penalties || 'Aucune pénalité de retard spécifiée.'}</Text>
+        </GridItem>
+        <GridItem>
+          <Stack spacing={2} textAlign="right">
+            <Text><strong>SOUS-TOTAL :</strong> {invoice.total_ht?.toFixed(2)} €</Text>
+            <Text><strong>REMISE :</strong> {invoice.discount?.toFixed(2) || '0.00'} €</Text>
+            <Text><strong>SOUS-TOTAL MOINS LES REMISES :</strong> {(invoice.total_ht - (invoice.discount || 0)).toFixed(2)} €</Text>
+            <Text><strong>TAUX DE TVA :</strong> {invoice.product_vat_rates.length > 0 ? `${invoice.product_vat_rates[0]}%` : 'N/A'}</Text>
+            <Text><strong>TOTAL TTC :</strong> {invoice.total_ttc?.toFixed(2)} €</Text>
+            <Text><strong>EXPÉDITION ET MANUTENTION :</strong> 0,00 €</Text>
+            <Text><strong>SOMME FINALE À PAYER :</strong> {invoice.total_ttc?.toFixed(2)} €</Text>
+          </Stack>
+        </GridItem>
+      </Grid>
+
       <Divider mt={6} mb={6} />
-      <Text fontWeight="bold">Total HT: {invoice.total_ht || 0} €</Text>
-      {invoice.discount && <Text fontWeight="bold">Remise: {invoice.discount} €</Text>}
-      <Text fontWeight="bold">Total TTC: {invoice.total_ttc || 0} €</Text>
-      <Divider mt={6} mb={6} />
-      <Button colorScheme="teal" onClick={downloadPdf}>Télécharger en PDF</Button>
+      <Text textAlign="center" fontStyle="italic">{invoice.special_mention || "Nous apprécions votre clientèle. Si vous avez des questions sur cette facture, n'hésitez pas à nous contacter."}</Text>
+      <Text textAlign="center" mt={6} fontSize="sm">Numéro SIRET | Code APE | Numéro TVA Intracommunautaire</Text>
+
+      <Button colorScheme="teal" onClick={downloadPdf} mt={6} width="full">Télécharger en PDF</Button>
     </Box>
   );
 };
