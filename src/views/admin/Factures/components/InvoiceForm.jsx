@@ -16,9 +16,11 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import { FcMoneyTransfer } from 'react-icons/fc';
+import { useEvent } from '../../../../EventContext'; // Import the EventContext
 
 const InvoiceForm = () => {
   const toast = useToast();
+  const { selectedEventId } = useEvent(); // Get the selectedEventId from context
   const [errors, setErrors] = useState({});
   const [invoiceData, setInvoiceData] = useState({
     invoiceDate: '',
@@ -162,7 +164,8 @@ const InvoiceForm = () => {
         discount_conditions: invoiceData.discountConditions,
         late_payment_penalties: invoiceData.latePaymentPenalties,
         warranty_info: invoiceData.warrantyInfo,
-        special_mention: invoiceData.specialMention
+        special_mention: invoiceData.specialMention,
+        event_id: selectedEventId, // Add event_id from context
       });
 
     if (error) {
@@ -419,7 +422,7 @@ const InvoiceForm = () => {
           <Heading as="h3" size="md">Informations de Paiement</Heading>
 
           <FormControl id="paymentDueDate" isRequired>
-              <FormLabel>Date d'échéance de paiement</FormLabel>
+            <FormLabel>Date d'échéance de paiement</FormLabel>
             <Input
               type="date"
               name="paymentDueDate"
@@ -449,13 +452,13 @@ const InvoiceForm = () => {
           <Heading as="h3" size="md">Mentions Spéciales et Garantie</Heading>
 
           <FormControl id="warrantyInfo">
-              <FormLabel>Informations sur la garantie</FormLabel>
+            <FormLabel>Informations sur la garantie</FormLabel>
             <Input type="text" name="warrantyInfo" value={invoiceData.warrantyInfo} onChange={handleChange} />
           </FormControl>
 
           <FormControl id="specialMention">
-              <FormLabel>Mention spéciale</FormLabel>
-                        <Input type="text" name="specialMention" value={invoiceData.specialMention} onChange={handleChange} />
+            <FormLabel>Mention spéciale</FormLabel>
+            <Input type="text" name="specialMention" value={invoiceData.specialMention} onChange={handleChange} />
           </FormControl>
 
           <Button type="submit" colorScheme="teal" size="lg" mt={6}>
