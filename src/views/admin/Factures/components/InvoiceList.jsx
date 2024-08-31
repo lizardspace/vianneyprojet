@@ -3,20 +3,28 @@ import { Box, Button, Heading, Table, Tbody, Tr, Td, Thead, Th, Spinner, Alert, 
 import { supabase } from './../../../../supabaseClient';  // Ensure this is the correct path to your Supabase client
 import { ViewIcon } from '@chakra-ui/icons';
 import InvoicePreview from './InvoicePreview';  // Import the InvoicePreview component
+import { useEvent } from '../../../../EventContext';  // Import the EventContext
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const { selectedEventId } = useEvent();  // Get the selectedEventId from context
 
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from('vianney_factures')
           .select('*')
           .order('invoice_date', { ascending: false });
+
+        if (selectedEventId) {
+          query = query.eq('event_id', selectedEventId);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
           throw error;
@@ -31,7 +39,7 @@ const InvoiceList = () => {
     };
 
     fetchInvoices();
-  }, []);
+  }, [selectedEventId]);
 
   if (loading) {
     return (
