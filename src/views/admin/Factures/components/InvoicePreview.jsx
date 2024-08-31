@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Text, Stack, Heading, Divider, Grid, GridItem, Button, Table, Tbody, Tr, Td, Thead, Th, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
+import { Box, Text, Stack, Heading, Divider, Grid, GridItem, Table, Tbody, Tr, Td, Thead, Th, Spinner, Alert, AlertIcon, Button } from '@chakra-ui/react';
+import { supabase } from './../../../../supabaseClient';  // Ensure this is the correct path to your Supabase client
 import jsPDF from 'jspdf';
-import { supabase } from './../../../../supabaseClient';  // Ensure you have the correct path to your Supabase client
+import 'jspdf-autotable';
 
 const InvoicePreview = ({ invoiceNumber }) => {
   const [invoice, setInvoice] = useState(null);
@@ -10,27 +11,22 @@ const InvoicePreview = ({ invoiceNumber }) => {
 
   useEffect(() => {
     const fetchInvoice = async () => {
-      setLoading(true); // Start loading state
       try {
         const { data, error } = await supabase
           .from('vianney_factures')
           .select('*')
           .eq('invoice_number', invoiceNumber)
-          .maybeSingle(); // Use maybeSingle() to allow handling no rows or multiple rows
+          .single();
 
         if (error) {
           throw error;
         }
 
-        if (!data) {
-          throw new Error('No invoice found with the provided invoice number.');
-        }
-
-        setInvoice(data); // Set the retrieved invoice data
+        setInvoice(data);
       } catch (error) {
         setError(error.message);
       } finally {
-        setLoading(false); // Stop loading state
+        setLoading(false);
       }
     };
 
@@ -41,8 +37,51 @@ const InvoicePreview = ({ invoiceNumber }) => {
     if (!invoice) return;
 
     const doc = new jsPDF('p', 'pt', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Add Title
+    doc.setFontSize(20);
+    doc.text('Facture', pageWidth / 2, 40, { align: 'center' });
 
-    // Add PDF generation logic here using the invoice data
+    // Add Seller Information
+    doc.setFontSize(12);
+    doc.text(`Nom de la société: ${invoice.seller_name}`, 40, 80);
+    doc.text(`Adresse: ${invoice.seller_address}`, 40, 100);
+    doc.text(`SIREN: ${invoice.seller_siren || 'N/A'}`, 40, 120);
+    doc.text(`SIRET: ${invoice.seller_siret || 'N/A'}`, 40, 140);
+
+    // Add Buyer Information
+    doc.text(`Facturer à: ${invoice.buyer_name}`, 400, 80);
+    doc.text(`Adresse: ${invoice.buyer_address}`, 400, 100);
+
+    // Add Invoice Information
+    doc.text(`Numéro de Facture: ${invoice.invoice_number}`, 40, 180);
+    doc.text(`Date de Facture: ${new Date(invoice.invoice_date).toLocaleDateString()}`, 40, 200);
+    doc.text(`Date d'Échéance: ${new Date(invoice.payment_due_date).toLocaleDateString()}`, 40, 220);
+
+    // Add Table for Products/Services
+    const products = invoice.product_descriptions.map((desc, index) => [
+      desc,
+      invoice.product_quantities[index],
+      `${invoice.product_unit_prices[index]?.toFixed(2)} €`,
+      `${(invoice.product_unit_prices[index] * invoice.product_quantities[index]).toFixed(2)} €`
+    ]);
+
+    doc.autoTable({
+      startY: 260,
+      head: [['Description', 'Quantité', 'Prix unitaire HT', 'Prix total HT']],
+      body: products,
+      margin: { top: 260 },
+    });
+
+    // Add Totals
+    doc.text(`Sous-Total: ${invoice.total_ht?.toFixed(2)} €`, pageWidth - 150, doc.lastAutoTable.finalY + 20);
+    doc.text(`TVA: ${invoice.product_vat_rates[0]}%`, pageWidth - 150, doc.lastAutoTable.finalY + 40);
+    doc.text(`Total TTC: ${invoice.total_ttc?.toFixed(2)} €`, pageWidth - 150, doc.lastAutoTable.finalY + 60);
+
+    // Add Footer
+    doc.setFontSize(10);
+    doc.text('Nous apprécions votre clientèle.', pageWidth / 2, doc.internal.pageSize.getHeight() - 50, { align: 'center' });
 
     doc.save(`Facture_${invoice.invoice_number}.pdf`);
   };
