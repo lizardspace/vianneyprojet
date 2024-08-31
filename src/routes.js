@@ -1,19 +1,7 @@
 import React from "react";
 import { Icon } from "@chakra-ui/react";
-import {
-  FcMindMap,
-  FcVideoCall,
-  FcPlanner,
-  FcSurvey,
-  FcSettings,
-  FcGrid,
-  FcHighPriority,
-  FcDiploma2,
-  FcDocument,
-  FcAbout,
-  FcOpenedFolder,
-} from "react-icons/fc";
-import { MdQrCodeScanner, MdOutlineSos } from "react-icons/md"; // Import the new icon
+import { FcMindMap, FcVideoCall, FcPlanner, FcSurvey, FcSettings, FcGrid, FcHighPriority, FcDiploma2, FcDocument, FcAbout, FcOpenedFolder, FcMoneyTransfer } from "react-icons/fc";
+import { MdQrCodeScanner, MdOutlineSos } from "react-icons/md"; 
 
 import MainDashboard from "views/admin/default";
 import NFTMarketplace from "views/admin/carte";
@@ -28,7 +16,8 @@ import Parameters from "views/admin/Parameters";
 import SOSComponent from "views/admin/SOSComponent"; 
 import ChatComponent from "views/admin/ChatComponent"; 
 import IncidentReportForm from "views/admin/IncidentReportForm"; 
-import VideoStreamAnalysisComponent from "views/admin/VideoStreamAnalysisComponent"; // Import the new component
+import VideoStreamAnalysisComponent from "views/admin/VideoStreamAnalysisComponent"; 
+import Factures from "views/admin/Factures"; // Import the new Invoice component
 
 const routes = [
   {
@@ -74,13 +63,13 @@ const routes = [
   //  icon: <Icon as={FcLock} width='20px' height='20px' color='inherit' />,
   //  component: SignInCentered,
  // },
- {
-  name: "Chat",
-  layout: "/admin",
-  path: "/chat",
-  icon: <Icon as={FcAbout} width="20px" height="20px" color="inherit" />, 
-  component: ChatComponent,
-},
+  {
+    name: "Chat",
+    layout: "/admin",
+    path: "/chat",
+    icon: <Icon as={FcAbout} width="20px" height="20px" color="inherit" />, 
+    component: ChatComponent,
+  },
   {
     name: "Paramètres",
     layout: "/admin",
@@ -141,7 +130,7 @@ const routes = [
     name: "Analyse flux vidéo",
     layout: "/admin",
     path: "/video-stream-analysis",
-    icon: <Icon as={FcVideoCall} width="20px" height="20px" color="inherit" />, // You can choose a more relevant icon
+    icon: <Icon as={FcVideoCall} width="20px" height="20px" color="inherit" />,
     component: VideoStreamAnalysisComponent,
   },
   {
@@ -150,6 +139,13 @@ const routes = [
     path: "/alerte-equipe",
     icon: <Icon as={FcHighPriority} width="20px" height="20px" color="inherit" />,
     component: AlerteEquipe,
+  },
+  {
+    name: "Gestion des Factures",
+    layout: "/admin",
+    path: "/factures",
+    icon: <Icon as={FcMoneyTransfer} width="20px" height="20px" color="inherit" />,
+    component: Factures,
   },
 ];
 
