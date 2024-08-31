@@ -11,13 +11,15 @@ import {
   Heading,
   Divider,
   useToast,
+  FormErrorMessage,
+  Tooltip,
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import { FcMoneyTransfer } from 'react-icons/fc';
 
 const InvoiceForm = () => {
   const toast = useToast();
-
+  const [errors, setErrors] = useState({});
   const [invoiceData, setInvoiceData] = useState({
     invoiceDate: '',
     invoiceNumber: '',
@@ -51,12 +53,58 @@ const InvoiceForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (['sellerSiren', 'sellerSiret', 'sellerCapital', 'sellerRCS', 'sellerGreffe', 'sellerRM', 'sellerVATNumber', 'buyerVATNumber', 'discount', 'totalHT', 'totalTTC'].includes(name)) {
+      if (!/^\d*$/.test(value)) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: 'Ce champ doit contenir uniquement des chiffres.',
+        }));
+
+        toast({
+          title: 'Erreur de saisie',
+          description: 'Ce champ doit contenir uniquement des chiffres.',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: null,
+        }));
+      }
+    }
+
     setInvoiceData({ ...invoiceData, [name]: value });
   };
 
   const handleProductChange = (index, e) => {
     const { name, value } = e.target;
     const updatedProducts = [...invoiceData.productDetails];
+
+    if (['quantity', 'unitPrice', 'vatRate'].includes(name)) {
+      if (!/^\d*\.?\d*$/.test(value)) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [`product-${index}-${name}`]: 'Ce champ doit contenir uniquement des chiffres ou un point décimal.',
+        }));
+
+        toast({
+          title: 'Erreur de saisie',
+          description: 'Ce champ doit contenir uniquement des chiffres ou un point décimal.',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [`product-${index}-${name}`]: null,
+        }));
+      }
+    }
+
     updatedProducts[index][name] = value;
     setInvoiceData({ ...invoiceData, productDetails: updatedProducts });
   };
@@ -76,13 +124,11 @@ const InvoiceForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Extraction des données des produits/services
     const productDescriptions = invoiceData.productDetails.map(item => item.description);
     const productQuantities = invoiceData.productDetails.map(item => item.quantity);
     const productUnitPrices = invoiceData.productDetails.map(item => item.unitPrice);
     const productVatRates = invoiceData.productDetails.map(item => item.vatRate);
 
-    // Insertion des données dans la table `vianney_factures`
     const { error } = await supabase
       .from('vianney_factures')
       .insert({
@@ -179,14 +225,20 @@ const InvoiceForm = () => {
           </FormControl>
 
           <Stack direction="row" spacing={4}>
-            <FormControl id="sellerSiren">
-              <FormLabel>SIREN</FormLabel>
+            <FormControl id="sellerSiren" isInvalid={errors.sellerSiren}>
+              <Tooltip label="SIREN: Système d'Identification du Répertoire des Entreprises" placement="top">
+                <FormLabel>SIREN</FormLabel>
+              </Tooltip>
               <Input type="text" name="sellerSiren" value={invoiceData.sellerSiren} onChange={handleChange} />
+              {errors.sellerSiren && <FormErrorMessage>{errors.sellerSiren}</FormErrorMessage>}
             </FormControl>
 
-            <FormControl id="sellerSiret">
-              <FormLabel>SIRET</FormLabel>
+            <FormControl id="sellerSiret" isInvalid={errors.sellerSiret}>
+              <Tooltip label="SIRET: Système d'Identification du Répertoire des Etablissements" placement="top">
+                <FormLabel>SIRET</FormLabel>
+              </Tooltip>
               <Input type="text" name="sellerSiret" value={invoiceData.sellerSiret} onChange={handleChange} />
+              {errors.sellerSiret && <FormErrorMessage>{errors.sellerSiret}</FormErrorMessage>}
             </FormControl>
           </Stack>
 
@@ -196,26 +248,38 @@ const InvoiceForm = () => {
           </FormControl>
 
           <Stack direction="row" spacing={4}>
-            <FormControl id="sellerCapital">
-              <FormLabel>Capital</FormLabel>
+            <FormControl id="sellerCapital" isInvalid={errors.sellerCapital}>
+              <Tooltip label="Capital social de l'entreprise" placement="top">
+                <FormLabel>Capital</FormLabel>
+              </Tooltip>
               <Input type="text" name="sellerCapital" value={invoiceData.sellerCapital} onChange={handleChange} />
+              {errors.sellerCapital && <FormErrorMessage>{errors.sellerCapital}</FormErrorMessage>}
             </FormControl>
 
-            <FormControl id="sellerRCS">
-              <FormLabel>Numéro RCS</FormLabel>
+            <FormControl id="sellerRCS" isInvalid={errors.sellerRCS}>
+              <Tooltip label="RCS: Registre du Commerce et des Sociétés" placement="top">
+                <FormLabel>Numéro RCS</FormLabel>
+              </Tooltip>
               <Input type="text" name="sellerRCS" value={invoiceData.sellerRCS} onChange={handleChange} />
+              {errors.sellerRCS && <FormErrorMessage>{errors.sellerRCS}</FormErrorMessage>}
             </FormControl>
           </Stack>
 
           <Stack direction="row" spacing={4}>
-            <FormControl id="sellerGreffe">
-              <FormLabel>Greffe</FormLabel>
+            <FormControl id="sellerGreffe" isInvalid={errors.sellerGreffe}>
+              <Tooltip label="Greffe: Bureau où sont déposés les actes juridiques" placement="top">
+                <FormLabel>Greffe</FormLabel>
+              </Tooltip>
               <Input type="text" name="sellerGreffe" value={invoiceData.sellerGreffe} onChange={handleChange} />
+              {errors.sellerGreffe && <FormErrorMessage>{errors.sellerGreffe}</FormErrorMessage>}
             </FormControl>
 
-            <FormControl id="sellerRM">
-              <FormLabel>Numéro RM</FormLabel>
+            <FormControl id="sellerRM" isInvalid={errors.sellerRM}>
+              <Tooltip label="RM: Répertoire des Métiers" placement="top">
+                <FormLabel>Numéro RM</FormLabel>
+              </Tooltip>
               <Input type="text" name="sellerRM" value={invoiceData.sellerRM} onChange={handleChange} />
+              {errors.sellerRM && <FormErrorMessage>{errors.sellerRM}</FormErrorMessage>}
             </FormControl>
           </Stack>
 
@@ -260,8 +324,10 @@ const InvoiceForm = () => {
                   />
                 </FormControl>
 
-                <FormControl id={`quantity-${index}`} isRequired>
-                  <FormLabel>Quantité</FormLabel>
+                <FormControl id={`quantity-${index}`} isRequired isInvalid={errors[`product-${index}-quantity`]}>
+                  <Tooltip label="Quantité du produit ou service" placement="top">
+                    <FormLabel>Quantité</FormLabel>
+                  </Tooltip>
                   <Input
                     type="number"
                     name="quantity"
@@ -269,10 +335,13 @@ const InvoiceForm = () => {
                     onChange={(e) => handleProductChange(index, e)}
                     required
                   />
+                  {errors[`product-${index}-quantity`] && <FormErrorMessage>{errors[`product-${index}-quantity`]}</FormErrorMessage>}
                 </FormControl>
 
-                <FormControl id={`unitPrice-${index}`} isRequired>
-                  <FormLabel>Prix Unitaire (HT)</FormLabel>
+                <FormControl id={`unitPrice-${index}`} isRequired isInvalid={errors[`product-${index}-unitPrice`]}>
+                  <Tooltip label="Prix Unitaire HT: Prix unitaire hors taxes" placement="top">
+                    <FormLabel>Prix Unitaire (HT)</FormLabel>
+                  </Tooltip>
                   <Input
                     type="number"
                     name="unitPrice"
@@ -280,10 +349,13 @@ const InvoiceForm = () => {
                     onChange={(e) => handleProductChange(index, e)}
                     required
                   />
+                  {errors[`product-${index}-unitPrice`] && <FormErrorMessage>{errors[`product-${index}-unitPrice`]}</FormErrorMessage>}
                 </FormControl>
 
-                <FormControl id={`vatRate-${index}`} isRequired>
-                  <FormLabel>Taux TVA</FormLabel>
+                <FormControl id={`vatRate-${index}`} isRequired isInvalid={errors[`product-${index}-vatRate`]}>
+                  <Tooltip label="TVA: Taxe sur la Valeur Ajoutée" placement="top">
+                    <FormLabel>Taux TVA</FormLabel>
+                  </Tooltip>
                   <Input
                     type="number"
                     name="vatRate"
@@ -291,6 +363,7 @@ const InvoiceForm = () => {
                     onChange={(e) => handleProductChange(index, e)}
                     required
                   />
+                  {errors[`product-${index}-vatRate`] && <FormErrorMessage>{errors[`product-${index}-vatRate`]}</FormErrorMessage>}
                 </FormControl>
 
                 <IconButton
@@ -317,19 +390,28 @@ const InvoiceForm = () => {
 
           <Heading as="h3" size="md">Informations Financières</Heading>
 
-          <FormControl id="discount">
-            <FormLabel>Remise</FormLabel>
+          <FormControl id="discount" isInvalid={errors.discount}>
+            <Tooltip label="Remise appliquée sur le montant total" placement="top">
+              <FormLabel>Remise</FormLabel>
+            </Tooltip>
             <Input type="text" name="discount" value={invoiceData.discount} onChange={handleChange} />
+            {errors.discount && <FormErrorMessage>{errors.discount}</FormErrorMessage>}
           </FormControl>
 
-          <FormControl id="totalHT" isRequired>
-            <FormLabel>Total HT</FormLabel>
+          <FormControl id="totalHT" isRequired isInvalid={errors.totalHT}>
+            <Tooltip label="Total HT: Montant total hors taxes" placement="top">
+              <FormLabel>Total HT</FormLabel>
+            </Tooltip>
             <Input type="number" name="totalHT" value={invoiceData.totalHT} onChange={handleChange} required />
+            {errors.totalHT && <FormErrorMessage>{errors.totalHT}</FormErrorMessage>}
           </FormControl>
 
-          <FormControl id="totalTTC" isRequired>
-            <FormLabel>Total TTC</FormLabel>
+          <FormControl id="totalTTC" isRequired isInvalid={errors.totalTTC}>
+            <Tooltip label="Total TTC: Montant total toutes taxes comprises" placement="top">
+              <FormLabel>Total TTC</FormLabel>
+            </Tooltip>
             <Input type="number" name="totalTTC" value={invoiceData.totalTTC} onChange={handleChange} required />
+            {errors.totalTTC && <FormErrorMessage>{errors.totalTTC}</FormErrorMessage>}
           </FormControl>
 
           <Divider my={6} />
@@ -337,7 +419,7 @@ const InvoiceForm = () => {
           <Heading as="h3" size="md">Informations de Paiement</Heading>
 
           <FormControl id="paymentDueDate" isRequired>
-            <FormLabel>Date d'échéance de paiement</FormLabel>
+              <FormLabel>Date d'échéance de paiement</FormLabel>
             <Input
               type="date"
               name="paymentDueDate"
@@ -367,13 +449,13 @@ const InvoiceForm = () => {
           <Heading as="h3" size="md">Mentions Spéciales et Garantie</Heading>
 
           <FormControl id="warrantyInfo">
-            <FormLabel>Informations sur la garantie</FormLabel>
+              <FormLabel>Informations sur la garantie</FormLabel>
             <Input type="text" name="warrantyInfo" value={invoiceData.warrantyInfo} onChange={handleChange} />
           </FormControl>
 
           <FormControl id="specialMention">
-            <FormLabel>Mention spéciale</FormLabel>
-            <Input type="text" name="specialMention" value={invoiceData.specialMention} onChange={handleChange} />
+              <FormLabel>Mention spéciale</FormLabel>
+                        <Input type="text" name="specialMention" value={invoiceData.specialMention} onChange={handleChange} />
           </FormControl>
 
           <Button type="submit" colorScheme="teal" size="lg" mt={6}>
