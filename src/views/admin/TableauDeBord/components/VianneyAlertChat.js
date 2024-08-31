@@ -288,7 +288,7 @@ function VianneyAlertChat() {
       // Find the last 3 unresolved alerts (warning, error, info)
       const unresolvedAlerts = allAlerts.filter(a => ['warning', 'error', 'info'].includes(a.solved_or_not))
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Sort by timestamp, newest first
-        .slice(0, 3); // Take only the last 3 items
+        .slice(0, 12); // Take only the last 12 items
       return unresolvedAlerts.some(unresolvedAlert => unresolvedAlert.id === alert.id); // Check if the current alert is one of the last 3 unresolved
     }
     return false;
@@ -343,7 +343,7 @@ function VianneyAlertChat() {
       overflowX={{ sm: "scroll", lg: "hidden" }}>
       <Box>
         <Flex justify='space-between' mb='sm' align='center'>
-          <Badge colorScheme="orange">
+          <Badge colorScheme="orange" fontSize="lg">
             Messages et Alertes
           </Badge>
           <Menu
@@ -374,12 +374,14 @@ function VianneyAlertChat() {
               value={newAlertText}
               onChange={handleInputChange}
               mt={2}
+              fontSize="lg" // Larger text
             />
             <Textarea
               placeholder="Ajoutez des détails ici..."
               value={details}
               onChange={handleDetailsChange}
               mt={2}
+              fontSize="lg" // Larger text
             />
             <Input
               type="file"
@@ -412,10 +414,13 @@ function VianneyAlertChat() {
               : 'info';
 
             return (
-              <Alert key={index} status={alertStatus} >
+              <Alert key={index} status={alertStatus} fontSize="lg">
                 <AlertIcon />
                 <Box flex="1">
-                  <Text>{alert.team_name && (<><Badge colorScheme="orange">{alert.team_name}</Badge> dit: </> )} {alert.alert_text}</Text>
+                  <Text fontSize="lg">
+                    {alert.team_name && (<><Badge colorScheme="orange" fontSize="md">{alert.team_name}</Badge> dit: </> )} 
+                    {alert.alert_text}
+                  </Text>
                   <Text fontSize="sm" color="gray.500">
                     {new Date(alert.timestamp).toLocaleString()}
                   </Text>
@@ -456,6 +461,7 @@ function VianneyAlertChat() {
                 onChange={handleEditChange}
                 placeholder="Texte de l'alerte"
                 mt={2}
+                fontSize="lg"
               />
               <Textarea
                 name="details"
@@ -463,6 +469,7 @@ function VianneyAlertChat() {
                 onChange={handleEditChange}
                 placeholder="Détails de l'alerte"
                 mt={2}
+                fontSize="lg"
               />
               <Image
                 src={editingAlert?.image_url || ''}
