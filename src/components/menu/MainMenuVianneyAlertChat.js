@@ -183,7 +183,7 @@ export default function Banner(props) {
           <Flex align='center'>
             <Icon as={FcClock} h='16px' w='16px' me='8px' />
             <Text fontSize='sm' fontWeight='400'>
-              Afficher les 3 dernières alertes non résolues
+              Afficher les 12 dernières alertes non résolues
             </Text>
           </Flex>
         </MenuItem>

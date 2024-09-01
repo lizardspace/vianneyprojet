@@ -353,11 +353,11 @@ function VianneyAlertChat() {
         </Flex>
         {/* Button to toggle the visibility of the add alert form */}
         <Button
-          size="lg"           
+          size="lg"
           colorScheme="blue"
           onClick={toggleAddAlertForm}
-          mt={4}               
-          mb={4}               
+          mt={4}
+          mb={4}
         >
           {showAddAlertForm ? 'Cacher le formulaire' : 'Ajouter une alerte'}
         </Button>
@@ -393,11 +393,11 @@ function VianneyAlertChat() {
               mt={2}
             />
             <Button
-              size="lg"            
+              size="lg"
               colorScheme="blue"
               onClick={handleSubmit}
-              mt={4}             
-              mb={4}              
+              mt={4}
+              mb={4}
             >
               Ajouter une alerte
             </Button>
@@ -407,18 +407,18 @@ function VianneyAlertChat() {
         <VStack
           spacing={4}
           overflowY={allowScrolling ? "scroll" : "hidden"}
-          maxHeight={allowScrolling ? "200px" : "none"}>
+          maxHeight={allowScrolling ? "1100px" : "none"}>
           {alerts.filter(shouldShowAlert).map((alert, index) => {
             const alertStatus = ['info', 'warning', 'success', 'error'].includes(alert.solved_or_not)
               ? alert.solved_or_not
               : 'info';
 
             return (
-              <Alert key={index} status={alertStatus} fontSize="lg">
+              <Alert key={index} status={alertStatus} fontSize="lg" minHeight="65px"> {/* Set minHeight here */}
                 <AlertIcon />
                 <Box flex="1">
                   <Text fontSize="lg">
-                    {alert.team_name && (<><Badge colorScheme="orange" fontSize="md">{alert.team_name}</Badge> dit: </> )} 
+                    {alert.team_name && (<><Badge colorScheme="orange" fontSize="md">{alert.team_name}</Badge> dit: </>)}
                     {alert.alert_text}
                   </Text>
                   <Text fontSize="sm" color="gray.500">
@@ -449,7 +449,6 @@ function VianneyAlertChat() {
             );
           })}
         </VStack>
-
         <Modal isOpen={isEditOpen} onClose={closeEditModal}>
           <ModalOverlay />
           <ModalContent>
