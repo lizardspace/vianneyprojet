@@ -14,7 +14,7 @@ function VianneyAlertChat() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const { selectedEventId } = useEvent();
-  const [alertStatus, setAlertStatus] = useState('info'); // New state for alert status
+  const [alertStatus, setAlertStatus] = useState('info');
   const [alerts, setAlerts] = useState([]);
   const [newAlertText, setNewAlertText] = useState('');
   const toast = useToast();
@@ -23,12 +23,12 @@ function VianneyAlertChat() {
   const [editingAlert, setEditingAlert] = useState(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [alertToDelete, setAlertToDelete] = useState(null);
-  const [allowScrolling, setAllowScrolling] = useState(false);
-  const [filter, setFilter] = useState('warning');
+  const [allowScrolling, setAllowScrolling] = useState(true); // Default to true
+  const [filter, setFilter] = useState('all'); // Default to 'all'
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
-  const [showAddAlertForm, setShowAddAlertForm] = useState(false); // State to control the visibility of the add alert form
+  const [showAddAlertForm, setShowAddAlertForm] = useState(false);
 
   const toggleAddAlertForm = () => {
     setShowAddAlertForm(!showAddAlertForm);
@@ -38,15 +38,16 @@ function VianneyAlertChat() {
     setAlertToDelete(alertId);
     setIsConfirmOpen(true);
   };
+
   const handlePasswordChange = (event) => {
     const inputPassword = event.target.value;
     setPassword(inputPassword);
     setIsPasswordCorrect(inputPassword === "vianney123");
   };
+
   const handleAllowScrollingToggle = () => {
     setAllowScrolling(!allowScrolling);
   };
-
 
   const openEditModal = (alert) => {
     setEditingAlert(alert);
@@ -71,13 +72,13 @@ function VianneyAlertChat() {
       .match({ id: editingAlert.id });
 
     if (!error) {
-      // Update local state to reflect changes
       setAlerts(alerts.map(alert => alert.id === editingAlert.id ? editingAlert : alert));
       closeEditModal();
     } else {
       console.error('Error updating alert:', error);
     }
   };
+
   const handleSolveAlert = async (alertId) => {
     const { error } = await supabase
       .from('vianney_alert')
@@ -105,11 +106,9 @@ function VianneyAlertChat() {
     }
   };
 
-
   const closeConfirmModal = () => {
     setIsConfirmOpen(false);
   };
-
 
   const handleDeleteAlert = async () => {
     const { error } = await supabase
@@ -121,7 +120,7 @@ function VianneyAlertChat() {
       console.error('Error deleting alert:', error);
       toast({
         title: "Erreur",
-        description: "Nous n'avons pass réussi à supprimer l'alerte.",
+        description: "Nous n'avons pas réussi à supprimer l'alerte.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -139,21 +138,19 @@ function VianneyAlertChat() {
     closeConfirmModal();
     setIsConfirmOpen(false);
   };
+
   const handleDetailsChange = (event) => {
     setDetails(event.target.value);
   };
 
-
-
   useEffect(() => {
-
     const fetchAlerts = async () => {
       try {
         const { data, error } = await supabase
           .from('vianney_alert')
           .select('*')
-          .eq('event_id', selectedEventId) // Filter by selected event_id
-          .order('timestamp', { ascending: true }); // Changed to true for chronological order
+          .eq('event_id', selectedEventId)
+          .order('timestamp', { ascending: true });
 
         if (error) {
           console.error('Error fetching alerts:', error);
@@ -168,8 +165,6 @@ function VianneyAlertChat() {
 
     fetchAlerts();
   }, [selectedEventId]);
-
-
 
   const handleStatusChange = (event) => {
     setAlertStatus(event.target.value);
@@ -198,17 +193,16 @@ function VianneyAlertChat() {
 
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
-      const fakeUUID = uuidv4(); // Use UUID v4 to generate a unique user_id for the demo
+      const fakeUUID = uuidv4();
 
       try {
-        let imageUrl = ''; // Initialize imageUrl variable
+        let imageUrl = '';
 
         if (selectedFile) {
           const fileExtension = selectedFile.name.split('.').pop();
           const fileName = `${uuidv4()}.${fileExtension}`;
           const filePath = `${fakeUUID}/${fileName}`;
 
-          // Upload the file if it exists
           let { error: uploadError } = await supabase.storage
             .from('alert-images')
             .upload(filePath, selectedFile, {
@@ -223,7 +217,6 @@ function VianneyAlertChat() {
           imageUrl = `${supabaseUrl.replace('.co', '.in')}/storage/v1/object/public/alert-images/${filePath}`;
         }
 
-        // Insert the alert into the database with or without imageUrl
         const { data, error } = await supabase
           .from('vianney_alert')
           .insert([
@@ -285,33 +278,28 @@ function VianneyAlertChat() {
     if (filter === 'error' && alert.solved_or_not === 'error') return true;
     if (filter === 'info' && (alert.solved_or_not === 'warning' || alert.solved_or_not === 'error' || alert.solved_or_not === 'info')) return true;
     if (filter === 'warning') {
-      // Find the last 3 unresolved alerts (warning, error, info)
       const unresolvedAlerts = allAlerts.filter(a => ['warning', 'error', 'info'].includes(a.solved_or_not))
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Sort by timestamp, newest first
-        .slice(0, 12); // Take only the last 12 items
-      return unresolvedAlerts.some(unresolvedAlert => unresolvedAlert.id === alert.id); // Check if the current alert is one of the last 3 unresolved
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 12);
+      return unresolvedAlerts.some(unresolvedAlert => unresolvedAlert.id === alert.id);
     }
     return false;
   };
-
-
 
   const updateImageUrl = (fileUrl) => {
     const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
     const publicUrl = fileUrl
       ? `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/alert-images/${fakeUUID}/${fileUrl.split('/').pop()}`
-      : ''; // Construct the URL if fileUrl has a value
-    setImageUrl(publicUrl); // Fill the input field with the publicUrl
+      : '';
+    setImageUrl(publicUrl);
   };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     const fakeUUID = '123e4567-e89b-12d3-a456-426614174000';
     if (file) {
-
       const formData = new FormData();
       formData.append('file', file);
-
 
       const { data: fileData, error: fileError } = await supabase.storage
         .from('alert-images')
@@ -330,7 +318,6 @@ function VianneyAlertChat() {
       updateImageUrl(imageUrl);
     }
   };
-
 
   const toggleImageSize = () => {
     setIsImageEnlarged(!isImageEnlarged);
@@ -351,7 +338,6 @@ function VianneyAlertChat() {
             onAllowScrollingToggle={handleAllowScrollingToggle}
           />
         </Flex>
-        {/* Button to toggle the visibility of the add alert form */}
         <Button
           size="lg"
           colorScheme="blue"
@@ -361,7 +347,6 @@ function VianneyAlertChat() {
         >
           {showAddAlertForm ? 'Cacher le formulaire' : 'Ajouter une alerte'}
         </Button>
-        {/* Conditionally render the add alert form based on the state */}
         {showAddAlertForm && (
           <Box mt={4}>
             <Select placeholder="Sélectionnez le degrès d'urgence" value={alertStatus} onChange={handleStatusChange}>
@@ -374,14 +359,14 @@ function VianneyAlertChat() {
               value={newAlertText}
               onChange={handleInputChange}
               mt={2}
-              fontSize="lg" // Larger text
+              fontSize="lg"
             />
             <Textarea
               placeholder="Ajoutez des détails ici..."
               value={details}
               onChange={handleDetailsChange}
               mt={2}
-              fontSize="lg" // Larger text
+              fontSize="lg"
             />
             <Input
               type="file"
@@ -414,7 +399,7 @@ function VianneyAlertChat() {
               : 'info';
 
             return (
-              <Alert key={index} status={alertStatus} fontSize="lg" minHeight="65px"> {/* Set minHeight here */}
+              <Alert key={index} status={alertStatus} fontSize="lg" minHeight="70px">
                 <AlertIcon />
                 <Box flex="1">
                   <Text fontSize="lg">
@@ -449,6 +434,7 @@ function VianneyAlertChat() {
             );
           })}
         </VStack>
+
         <Modal isOpen={isEditOpen} onClose={closeEditModal}>
           <ModalOverlay />
           <ModalContent>
@@ -485,6 +471,7 @@ function VianneyAlertChat() {
             </ModalFooter>
           </ModalContent>
         </Modal>
+
         <Modal isOpen={isConfirmOpen} onClose={() => setIsConfirmOpen(false)}>
           <ModalOverlay />
           <ModalContent>
