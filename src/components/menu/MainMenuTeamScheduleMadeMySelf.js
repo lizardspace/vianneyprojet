@@ -53,7 +53,7 @@ export default function Banner(props) {
           <Flex align='center'>
             <Icon as={FcAutomatic} h='16px' w='16px' me='8px' />
             <Text fontSize='sm' fontWeight='400'>
-              Allow Scrolling
+              Scrolling
             </Text>
           </Flex>
         </MenuItem>
