@@ -428,6 +428,65 @@ const MapComponent = () => {
     }
   };
 
+  const deleteLastItinerary = async () => {
+    try {
+      // Fetch the last saved itinerary
+      const { data, error } = await supabase
+        .from('vianney_itineraire_carte')
+        .select('id')
+        .eq('event_id', selectedEventId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        // Delete the last saved itinerary
+        const { error: deleteError } = await supabase
+          .from('vianney_itineraire_carte')
+          .delete()
+          .eq('id', data.id);
+
+        if (deleteError) throw deleteError;
+
+        toast({
+          title: 'Itinéraire supprimé',
+          description: 'Le dernier itinéraire a été supprimé avec succès.',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
+
+        // Optionally, remove the routing control from the map
+        if (routingControlRef.current) {
+          mapRef.current.removeControl(routingControlRef.current);
+          routingControlRef.current = null;
+        }
+
+        // Clear the itinerary text
+        setLatestItineraryText([]);
+      } else {
+        toast({
+          title: 'Aucun itinéraire trouvé',
+          description: "Il n'y a pas d'itinéraire à supprimer.",
+          status: 'info',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression du dernier itinéraire:', error.message);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de supprimer le dernier itinéraire. Veuillez réessayer.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
   useEffect(() => {
     const updateMapHeight = () => {
       const newHeight = `${window.innerHeight - 60}px`;
@@ -873,6 +932,11 @@ const MapComponent = () => {
           <Tooltip label="Calculer et ajouter l'itinéraire sélectionné" aria-label="Add route tooltip">
             <Button colorScheme="blue" onClick={handleRouteCalculation} mt="10px">
               Ajouter l'itinéraire
+            </Button>
+          </Tooltip>
+          <Tooltip label="Supprimer le dernier itinéraire enregistré et afficher le précédent enregistré s'il existe" aria-label="Delete last itinerary tooltip">
+            <Button colorScheme="red" onClick={deleteLastItinerary} mt="10px">
+              Supprimer l'itinéraire
             </Button>
           </Tooltip>
           <Tooltip label="Afficher ou masquer les détails textuels de l'itinéraire" aria-label="Toggle route details tooltip">
