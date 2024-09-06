@@ -13,7 +13,7 @@ function VianneyAlertChat() {
   const { selectedTeam } = useTeam();
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
-  const { selectedEventId } = useEvent();
+  const { selectedEventId } = useEvent(); // Accéder au selectedEventId du contexte
   const [alertStatus, setAlertStatus] = useState('info');
   const [alerts, setAlerts] = useState([]);
   const [newAlertText, setNewAlertText] = useState('');
@@ -23,8 +23,8 @@ function VianneyAlertChat() {
   const [editingAlert, setEditingAlert] = useState(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [alertToDelete, setAlertToDelete] = useState(null);
-  const [allowScrolling, setAllowScrolling] = useState(true); // Default to true
-  const [filter, setFilter] = useState('all'); // Default to 'all'
+  const [allowScrolling, setAllowScrolling] = useState(true); 
+  const [filter, setFilter] = useState('all'); 
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [isImageEnlarged, setIsImageEnlarged] = useState(false);
@@ -144,27 +144,29 @@ function VianneyAlertChat() {
   };
 
   useEffect(() => {
-    const fetchAlerts = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('vianney_alert')
-          .select('*')
-          .eq('event_id', selectedEventId)
-          .order('timestamp', { ascending: true });
+    if (selectedEventId) { // Ne récupérer les alertes que si un événement est sélectionné
+      const fetchAlerts = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('vianney_alert')
+            .select('*')
+            .eq('event_id', selectedEventId)
+            .order('timestamp', { ascending: true });
 
-        if (error) {
+          if (error) {
+            console.error('Error fetching alerts:', error);
+            return;
+          }
+
+          setAlerts(data);
+        } catch (error) {
           console.error('Error fetching alerts:', error);
-          return;
         }
+      };
 
-        setAlerts(data);
-      } catch (error) {
-        console.error('Error fetching alerts:', error);
-      }
-    };
-
-    fetchAlerts();
-  }, [selectedEventId]);
+      fetchAlerts();
+    }
+  }, [selectedEventId]); // Exécuter seulement quand selectedEventId change
 
   const handleStatusChange = (event) => {
     setAlertStatus(event.target.value);
@@ -173,23 +175,6 @@ function VianneyAlertChat() {
   const handleInputChange = (event) => {
     setNewAlertText(event.target.value);
   };
-
-  const fetchAlerts = async () => {
-    const { data, error } = await supabase
-      .from('vianney_alert')
-      .select('*')
-      .order('timestamp', { ascending: true });
-
-    if (error) {
-      console.log('Erreur lors de la récupération des alertes:', error);
-    } else {
-      setAlerts(data);
-    }
-  };
-
-  useEffect(() => {
-    fetchAlerts();
-  }, []);
 
   const handleSubmit = async () => {
     if (newAlertText.trim() !== '') {
@@ -225,7 +210,7 @@ function VianneyAlertChat() {
               user_id: fakeUUID,
               solved_or_not: alertStatus,
               details: details,
-              event_id: selectedEventId,
+              event_id: selectedEventId, // Ajouter event_id ici
               image_url: imageUrl,
               team_name: selectedTeam,
             },
@@ -389,51 +374,54 @@ function VianneyAlertChat() {
           </Box>
         )}
 
-        <VStack
-          spacing={4}
-          overflowY={allowScrolling ? "scroll" : "hidden"}
-          maxHeight={allowScrolling ? "1100px" : "none"}>
-          {alerts.filter(shouldShowAlert).map((alert, index) => {
-            const alertStatus = ['info', 'warning', 'success', 'error'].includes(alert.solved_or_not)
-              ? alert.solved_or_not
-              : 'info';
+        {/* N'afficher les alertes que si un événement est sélectionné */}
+        {selectedEventId && (
+          <VStack
+            spacing={4}
+            overflowY={allowScrolling ? "scroll" : "hidden"}
+            maxHeight={allowScrolling ? "1100px" : "none"}>
+            {alerts.filter(shouldShowAlert).map((alert, index) => {
+              const alertStatus = ['info', 'warning', 'success', 'error'].includes(alert.solved_or_not)
+                ? alert.solved_or_not
+                : 'info';
 
-            return (
-              <Alert key={index} status={alertStatus} fontSize="lg" minHeight="70px">
-                <AlertIcon />
-                <Box flex="1">
-                  <Text fontSize="lg">
-                    {alert.team_name && (<><Badge colorScheme="orange" fontSize="md">{alert.team_name}</Badge> dit: </>)}
-                    {alert.alert_text}
-                  </Text>
-                  <Text fontSize="sm" color="gray.500">
-                    {new Date(alert.timestamp).toLocaleString()}
-                  </Text>
-                  {imageUrl && (
-                    <img
-                      src={imageUrl}
-                      alt="essai"
-                      style={{ maxHeight: isImageEnlarged ? "auto" : "100px", cursor: "pointer" }}
-                      onClick={toggleImageSize}
-                    />
-                  )}
-                  {alert.image_url && (
-                    <img src={alert.image_url} alt="essai" style={{ maxHeight: "120px" }} />
-                  )}
-                </Box>
-                <Tooltip label="Marqué comme résolue" hasArrow>
-                  <Button mr="2px" onClick={() => handleSolveAlert(alert.id)}><FcOk /></Button>
-                </Tooltip>
-                <Tooltip label="Supprimer" hasArrow>
-                  <Button mr="2px" onClick={() => openConfirmModal(alert.id)}><FcDeleteDatabase /></Button>
-                </Tooltip>
-                <Tooltip label="Information" hasArrow>
-                  <Button onClick={() => openEditModal(alert)}><FcInfo /></Button>
-                </Tooltip>
-              </Alert>
-            );
-          })}
-        </VStack>
+              return (
+                <Alert key={index} status={alertStatus} fontSize="lg" minHeight="70px">
+                  <AlertIcon />
+                  <Box flex="1">
+                    <Text fontSize="lg">
+                      {alert.team_name && (<><Badge colorScheme="orange" fontSize="md">{alert.team_name}</Badge> dit: </>)}
+                      {alert.alert_text}
+                    </Text>
+                    <Text fontSize="sm" color="gray.500">
+                      {new Date(alert.timestamp).toLocaleString()}
+                    </Text>
+                    {imageUrl && (
+                      <img
+                        src={imageUrl}
+                        alt="essai"
+                        style={{ maxHeight: isImageEnlarged ? "auto" : "100px", cursor: "pointer" }}
+                        onClick={toggleImageSize}
+                      />
+                    )}
+                    {alert.image_url && (
+                      <img src={alert.image_url} alt="essai" style={{ maxHeight: "120px" }} />
+                    )}
+                  </Box>
+                  <Tooltip label="Marqué comme résolue" hasArrow>
+                    <Button mr="2px" onClick={() => handleSolveAlert(alert.id)}><FcOk /></Button>
+                  </Tooltip>
+                  <Tooltip label="Supprimer" hasArrow>
+                    <Button mr="2px" onClick={() => openConfirmModal(alert.id)}><FcDeleteDatabase /></Button>
+                  </Tooltip>
+                  <Tooltip label="Information" hasArrow>
+                    <Button onClick={() => openEditModal(alert)}><FcInfo /></Button>
+                  </Tooltip>
+                </Alert>
+              );
+            })}
+          </VStack>
+        )}
 
         <Modal isOpen={isEditOpen} onClose={closeEditModal}>
           <ModalOverlay />
