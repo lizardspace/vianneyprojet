@@ -43,9 +43,6 @@ export default function UserReports() {
   const textColor = useColorModeValue("secondaryGray.900", "white");
 
   const handleSaveTeam = (updatedTeamData) => {
-    // Perform the update operation with updatedTeamData
-    // Close the edit modal
-    // Refresh teams data, if necessary
     setEditingTeam(null);
   };
 
@@ -63,8 +60,8 @@ export default function UserReports() {
       const { data: teamsForEvent, error } = await supabase
         .from('vianney_teams')
         .select('*')
-        .eq('event_id', selectedEventId); // Filter teams by selected event_id
-  
+        .eq('event_id', selectedEventId);
+
       if (error) {
         console.error('Error fetching teams for the event:', error);
       } else {
@@ -73,13 +70,7 @@ export default function UserReports() {
     } catch (error) {
       console.error('Error fetching teams for the event:', error);
     }
-  }, [selectedEventId]); // Ajouter selectedEventId comme dépendance
-  
-  useEffect(() => {
-    if (selectedEventId) {
-      fetchTeamsForEvent();
-    }
-  }, [selectedEventId, fetchTeamsForEvent]);
+  }, [selectedEventId]);
 
   useEffect(() => {
     fetchEvents();
@@ -89,8 +80,7 @@ export default function UserReports() {
     if (selectedEventId) {
       fetchTeamsForEvent();
     }
-  }, [selectedEventId, fetchTeamsForEvent]); // Inclure fetchTeamsForEvent dans les dépendances
-  
+  }, [selectedEventId, fetchTeamsForEvent]);
 
   const toggleAddEventForm = () => setShowAddEventForm(!showAddEventForm);
 
@@ -218,9 +208,11 @@ export default function UserReports() {
           </ModalContent>
         </Modal>
       )}
+
       {showUserform && (
         <Userform />
       )}
+
       {showCreateTeamModal && (
         <Modal isOpen={showCreateTeamModal} onClose={() => setShowCreateTeamModal(false)}>
           <ModalOverlay />
@@ -245,7 +237,10 @@ export default function UserReports() {
         </Modal>
       )}
 
-      <DocumentationsComponent eventId={selectedEventId} />
+      {/* Display documentations only if an event is selected */}
+      {selectedEventId && (
+        <DocumentationsComponent eventId={selectedEventId} />
+      )}
 
       <TableTopCreators
         tableData={tableDataTopCreators}
