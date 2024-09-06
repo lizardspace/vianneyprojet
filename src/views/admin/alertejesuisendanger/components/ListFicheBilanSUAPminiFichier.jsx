@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Box, Heading, Stack, Flex, Text, IconButton } from "@chakra-ui/react";
 import { FiFile, FiArrowLeft } from 'react-icons/fi';
 import { supabase } from './../../../../supabaseClient';
+import { useEvent } from '../../../../EventContext'; // Importer le contexte d'événement
 import RenderFicheBilanSUAP from './RenderFicheBilanSUAP';
 
 const ListFicheBilanSUAPminiFichier = () => {
+  const { selectedEventId } = useEvent(); // Accéder au selectedEventId depuis le contexte
   const [fiches, setFiches] = useState([]);
     // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(true);
@@ -13,27 +15,38 @@ const ListFicheBilanSUAPminiFichier = () => {
   const [selectedFiche, setSelectedFiche] = useState(null);
 
   useEffect(() => {
-    const fetchFiches = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('vianney_fiche_bilan_suap')
-          .select('*');
+    if (selectedEventId) {
+      setLoading(true); // Commence à charger uniquement si un event_id est sélectionné
+      const fetchFiches = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('vianney_fiche_bilan_suap')
+            .select('*')
+            .eq('event_id', selectedEventId); // Filtrer par l'event_id
 
-        if (error) {
-          throw error;
+          if (error) {
+            throw error;
+          }
+
+          setFiches(data);
+        } catch (error) {
+          setError('Erreur lors de la récupération des fiches.');
+          console.error('Error fetching fiches:', error.message);
+        } finally {
+          setLoading(false);
         }
+      };
 
-        setFiches(data);
-      } catch (error) {
-        setError('Erreur lors de la récupération des fiches.');
-        console.error('Error fetching fiches:', error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+      fetchFiches();
+    } else {
+      setFiches([]); // Réinitialiser si aucun event_id
+    }
+  }, [selectedEventId]);
 
-    fetchFiches();
-  }, []);
+  if (!selectedEventId) {
+    // Ne rien afficher si aucun event_id n'est sélectionné
+    return null;
+  }
 
   return (
     <Box width="80%" margin="auto">
