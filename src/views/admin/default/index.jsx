@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -58,13 +58,13 @@ export default function UserReports() {
     else setEvents(vianney_event);
   };
 
-  const fetchTeamsForEvent = async () => {
+  const fetchTeamsForEvent = useCallback(async () => {
     try {
       const { data: teamsForEvent, error } = await supabase
         .from('vianney_teams')
         .select('*')
         .eq('event_id', selectedEventId); // Filter teams by selected event_id
-
+  
       if (error) {
         console.error('Error fetching teams for the event:', error);
       } else {
@@ -73,7 +73,13 @@ export default function UserReports() {
     } catch (error) {
       console.error('Error fetching teams for the event:', error);
     }
-  };
+  }, [selectedEventId]); // Ajouter selectedEventId comme dépendance
+  
+  useEffect(() => {
+    if (selectedEventId) {
+      fetchTeamsForEvent();
+    }
+  }, [selectedEventId, fetchTeamsForEvent]);
 
   useEffect(() => {
     fetchEvents();
@@ -83,7 +89,8 @@ export default function UserReports() {
     if (selectedEventId) {
       fetchTeamsForEvent();
     }
-  }, [selectedEventId]);
+  }, [selectedEventId, fetchTeamsForEvent]); // Inclure fetchTeamsForEvent dans les dépendances
+  
 
   const toggleAddEventForm = () => setShowAddEventForm(!showAddEventForm);
 
