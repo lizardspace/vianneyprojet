@@ -67,7 +67,7 @@ const LiveStreamsPage = () => {
     <Box p={8} bg={bgColor} color={color} minHeight="100vh">
       <Box display="flex" justifyContent="center" mb={12}>
         <Badge colorScheme="blue" px={4} py={1} fontSize="1.25em" borderRadius="full" color={badgeColor}>
-          Centre de surveillance vidéo
+          Ajouter une chaîne de télévision
         </Badge>
       </Box>
       <VideoInputForm onAddVideo={addVideo} />
