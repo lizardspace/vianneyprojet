@@ -17,11 +17,23 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from './../../../../supabaseClient';
 
+// Utility function to generate a random password
+const generatePassword = (length = 12) => {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!';
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    password += charset[randomIndex];
+  }
+  return password;
+};
+
 export default function AddEventForm() {
   const [eventName, setEventName] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [eventLocation, setEventLocation] = useState('');
   const [eventDescription, setEventDescription] = useState('');
+  const [password, setPassword] = useState(generatePassword()); // Auto-generate password
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // State for success modal
   const toast = useToast();
 
@@ -37,6 +49,7 @@ export default function AddEventForm() {
         event_date: new Date(eventDate).toISOString(),
         event_location: eventLocation,
         event_description: eventDescription,
+        password: password, // Add generated password
       },
     ]);
 
@@ -62,12 +75,24 @@ export default function AddEventForm() {
       setEventDate('');
       setEventLocation('');
       setEventDescription('');
+      setPassword(generatePassword()); // Generate a new password for the next event
     }
   };
 
   // Function to close the success modal
   const handleCloseSuccessModal = () => {
     setIsSuccessModalOpen(false);
+  };
+
+  // Function to copy the password to clipboard
+  const handleCopyPassword = () => {
+    navigator.clipboard.writeText(password);
+    toast({
+      title: 'Mot de passe copié dans le presse-papier',
+      status: 'info',
+      duration: 2000,
+      isClosable: true,
+    });
   };
 
   return (
@@ -89,7 +114,7 @@ export default function AddEventForm() {
             onChange={(e) => setEventDate(e.target.value)}
           />
         </FormControl>
-        <FormControl id='event-location' mt={4} isRequired> {/* Add event-location input */}
+        <FormControl id='event-location' mt={4} isRequired>
           <FormLabel>Lieu de l'événement</FormLabel>
           <Input
             type='text'
@@ -97,12 +122,24 @@ export default function AddEventForm() {
             onChange={(e) => setEventLocation(e.target.value)}
           />
         </FormControl>
-        <FormControl id='event-description' mt={4}> {/* Add event-description input */}
+        <FormControl id='event-description' mt={4}>
           <FormLabel>Description de l'événement</FormLabel>
           <Textarea
             value={eventDescription}
             onChange={(e) => setEventDescription(e.target.value)}
           />
+        </FormControl>
+        <FormControl id='event-password' mt={4} isRequired>
+          <FormLabel>Mot de passe généré automatiquement</FormLabel>
+          <Input
+            type='text'
+            value={password}
+            isReadOnly
+            onClick={handleCopyPassword} // Allow users to click to copy password
+          />
+          <Button mt={2} colorScheme='gray' size='sm' onClick={handleCopyPassword}>
+            Copier le mot de passe
+          </Button>
         </FormControl>
         <Button
           mt={4}
@@ -120,7 +157,7 @@ export default function AddEventForm() {
         <ModalContent>
           <ModalHeader>Événement ajouté avec succès</ModalHeader>
           <ModalBody>
-          ⚠️ Pensez à changer d'évênement dans le menu ↗️
+            ⚠️ Pensez à changer d'événement dans le menu ↗️
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={handleCloseSuccessModal}>
