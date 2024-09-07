@@ -132,15 +132,14 @@ export default function UserReports() {
         <>
           {/* Button to reveal the password form */}
           {!showPasswordForm && (
-            <Button onClick={() => setShowPasswordForm(true)} mb="20px" colorScheme="blue">
-              Voir les événements
+            <Button onClick={() => setShowPasswordForm(true)} mb="20px" colorScheme="white">
+              
             </Button>
           )}
 
           {/* Password form shown after clicking the button */}
           {showPasswordForm && (
             <Box maxW="400px" mx="auto" p={6} boxShadow="md" borderRadius="md">
-              <Heading mb={4} fontSize="lg">Saisissez le mot de passe pour voir les événements</Heading>
               <Input
                 type="password"
                 placeholder="Mot de passe"
