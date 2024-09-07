@@ -1,4 +1,3 @@
-// src/index.js
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'assets/css/App.css';
@@ -13,7 +12,9 @@ import { ThemeEditorProvider } from '@hypertheme-editor/chakra-ui';
 import { EventProvider } from './EventContext';
 import { TeamProvider } from './views/admin/InterfaceEquipe/TeamContext';
 import GpsPositionSimplified from './views/admin/InterfaceEquipe/components/GpsPositionSimplified';
-import { RealtimeProvider } from './RealtimeContext'; // Import the RealtimeProvider
+import { RealtimeProvider } from './RealtimeContext';
+import ProtectedRoute from './ProtectedRoute';
+import Login from './views/auth/Login'; // <-- Import the Login component
 
 ReactDOM.render(
   <ChakraProvider theme={theme}>
@@ -23,13 +24,14 @@ ReactDOM.render(
           <GPSPositionProvider>
             <ThemeEditorProvider>
               <HashRouter>
-                <RealtimeProvider> {/* Wrap your app with RealtimeProvider */}
+                <RealtimeProvider>
                   <GpsPositionSimplified />
                   <Switch>
+                    <Route path={`/auth/login`} component={Login} /> {/* Login route */}
                     <Route path={`/auth`} component={AuthLayout} />
-                    <Route path={`/admin`} component={AdminLayout} />
+                    <ProtectedRoute path={`/admin`} component={AdminLayout} /> {/* Protect admin routes */}
                     <Route path={`/rtl`} component={RtlLayout} />
-                    <Redirect from='/' to='/admin' />
+                    <Redirect from='/' to='/auth/login' />
                   </Switch>
                 </RealtimeProvider>
               </HashRouter>

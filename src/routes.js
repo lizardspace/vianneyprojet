@@ -19,8 +19,16 @@ import IncidentReportForm from "views/admin/IncidentReportForm";
 import VideoStreamAnalysisComponent from "views/admin/VideoStreamAnalysisComponent"; 
 import Factures from "views/admin/Factures"; 
 import AddDocumentComponent from "views/admin/AddDocumentComponent";
+import Login from "views/auth/Login"; // Import the login page
 
 const routes = [
+  {
+    name: "Login",
+    layout: "/auth",
+    path: "/login", // Add login route
+    icon: <Icon as={FcSettings} width="20px" height="20px" color="inherit" />,
+    component: Login,
+  },
   {
     name: "Ecran principal",
     layout: "/admin",
@@ -49,7 +57,7 @@ const routes = [
     path: "/zoomed-map",
     component: ZoomedMapComponent,
   },
-  //
+    //
  // {
  //   name: "Profil des utilisateurs",
  //   layout: "/admin",
@@ -85,7 +93,7 @@ const routes = [
     icon: <Icon as={FcOpenedFolder} width="20px" height="20px" color="red" />, 
     component: AlerteJeSuisEnDanger,
   },
- // {
+   // {
  //   name: "Interface Equipe",
  //   layout: "/admin",
  //   path: "/interface-equipe",
