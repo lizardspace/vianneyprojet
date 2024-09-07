@@ -1,3 +1,4 @@
+// src/index.js
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'assets/css/App.css';
@@ -14,7 +15,7 @@ import { TeamProvider } from './views/admin/InterfaceEquipe/TeamContext';
 import GpsPositionSimplified from './views/admin/InterfaceEquipe/components/GpsPositionSimplified';
 import { RealtimeProvider } from './RealtimeContext';
 import ProtectedRoute from './ProtectedRoute';
-import Login from './views/auth/Login'; // <-- Import the Login component
+import Login from './views/auth/Login';
 
 ReactDOM.render(
   <ChakraProvider theme={theme}>

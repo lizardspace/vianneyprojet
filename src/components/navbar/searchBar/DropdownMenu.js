@@ -1,25 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Text,
   Alert,
   AlertIcon,
+  useToast,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
-  useToast,
 } from '@chakra-ui/react';
-import { createClient } from '@supabase/supabase-js';
 import { FcExpand, FcCollapse, FcAdvance } from 'react-icons/fc';
-import { useEvent } from './../../../EventContext';
+import { useEvent } from './../../../EventContext'; // Use EventContext to access selected event
+import { createClient } from '@supabase/supabase-js';
 import AlertModal from 'components/AlertModal';
 
 const supabaseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co';
@@ -27,33 +22,13 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const DropdownMenu = () => {
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [eventList, setEventList] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isEventSelected, setIsEventSelected] = useState(false);
-  const [isEventModalOpen, setIsEventModalOpen] = useState(true);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [unresolvedAlert, setUnresolvedAlert] = useState(null);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const [teams, setTeams] = useState([]);
 
-  const { setEventId, selectedEventId } = useEvent();
+  const { selectedEventId, selectedEventName } = useEvent(); // Get event details from context
   const toast = useToast();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data, error } = await supabase.from('vianney_event').select('*');
-        if (error) {
-          throw error;
-        }
-        setEventList(data);
-      } catch (error) {
-        console.error('Error fetching data:', error.message);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -79,39 +54,35 @@ const DropdownMenu = () => {
     // Check for unresolved alerts every 60 seconds
     const intervalId = setInterval(fetchAlerts, 60000); // 60 seconds in milliseconds
 
-    // Clear the interval when the component unmounts
-    return () => clearInterval(intervalId);
+    return () => clearInterval(intervalId); // Clean up the interval on component unmount
   }, []);
 
-  const handleSelect = async (event) => {
-    setSelectedItem(event.event_name);
-    setEventId(event.event_id);
-    setIsEventSelected(true);
-    setIsEventModalOpen(false);
-  
-    try {
-      const { data, error } = await supabase.from('vianney_teams').select('*').eq('event_id', event.event_id);
-      if (error) {
-        throw error;
-      }
-      setTeams(data);
-  
-      // Update the unresolved alert with the list of team IDs
-      if (unresolvedAlert) {
-        const teamIds = data.map(team => team.id);
-        await supabase
-          .from('vianney_sos_alerts')
-          .update({ teams_to_which_send_a_notification: teamIds })
-          .eq('id', unresolvedAlert.id);
-      }
-    } catch (error) {
-      console.error('Error fetching teams:', error.message);
-    }
-  };  
+  useEffect(() => {
+    const fetchTeams = async () => {
+      if (selectedEventId) {
+        try {
+          const { data, error } = await supabase.from('vianney_teams').select('*').eq('event_id', selectedEventId);
+          if (error) {
+            throw error;
+          }
+          setTeams(data);
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
+          // Update the unresolved alert with the list of team IDs
+          if (unresolvedAlert) {
+            const teamIds = data.map(team => team.id);
+            await supabase
+              .from('vianney_sos_alerts')
+              .update({ teams_to_which_send_a_notification: teamIds })
+              .eq('id', unresolvedAlert.id);
+          }
+        } catch (error) {
+          console.error('Error fetching teams:', error.message);
+        }
+      }
+    };
+
+    fetchTeams();
+  }, [selectedEventId, unresolvedAlert]);
 
   const resolveAlert = async (id) => {
     const { error } = await supabase
@@ -134,49 +105,20 @@ const DropdownMenu = () => {
     }
   };
 
-  useEffect(() => {
-    // Check if an event is selected every 30 seconds
-    const intervalId = setInterval(() => {
-      if (!isEventSelected) {
-        // Reload the page if no event is selected
-        window.location.reload();
-      }
-    }, 30000); // 30 seconds in milliseconds
-
-    // Clear the interval when the component unmounts
-    return () => clearInterval(intervalId);
-  }, [isEventSelected]);
-
   return (
     <Box>
-      <Menu>
-        <MenuButton
-          as={Button}
-          rightIcon={isOpen ? <FcCollapse /> : <FcExpand />}
-          onClick={toggleMenu}
-        >
-          {selectedItem || 'Choisissez l\'événement'}
-          {selectedEventId && <Text ml={2}> </Text>}
-        </MenuButton>
-        <MenuList>
-          {eventList.map((event) => (
-            <MenuItem
-              key={event.event_id}
-              onClick={() => handleSelect(event)}
-            >
-              {event.event_name}
-            </MenuItem>
-          ))}
-        </MenuList>
-      </Menu>
-      {!isEventSelected && (
+      <Button rightIcon={selectedEventId ? <FcCollapse /> : <FcExpand />} isDisabled>
+        {selectedEventName || 'Chargement de l\'événement...'}
+      </Button>
+
+      {!selectedEventId && (
         <Alert status="warning" mt={2}>
           <AlertIcon />
-          Merci de sélectionner un événement.
+          Aucun événement sélectionné.
         </Alert>
       )}
 
-      <Modal isOpen={isEventModalOpen && !isEventSelected} onClose={() => setIsEventModalOpen(false)}>
+      <Modal isOpen={isEventModalOpen && !selectedEventId} onClose={() => setIsEventModalOpen(false)}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Sélectionnez un événement</ModalHeader>
@@ -198,7 +140,7 @@ const DropdownMenu = () => {
         onClose={() => setIsAlertModalOpen(false)}
         alert={unresolvedAlert}
         onResolve={resolveAlert}
-        teams={teams} // Pass teams to AlertModal
+        teams={teams}
       />
     </Box>
   );

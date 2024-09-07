@@ -4,27 +4,28 @@ import { Box, Input, Button, Heading, useToast, InputGroup, InputRightElement, I
 import { useHistory } from 'react-router-dom';
 import { supabase } from '../../supabaseClient';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import { useEvent } from '../../EventContext'; // Import the EventContext
 
 const Login = () => {
   const [eventName, setEventName] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-  const [allEvents, setAllEvents] = useState([]); // State to store all events for debugging
+  const [showPassword, setShowPassword] = useState(false);
+  const [allEvents, setAllEvents] = useState([]); 
+  const { setEventId } = useEvent(); // Use setEventId from EventContext
   const toast = useToast();
   const history = useHistory();
 
   // Fetch all events on component mount
   useEffect(() => {
     const fetchAllEvents = async () => {
-      // eslint-disable-next-line
-      const { data, error } = await supabase
-        .from('vianney_event')
-        .select('*');
-
-      console.log("All Events:", data);
-      setAllEvents(data); // Store fetched data for potential use
+      const { data, error } = await supabase.from('vianney_event').select('*');
+      if (error) {
+        console.error('Error fetching events:', error.message);
+      } else {
+        console.log("All Events:", data);
+        setAllEvents(data); // Store fetched data for potential use
+      }
     };
-
     fetchAllEvents();
   }, []);
 
@@ -64,15 +65,15 @@ const Login = () => {
       return;
     }
 
-    // Debugging Redirection
-    console.log("Login successful! Redirecting...");
+    // Save eventId and eventName in the EventContext and localStorage
+    setEventId(eventExists.event_id, eventExists.event_name); 
 
     // Save login status in localStorage
     localStorage.setItem('isLoggedIn', 'true');
-    
+
     // Redirect to the admin page
-    history.push('/admin/default'); // Adjust the route as needed
-    alert('Redirection triggered');  // Add an alert to confirm if the redirection is happening
+    history.push('/admin/default'); 
+    console.log('Login successful! Event selected:', eventExists.event_name);
   };
 
   return (

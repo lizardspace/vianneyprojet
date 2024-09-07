@@ -1,6 +1,6 @@
 import React from "react";
 import { Icon } from "@chakra-ui/react";
-import { FcMindMap, FcVideoCall, FcPlanner, FcSurvey, FcSettings, FcGrid, FcHighPriority, FcDiploma2, FcDocument, FcAbout, FcOpenedFolder, FcMoneyTransfer } from "react-icons/fc";
+import { FcMindMap, FcLock, FcVideoCall, FcPlanner, FcSurvey, FcSettings, FcGrid, FcHighPriority, FcDiploma2, FcDocument, FcAbout, FcOpenedFolder, FcMoneyTransfer } from "react-icons/fc";
 import { MdQrCodeScanner, MdOutlineSos } from "react-icons/md"; 
 
 import MainDashboard from "views/admin/default";
@@ -23,10 +23,10 @@ import Login from "views/auth/Login"; // Import the login page
 
 const routes = [
   {
-    name: "Login",
+    name: "Login Logout",
     layout: "/auth",
     path: "/login", // Add login route
-    icon: <Icon as={FcSettings} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={FcLock} width="20px" height="20px" color="inherit" />,
     component: Login,
   },
   {
