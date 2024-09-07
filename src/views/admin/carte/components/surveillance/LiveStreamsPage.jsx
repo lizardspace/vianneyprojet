@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './../../../../../supabaseClient';
-import { Box, Grid, Badge, useColorModeValue } from '@chakra-ui/react';
+import { Box, Grid, Badge, useColorModeValue, useToast } from '@chakra-ui/react';
 import VideoInputForm from './VideoInputForm';
 import VideoList from './VideoList';
 import PorteDuValvertLive from './PorteDuValvertLive';
@@ -11,20 +11,21 @@ import PlageDuSillonThermesMarinsLive from './PlageDuSillonThermesMarinsLive';
 import SaintMaloLesMursLive from './SaintMaloLesMursLive';
 import TunnelDeFourviereLive from './TunnelDeFourviereLive';
 import TunnelDeFourviereBisLive from './TunnelDeFourviereBisLive';
-import { useEvent } from './../../../../../EventContext'; // Import du contexte de l'événement
+import { useEvent } from './../../../../../EventContext';
 
 const LiveStreamsPage = () => {
   const [videos, setVideos] = useState([]);
-  const { selectedEventId } = useEvent(); // Récupère l'ID de l'événement à partir du contexte
+  const { selectedEventId } = useEvent();
+  const toast = useToast();
 
   useEffect(() => {
     const fetchVideos = async () => {
-      if (!selectedEventId) return; // Ne rien faire si aucun événement n'est sélectionné
+      if (!selectedEventId) return;
 
       const { data, error } = await supabase
         .from('vianney_videos_streaming_live')
         .select('*')
-        .eq('event_id', selectedEventId); // Filtre par event_id
+        .eq('event_id', selectedEventId);
 
       if (error) {
         console.error('Error fetching videos:', error.message);
@@ -34,10 +35,36 @@ const LiveStreamsPage = () => {
     };
 
     fetchVideos();
-  }, [selectedEventId]); // Récupère les vidéos lorsque l'event_id change
+  }, [selectedEventId]);
 
   const addVideo = (video) => {
     setVideos([...videos, video]);
+  };
+
+  const deleteVideo = async (id) => {
+    const { error } = await supabase
+      .from('vianney_videos_streaming_live')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast({
+        title: 'Erreur',
+        description: "Erreur lors de la suppression de la vidéo",
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } else {
+      setVideos(videos.filter((video) => video.id !== id));
+      toast({
+        title: 'Vidéo supprimée',
+        description: "Vidéo supprimée avec succès !",
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   const bgColor = useColorModeValue('gray.50', 'gray.900');
@@ -65,7 +92,7 @@ const LiveStreamsPage = () => {
         <SaintMaloLesMursLive />
         <TunnelDeFourviereLive />
         <TunnelDeFourviereBisLive />
-        <VideoList videos={videos} />
+        <VideoList videos={videos} onDeleteVideo={deleteVideo} />
       </Grid>
     </Box>
   );
