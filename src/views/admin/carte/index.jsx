@@ -25,6 +25,7 @@ import BaseDeDonneeOperationnel from './components/basededonnee/BaseDeDonneeOper
 import BaseDeDonneeRenseignements from './components/basededonnee/BaseDeDonneeRenseignements';
 import BaseDeDonneeMoyens from './components/basededonnee/BaseDeDonneeMoyens';
 import VianneyAlertTableEvent from '../TableauExcel/componentsEventContext/VianneyAlertTableEvent';
+import VideoStream from './components/tv/VideoStream';
 
 export default function Marketplace() {
   // eslint-disable-next-line no-unused-vars
@@ -153,7 +154,7 @@ export default function Marketplace() {
                       <EuronewsLive />
                     </Box>
                     <Box>
-
+                      <VideoStream/>
                     </Box>
                     <Box>
                       <NewChannelLive />
