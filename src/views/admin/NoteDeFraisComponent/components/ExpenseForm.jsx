@@ -707,7 +707,7 @@ const ExpenseForm = () => {
         <AccordionItem>
           <h2>
             <AccordionButton as={Box}>
-              <CustomAccordionButton number="1" title="Identité du bénévole" />
+              <CustomAccordionButton number="1" title="Identité" />
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>

@@ -193,7 +193,7 @@ const InvoiceForm = () => {
     <Box maxW="800px" mx="auto" p={6} borderWidth={1} borderRadius={8} boxShadow="lg">
       <Heading as="h2" size="lg" mb={6} display="flex" alignItems="center">
         <FcMoneyTransfer style={{ marginRight: '10px' }} />
-        Gestion des Factures
+        Factures
       </Heading>
 
       <form onSubmit={handleSubmit}>

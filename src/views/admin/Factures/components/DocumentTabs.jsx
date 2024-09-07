@@ -10,9 +10,9 @@ const DocumentTabs = () => {
     // Determine which tab should be active based on the current path
     const determineActiveIndex = useCallback(() => {
         switch (location.pathname) {
-            case "/admin/factures":
-                return 0;
             case "/admin/note-de-frais":
+                return 0;
+            case "/admin/factures":
                 return 1;
             default:
                 return 0;
@@ -34,13 +34,13 @@ const DocumentTabs = () => {
     return (
         <Tabs index={tabIndex} variant="soft-rounded" colorScheme="blue">
             <TabList>
-                <Tab onClick={() => handleTabClick(1, "/admin/note-de-frais")}>
+                <Tab onClick={() => handleTabClick(0, "/admin/note-de-frais")}>
                     <Icon as={FcDiploma2} mr={2} />
-                    Comptabilité
+                    Notes de Frais
                 </Tab>
-                <Tab onClick={() => handleTabClick(0, "/admin/factures")}>
+                <Tab onClick={() => handleTabClick(1, "/admin/factures")}>
                     <Icon as={FcMoneyTransfer} mr={2} />
-                    Gestion des Factures
+                    Factures
                 </Tab>
             </TabList>
 

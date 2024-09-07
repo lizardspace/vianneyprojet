@@ -81,7 +81,7 @@ const ExpenseSummaryPDF = ({ data, trips, expenses }) => {
       <Page size="A4" style={styles.page}>
         <Text style={styles.title}>Note de frais</Text>
         <View style={styles.section}>
-          <Text>Identité du bénévole : {data.volunteer_last_name} {data.volunteer_first_name}</Text>
+          <Text>Identité : {data.volunteer_last_name} {data.volunteer_first_name}</Text>
           <Text>Pôle & service : {data.pole}</Text>
           <Text>Adresse postale : {data.address}</Text>
           <Text>Adresse Mail : {data.email}</Text>

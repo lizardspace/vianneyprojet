@@ -20,7 +20,7 @@ function Sidebar(props) {
       route.name !== "Matériel" &&
       route.name !== "Rapport d'incident" &&
       route.name !== "Tableau Excel" &&
-      route.name !== "Gestion des Factures" &&
+      route.name !== "Factures" &&
       route.name !== "Ajouter un document"
   );
   

@@ -142,7 +142,7 @@ const routes = [
     component: AlerteEquipe,
   },
   {
-    name: "Gestion des Factures",
+    name: "Factures",
     layout: "/admin",
     path: "/factures",
     icon: <Icon as={FcMoneyTransfer} width="20px" height="20px" color="inherit" />,
