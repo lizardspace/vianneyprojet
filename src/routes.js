@@ -17,7 +17,8 @@ import SOSComponent from "views/admin/SOSComponent";
 import ChatComponent from "views/admin/ChatComponent"; 
 import IncidentReportForm from "views/admin/IncidentReportForm"; 
 import VideoStreamAnalysisComponent from "views/admin/VideoStreamAnalysisComponent"; 
-import Factures from "views/admin/Factures"; // Import the new Invoice component
+import Factures from "views/admin/Factures"; 
+import AddDocumentComponent from "views/admin/AddDocumentComponent";
 
 const routes = [
   {
@@ -146,6 +147,13 @@ const routes = [
     path: "/factures",
     icon: <Icon as={FcMoneyTransfer} width="20px" height="20px" color="inherit" />,
     component: Factures,
+  },
+  {
+    name: "Ajouter un document",
+    layout: "/admin",
+    path: "/ajouter-document",
+    icon: <Icon as={FcOpenedFolder} width="20px" height="20px" color="inherit" />,
+    component: AddDocumentComponent,
   },
 ];
 
