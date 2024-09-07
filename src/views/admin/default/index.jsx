@@ -132,8 +132,7 @@ export default function UserReports() {
         <>
           {/* Button to reveal the password form */}
           {!showPasswordForm && (
-            <Button onClick={() => setShowPasswordForm(true)} mb="20px" colorScheme="white">
-              
+            <Button onClick={() => setShowPasswordForm(true)} colorScheme="white">      
             </Button>
           )}
 
