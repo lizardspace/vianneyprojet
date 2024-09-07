@@ -14,7 +14,7 @@ import { supabase } from './../../../../supabaseClient';
 import { useHistory, useLocation } from "react-router-dom";
 import 'leaflet-draw';
 import 'leaflet-routing-machine';
-import { useGPSPosition } from './../../../../GPSPositionContext'; // Import the GPSPosition hook
+import { useGPSPosition } from './../../../../GPSPositionContext'; 
 
 const createTeamIcon = () => {
   const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: 'red' }} />);
@@ -40,7 +40,7 @@ const createCustomIcon = () => {
 
 const formatItineraryText = (itineraryText) => {
   if (!itineraryText) return [];
-    // eslint-disable-next-line
+      // eslint-disable-next-line
   const [distance, duration, ...steps] = itineraryText.split(/Instructions:|\s->\s/);
   return steps.map((step, index) => ({
     id: index + 1,
@@ -52,7 +52,7 @@ const MapComponent = () => {
   const mapRef = useRef(null);
   const routingControlRef = useRef(null);
   const gpsPosition = useGPSPosition(); 
-      // eslint-disable-next-line
+        // eslint-disable-next-line
   const [mapHeight, setMapHeight] = useState('800px');
   const { selectedEventId } = useEvent();
   const history = useHistory();
@@ -72,7 +72,7 @@ const MapComponent = () => {
   const [startLng, setStartLng] = useState('');
   const [endLat, setEndLat] = useState('');
   const [endLng, setEndLng] = useState('');
-    // eslint-disable-next-line
+      // eslint-disable-next-line
   const [itineraryText, setItineraryText] = useState('');
   const [latestItineraryText, setLatestItineraryText] = useState([]);
   const [selectingStart, setSelectingStart] = useState(false);
@@ -85,11 +85,10 @@ const MapComponent = () => {
     <MdOutlineZoomOutMap />;
   const isButtonVisible = location.pathname !== "/admin/zoomed-map";
 
-  // Center map on GPS position
   useEffect(() => {
     if (gpsPosition && mapRef.current) {
       const { latitude, longitude } = gpsPosition;
-      mapRef.current.setView([latitude, longitude], 13); // Center the map on GPS position
+      mapRef.current.setView([latitude, longitude], 13); 
     }
   }, [gpsPosition]);
 
@@ -142,7 +141,6 @@ const MapComponent = () => {
         isClosable: true,
       });
     } catch (error) {
-      console.error('Erreur lors de la suppression de l\'élément:', error.message);
       toast({
         title: 'Erreur',
         description: 'Impossible de supprimer l\'élément. Veuillez réessayer.',
@@ -400,8 +398,8 @@ const MapComponent = () => {
   };
 
   const saveItinerary = async (startLat, startLng, endLat, endLng, itineraryText) => {
-    console.log("Saving itinerary...");
     try {
+            // eslint-disable-next-line
       const { data, error } = await supabase
         .from('vianney_itineraire_carte')
         .insert([
@@ -418,8 +416,6 @@ const MapComponent = () => {
 
       if (error) throw error;
 
-      console.log("Itinerary saved:", data);
-
       toast({
         title: 'Itinéraire enregistré',
         description: 'L\'itinéraire a été enregistré avec succès dans la base de données.',
@@ -428,7 +424,6 @@ const MapComponent = () => {
         isClosable: true,
       });
     } catch (error) {
-      console.error('Erreur lors de l\'enregistrement de l\'itinéraire:', error.message);
       toast({
         title: 'Erreur',
         description: 'Impossible d\'enregistrer l\'itinéraire. Veuillez réessayer.',
@@ -441,7 +436,6 @@ const MapComponent = () => {
 
   const deleteLastItinerary = async () => {
     try {
-      // Fetch the last saved itinerary
       const { data, error } = await supabase
         .from('vianney_itineraire_carte')
         .select('id')
@@ -453,7 +447,6 @@ const MapComponent = () => {
       if (error) throw error;
 
       if (data) {
-        // Delete the last saved itinerary
         const { error: deleteError } = await supabase
           .from('vianney_itineraire_carte')
           .delete()
@@ -469,13 +462,11 @@ const MapComponent = () => {
           isClosable: true,
         });
 
-        // Optionally, remove the routing control from the map
         if (routingControlRef.current) {
           mapRef.current.removeControl(routingControlRef.current);
           routingControlRef.current = null;
         }
 
-        // Clear the itinerary text
         setLatestItineraryText([]);
       } else {
         toast({
@@ -487,7 +478,6 @@ const MapComponent = () => {
         });
       }
     } catch (error) {
-      console.error('Erreur lors de la suppression du dernier itinéraire:', error.message);
       toast({
         title: 'Erreur',
         description: 'Impossible de supprimer le dernier itinéraire. Veuillez réessayer.',
@@ -498,17 +488,14 @@ const MapComponent = () => {
     }
   };
 
-  // Center map on GPS position
   useEffect(() => {
     if (gpsPosition && mapRef.current) {
       const { latitude, longitude } = gpsPosition;
-      mapRef.current.setView([latitude, longitude], 13); // Center the map on GPS position
+      mapRef.current.setView([latitude, longitude], 13); 
     }
   }, [gpsPosition]);
 
-  // Initialize the map and manage the event selection
   useEffect(() => {
-    console.log("selectedEventId:", selectedEventId);
     if (!selectedEventId) {
       toast({
         title: 'Erreur',
@@ -572,8 +559,6 @@ const MapComponent = () => {
       console.error('selectedEventId is not defined.');
       return;
     }
-
-    console.log("Using selectedEventId:", selectedEventId);
 
     const fetchAndDisplayTeams = async () => {
       if (!selectedEventId) return;
