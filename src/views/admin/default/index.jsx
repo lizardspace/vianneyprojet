@@ -21,7 +21,6 @@ import MiniStatistics from "components/card/MiniStatistics";
 import TeamStatistics from "components/card/TeamStatistics";
 import AddEventForm from "./components/AddEventForm";
 import EditEventForm from "./components/EditEventForm";
-import DocumentationsComponent from "./DocumentionsComponent/DocumentationsComponent";
 import TableTopCreators from "../carte/components/TableTopCreators";
 import tableDataTopCreators from "views/admin/carte/variables/tableDataTopCreators.json";
 import { tableColumnsTopCreators } from "views/admin/carte/variables/tableColumnsTopCreators";
@@ -236,12 +235,6 @@ export default function UserReports() {
           <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} onClose={() => setShowEditUserFormModal(false)} />
         </Modal>
       )}
-
-      {/* Display documentations only if an event is selected */}
-      {selectedEventId && (
-        <DocumentationsComponent eventId={selectedEventId} />
-      )}
-
       <TableTopCreators
         tableData={tableDataTopCreators}
         columnsData={tableColumnsTopCreators}
