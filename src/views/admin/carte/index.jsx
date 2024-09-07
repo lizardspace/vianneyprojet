@@ -10,7 +10,6 @@ import MeteoAgricole from './components/MeteoAgricole';
 import EquipiersTableSimplify from './components/EquipiersTableSimplify';
 import LiveVideo from './components/tv/LiveVideo';
 import EuronewsLive from './components/tv/EuronewsLive';
-import MyChannelLive from './components/tv/MyChannelLive';
 import NewChannelLive from './components/tv/NewChannelLive';
 import ShowSITACbis from './components/ShowSITACbis';
 import RenseignementsInformationsForm from './components/RenseignementsInformationsForm';
@@ -154,7 +153,7 @@ export default function Marketplace() {
                       <EuronewsLive />
                     </Box>
                     <Box>
-                      <MyChannelLive />
+
                     </Box>
                     <Box>
                       <NewChannelLive />
