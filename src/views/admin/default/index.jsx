@@ -14,6 +14,8 @@ import {
   ModalBody,
   ModalCloseButton,
   Badge,
+  Input,
+  useToast
 } from "@chakra-ui/react";
 import EditUserForm from './components/EditUserForm';
 import { FcPlus } from "react-icons/fc";
@@ -40,6 +42,12 @@ export default function UserReports() {
   const [teams, setTeams] = useState([]); // Define teams state
   const { selectedEventId } = useEvent(); // Access the selectedEventId from the EventContext
   const textColor = useColorModeValue("secondaryGray.900", "white");
+
+  // New state for showing/hiding events, password form, and handling password
+  const [showEvents, setShowEvents] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false); // State to show password form
+  const [password, setPassword] = useState("");
+  const toast = useToast();
 
   const handleSaveTeam = (updatedTeamData) => {
     setEditingTeam(null);
@@ -95,42 +103,103 @@ export default function UserReports() {
 
   const toggleCreateTeamModal = () => setShowCreateTeamModal(!showCreateTeamModal);
 
+  // Handle password input
+  const handlePasswordSubmit = () => {
+    if (password === "123") {
+      setShowEvents(true);
+      toast({
+        title: "Accès autorisé",
+        description: "Vous avez maintenant accès aux événements.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "Mot de passe incorrect",
+        description: "Veuillez réessayer.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-      <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
-        Evènements
-      </Heading>
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }} gap='20px' mb='20px'>
-        {events.map((event, index) => (
-          <Box
-            key={index}
-            cursor="pointer"
-            transition="background-color 0.2s"
-            _hover={{ backgroundColor: "gray.100" }}
-            onClick={() => handleMiniStatisticsClick(event)}
-          >
-            <MiniStatistics
-              event_name={event.event_name}
-              date={event.event_date}
-            />
-          </Box>
-        ))}
-        <Button
-          mt="30px"
-          onClick={toggleAddEventForm}
-          leftIcon={<Icon as={FcPlus} />}
-          colorScheme='blue'
-          variant='solid'
-          size='md'
-          boxShadow='sm'
-          _hover={{ boxShadow: 'md' }}
-          _active={{ boxShadow: 'lg' }}>
-          Ajouter un évènement
-        </Button>
-      </SimpleGrid>
+      {/* If events are not shown yet, show password prompt */}
+      {!showEvents && (
+        <>
+          {/* Button to reveal the password form */}
+          {!showPasswordForm && (
+            <Button onClick={() => setShowPasswordForm(true)} mb="20px" colorScheme="blue">
+              Voir les événements
+            </Button>
+          )}
+
+          {/* Password form shown after clicking the button */}
+          {showPasswordForm && (
+            <Box maxW="400px" mx="auto" p={6} boxShadow="md" borderRadius="md">
+              <Heading mb={4} fontSize="lg">Saisissez le mot de passe pour voir les événements</Heading>
+              <Input
+                type="password"
+                placeholder="Mot de passe"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                mb={4}
+              />
+              <Button colorScheme="blue" onClick={handlePasswordSubmit}>
+                Valider
+              </Button>
+            </Box>
+          )}
+        </>
+      )}
+
+      {showEvents && (
+        <>
+          {/* Button to hide events */}
+          <Button onClick={() => setShowEvents(false)} mb="20px">
+            Cacher les évènements
+          </Button>
+
+          {/* Event section */}
+          <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
+            Evènements
+          </Heading>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }} gap='20px' mb='20px'>
+            {events.map((event, index) => (
+              <Box
+                key={index}
+                cursor="pointer"
+                transition="background-color 0.2s"
+                _hover={{ backgroundColor: "gray.100" }}
+                onClick={() => handleMiniStatisticsClick(event)}
+              >
+                <MiniStatistics
+                  event_name={event.event_name}
+                  date={event.event_date}
+                />
+              </Box>
+            ))}
+            <Button
+              mt="30px"
+              onClick={toggleAddEventForm}
+              leftIcon={<Icon as={FcPlus} />}
+              colorScheme='blue'
+              variant='solid'
+              size='md'
+              boxShadow='sm'
+              _hover={{ boxShadow: 'md' }}
+              _active={{ boxShadow: 'lg' }}>
+              Ajouter un évènement
+            </Button>
+          </SimpleGrid>
+        </>
+      )}
 
       {/* Display teams only if an event is selected */}
-      {selectedEventId && (
+      {selectedEventId && showEvents && (
         <>
           <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
             Equipes
