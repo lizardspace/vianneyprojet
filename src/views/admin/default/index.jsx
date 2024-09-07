@@ -197,7 +197,7 @@ export default function UserReports() {
       )}
 
       {/* Display teams only if an event is selected */}
-      {selectedEventId && showEvents && (
+      {selectedEventId && (
         <>
           <Heading me='auto' color={textColor} fontSize='2xl' fontWeight='700' lineHeight='100%' mb="20px">
             Equipes
