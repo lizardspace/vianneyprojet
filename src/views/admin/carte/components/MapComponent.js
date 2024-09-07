@@ -14,6 +14,7 @@ import { supabase } from './../../../../supabaseClient';
 import { useHistory, useLocation } from "react-router-dom";
 import 'leaflet-draw';
 import 'leaflet-routing-machine';
+import { useGPSPosition } from './../../../../GPSPositionContext'; // Import the GPSPosition hook
 
 const createTeamIcon = () => {
   const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: 'red' }} />);
@@ -39,7 +40,7 @@ const createCustomIcon = () => {
 
 const formatItineraryText = (itineraryText) => {
   if (!itineraryText) return [];
-  // eslint-disable-next-line
+    // eslint-disable-next-line
   const [distance, duration, ...steps] = itineraryText.split(/Instructions:|\s->\s/);
   return steps.map((step, index) => ({
     id: index + 1,
@@ -50,6 +51,8 @@ const formatItineraryText = (itineraryText) => {
 const MapComponent = () => {
   const mapRef = useRef(null);
   const routingControlRef = useRef(null);
+  const gpsPosition = useGPSPosition(); 
+      // eslint-disable-next-line
   const [mapHeight, setMapHeight] = useState('800px');
   const { selectedEventId } = useEvent();
   const history = useHistory();
@@ -69,18 +72,26 @@ const MapComponent = () => {
   const [startLng, setStartLng] = useState('');
   const [endLat, setEndLat] = useState('');
   const [endLng, setEndLng] = useState('');
-  // eslint-disable-next-line
+    // eslint-disable-next-line
   const [itineraryText, setItineraryText] = useState('');
   const [latestItineraryText, setLatestItineraryText] = useState([]);
   const [selectingStart, setSelectingStart] = useState(false);
   const [selectingEnd, setSelectingEnd] = useState(false);
   const [showRouteDetails, setShowRouteDetails] = useState(false);
-  const [showItineraryDetails, setShowItineraryDetails] = useState(false); // Set to false by default
+  const [showItineraryDetails, setShowItineraryDetails] = useState(false);
 
   const buttonText = location.pathname === "/admin/zoomed-map" ?
     <MdOutlineZoomInMap /> :
     <MdOutlineZoomOutMap />;
   const isButtonVisible = location.pathname !== "/admin/zoomed-map";
+
+  // Center map on GPS position
+  useEffect(() => {
+    if (gpsPosition && mapRef.current) {
+      const { latitude, longitude } = gpsPosition;
+      mapRef.current.setView([latitude, longitude], 13); // Center the map on GPS position
+    }
+  }, [gpsPosition]);
 
   const toggleMapView = () => {
     if (location.pathname === "/admin/zoomed-map") {
@@ -487,16 +498,15 @@ const MapComponent = () => {
     }
   };
 
+  // Center map on GPS position
   useEffect(() => {
-    const updateMapHeight = () => {
-      const newHeight = `${window.innerHeight - 60}px`;
-      setMapHeight(newHeight);
-    };
-    updateMapHeight();
-    window.addEventListener('resize', updateMapHeight);
-    return () => window.removeEventListener('resize', updateMapHeight);
-  }, []);
+    if (gpsPosition && mapRef.current) {
+      const { latitude, longitude } = gpsPosition;
+      mapRef.current.setView([latitude, longitude], 13); // Center the map on GPS position
+    }
+  }, [gpsPosition]);
 
+  // Initialize the map and manage the event selection
   useEffect(() => {
     console.log("selectedEventId:", selectedEventId);
     if (!selectedEventId) {
