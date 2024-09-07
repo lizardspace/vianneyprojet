@@ -27,6 +27,7 @@ const createTeamIcon = () => {
   });
 };
 
+// eslint-disable-next-line
 const createCustomIcon = () => {
   const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: '#34A853' }} />);
   return L.divIcon({
@@ -58,7 +59,7 @@ const MapComponent = () => {
   const history = useHistory();
   const location = useLocation();
   const toast = useToast();
-
+  const [newElementColor, setNewElementColor] = useState('#3388ff'); 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [elementToDelete, setElementToDelete] = useState(null);
   const cancelRef = useRef();
@@ -163,6 +164,7 @@ const MapComponent = () => {
     let payload = {
       event_id: selectedEventId,
       name_element: nameElement || null,
+      couleur: newElementColor, // Ajout de la couleur au payload
     };
 
     try {
@@ -177,7 +179,7 @@ const MapComponent = () => {
         if (error) throw error;
         insertedItem = data;
 
-        layer.setIcon(createCustomIcon());
+        layer.setIcon(createCustomIcon(newElementColor));
 
         const wazeUrl = `https://www.waze.com/ul?ll=${layer.getLatLng().lat},${layer.getLatLng().lng}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
@@ -205,6 +207,7 @@ const MapComponent = () => {
         if (error) throw error;
         insertedItem = data;
 
+        layer.setStyle({ color: newElementColor });
         layer.bindTooltip(nameElement || 'Ligne').on('click', () => openDeleteDialog(layer, type, insertedItem.id));
       } else if (type === 'polygon') {
         const points = layer.getLatLngs()[0].map(latlng => ({
@@ -218,6 +221,8 @@ const MapComponent = () => {
         const { data, error } = await supabase.from('vianney_drawn_polygons').insert(payload).select().single();
         if (error) throw error;
         insertedItem = data;
+
+        layer.setStyle({ color: newElementColor });
 
         const firstPoint = points[0];
         const wazeUrl = `https://www.waze.com/ul?ll=${firstPoint.latitude},${firstPoint.longitude}&navigate=yes`;
@@ -243,6 +248,8 @@ const MapComponent = () => {
         const { data, error } = await supabase.from('vianney_drawn_circle_markers').insert(payload).select().single();
         if (error) throw error;
         insertedItem = data;
+
+        layer.setStyle({ color: newElementColor });
 
         const wazeUrl = `https://www.waze.com/ul?ll=${layer.getLatLng().lat},${layer.getLatLng().lng}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
@@ -610,9 +617,9 @@ const MapComponent = () => {
             offset: L.point(0, -30)
           });
       });
-    };
+  };
 
-    const fetchAndDisplayDrawnItems = async () => {
+  const fetchAndDisplayDrawnItems = async () => {
       const { data: markers, error: markerError } = await supabase
         .from('vianney_drawn_markers')
         .select('*')
@@ -653,10 +660,9 @@ const MapComponent = () => {
         return;
       }
 
-      markers.forEach(marker => {
-        const layer = L.marker([marker.latitude, marker.longitude], { icon: createCustomIcon() });
-
-        const wazeUrl = `https://www.waze.com/ul?ll=${marker.latitude},${marker.longitude}&navigate=yes`;
+    markers.forEach(marker => {
+      const layer = L.marker([marker.latitude, marker.longitude], { icon: createCustomIcon(marker.couleur) });
+      const wazeUrl = `https://www.waze.com/ul?ll=${marker.latitude},${marker.longitude}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
         const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
 
@@ -672,45 +678,44 @@ const MapComponent = () => {
         window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
 
         layer.addTo(mapRef.current);
-      });
+    });
 
-      polylines.forEach(polyline => {
-        const points = polyline.points.map(point => [point.latitude, point.longitude]);
-        const layer = L.polyline(points, { color: 'blue' });
-        const nameElement = polyline.name_element || 'Polyline';
+    polylines.forEach(polyline => {
+      const points = polyline.points.map(point => [point.latitude, point.longitude]);
+      const layer = L.polyline(points, { color: polyline.couleur });
+      const nameElement = polyline.name_element || 'Polyline';
         layer.bindTooltip(nameElement).on('click', () => openDeleteDialog(layer, 'polyline', polyline.id));
         layer.addTo(mapRef.current);
+    });
+
+    polygons.forEach(polygon => {
+      const points = polygon.points.map(point => [point.latitude, point.longitude]);
+      const layer = L.polygon(points, { color: polygon.couleur });
+      const nameElement = polygon.name_element || 'Polygon';
+
+      const firstPoint = points[0];
+      const wazeUrl = `https://www.waze.com/ul?ll=${firstPoint[0]},${firstPoint[1]}&navigate=yes`;
+      const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
+      const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
+
+      const popupContent = `
+        <div>
+          <strong>${nameElement}</strong>
+          <div onclick="window.deleteItem('polygon', '${polygon.id}')">${deleteButtonHtml}</div>
+          ${wazeButtonHtml}
+        </div>
+      `;
+
+      layer.bindPopup(popupContent).bindTooltip(nameElement).on('click', () => openDeleteDialog(layer, 'polygon', polygon.id));
+      layer.addTo(mapRef.current);
+    });
+
+    circleMarkers.forEach(circleMarker => {
+      const layer = L.circleMarker([circleMarker.latitude, circleMarker.longitude], {
+        radius: circleMarker.radius,
+        color: circleMarker.couleur,
       });
-
-      polygons.forEach(polygon => {
-        const points = polygon.points.map(point => [point.latitude, point.longitude]);
-        const layer = L.polygon(points, { color: 'red' });
-        const nameElement = polygon.name_element || 'Polygon';
-
-        const firstPoint = points[0];
-        const wazeUrl = `https://www.waze.com/ul?ll=${firstPoint[0]},${firstPoint[1]}&navigate=yes`;
-        const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
-        const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-
-        const popupContent = `
-          <div>
-            <strong>${nameElement}</strong>
-            <div onclick="window.deleteItem('polygon', '${polygon.id}')">${deleteButtonHtml}</div>
-            ${wazeButtonHtml}
-          </div>
-        `;
-
-        layer.bindPopup(popupContent).bindTooltip(nameElement).on('click', () => openDeleteDialog(layer, 'polygon', polygon.id));
-        layer.addTo(mapRef.current);
-      });
-
-      circleMarkers.forEach(circleMarker => {
-        const layer = L.circleMarker([circleMarker.latitude, circleMarker.longitude], {
-          radius: circleMarker.radius,
-          color: '#34A853',
-        });
-
-        const wazeUrl = `https://www.waze.com/ul?ll=${circleMarker.latitude},${circleMarker.longitude}&navigate=yes`;
+      const wazeUrl = `https://www.waze.com/ul?ll=${circleMarker.latitude},${circleMarker.longitude}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
         const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
 
@@ -726,15 +731,14 @@ const MapComponent = () => {
         window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
 
         layer.addTo(mapRef.current);
-      });
-    };
+    });
+  };
 
-    fetchAndDisplayTeams();
-    fetchAndDisplayDrawnItems();
-  }, [selectedEventId, toast]);
-
-  const createBlueIcon = () => {
-    const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: 'blue' }} />);
+  fetchAndDisplayTeams();
+  fetchAndDisplayDrawnItems();
+}, [selectedEventId, toast]);
+  const createCustomIcon = (color) => {
+    const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: color }} />);
     return L.divIcon({
       html: placeIconHtml,
       className: 'custom-leaflet-icon',
@@ -758,7 +762,7 @@ const MapComponent = () => {
             mapRef.current.removeLayer(startMarker);
           }
 
-          const marker = L.marker([e.latlng.lat, e.latlng.lng], { icon: createBlueIcon() }).addTo(mapRef.current);
+          const marker = L.marker([e.latlng.lat, e.latlng.lng], { icon: createCustomIcon() }).addTo(mapRef.current);
           setStartMarker(marker);
 
           setSelectingStart(false);
@@ -784,7 +788,7 @@ const MapComponent = () => {
             mapRef.current.removeLayer(endMarker);
           }
 
-          const marker = L.marker([e.latlng.lat, e.latlng.lng], { icon: createBlueIcon() }).addTo(mapRef.current);
+          const marker = L.marker([e.latlng.lat, e.latlng.lng], { icon: createCustomIcon() }).addTo(mapRef.current);
           setEndMarker(marker);
 
           setSelectingEnd(false);
@@ -1011,15 +1015,25 @@ const MapComponent = () => {
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Entrez le nom de l'élément
+              Entrez le nom et la couleur de l'élément
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              <Input
-                placeholder="Nom de l'élément"
-                value={newElementName}
-                onChange={(e) => setNewElementName(e.target.value)}
-              />
+              <VStack spacing={4}>
+                <Input
+                  placeholder="Nom de l'élément"
+                  value={newElementName}
+                  onChange={(e) => setNewElementName(e.target.value)}
+                />
+                <FormControl>
+                  <FormLabel>Couleur</FormLabel>
+                  <Input
+                    type="color"
+                    value={newElementColor}
+                    onChange={(e) => setNewElementColor(e.target.value)}
+                  />
+                </FormControl>
+              </VStack>
             </AlertDialogBody>
 
             <AlertDialogFooter>
