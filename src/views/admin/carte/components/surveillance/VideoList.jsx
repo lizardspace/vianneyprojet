@@ -1,8 +1,30 @@
-import React from 'react';
-import { Box, Heading, IconButton } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Box, Heading, IconButton, useDisclosure, Button } from '@chakra-ui/react';
 import { MdDeleteForever } from "react-icons/md";
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+} from "@chakra-ui/react";
 
 const VideoList = ({ videos, onDeleteVideo }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure(); // Control the dialog
+  const [videoToDelete, setVideoToDelete] = useState(null); // Track which video to delete
+  const cancelRef = React.useRef();
+
+  const handleDeleteClick = (videoId) => {
+    setVideoToDelete(videoId); // Store the ID of the video to delete
+    onOpen(); // Open the confirmation dialog
+  };
+
+  const confirmDelete = () => {
+    onDeleteVideo(videoToDelete); // Call the delete function with the selected video
+    onClose(); // Close the confirmation dialog
+  };
+
   return (
     <Box>
       {videos.map((video) => (
@@ -25,10 +47,37 @@ const VideoList = ({ videos, onDeleteVideo }) => {
             position="absolute"
             top={0}
             right={0}
-            onClick={() => onDeleteVideo(video.id)} // Trigger delete
+            onClick={() => handleDeleteClick(video.id)} // Trigger the confirmation dialog
           />
         </Box>
       ))}
+
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Supprimer la vidéo
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Êtes-vous sûr de vouloir supprimer cette vidéo ? Cette action est irréversible.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Annuler
+              </Button>
+              <Button colorScheme="red" onClick={confirmDelete} ml={3}>
+                Supprimer
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   );
 };

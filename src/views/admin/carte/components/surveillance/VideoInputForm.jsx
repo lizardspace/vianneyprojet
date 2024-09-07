@@ -1,25 +1,35 @@
 import React, { useState } from 'react';
 import { Box, Button, FormControl, FormLabel, Input, Heading, useToast } from '@chakra-ui/react';
-import { supabase } from './../../../../../supabaseClient'; // Assurez-vous que le chemin est correct
-import { useEvent } from './../../../../../EventContext'; // Assurez-vous que le chemin est correct
+import { supabase } from './../../../../../supabaseClient'; 
+import { useEvent } from './../../../../../EventContext'; 
 
 const VideoInputForm = () => {
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
-  const { selectedEventId } = useEvent(); // Récupère l'ID de l'événement à partir du contexte
+  const { selectedEventId } = useEvent();
   const toast = useToast();
+
+  const convertToEmbedUrl = (url) => {
+    const youtubeWatchPattern = /https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/;
+    const match = youtubeWatchPattern.exec(url);
+    if (match) {
+      const videoId = match[1];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    return url; // If the URL is already in embed format or unrecognized, return as is
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  // eslint-disable-next-line no-unused-vars
+    const embedUrl = convertToEmbedUrl(url); // Convert the URL to embed format
+
     const { data, error } = await supabase
       .from('vianney_videos_streaming_live')
       .insert([
-        { title: title, url: url, event_id: selectedEventId }, // Inclure l'event_id
+        { title: title, url: embedUrl, event_id: selectedEventId },
       ]);
 
     if (error) {
-      console.error('Erreur lors de l\'insertion:', error);
       toast({
         title: 'Erreur',
         description: "Erreur lors de l'ajout de la vidéo",

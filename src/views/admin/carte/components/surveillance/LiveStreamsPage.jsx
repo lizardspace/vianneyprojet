@@ -3,14 +3,6 @@ import { supabase } from './../../../../../supabaseClient';
 import { Box, Grid, Badge, useColorModeValue, useToast } from '@chakra-ui/react';
 import VideoInputForm from './VideoInputForm';
 import VideoList from './VideoList';
-import PorteDuValvertLive from './PorteDuValvertLive';
-import PorteSaintClairLive from './PorteSaintClairLive';
-import PorteDeVaiseLive from './PorteDeVaiseLive';
-import IenaVueTourEiffelLive from './IenaVueTourEiffelLive';
-import PlageDuSillonThermesMarinsLive from './PlageDuSillonThermesMarinsLive';
-import SaintMaloLesMursLive from './SaintMaloLesMursLive';
-import TunnelDeFourviereLive from './TunnelDeFourviereLive';
-import TunnelDeFourviereBisLive from './TunnelDeFourviereBisLive';
 import { useEvent } from './../../../../../EventContext';
 
 const LiveStreamsPage = () => {
@@ -84,14 +76,6 @@ const LiveStreamsPage = () => {
         gap={6}
         px={4}
       >
-        <PorteDuValvertLive />
-        <PorteSaintClairLive />
-        <PorteDeVaiseLive />
-        <IenaVueTourEiffelLive />
-        <PlageDuSillonThermesMarinsLive />
-        <SaintMaloLesMursLive />
-        <TunnelDeFourviereLive />
-        <TunnelDeFourviereBisLive />
         <VideoList videos={videos} onDeleteVideo={deleteVideo} />
       </Grid>
     </Box>
