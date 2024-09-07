@@ -22,7 +22,7 @@ const VideoInputForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const embedUrl = convertToEmbedUrl(url); // Convert the URL to embed format
-
+// eslint-disable-next-line
     const { data, error } = await supabase
       .from('vianney_videos_streaming_live')
       .insert([

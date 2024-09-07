@@ -25,6 +25,13 @@ const VideoList = ({ videos, onDeleteVideo }) => {
     onClose(); // Close the confirmation dialog
   };
 
+  const modifyUrlForAutoplay = (url) => {
+    const urlObj = new URL(url);
+    urlObj.searchParams.set('autoplay', '1'); // Add the autoplay=1 parameter
+    urlObj.searchParams.set('mute', '1'); // Optionally mute the video to prevent user annoyance
+    return urlObj.toString();
+  };
+
   return (
     <Box>
       {videos.map((video) => (
@@ -35,7 +42,7 @@ const VideoList = ({ videos, onDeleteVideo }) => {
           <iframe
             width="560"
             height="315"
-            src={video.url}
+            src={modifyUrlForAutoplay(video.url)} // Modify the video URL to autoplay
             title={video.title}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
