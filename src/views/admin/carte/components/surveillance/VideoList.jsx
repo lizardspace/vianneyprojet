@@ -35,27 +35,29 @@ const VideoList = ({ videos, onDeleteVideo }) => {
   return (
     <Box>
       {videos.map((video) => (
-        <Box key={video.id} mb={8} position="relative">
+        <Box key={video.id} mb={8} position="relative" width="100%">
           <Heading as="h3" size="md" mb={4}>
             {video.title}
           </Heading>
-          <iframe
-            width="560"
-            height="315"
-            src={modifyUrlForAutoplay(video.url)} // Modify the video URL to autoplay
-            title={video.title}
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          ></iframe>
-          <IconButton
-            icon={<MdDeleteForever />}
-            colorScheme="red"
-            position="absolute"
-            top={0}
-            right={0}
-            onClick={() => handleDeleteClick(video.id)} // Trigger the confirmation dialog
-          />
+          <Box position="relative" width="100%">
+            <iframe
+              width="100%"  // Set the iframe to take the full width of its container
+              height="315"
+              src={modifyUrlForAutoplay(video.url)}
+              title={video.title}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            ></iframe>
+            <IconButton
+              icon={<MdDeleteForever />}
+              colorScheme="red"
+              position="absolute"
+              top="5px"
+              right="5px"
+              onClick={() => handleDeleteClick(video.id)}
+            />
+          </Box>
         </Box>
       ))}
 
