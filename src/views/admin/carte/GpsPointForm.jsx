@@ -76,6 +76,55 @@ const GpsPointForm = () => {
     }
   };
 
+  const handleClearGps = async () => {
+    if (selectedEventId) {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // eslint-disable-next-line
+        const { data, error } = await supabase
+          .from('vianney_event')
+          .update({
+            latitude: null,
+            longitude: null,
+          })
+          .eq('event_id', selectedEventId);
+
+        if (error) throw error;
+
+        // Mettre à jour le contexte local avec les valeurs nulles
+        setEvent(selectedEventId, selectedEventName, null, null);
+        setLatitude(0); // Réinitialiser les valeurs dans le formulaire
+        setLongitude(0);
+
+        // Affichage du toast en cas de succès
+        toast({
+          title: "Coordonnées GPS effacées.",
+          description: "Les coordonnées GPS ont été effacées avec succès.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+
+      } catch (err) {
+        console.error('Error clearing GPS coordinates:', err);
+        setError('Une erreur est survenue lors de l\'effacement des coordonnées GPS.');
+
+        // Affichage du toast en cas d'erreur
+        toast({
+          title: "Erreur lors de l'effacement.",
+          description: "Une erreur est survenue lors de l'effacement des coordonnées GPS.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const LocationMarker = () => {
     useMapEvents({
       click: handleMapClick,
@@ -110,6 +159,10 @@ const GpsPointForm = () => {
 
       <Button colorScheme="teal" onClick={handleSubmit} isLoading={loading}>
         Centrer la carte sur ces coordonnées GPS
+      </Button>
+
+      <Button colorScheme="red" onClick={handleClearGps} isLoading={loading} mt={2}>
+        Effacer les coordonnées GPS
       </Button>
 
       {error && <Box color="red.500">{error}</Box>}

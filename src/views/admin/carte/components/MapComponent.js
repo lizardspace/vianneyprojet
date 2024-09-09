@@ -87,11 +87,32 @@ const MapComponent = () => {
   const isButtonVisible = location.pathname !== "/admin/zoomed-map";
 
   useEffect(() => {
-    if (gpsPosition && mapRef.current) {
-      const { latitude, longitude } = gpsPosition;
-      mapRef.current.setView([latitude, longitude], 13); 
+    const fetchEventDetails = async () => {
+      try {
+        const { data: eventDetails, error } = await supabase
+          .from('vianney_event') // Ensure your table name is correct
+          .select('latitude, longitude')
+          .eq('event_id', selectedEventId) // Replace with your selectedEventId
+          .single();
+  
+        if (error) {
+          throw error;
+        }
+  
+        // Check if latitude and longitude are null
+        if (eventDetails.latitude === null && eventDetails.longitude === null && gpsPosition && mapRef.current) {
+          const { latitude, longitude } = gpsPosition;
+          mapRef.current.setView([latitude, longitude], 13); // Set the view using GPS coordinates
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération des détails de l\'événement:', error.message);
+      }
+    };
+  
+    if (selectedEventId) {
+      fetchEventDetails(); // Only fetch details if an event ID is selected
     }
-  }, [gpsPosition]);
+  }, [selectedEventId, gpsPosition]);  
 
   const toggleMapView = () => {
     if (location.pathname === "/admin/zoomed-map") {
@@ -495,12 +516,7 @@ const MapComponent = () => {
     }
   };
 
-  useEffect(() => {
-    if (gpsPosition && mapRef.current) {
-      const { latitude, longitude } = gpsPosition;
-      mapRef.current.setView([latitude, longitude], 13); 
-    }
-  }, [gpsPosition]);
+
 
   useEffect(() => {
     if (!selectedEventId) {
@@ -513,53 +529,81 @@ const MapComponent = () => {
       });
       return;
     }
-
-    let mapInstance = mapRef.current;
-    if (!mapInstance) {
-      mapInstance = L.map('map').setView([45, 4.7], 7);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: ''
-      }).addTo(mapInstance);
-
-      const drawControl = new L.Control.Draw({
-        draw: {
-          polygon: true,
-          polyline: true,
-          marker: true,
-          circle: false,
-          rectangle: false,
-          circlemarker: true,
-        },
-        edit: {
-          featureGroup: new L.FeatureGroup().addTo(mapInstance),
-        },
-      });
-      mapInstance.addControl(drawControl);
-      mapRef.current = mapInstance;
-
-      mapInstance.on(L.Draw.Event.CREATED, (event) => {
-        const layer = event.layer;
-        const type = event.layerType;
-
-        if (!selectedEventId) {
-          toast({
-            title: 'Erreur',
-            description: "L'ID de l'événement est manquant. Impossible d'ajouter l'objet.",
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
+  
+    const fetchEventDetails = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('vianney_event')
+          .select('latitude, longitude')
+          .eq('event_id', selectedEventId)
+          .single();
+        
+        if (error) throw error;
+        
+        let mapInstance = mapRef.current;
+        
+        if (!mapInstance) {
+          // Default map initialization with fallback to a general view
+          const defaultLatLng = [45, 4.7];
+          const latLng = data.latitude && data.longitude ? [data.latitude, data.longitude] : defaultLatLng;
+  
+          mapInstance = L.map('map').setView(latLng, 13); // Zoom level set to 13 for a closer view
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: ''
+          }).addTo(mapInstance);
+          
+          const drawControl = new L.Control.Draw({
+            draw: {
+              polygon: true,
+              polyline: true,
+              marker: true,
+              circle: false,
+              rectangle: false,
+              circlemarker: true,
+            },
+            edit: {
+              featureGroup: new L.FeatureGroup().addTo(mapInstance),
+            },
           });
-          return;
+          mapInstance.addControl(drawControl);
+          mapRef.current = mapInstance;
+  
+          mapInstance.on(L.Draw.Event.CREATED, (event) => {
+            const layer = event.layer;
+            const type = event.layerType;
+  
+            if (!selectedEventId) {
+              toast({
+                title: 'Erreur',
+                description: "L'ID de l'événement est manquant. Impossible d'ajouter l'objet.",
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+              });
+              return;
+            }
+  
+            openNameModal(layer, type);
+          });
         }
-
-        openNameModal(layer, type);
-      });
-    }
-
-    loadAndDisplaySavedRoutes();
-
-  }, [selectedEventId, toast, loadAndDisplaySavedRoutes]);
+        
+      } catch (error) {
+        console.error('Erreur lors de la récupération des détails de l\'événement:', error.message);
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de récupérer les détails de l\'événement. Veuillez réessayer.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    };
+  
+    fetchEventDetails();
+    loadAndDisplaySavedRoutes(); // Load saved routes once the map is set up
+  
+  }, [selectedEventId, toast, loadAndDisplaySavedRoutes]);  
 
   useEffect(() => {
     if (!selectedEventId) {
@@ -568,56 +612,66 @@ const MapComponent = () => {
     }
 
     const fetchAndDisplayTeams = async () => {
-      if (!selectedEventId) return;
-
-      const { data: teams, error } = await supabase
-        .from('vianney_teams')
-        .select('*')
-        .eq('event_id', selectedEventId);
-
-      if (error) {
-        console.error('Erreur lors de la récupération des équipes:', error);
+      if (!mapRef.current) {
+        // Wait for the map to be initialized
+        console.warn("Map is not initialized yet.");
         return;
       }
-
-      mapRef.current.eachLayer(layer => {
-        if (layer instanceof L.Marker || (layer.options && layer.options.team)) {
-          mapRef.current.removeLayer(layer);
+    
+      try {
+        if (!selectedEventId) return;
+    
+        const { data: teams, error } = await supabase
+          .from('vianney_teams')
+          .select('*')
+          .eq('event_id', selectedEventId);
+    
+        if (error) {
+          console.error('Erreur lors de la récupération des équipes:', error);
+          return;
         }
-      });
-
-      teams.forEach(team => {
-        const teamIcon = createTeamIcon();
-        const deleteIconHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-
-        const wazeUrl = `https://www.waze.com/ul?ll=${team.latitude},${team.longitude}&navigate=yes`;
-        const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Aller vers Waze</a>`;
-
-        const popupContent = `
-          <div>
-            <strong>${team.name_of_the_team}</strong>
-            ${team.photo_profile_url ? `<br/><img src="${team.photo_profile_url}" alt="${team.name_of_the_team}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-top: 5px;"/>` : ''}
-            <div onclick="window.deleteTeam(${team.id})" style="margin-top: 10px;">${deleteIconHtml}</div>
-            ${wazeButtonHtml}
-          </div>
-        `;
-
-        const tooltipContent = team.name_of_the_team;
-
-        const marker = L.marker([team.latitude, team.longitude], { icon: teamIcon, team: true });
-
-        marker.addTo(mapRef.current)
-          .bindPopup(popupContent, {
-            offset: L.point(0, -30),
-            direction: 'top'
-          })
-          .bindTooltip(tooltipContent, {
-            permanent: false,
-            direction: 'top',
-            offset: L.point(0, -30)
-          });
-      });
-  };
+    
+        mapRef.current.eachLayer(layer => {
+          if (layer instanceof L.Marker || (layer.options && layer.options.team)) {
+            mapRef.current.removeLayer(layer);
+          }
+        });
+    
+        teams.forEach(team => {
+          const teamIcon = createTeamIcon();
+          const deleteIconHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
+    
+          const wazeUrl = `https://www.waze.com/ul?ll=${team.latitude},${team.longitude}&navigate=yes`;
+          const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Aller vers Waze</a>`;
+    
+          const popupContent = `
+            <div>
+              <strong>${team.name_of_the_team}</strong>
+              ${team.photo_profile_url ? `<br/><img src="${team.photo_profile_url}" alt="${team.name_of_the_team}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-top: 5px;"/>` : ''}
+              <div onclick="window.deleteTeam(${team.id})" style="margin-top: 10px;">${deleteIconHtml}</div>
+              ${wazeButtonHtml}
+            </div>
+          `;
+    
+          const tooltipContent = team.name_of_the_team;
+    
+          const marker = L.marker([team.latitude, team.longitude], { icon: teamIcon, team: true });
+    
+          marker.addTo(mapRef.current)
+            .bindPopup(popupContent, {
+              offset: L.point(0, -30),
+              direction: 'top'
+            })
+            .bindTooltip(tooltipContent, {
+              permanent: false,
+              direction: 'top',
+              offset: L.point(0, -30)
+            });
+        });
+      } catch (error) {
+        console.error('Erreur lors de la récupération des équipes:', error.message);
+      }
+    };    
 
   const fetchAndDisplayDrawnItems = async () => {
       const { data: markers, error: markerError } = await supabase
