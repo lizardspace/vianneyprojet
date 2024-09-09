@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useEvent } from './../../../EventContext';
+import { supabase } from './../../../supabaseClient';  // Importez le client Supabase
 
 // Correction icônes Leaflet dans React
 import markerIconPng from 'leaflet/dist/images/marker-icon.png';
@@ -18,17 +19,41 @@ const GpsPointForm = () => {
   const { selectedEventId, selectedEventName, setEvent } = useEvent();
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
+  const [loading, setLoading] = useState(false); // Ajouter un indicateur de chargement
+  const [error, setError] = useState(null); // Ajouter un état pour gérer les erreurs
 
   const handleMapClick = (e) => {
     setLatitude(e.latlng.lat);
     setLongitude(e.latlng.lng);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (selectedEventId) {
-      // Sauvegarder l'événement avec les coordonnées GPS
-      setEvent(selectedEventId, selectedEventName, latitude, longitude);
-      console.log('Event updated:', { selectedEventId, selectedEventName, latitude, longitude });
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Envoyer les coordonnées à Supabase
+        const { data, error } = await supabase
+          .from('vianney_event')
+          .update({
+            latitude: latitude,
+            longitude: longitude,
+          })
+          .eq('event_id', selectedEventId);
+
+        if (error) throw error;
+
+        // Mettre à jour le contexte local
+        setEvent(selectedEventId, selectedEventName, latitude, longitude);
+        console.log('Event updated in Supabase:', data);
+
+      } catch (err) {
+        console.error('Error updating event:', err);
+        setError('Une erreur est survenue lors de la mise à jour de l\'événement.');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -64,9 +89,11 @@ const GpsPointForm = () => {
         <Input value={longitude} isReadOnly />
       </FormControl>
 
-      <Button colorScheme="teal" onClick={handleSubmit}>
+      <Button colorScheme="teal" onClick={handleSubmit} isLoading={loading}>
         Sauvegarder les coordonnées GPS
       </Button>
+
+      {error && <Box color="red.500">{error}</Box>}
     </VStack>
   );
 };
