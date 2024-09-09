@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, FormControl, FormLabel, Input, VStack } from '@chakra-ui/react';
+import { Box, Button, FormControl, FormLabel, Input, VStack, useToast } from '@chakra-ui/react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -21,6 +21,7 @@ const GpsPointForm = () => {
   const [longitude, setLongitude] = useState(0);
   const [loading, setLoading] = useState(false); // Ajouter un indicateur de chargement
   const [error, setError] = useState(null); // Ajouter un état pour gérer les erreurs
+  const toast = useToast(); // Initialisation du toast Chakra UI
 
   const handleMapClick = (e) => {
     setLatitude(e.latlng.lat);
@@ -48,9 +49,27 @@ const GpsPointForm = () => {
         setEvent(selectedEventId, selectedEventName, latitude, longitude);
         console.log('Event updated in Supabase:', data);
 
+        // Affichage du toast en cas de succès
+        toast({
+          title: "Coordonnées GPS sauvegardées.",
+          description: "Les coordonnées GPS ont été mises à jour avec succès.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+
       } catch (err) {
         console.error('Error updating event:', err);
         setError('Une erreur est survenue lors de la mise à jour de l\'événement.');
+
+        // Affichage du toast en cas d'erreur
+        toast({
+          title: "Erreur lors de la mise à jour.",
+          description: "Une erreur est survenue lors de la mise à jour des coordonnées GPS.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
       } finally {
         setLoading(false);
       }
