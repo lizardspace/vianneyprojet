@@ -98,12 +98,12 @@ const GpsPointForm = () => {
         </MapContainer>
       </Box>
 
-      <FormControl>
+      <FormControl display="none">
         <FormLabel>Latitude</FormLabel>
         <Input value={latitude} isReadOnly />
       </FormControl>
 
-      <FormControl>
+      <FormControl display="none">
         <FormLabel>Longitude</FormLabel>
         <Input value={longitude} isReadOnly />
       </FormControl>
