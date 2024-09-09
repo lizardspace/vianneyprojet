@@ -26,7 +26,6 @@ import BaseDeDonneeRenseignements from './components/basededonnee/BaseDeDonneeRe
 import BaseDeDonneeMoyens from './components/basededonnee/BaseDeDonneeMoyens';
 import VianneyAlertTableEvent from '../TableauExcel/componentsEventContext/VianneyAlertTableEvent';
 import VideoStream from './components/tv/VideoStream';
-import ToggleComponentGpsPointForm from './ToggleComponentGpsPointForm';
 
 export default function Marketplace() {
   // eslint-disable-next-line no-unused-vars
@@ -74,8 +73,6 @@ export default function Marketplace() {
                   <Box>
                     <Flex direction={{ base: "column", md: "row" }} mt="10px">
                       <Box flex="1" borderRadius="lg" overflow="hidden">
-                        {/* Utiliser une clé unique pour détruire et recréer la carte */}
-                        <ToggleComponentGpsPointForm/>
                         <MapComponent key={mapKey} ref={mapRef} />
                       </Box>
                       <Box flex="1" ml={{ md: "10px" }} display={isFullScreen ? 'none' : 'block'}>

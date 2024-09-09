@@ -14,7 +14,8 @@ import { supabase } from './../../../../supabaseClient';
 import { useHistory, useLocation } from "react-router-dom";
 import 'leaflet-draw';
 import 'leaflet-routing-machine';
-import { useGPSPosition } from './../../../../GPSPositionContext'; 
+import { useGPSPosition } from './../../../../GPSPositionContext';
+import ToggleComponentGpsPointForm from '../ToggleComponentGpsPointForm';
 
 const createTeamIcon = () => {
   const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: 'red' }} />);
@@ -41,7 +42,7 @@ const createCustomIcon = () => {
 
 const formatItineraryText = (itineraryText) => {
   if (!itineraryText) return [];
-      // eslint-disable-next-line
+  // eslint-disable-next-line
   const [distance, duration, ...steps] = itineraryText.split(/Instructions:|\s->\s/);
   return steps.map((step, index) => ({
     id: index + 1,
@@ -52,14 +53,14 @@ const formatItineraryText = (itineraryText) => {
 const MapComponent = () => {
   const mapRef = useRef(null);
   const routingControlRef = useRef(null);
-  const gpsPosition = useGPSPosition(); 
-        // eslint-disable-next-line
+  const gpsPosition = useGPSPosition();
+  // eslint-disable-next-line
   const [mapHeight, setMapHeight] = useState('800px');
   const { selectedEventId } = useEvent();
   const history = useHistory();
   const location = useLocation();
   const toast = useToast();
-  const [newElementColor, setNewElementColor] = useState('#3388ff'); 
+  const [newElementColor, setNewElementColor] = useState('#3388ff');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [elementToDelete, setElementToDelete] = useState(null);
   const cancelRef = useRef();
@@ -73,7 +74,7 @@ const MapComponent = () => {
   const [startLng, setStartLng] = useState('');
   const [endLat, setEndLat] = useState('');
   const [endLng, setEndLng] = useState('');
-      // eslint-disable-next-line
+  // eslint-disable-next-line
   const [itineraryText, setItineraryText] = useState('');
   const [latestItineraryText, setLatestItineraryText] = useState([]);
   const [selectingStart, setSelectingStart] = useState(false);
@@ -94,11 +95,11 @@ const MapComponent = () => {
           .select('latitude, longitude')
           .eq('event_id', selectedEventId) // Replace with your selectedEventId
           .single();
-  
+
         if (error) {
           throw error;
         }
-  
+
         // Check if latitude and longitude are null
         if (eventDetails.latitude === null && eventDetails.longitude === null && gpsPosition && mapRef.current) {
           const { latitude, longitude } = gpsPosition;
@@ -108,11 +109,11 @@ const MapComponent = () => {
         console.error('Erreur lors de la récupération des détails de l\'événement:', error.message);
       }
     };
-  
+
     if (selectedEventId) {
       fetchEventDetails(); // Only fetch details if an event ID is selected
     }
-  }, [selectedEventId, gpsPosition]);  
+  }, [selectedEventId, gpsPosition]);
 
   const toggleMapView = () => {
     if (location.pathname === "/admin/zoomed-map") {
@@ -427,7 +428,7 @@ const MapComponent = () => {
 
   const saveItinerary = async (startLat, startLng, endLat, endLng, itineraryText) => {
     try {
-            // eslint-disable-next-line
+      // eslint-disable-next-line
       const { data, error } = await supabase
         .from('vianney_itineraire_carte')
         .insert([
@@ -529,7 +530,7 @@ const MapComponent = () => {
       });
       return;
     }
-  
+
     const fetchEventDetails = async () => {
       try {
         const { data, error } = await supabase
@@ -537,22 +538,22 @@ const MapComponent = () => {
           .select('latitude, longitude')
           .eq('event_id', selectedEventId)
           .single();
-        
+
         if (error) throw error;
-        
+
         let mapInstance = mapRef.current;
-        
+
         if (!mapInstance) {
           // Default map initialization with fallback to a general view
           const defaultLatLng = [45, 4.7];
           const latLng = data.latitude && data.longitude ? [data.latitude, data.longitude] : defaultLatLng;
-  
+
           mapInstance = L.map('map').setView(latLng, 13); // Zoom level set to 13 for a closer view
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: ''
           }).addTo(mapInstance);
-          
+
           const drawControl = new L.Control.Draw({
             draw: {
               polygon: true,
@@ -568,11 +569,11 @@ const MapComponent = () => {
           });
           mapInstance.addControl(drawControl);
           mapRef.current = mapInstance;
-  
+
           mapInstance.on(L.Draw.Event.CREATED, (event) => {
             const layer = event.layer;
             const type = event.layerType;
-  
+
             if (!selectedEventId) {
               toast({
                 title: 'Erreur',
@@ -583,11 +584,11 @@ const MapComponent = () => {
               });
               return;
             }
-  
+
             openNameModal(layer, type);
           });
         }
-        
+
       } catch (error) {
         console.error('Erreur lors de la récupération des détails de l\'événement:', error.message);
         toast({
@@ -599,11 +600,11 @@ const MapComponent = () => {
         });
       }
     };
-  
+
     fetchEventDetails();
     loadAndDisplaySavedRoutes(); // Load saved routes once the map is set up
-  
-  }, [selectedEventId, toast, loadAndDisplaySavedRoutes]);  
+
+  }, [selectedEventId, toast, loadAndDisplaySavedRoutes]);
 
   useEffect(() => {
     if (!selectedEventId) {
@@ -617,33 +618,33 @@ const MapComponent = () => {
         console.warn("Map is not initialized yet.");
         return;
       }
-    
+
       try {
         if (!selectedEventId) return;
-    
+
         const { data: teams, error } = await supabase
           .from('vianney_teams')
           .select('*')
           .eq('event_id', selectedEventId);
-    
+
         if (error) {
           console.error('Erreur lors de la récupération des équipes:', error);
           return;
         }
-    
+
         mapRef.current.eachLayer(layer => {
           if (layer instanceof L.Marker || (layer.options && layer.options.team)) {
             mapRef.current.removeLayer(layer);
           }
         });
-    
+
         teams.forEach(team => {
           const teamIcon = createTeamIcon();
           const deleteIconHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
-    
+
           const wazeUrl = `https://www.waze.com/ul?ll=${team.latitude},${team.longitude}&navigate=yes`;
           const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Aller vers Waze</a>`;
-    
+
           const popupContent = `
             <div>
               <strong>${team.name_of_the_team}</strong>
@@ -652,11 +653,11 @@ const MapComponent = () => {
               ${wazeButtonHtml}
             </div>
           `;
-    
+
           const tooltipContent = team.name_of_the_team;
-    
+
           const marker = L.marker([team.latitude, team.longitude], { icon: teamIcon, team: true });
-    
+
           marker.addTo(mapRef.current)
             .bindPopup(popupContent, {
               offset: L.point(0, -30),
@@ -671,9 +672,9 @@ const MapComponent = () => {
       } catch (error) {
         console.error('Erreur lors de la récupération des équipes:', error.message);
       }
-    };    
+    };
 
-  const fetchAndDisplayDrawnItems = async () => {
+    const fetchAndDisplayDrawnItems = async () => {
       const { data: markers, error: markerError } = await supabase
         .from('vianney_drawn_markers')
         .select('*')
@@ -714,9 +715,9 @@ const MapComponent = () => {
         return;
       }
 
-    markers.forEach(marker => {
-      const layer = L.marker([marker.latitude, marker.longitude], { icon: createCustomIcon(marker.couleur) });
-      const wazeUrl = `https://www.waze.com/ul?ll=${marker.latitude},${marker.longitude}&navigate=yes`;
+      markers.forEach(marker => {
+        const layer = L.marker([marker.latitude, marker.longitude], { icon: createCustomIcon(marker.couleur) });
+        const wazeUrl = `https://www.waze.com/ul?ll=${marker.latitude},${marker.longitude}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
         const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
 
@@ -732,27 +733,27 @@ const MapComponent = () => {
         window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
 
         layer.addTo(mapRef.current);
-    });
+      });
 
-    polylines.forEach(polyline => {
-      const points = polyline.points.map(point => [point.latitude, point.longitude]);
-      const layer = L.polyline(points, { color: polyline.couleur });
-      const nameElement = polyline.name_element || 'Polyline';
+      polylines.forEach(polyline => {
+        const points = polyline.points.map(point => [point.latitude, point.longitude]);
+        const layer = L.polyline(points, { color: polyline.couleur });
+        const nameElement = polyline.name_element || 'Polyline';
         layer.bindTooltip(nameElement).on('click', () => openDeleteDialog(layer, 'polyline', polyline.id));
         layer.addTo(mapRef.current);
-    });
+      });
 
-    polygons.forEach(polygon => {
-      const points = polygon.points.map(point => [point.latitude, point.longitude]);
-      const layer = L.polygon(points, { color: polygon.couleur });
-      const nameElement = polygon.name_element || 'Polygon';
+      polygons.forEach(polygon => {
+        const points = polygon.points.map(point => [point.latitude, point.longitude]);
+        const layer = L.polygon(points, { color: polygon.couleur });
+        const nameElement = polygon.name_element || 'Polygon';
 
-      const firstPoint = points[0];
-      const wazeUrl = `https://www.waze.com/ul?ll=${firstPoint[0]},${firstPoint[1]}&navigate=yes`;
-      const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
-      const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
+        const firstPoint = points[0];
+        const wazeUrl = `https://www.waze.com/ul?ll=${firstPoint[0]},${firstPoint[1]}&navigate=yes`;
+        const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
+        const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
 
-      const popupContent = `
+        const popupContent = `
         <div>
           <strong>${nameElement}</strong>
           <div onclick="window.deleteItem('polygon', '${polygon.id}')">${deleteButtonHtml}</div>
@@ -760,16 +761,16 @@ const MapComponent = () => {
         </div>
       `;
 
-      layer.bindPopup(popupContent).bindTooltip(nameElement).on('click', () => openDeleteDialog(layer, 'polygon', polygon.id));
-      layer.addTo(mapRef.current);
-    });
-
-    circleMarkers.forEach(circleMarker => {
-      const layer = L.circleMarker([circleMarker.latitude, circleMarker.longitude], {
-        radius: circleMarker.radius,
-        color: circleMarker.couleur,
+        layer.bindPopup(popupContent).bindTooltip(nameElement).on('click', () => openDeleteDialog(layer, 'polygon', polygon.id));
+        layer.addTo(mapRef.current);
       });
-      const wazeUrl = `https://www.waze.com/ul?ll=${circleMarker.latitude},${circleMarker.longitude}&navigate=yes`;
+
+      circleMarkers.forEach(circleMarker => {
+        const layer = L.circleMarker([circleMarker.latitude, circleMarker.longitude], {
+          radius: circleMarker.radius,
+          color: circleMarker.couleur,
+        });
+        const wazeUrl = `https://www.waze.com/ul?ll=${circleMarker.latitude},${circleMarker.longitude}&navigate=yes`;
         const wazeButtonHtml = `<a href="${wazeUrl}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background-color: #007aff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Se rendre sur place</a>`;
         const deleteButtonHtml = renderToString(<MdDeleteForever style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />);
 
@@ -785,12 +786,12 @@ const MapComponent = () => {
         window.deleteItem = (type, id) => openDeleteDialog(layer, type, id);
 
         layer.addTo(mapRef.current);
-    });
-  };
+      });
+    };
 
-  fetchAndDisplayTeams();
-  fetchAndDisplayDrawnItems();
-}, [selectedEventId, toast]);
+    fetchAndDisplayTeams();
+    fetchAndDisplayDrawnItems();
+  }, [selectedEventId, toast]);
   const createCustomIcon = (color) => {
     const placeIconHtml = renderToString(<MdPlace style={{ fontSize: '24px', color: color }} />);
     return L.divIcon({
@@ -870,18 +871,20 @@ const MapComponent = () => {
   return (
     <Box pt="10px" position="relative">
       {isButtonVisible && (
-        <Tooltip label="Basculer entre vue zoomée et vue complète de la carte" aria-label="Toggle map view tooltip">
-          <Button
-            onClick={toggleMapView}
-            bg="red.500"
-            color="white"
-            _hover={{ bg: "red.600" }}
-            _active={{ bg: "red.700" }}
-            mt={4}
-          >
-            {buttonText}
-          </Button>
-        </Tooltip>
+        <HStack spacing={4} mt={4}> {/* Adjust spacing as needed */}
+          <Tooltip label="Basculer entre vue zoomée et vue complète de la carte" aria-label="Toggle map view tooltip">
+            <Button
+              onClick={toggleMapView}
+              bg="red.500"
+              color="white"
+              _hover={{ bg: "red.600" }}
+              _active={{ bg: "red.700" }}
+            >
+              {buttonText}
+            </Button>
+          </Tooltip>
+          <ToggleComponentGpsPointForm />
+        </HStack>
       )}
       {location.pathname === "/admin/zoomed-map" && (
         <Tooltip label="Fermer la vue zoomée et retourner à la carte complète" aria-label="Close zoomed map tooltip">
