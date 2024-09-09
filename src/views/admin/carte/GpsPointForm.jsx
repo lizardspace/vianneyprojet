@@ -109,7 +109,7 @@ const GpsPointForm = () => {
       </FormControl>
 
       <Button colorScheme="teal" onClick={handleSubmit} isLoading={loading}>
-        Sauvegarder les coordonnées GPS
+        Centrer la carte sur ces coordonnées GPS
       </Button>
 
       {error && <Box color="red.500">{error}</Box>}
