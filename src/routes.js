@@ -23,7 +23,7 @@ import Login from "views/auth/Login"; // Import the login page
 
 const routes = [
   {
-    name: "Login Logout",
+    name: "Déconnexion",
     layout: "/auth",
     path: "/login", // Add login route
     icon: <Icon as={FcLock} width="20px" height="20px" color="inherit" />,
