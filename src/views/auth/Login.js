@@ -1,4 +1,3 @@
-// src/views/auth/Login.js
 import React, { useState, useEffect } from 'react';
 import { Box, Input, Button, Heading, useToast, InputGroup, InputRightElement, IconButton } from '@chakra-ui/react';
 import { useHistory } from 'react-router-dom';
@@ -10,8 +9,8 @@ const Login = () => {
   const [eventName, setEventName] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [allEvents, setAllEvents] = useState([]); 
-  const { setEventId } = useEvent(); // Use setEventId from EventContext
+  const [allEvents, setAllEvents] = useState([]);
+  const { setEvent } = useEvent(); // Use setEvent from EventContext
   const toast = useToast();
   const history = useHistory();
 
@@ -65,8 +64,8 @@ const Login = () => {
       return;
     }
 
-    // Save eventId and eventName in the EventContext and localStorage
-    setEventId(eventExists.event_id, eventExists.event_name); 
+    // Save eventId, eventName, latitude, and longitude in the EventContext and localStorage
+    setEvent(eventExists.event_id, eventExists.event_name, eventExists.latitude, eventExists.longitude);
 
     // Save login status in localStorage
     localStorage.setItem('isLoggedIn', 'true');
