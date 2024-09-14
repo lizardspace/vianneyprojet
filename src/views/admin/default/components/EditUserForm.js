@@ -21,7 +21,6 @@ import {
   CloseButton,
   Avatar,
   Modal,
-  ModalOverlay,
   ModalFooter,
   ModalContent,
   ModalBody,
