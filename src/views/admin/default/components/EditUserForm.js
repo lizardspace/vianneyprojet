@@ -103,7 +103,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
   };
 
   const isValidPassword = (password) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\s\S])[A-Za-z\d\s\S]{8,}$/;
     return passwordRegex.test(password);
   };
 
