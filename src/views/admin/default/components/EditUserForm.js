@@ -43,7 +43,6 @@ import { PhoneIcon, EmailIcon } from '@chakra-ui/icons';
 import { supabase } from './../../../../supabaseClient';
 import TeamScheduleByMySelfUnique from 'views/admin/TableauDeBord/components/TeamScheduleByMySelfUnique';
 import AfficherMaterielsUnique from './AfficherMaterielsUnique';
-
 const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
   const [nameOfTheTeam, setNameOfTheTeam] = useState('');
   const [profilePhoto, setProfilePhoto] = useState(null);
@@ -67,11 +66,9 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
     isLeader: false,
   }]);
   const [leaderName, setLeaderName] = useState({ firstname: '', familyname: '', phone: '', mail: '' });
-  const [currentPassword, setCurrentPassword] = useState(''); // State to hold the current password
+  const [currentPassword, setCurrentPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
-  const toast = useToast(); // Initialize the useToast hook
-
+  const toast = useToast(); 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -107,7 +104,34 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
     return passwordRegex.test(password);
   };
 
+  // Function to fetch updated team data
+  const fetchUpdatedTeamData = async () => {
+    const { data, error } = await supabase
+      .from('vianney_teams')
+      .select('*')
+      .eq('id', teamData.id)
+      .single();
+    
+    if (data) {
+      setNameOfTheTeam(data.name_of_the_team);
+      setLat(data.latitude);
+      setLng(data.longitude);
+      setMission(data.mission);
+      setTypeDeVehicule(data.type_de_vehicule);
+      setImmatriculation(data.immatriculation);
+      setSpecialite(data.specialite);
+      setProfilePhotoUrl(data.photo_profile_url);
+      setTeamMembers(data.team_members);
+      setCurrentPassword(data.password);
+    }
+
+    if (error) {
+      console.error("Error fetching updated data:", error);
+    }
+  };
+
   const handleModifyAndPushData = async () => {
+    // Validate password (skip if empty)
     if (currentPassword && !isValidPassword(currentPassword)) {
       toast({
         title: "Mot de passe invalide.",
@@ -142,7 +166,18 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       if (error) {
         console.error('Error updating data:', error);
       } else {
-        setShowSuccessAlert(true);
+        // Show success toast
+        toast({
+          title: "Modification réussie",
+          description: "L'équipe a été modifiée avec succès.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "top",
+        });
+
+        // Fetch updated team data and update the component's state
+        await fetchUpdatedTeamData();
       }
     } catch (error) {
       console.error('Error updating data:', error);
@@ -249,7 +284,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
       setSpecialite(teamData.specialite || '');
       setProfilePhotoUrl(teamData.photo_profile_url || '');
       setTeamMembers(teamData.team_members || []);
-      setCurrentPassword(teamData.password || ''); // Load the current password
+      setCurrentPassword(teamData.password || '');
       updateLeaderName(teamData.team_members || []);
     }
   }, [teamData]);
@@ -283,13 +318,13 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
 
   return (
     <Modal isOpen onClose={onClose} size="full">
-      <ModalOverlay />
+      {/* Modal content */}
       <ModalContent>
         <ModalHeader>Modifier l'équipe</ModalHeader>
         <ModalCloseButton />
-        <ModalBody pb={20}>
+        <ModalBody>
           <form onSubmit={handleSubmit}>
-            <Grid
+          <Grid
               templateAreas={`"header header"
                         "missions team"
                         "materials timeline"
@@ -482,6 +517,11 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
                 </Alert>
               )}
             </VStack>
+            <Flex justifyContent="flex-end" mt={4}>
+            <Button mr={2} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
+            <Button mr={2} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
+            <Button mr={2} colorScheme="blue" onClick={onClose}>Fermer</Button>
+            </Flex>
           </form>
           {showDeleteSuccessAlert && (
             <Alert status="success" mt={4}>
@@ -490,10 +530,8 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             </Alert>
           )}
         </ModalBody>
-        <ModalFooter position="sticky" bottom="0" bg="white" zIndex="1000">
-          <Button mr={1} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
-          <Button mr={1} colorScheme="blue" onClick={onClose}>Fermer</Button>
-          <Button mr={1} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
+        <ModalFooter>
+
         </ModalFooter>
       </ModalContent>
     </Modal>
