@@ -859,6 +859,12 @@ useEffect(() => {
 
   const [startMarker, setStartMarker] = useState(null);
   const [endMarker, setEndMarker] = useState(null);
+  // Centrer la carte sur la position de l'équipe
+  const centerMapOnPosition = (latitude, longitude) => {
+    if (mapRef.current) {
+      mapRef.current.setView([latitude, longitude], 13); // Ajuster le zoom si nécessaire
+    }
+  };
 
   useEffect(() => {
     if (mapRef.current) {
@@ -957,7 +963,6 @@ useEffect(() => {
 
       <div id="map" style={{ height: mapHeight, width: '100%', zIndex: '0' }}></div>
 
-      {/* Tableau de la liste des équipes */}
       <Box mt={8} p={4} bg="gray.100" borderRadius="md" boxShadow="md" border="1px solid black">
         <Text fontSize="xl" mb={4} fontWeight="bold" color="black" textAlign="center">
           Liste des équipes
@@ -967,16 +972,37 @@ useEffect(() => {
             <Thead>
               <Tr>
                 <Th>Nom de l'équipe</Th>
-                <Th>Latitude</Th>
-                <Th>Longitude</Th>
+                <Th>Actions</Th>
               </Tr>
             </Thead>
             <Tbody>
               {teamsList.map((team, index) => (
                 <Tr key={index}>
                   <Td>{team.name_of_the_team}</Td>
-                  <Td>{team.latitude}</Td>
-                  <Td>{team.longitude}</Td>
+                  <Td>
+                    <HStack spacing={2}>
+                      {/* Bouton pour centrer la carte */}
+                      <Button
+                        size="sm"
+                        colorScheme="blue"
+                        onClick={() => centerMapOnPosition(team.latitude, team.longitude)}
+                      >
+                        Sur la carte
+                      </Button>
+
+                      {/* Bouton pour ouvrir Waze */}
+                      <Button
+                        size="sm"
+                        colorScheme="teal"
+                        onClick={() => {
+                          const wazeUrl = `https://www.waze.com/ul?ll=${team.latitude},${team.longitude}&navigate=yes`;
+                          window.open(wazeUrl, '_blank');
+                        }}
+                      >
+                        Avec Waze
+                      </Button>
+                    </HStack>
+                  </Td>
                 </Tr>
               ))}
             </Tbody>
