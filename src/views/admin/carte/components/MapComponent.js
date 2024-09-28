@@ -6,7 +6,8 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import { renderToString } from "react-dom/server";
 import {
   Box, Button, useToast, CloseButton, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader,
-  AlertDialogContent, AlertDialogOverlay, Input, VStack, HStack, FormControl, FormLabel, Text, Tooltip
+  AlertDialogContent, AlertDialogOverlay, Input, VStack, HStack, FormControl, FormLabel, Text, Tooltip, Table,
+  Thead, Tbody, Tr, Th, Td, TableContainer
 } from '@chakra-ui/react';
 import { MdPlace, MdOutlineZoomInMap, MdOutlineZoomOutMap, MdDeleteForever } from "react-icons/md";
 import { useEvent } from './../../../../EventContext';
@@ -64,6 +65,8 @@ const MapComponent = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [elementToDelete, setElementToDelete] = useState(null);
   const cancelRef = useRef();
+  // eslint-disable-next-line
+  const [teamsList, setTeamsList] = useState([]); 
 
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
   const [newElementName, setNewElementName] = useState('');
@@ -632,6 +635,9 @@ useEffect(() => {
         return;
       }
 
+      // Mettre à jour l'état de la liste des équipes
+      setTeamsList(teams);
+
       // Supprimez uniquement les couches des équipes existantes
       teamLayersRef.current.forEach(layer => {
         mapRef.current.removeLayer(layer);
@@ -950,6 +956,33 @@ useEffect(() => {
       )}
 
       <div id="map" style={{ height: mapHeight, width: '100%', zIndex: '0' }}></div>
+
+      {/* Tableau de la liste des équipes */}
+      <Box mt={8} p={4} bg="gray.100" borderRadius="md" boxShadow="md" border="1px solid black">
+        <Text fontSize="xl" mb={4} fontWeight="bold" color="black" textAlign="center">
+          Liste des équipes
+        </Text>
+        <TableContainer>
+          <Table variant="simple">
+            <Thead>
+              <Tr>
+                <Th>Nom de l'équipe</Th>
+                <Th>Latitude</Th>
+                <Th>Longitude</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {teamsList.map((team, index) => (
+                <Tr key={index}>
+                  <Td>{team.name_of_the_team}</Td>
+                  <Td>{team.latitude}</Td>
+                  <Td>{team.longitude}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+      </Box>
 
       <Box
         mt={4}
