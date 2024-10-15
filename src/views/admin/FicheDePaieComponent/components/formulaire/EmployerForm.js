@@ -1,122 +1,86 @@
 import React, { useState } from 'react';
-import { Box, Button, FormControl, FormLabel, Input, Textarea, VStack } from '@chakra-ui/react';
-import supabase from './../../../../../supabaseClient'; // Import the Supabase client
+import { Box, Input, Button, FormControl, FormLabel, Textarea } from '@chakra-ui/react';
+import { v4 as uuidv4 } from 'uuid';
+import { supabase } from './../../../../../supabaseClient';
 
-const EmployerForm: React.FC = () => {
-  const [formData, setFormData] = useState({
-    employerName: '',
-    employerAddress: '',
-    postalCode: '',
-  });
-  const [logoFile, setLogoFile] = useState<File | null>(null);  // To store the file selected
-
-  // Handle text input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Handle file input change safely
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setLogoFile(file);
-    } else {
-      setLogoFile(null); // Handle cases where no file is selected
-    }
-  };
-
-  const uploadLogo = async () => {
-    if (!logoFile) return null;
-
-    const { data, error } = await supabase.storage
-      .from('vianney-employer-logos')  // Updated bucket name
-      .upload(`logos/${logoFile.name}`, logoFile);
-
-    if (error) {
-      console.error('Error uploading logo:', error);
-      return null;
-    }
-
-    return data?.Key ? `${supabase.storage.from('vianney-employer-logos').getPublicUrl(data.Key)}` : null;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+const EmployerForm = () => {
+  // State for form fields
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
+  
+  // Handler for form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const logoUrl = await uploadLogo();  // Upload the logo and get the URL
-
+    
+    // Insert the new employer data into the Supabase database
     const { data, error } = await supabase
-      .from('vianney_employers')  // Updated table name
+      .from('vianney_employers')
       .insert([
         {
-          name: formData.employerName,
-          address: formData.employerAddress,
-          postal_code: formData.postalCode,
-          logo_url: logoUrl || null,  // Store the logo URL
+          id: uuidv4(),  // Generate a UUID for the new entry
+          name: name,
+          address: address,
+          postal_code: postalCode,
+          logo_url: logoUrl,
+          created_at: new Date().toISOString(),  // Add the current timestamp
         }
       ]);
 
     if (error) {
-      console.error('Error inserting data:', error);
+      console.error('Error inserting employer data:', error.message);
     } else {
-      console.log('Employer data inserted successfully:', data);
+      console.log('Employer data inserted:', data);
+      // Optionally, reset the form or notify the user
     }
   };
 
   return (
-    <Box maxWidth="600px" mx="auto" mt={8} p={4} border="1px solid black" borderRadius="md" boxShadow="md">
+    <Box p={4} maxWidth="600px" mx="auto">
       <form onSubmit={handleSubmit}>
-        <VStack spacing={4}>
-          {/* Employer Logo File Input */}
-          <FormControl id="logo" isRequired>
-            <FormLabel>Logo de l'entreprise</FormLabel>
-            <Input type="file" accept="image/*" onChange={handleFileChange} />
-          </FormControl>
+        <FormControl id="name" mb={4} isRequired>
+          <FormLabel>Nom de l'employeur</FormLabel>
+          <Input 
+            type="text" 
+            value={name} 
+            onChange={(e) => setName(e.target.value)} 
+            placeholder="Nom de l'employeur" 
+          />
+        </FormControl>
 
-          {/* Employer Name Input */}
-          <FormControl id="employerName" isRequired>
-            <FormLabel>Nom de l'employeur</FormLabel>
-            <Input
-              type="text"
-              name="employerName"
-              placeholder="Nom de l'employeur"
-              value={formData.employerName}
-              onChange={handleChange}
-            />
-          </FormControl>
+        <FormControl id="address" mb={4} isRequired>
+          <FormLabel>Adresse de l'employeur</FormLabel>
+          <Textarea 
+            value={address} 
+            onChange={(e) => setAddress(e.target.value)} 
+            placeholder="Adresse de l'employeur" 
+          />
+        </FormControl>
 
-          {/* Employer Address Input */}
-          <FormControl id="employerAddress" isRequired>
-            <FormLabel>Adresse de l'employeur</FormLabel>
-            <Textarea
-              name="employerAddress"
-              placeholder="Adresse de l'employeur"
-              value={formData.employerAddress}
-              onChange={handleChange}
-            />
-          </FormControl>
+        <FormControl id="postalCode" mb={4} isRequired>
+          <FormLabel>Code postal de l'employeur</FormLabel>
+          <Input 
+            type="text" 
+            value={postalCode} 
+            onChange={(e) => setPostalCode(e.target.value)} 
+            placeholder="Code postal de l'employeur" 
+          />
+        </FormControl>
 
-          {/* Postal Code Input */}
-          <FormControl id="postalCode" isRequired>
-            <FormLabel>Code postal de l'employeur</FormLabel>
-            <Input
-              type="text"
-              name="postalCode"
-              placeholder="Code postal"
-              value={formData.postalCode}
-              onChange={handleChange}
-            />
-          </FormControl>
+        <FormControl id="logoUrl" mb={4}>
+          <FormLabel>URL du logo</FormLabel>
+          <Input 
+            type="text" 
+            value={logoUrl} 
+            onChange={(e) => setLogoUrl(e.target.value)} 
+            placeholder="URL du logo de l'employeur" 
+          />
+        </FormControl>
 
-          {/* Submit Button */}
-          <Button colorScheme="blue" type="submit" width="full">
-            Enregistrer
-          </Button>
-        </VStack>
+        <Button colorScheme="teal" type="submit">
+          Soumettre
+        </Button>
       </form>
     </Box>
   );
