@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Table, Thead, Tbody, Tr, Th, Td, Text, Grid } from '@chakra-ui/react';
+import { Box, Table, Thead, Tbody, Tr, Th, Td, Grid } from '@chakra-ui/react';
 
 const AcquisPrisSoldeTable: React.FC = () => {
   return (
