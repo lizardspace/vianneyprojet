@@ -1,6 +1,6 @@
 import React from "react";
 import { Icon } from "@chakra-ui/react";
-import { FcMindMap, FcLock, FcVideoCall, FcPlanner, FcSurvey, FcSettings, FcGrid, FcHighPriority, FcDiploma2, FcDocument, FcAbout, FcOpenedFolder, FcMoneyTransfer } from "react-icons/fc";
+import { FcMindMap, FcLock, FcVideoCall, FcPlanner, FcSurvey, FcSettings, FcGrid, FcHighPriority, FcDiploma2, FcDocument, FcAbout, FcOpenedFolder, FcMoneyTransfer, FcNook } from "react-icons/fc";
 import { MdQrCodeScanner, MdOutlineSos } from "react-icons/md"; 
 
 import MainDashboard from "views/admin/default";
@@ -168,7 +168,7 @@ const routes = [
     name: "Fiche de paie", // New route
     layout: "/admin",
     path: "/fiche-de-paie",
-    icon: <Icon as={FcDiploma2} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={FcNook} width="20px" height="20px" color="inherit" />,
     component: FicheDePaieComponent,
   },
 ];
