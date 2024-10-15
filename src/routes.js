@@ -19,8 +19,8 @@ import IncidentReportForm from "views/admin/IncidentReportForm";
 import VideoStreamAnalysisComponent from "views/admin/VideoStreamAnalysisComponent"; 
 import Factures from "views/admin/Factures"; 
 import AddDocumentComponent from "views/admin/AddDocumentComponent";
-import Login from "views/auth/Login"; // Import the login page
-import FicheDePaieComponent from "views/admin/FicheDePaieComponent"; // Import the new Fiche de paie component
+import Login from "views/auth/Login"; 
+import FicheDePaieComponent from "views/admin/FicheDePaieComponent"; 
 
 const routes = [
   {
