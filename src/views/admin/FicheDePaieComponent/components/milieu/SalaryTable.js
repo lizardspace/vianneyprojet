@@ -60,13 +60,13 @@ const SalaryTable: React.FC = () => {
             <Td border="1px solid black"></Td>
           </Tr>
 
-          {/* Additional rows for Santé and other sections */}
+          {/* Santé Section */}
           <Tr>
             <Td border="1px solid black" fontWeight="bold">Santé</Td>
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
-            <Td></Td> {/* Empty column without border */}
+            <Td></Td> {/* Empty column */}
             <Td border="1px solid black"></Td>
           </Tr>
           <Tr>
@@ -74,10 +74,233 @@ const SalaryTable: React.FC = () => {
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
-            <Td></Td> {/* Empty column without border */}
+            <Td></Td> {/* Empty column */}
             <Td border="1px solid black"></Td>
           </Tr>
-          {/* Continue with other rows... */}
+          <Tr>
+            <Td border="1px solid black">Complément d'assurance maladie</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Mutuelle I Forfait</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Prévoyance I Tranche A (obligatoire pour les cadres, option pour les non cadres)</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Prévoyance I Tranche B (obligatoire pour les cadres, option pour les non cadres)</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+
+          {/* Accidents du travail Section */}
+          <Tr>
+            <Td border="1px solid black" fontWeight="bold">
+              Accidents du travail - Maladies professionnelles
+            </Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+
+          {/* Retraite Section */}
+          <Tr>
+            <Td border="1px solid black" fontWeight="bold">Retraite</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Sécurité sociale plafonnée</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Sécurité sociale déplafonnée</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Complémentaire I Tranche 1</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Complémentaire I Tranche 2</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Contribution d'Equilibre Technique</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+
+          {/* Famille Section */}
+          <Tr>
+            <Td border="1px solid black" fontWeight="bold">Famille</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Assurance chômage</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Chômage</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">APEC (cadre)</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+
+          {/* Autres contributions due by employeur */}
+          <Tr>
+            <Td border="1px solid black" fontWeight="bold">Autres contributions dues par l'employeur</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">CSG déductible de l'impôt sur le revenu</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">CSG/CRDS non déductible de l'impôt sur le revenu</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">CSG/CRDS 9,7% non déductible</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Réduction salariale sur heures supplémentaires</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+
+          {/* Total Contributions Section */}
+          <Tr>
+            <Td border="1px solid black" fontWeight="bold">TOTAL COTISATIONS ET CONTRIBUTIONS SALARIALES (4)</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td>
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black" fontWeight="bold">TOTAL COTISATIONS ET CONTRIBUTIONS PATRONALES</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td>
+            <Td border="1px solid black"></Td>
+          </Tr>
+
+          {/* Other sections */}
+          <Tr>
+            <Td border="1px solid black">Frais transport public (option)</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black" fontWeight="bold">Indemnités non soumises (2)</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td>
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Autres retenues (3)</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column */}
+            <Td border="1px solid black"></Td>
+          </Tr>
+
+          {/* Montant net social */}
+          <Tr>
+            <Td border="1px solid black" fontWeight="bold">Montant net social</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td></Td>
+            <Td border="1px solid black"></Td>
+          </Tr>
         </Tbody>
       </Table>
     </Box>
