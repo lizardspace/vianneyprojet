@@ -1,12 +1,12 @@
 import React from 'react';
 import { Box, Text, Grid } from '@chakra-ui/react';
-import EmployerCard from './components/EmployerCard';
-import ContractDetails from './components/ContractDetails';
-import CompanyInfo from './components/CompanyInfo';
-import EmployeeInfo from './components/EmployeeInfo';
-import JobClassification from './components/JobClassification';
-import SalaryDetails from './components/SalaryDetails';
-import ContractualSalaryDetails from './components/ContractualSalaryDetails';
+import EmployerCard from './components/debut/EmployerCard';
+import ContractDetails from './components/debut/ContractDetails';
+import CompanyInfo from './components/debut/CompanyInfo';
+import EmployeeInfo from './components/debut/EmployeeInfo';
+import JobClassification from './components/debut/JobClassification';
+import SalaryDetails from './components/debut/SalaryDetails';
+import ContractualSalaryDetails from './components/debut/ContractualSalaryDetails';
 
 const PaySlip: React.FC = () => {
   return (
