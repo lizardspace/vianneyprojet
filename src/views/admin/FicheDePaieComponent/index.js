@@ -1,8 +1,6 @@
 // views/admin/FicheDePaieComponent.jsx
 import React from 'react';
 import { Box} from '@chakra-ui/react';
-import EmployerCard from './components/EmployerCard';
-import ContractDetails from './components/ContractDetails';
 import PaySlip from './PaySlip';
 
 const FicheDePaieComponent = () => {

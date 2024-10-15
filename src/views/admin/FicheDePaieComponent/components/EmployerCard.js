@@ -7,7 +7,10 @@ const EmployerCard: React.FC = () => {
       border="1px solid" 
       borderColor="black" 
       p={4} 
-      width="400px"
+      width="90%"             // Set width to 90% of the container
+      minWidth="90%"         // Set minimum width to 300px (or any value)
+      maxWidth="90%"        // Set maximum width to 1200px (or any value)
+      mx="auto" 
       borderRadius="md"
       boxShadow="md"
       bg="white"
