@@ -46,6 +46,61 @@ const SalaryTable: React.FC = () => {
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
           </Tr>
+
+          {/* Section: Santé */}
+          <Tr>
+            <Td border="1px solid black" fontWeight="bold">Santé</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Assurance maladie</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Complément d'assurance maladie</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Mutuelle I Forfait</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Prévoyance I Tranche A (obligatoire pour les cadres, option pour les non cadres)</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+          </Tr>
+          <Tr>
+            <Td border="1px solid black">Prévoyance I Tranche B (obligatoire pour les cadres, option pour les non cadres)</Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+          </Tr>
+
+          {/* Section: Accidents du travail - Maladies professionnelles */}
+          <Tr>
+            <Td border="1px solid black" fontWeight="bold">
+              Accidents du travail - Maladies professionnelles
+            </Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+            <Td border="1px solid black"></Td>
+          </Tr>
         </Tbody>
       </Table>
     </Box>
