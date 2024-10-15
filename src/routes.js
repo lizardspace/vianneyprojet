@@ -20,6 +20,7 @@ import VideoStreamAnalysisComponent from "views/admin/VideoStreamAnalysisCompone
 import Factures from "views/admin/Factures"; 
 import AddDocumentComponent from "views/admin/AddDocumentComponent";
 import Login from "views/auth/Login"; // Import the login page
+import FicheDePaieComponent from "views/admin/FicheDePaieComponent"; // Import the new Fiche de paie component
 
 const routes = [
   {
@@ -162,6 +163,13 @@ const routes = [
     path: "/ajouter-document",
     icon: <Icon as={FcOpenedFolder} width="20px" height="20px" color="inherit" />,
     component: AddDocumentComponent,
+  },
+  {
+    name: "Fiche de paie", // New route
+    layout: "/admin",
+    path: "/fiche-de-paie",
+    icon: <Icon as={FcDiploma2} width="20px" height="20px" color="inherit" />,
+    component: FicheDePaieComponent,
   },
 ];
 
