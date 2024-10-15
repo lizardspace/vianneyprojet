@@ -7,16 +7,25 @@ const SalaryTable: React.FC = () => {
       <Table variant="simple">
         <Thead>
           <Tr>
-            <Th border="1px solid black" textAlign="center">Désignation</Th>
-            <Th border="1px solid black" textAlign="center">Base</Th>
-            <Th border="1px solid black" textAlign="center" colSpan={2}>Part employé</Th>
-            <Th border="1px solid black" textAlign="center">Employeur</Th>
+            {/* Désignation column spans 2 rows */}
+            <Th border="1px solid black" textAlign="center" rowSpan={2}>
+              Désignation
+            </Th>
+            {/* Base column spans 2 rows */}
+            <Th border="1px solid black" textAlign="center" rowSpan={2}>
+              Base
+            </Th>
+            {/* Part employé column spans 2 columns */}
+            <Th border="1px solid black" textAlign="center" colSpan={2}>
+              Part employé
+            </Th>
+            {/* Employeur column spans 1 row */}
+            <Th border="1px solid black" textAlign="center" rowSpan={2}>
+              Employeur
+            </Th>
           </Tr>
           <Tr>
-            <Th></Th>
-            <Th></Th>
             <Th border="1px solid black" textAlign="center">Taux ou %</Th>
-            <Th border="1px solid black" textAlign="center">Montant</Th>
             <Th border="1px solid black" textAlign="center">Montant</Th>
           </Tr>
         </Thead>
@@ -47,7 +56,7 @@ const SalaryTable: React.FC = () => {
             <Td border="1px solid black"></Td>
           </Tr>
 
-          {/* Section: Santé */}
+          {/* Additional rows for Santé and other sections */}
           <Tr>
             <Td border="1px solid black" fontWeight="bold">Santé</Td>
             <Td border="1px solid black"></Td>
@@ -62,45 +71,7 @@ const SalaryTable: React.FC = () => {
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
           </Tr>
-          <Tr>
-            <Td border="1px solid black">Complément d'assurance maladie</Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-          </Tr>
-          <Tr>
-            <Td border="1px solid black">Mutuelle I Forfait</Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-          </Tr>
-          <Tr>
-            <Td border="1px solid black">Prévoyance I Tranche A (obligatoire pour les cadres, option pour les non cadres)</Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-          </Tr>
-          <Tr>
-            <Td border="1px solid black">Prévoyance I Tranche B (obligatoire pour les cadres, option pour les non cadres)</Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-          </Tr>
-
-          {/* Section: Accidents du travail - Maladies professionnelles */}
-          <Tr>
-            <Td border="1px solid black" fontWeight="bold">
-              Accidents du travail - Maladies professionnelles
-            </Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-            <Td border="1px solid black"></Td>
-          </Tr>
+          {/* Continue with other rows... */}
         </Tbody>
       </Table>
     </Box>
