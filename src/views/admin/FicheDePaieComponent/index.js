@@ -6,6 +6,7 @@ import SalaryTable from './components/milieu/SalaryTable';
 import NetPayableTable from './components/milieu/NetPayableTable';
 import AcquisPrisSoldeTable from './components/fin/AcquisPrisSoldeTable';
 import PaySlipNotice from './components/fin/PaySlipNotice';
+import Form from './Form';
 
 const FicheDePaieComponent = () => {
   return (
@@ -18,7 +19,7 @@ const FicheDePaieComponent = () => {
         <PaySlipNotice />
       </Box>
       <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
-
+        <Form/>
       </Box>
     </Box>
   );
