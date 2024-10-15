@@ -19,6 +19,8 @@ const SalaryTable: React.FC = () => {
             <Th border="1px solid black" textAlign="center" colSpan={2}>
               Part employé
             </Th>
+            {/* Empty column without border */}
+            <Th textAlign="center" rowSpan={2}></Th>
             {/* Employeur column spans 1 row */}
             <Th border="1px solid black" textAlign="center" rowSpan={2}>
               Employeur
@@ -44,6 +46,7 @@ const SalaryTable: React.FC = () => {
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column without border */}
             <Td border="1px solid black"></Td>
           </Tr>
 
@@ -53,6 +56,7 @@ const SalaryTable: React.FC = () => {
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column without border */}
             <Td border="1px solid black"></Td>
           </Tr>
 
@@ -62,6 +66,7 @@ const SalaryTable: React.FC = () => {
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column without border */}
             <Td border="1px solid black"></Td>
           </Tr>
           <Tr>
@@ -69,6 +74,7 @@ const SalaryTable: React.FC = () => {
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
             <Td border="1px solid black"></Td>
+            <Td></Td> {/* Empty column without border */}
             <Td border="1px solid black"></Td>
           </Tr>
           {/* Continue with other rows... */}
