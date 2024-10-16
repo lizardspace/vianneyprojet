@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Input, Button, FormControl, FormLabel, Textarea } from '@chakra-ui/react';
+import { Box, Input, Button, FormControl, FormLabel, Textarea, useToast } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from './../../../../../supabaseClient';
 import { useEvent } from './../../../../../EventContext';  // Import the useEvent hook
@@ -11,6 +11,9 @@ const EmployerForm = () => {
   const [logoUrl, setLogoUrl] = useState('');
   const [logoFile, setLogoFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Toast hook from Chakra UI
+  const toast = useToast();
 
   // Get event information from context
   const { selectedEventId } = useEvent();
@@ -49,6 +52,13 @@ const EmployerForm = () => {
       } else {
         console.error('Failed to upload logo');
         setIsSubmitting(false);
+        toast({
+          title: "Échec de l'upload du logo.",
+          description: "Une erreur est survenue lors du téléchargement du logo.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
         return;
       }
     }
@@ -70,8 +80,29 @@ const EmployerForm = () => {
 
     if (error) {
       console.error('Error inserting employer data:', error.message);
+      toast({
+        title: "Échec de l'enregistrement.",
+        description: "Une erreur est survenue lors de l'enregistrement des données.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     } else {
       console.log('Employer data inserted:', data);
+      toast({
+        title: "Succès.",
+        description: "Les données de l'employeur ont été enregistrées avec succès.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+
+      // Optionally, reset the form after submission
+      setName('');
+      setAddress('');
+      setPostalCode('');
+      setLogoUrl('');
+      setLogoFile(null);
     }
 
     setIsSubmitting(false);
