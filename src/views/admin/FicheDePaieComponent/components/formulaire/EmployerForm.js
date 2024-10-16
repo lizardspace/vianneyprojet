@@ -4,61 +4,68 @@ import { v4 as uuidv4 } from 'uuid';
 import { supabase } from './../../../../../supabaseClient';
 
 const EmployerForm = () => {
-  // State for form fields
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
   const [logoFile, setLogoFile] = useState(null);
-  
-  // Handler for image file selection
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setLogoFile(file);
-  };
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Function to upload the logo image to Supabase bucket
-  const uploadLogo = async () => {
-    if (!logoFile) return null;
-    
-    const fileName = `${uuidv4()}-${logoFile.name}`;
-    // eslint-disable-next-line
+  // Function to upload the logo image to Supabase bucket and return the public URL
+  const uploadLogo = async (file) => {
+    if (!file) {
+      console.log('No file selected for upload');
+      return null;
+    }
+
+    console.log('Uploading logo file:', file);
+
+    const fileName = `${uuidv4()}-${file.name}`;
+    console.log('Generated file name:', fileName);
+
     const { data, error } = await supabase
       .storage
       .from('vianney-employer-logos')
-      .upload(fileName, logoFile);
+      .upload(fileName, file);
     
     if (error) {
       console.error('Error uploading logo:', error.message);
       return null;
     }
 
-    // Get the public URL of the uploaded image
-    const { publicURL, error: urlError } = supabase
-      .storage
-      .from('vianney-employer-logos')
-      .getPublicUrl(fileName);
+    console.log('File uploaded successfully, data:', data);
 
-    if (urlError) {
-      console.error('Error fetching logo URL:', urlError.message);
-      return null;
-    }
+    // Construct the public URL manually
+    const baseUrl = 'https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/vianney-employer-logos';
+    const publicURL = `${baseUrl}/${fileName}`;
 
+    console.log('Public URL constructed manually:', publicURL);
     return publicURL;
   };
 
   // Handler for form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true); // Disable the button while submitting
+    console.log('Form submission started');
+
+    let uploadedLogoUrl = logoUrl;
 
     // First, upload the logo if a file is selected
-    let uploadedLogoUrl = logoUrl;
     if (logoFile) {
-      uploadedLogoUrl = await uploadLogo();
+      console.log('Uploading logo file...');
+      uploadedLogoUrl = await uploadLogo(logoFile);
       if (uploadedLogoUrl) {
-        setLogoUrl(uploadedLogoUrl);
+        console.log('Logo uploaded successfully, URL:', uploadedLogoUrl);
+        setLogoUrl(uploadedLogoUrl);  // Set the URL in the input field
+      } else {
+        console.error('Failed to upload logo or retrieve its URL');
+        setIsSubmitting(false);
+        return; // Stop submission if there's an issue with the logo
       }
     }
+
+    console.log('Proceeding with database insert...');
 
     // Insert the new employer data into the Supabase database
     const { data, error } = await supabase
@@ -77,8 +84,20 @@ const EmployerForm = () => {
     if (error) {
       console.error('Error inserting employer data:', error.message);
     } else {
-      console.log('Employer data inserted:', data);
+      console.log('Employer data inserted successfully:', data);
       // Optionally, reset the form or notify the user
+    }
+
+    setIsSubmitting(false); // Re-enable the button
+    console.log('Form submission complete');
+  };
+
+  // Handler for image file selection
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      console.log('File selected:', file);
+      setLogoFile(file);
     }
   };
 
@@ -128,14 +147,13 @@ const EmployerForm = () => {
           <Input 
             type="text" 
             value={logoUrl} 
-            onChange={(e) => setLogoUrl(e.target.value)} 
             placeholder="URL du logo de l'employeur" 
-            readOnly
+            readOnly  // This field is read-only and auto-filled
           />
         </FormControl>
 
-        <Button colorScheme="teal" type="submit">
-          Soumettre
+        <Button colorScheme="teal" type="submit" isDisabled={isSubmitting}>
+          {isSubmitting ? 'Envoi en cours...' : 'Soumettre'}
         </Button>
       </form>
     </Box>
