@@ -127,7 +127,6 @@ const EmployerForm = () => {
         </FormControl>
 
         <FormControl id="logoUrl" mb={4}>
-          <FormLabel>URL du logo</FormLabel>
           <Input 
             type="text" 
             value={logoUrl} 
