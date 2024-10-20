@@ -156,9 +156,9 @@ const CompanyAndEmployerForm = () => {
         </Box>
       )}
       
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>  {/* Désactiver la validation HTML par défaut */}
         {/* N° de SIRET */}
-        <FormControl id="siret" mb={4} isRequired>
+        <FormControl id="siret" mb={4}>
           <FormLabel>N° de SIRET</FormLabel>
           <Input 
             type="text" 
@@ -169,7 +169,7 @@ const CompanyAndEmployerForm = () => {
         </FormControl>
 
         {/* Code APE */}
-        <FormControl id="apeCode" mb={4} isRequired>
+        <FormControl id="apeCode" mb={4}>
           <FormLabel>Code APE</FormLabel>
           <Input 
             type="text" 
@@ -180,7 +180,7 @@ const CompanyAndEmployerForm = () => {
         </FormControl>
 
         {/* Convention collective */}
-        <FormControl id="collectiveAgreement" mb={4} isRequired>
+        <FormControl id="collectiveAgreement" mb={4}>
           <FormLabel>Convention collective</FormLabel>
           <Textarea 
             value={collectiveAgreement} 
@@ -190,7 +190,7 @@ const CompanyAndEmployerForm = () => {
         </FormControl>
 
         {/* Nom de l'employeur */}
-        <FormControl id="name" mb={4} isRequired>
+        <FormControl id="name" mb={4}>
           <FormLabel>Nom de l'employeur</FormLabel>
           <Input 
             type="text" 
@@ -201,7 +201,7 @@ const CompanyAndEmployerForm = () => {
         </FormControl>
 
         {/* Adresse de l'employeur */}
-        <FormControl id="address" mb={4} isRequired>
+        <FormControl id="address" mb={4}>
           <FormLabel>Adresse de l'employeur</FormLabel>
           <Textarea 
             value={address} 
@@ -211,7 +211,7 @@ const CompanyAndEmployerForm = () => {
         </FormControl>
 
         {/* Code postal de l'employeur */}
-        <FormControl id="postalCode" mb={4} isRequired>
+        <FormControl id="postalCode" mb={4}>
           <FormLabel>Code postal de l'employeur</FormLabel>
           <Input 
             type="text" 
