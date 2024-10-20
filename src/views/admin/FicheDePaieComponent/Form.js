@@ -4,6 +4,7 @@ import { Box } from '@chakra-ui/react';
 import EmployerForm from './components/formulaire/EmployerForm';
 import EmployeeForm from './components/formulaire/EmployeeForm';
 import CompanyInfoForm from './components/formulaire/CompanyInfoForm';
+import CompanyAndEmployerForm from './components/formulaire/CompanyAndEmployerForm';
 
 const Form = () => {
   return (
@@ -11,7 +12,8 @@ const Form = () => {
       <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
         <EmployerForm/>  
         <EmployeeForm/>   
-        <CompanyInfoForm/>   
+        <CompanyInfoForm/> 
+        <CompanyAndEmployerForm/>  
       </Box>
     </Box>
   );
