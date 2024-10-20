@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Input, Button, FormControl, FormLabel, Textarea, useToast } from '@chakra-ui/react';
+import { Box, Input, Button, FormControl, FormLabel, Textarea, useToast, Alert, AlertIcon } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from './../../../../../supabaseClient'; // Assure-toi que le chemin est correct
 import { useEvent } from './../../../../../EventContext';  // Import the useEvent hook
 
-const CompanyAndEmployerForm: React.FC = () => {
+const CompanyAndEmployerForm = () => {
   const [siret, setSiret] = useState('');
   const [apeCode, setApeCode] = useState('');
   const [collectiveAgreement, setCollectiveAgreement] = useState('');
@@ -14,6 +14,7 @@ const CompanyAndEmployerForm: React.FC = () => {
   const [logoUrl, setLogoUrl] = useState('');
   const [logoFile, setLogoFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState([]); // State to handle form errors
 
   // Toast pour les notifications
   const toast = useToast();
@@ -26,6 +27,7 @@ const CompanyAndEmployerForm: React.FC = () => {
     if (!file) return 'https://via.placeholder.com/150'; // Fallback URL si aucun logo n'est fourni
 
     const fileName = `${uuidv4()}-${file.name}`;
+    // eslint-disable-next-line
     const { data, error } = await supabase
       .storage
       .from('vianney-employer-logos')
@@ -40,9 +42,26 @@ const CompanyAndEmployerForm: React.FC = () => {
     return publicURL;
   };
 
+  // Validate the form and return errors if any fields are missing
+  const validateForm = () => {
+    const newErrors = [];
+    if (!siret) newErrors.push("Veuillez renseigner le N° de SIRET.");
+    if (!apeCode) newErrors.push("Veuillez renseigner le Code APE.");
+    if (!collectiveAgreement) newErrors.push("Veuillez renseigner la Convention collective.");
+    if (!name) newErrors.push("Veuillez renseigner le Nom de l'employeur.");
+    if (!address) newErrors.push("Veuillez renseigner l'Adresse de l'employeur.");
+    if (!postalCode) newErrors.push("Veuillez renseigner le Code postal de l'employeur.");
+    
+    setErrors(newErrors);
+    return newErrors.length === 0;
+  };
+
   // Handler pour la soumission du formulaire
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) return;  // Stop submission if validation fails
+
     setIsSubmitting(true);
 
     let uploadedLogoUrl = logoUrl;
@@ -126,6 +145,17 @@ const CompanyAndEmployerForm: React.FC = () => {
 
   return (
     <Box p={4} maxWidth="600px" mx="auto">
+      {errors.length > 0 && (
+        <Box mb={4}>
+          {errors.map((error, index) => (
+            <Alert status="error" key={index} mb={2}>
+              <AlertIcon />
+              {error}
+            </Alert>
+          ))}
+        </Box>
+      )}
+      
       <form onSubmit={handleSubmit}>
         {/* N° de SIRET */}
         <FormControl id="siret" mb={4} isRequired>
