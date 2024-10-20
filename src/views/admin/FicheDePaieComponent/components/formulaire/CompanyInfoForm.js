@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Input, Button, FormControl, FormLabel, Textarea, useToast } from '@chakra-ui/react';
-import { supabase } from '../../../../../supabaseClient'; // Ensure the path is correct
+import { supabase } from './../../../../../supabaseClient'; // Assure-toi que le chemin est correct
 
 const CompanyInfoForm: React.FC = () => {
   const [siret, setSiret] = useState('');
@@ -8,17 +8,17 @@ const CompanyInfoForm: React.FC = () => {
   const [collectiveAgreement, setCollectiveAgreement] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Toast for notifications
+  // Toast pour les notifications
   const toast = useToast();
 
-  // Handler for form submission
+  // Handler pour la soumission du formulaire
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Insert the new company data into the Supabase database
+    // Insertion des données dans la table "vianney_employers" de Supabase
     const { data, error } = await supabase
-      .from('company_info')  // Make sure the table name matches
+      .from('vianney_employers')  // Utiliser la table "vianney_employers"
       .insert([
         {
           siret: siret,
@@ -46,7 +46,7 @@ const CompanyInfoForm: React.FC = () => {
         isClosable: true,
       });
 
-      // Optionally, reset the form after submission
+      // Réinitialiser le formulaire après la soumission
       setSiret('');
       setApeCode('');
       setCollectiveAgreement('');
