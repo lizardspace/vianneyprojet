@@ -3,7 +3,10 @@ import { Box, Input, Button, FormControl, FormLabel, useToast } from '@chakra-ui
 import { supabase } from './../../../../../supabaseClient';  // Assure-toi que le chemin est correct
 
 const ContractDetailsForm: React.FC = () => {
-  const [startPeriod, setStartPeriod] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [address, setAddress] = useState('');
+  const [startPeriodTravail, setStartPeriodTravail] = useState('');  // Updated
   const [endPeriod, setEndPeriod] = useState('');
   const [startContract, setStartContract] = useState('');
   const [seniorityDate, setSeniorityDate] = useState('');
@@ -18,12 +21,15 @@ const ContractDetailsForm: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Insert the new contract details into the Supabase database
+    // Insert the new contract details and employee information into the Supabase database
     const { data, error } = await supabase
       .from('vianney_fiche_de_paye_employees')
       .insert([
         {
-          start_period: startPeriod,
+          first_name: firstName,
+          last_name: lastName,
+          address: address,
+          start_period_travail: startPeriodTravail,  // Updated
           end_period: endPeriod,
           start_contract: startContract,
           seniority_date: seniorityDate,
@@ -41,17 +47,20 @@ const ContractDetailsForm: React.FC = () => {
         isClosable: true,
       });
     } else {
-      console.log('Contract data inserted:', data);
+      console.log('Contract and employee data inserted:', data);
       toast({
         title: "Succès.",
-        description: "Les données du contrat ont été enregistrées avec succès.",
+        description: "Les données du contrat et de l'employé ont été enregistrées avec succès.",
         status: "success",
         duration: 5000,
         isClosable: true,
       });
 
       // Optionally, reset the form after submission
-      setStartPeriod('');
+      setFirstName('');
+      setLastName('');
+      setAddress('');
+      setStartPeriodTravail('');
       setEndPeriod('');
       setStartContract('');
       setSeniorityDate('');
@@ -64,12 +73,41 @@ const ContractDetailsForm: React.FC = () => {
   return (
     <Box p={4} maxWidth="600px" mx="auto">
       <form onSubmit={handleSubmit}>
-        <FormControl id="startPeriod" mb={4} isRequired>
-          <FormLabel>Début de période</FormLabel>
+        <FormControl id="firstName" mb={4} isRequired>
+          <FormLabel>Prénom</FormLabel>
+          <Input 
+            type="text" 
+            value={firstName} 
+            onChange={(e) => setFirstName(e.target.value)} 
+            placeholder="Prénom" 
+          />
+        </FormControl>
+
+        <FormControl id="lastName" mb={4} isRequired>
+          <FormLabel>Nom</FormLabel>
+          <Input 
+            type="text" 
+            value={lastName} 
+            onChange={(e) => setLastName(e.target.value)} 
+            placeholder="Nom" 
+          />
+        </FormControl>
+
+        <FormControl id="address" mb={4} isRequired>
+          <FormLabel>Adresse</FormLabel>
+          <Input 
+            value={address} 
+            onChange={(e) => setAddress(e.target.value)} 
+            placeholder="Adresse" 
+          />
+        </FormControl>
+
+        <FormControl id="startPeriodTravail" mb={4} isRequired>
+          <FormLabel>Début de période de travail</FormLabel>  {/* Updated */}
           <Input 
             type="date" 
-            value={startPeriod} 
-            onChange={(e) => setStartPeriod(e.target.value)} 
+            value={startPeriodTravail} 
+            onChange={(e) => setStartPeriodTravail(e.target.value)}  // Updated
           />
         </FormControl>
 

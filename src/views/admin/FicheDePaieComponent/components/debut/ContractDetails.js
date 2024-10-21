@@ -10,7 +10,7 @@ const ContractDetails: React.FC = () => {
     const fetchContractData = async () => {
       const { data, error } = await supabase
         .from('vianney_fiche_de_paye_employees')
-        .select('start_period, end_period, start_contract, seniority_date, social_security_number')
+        .select('start_period_travail, end_period, start_contract, seniority_date, social_security_number')  // Updated fields
         .order('created_at', { ascending: false })  // Get the most recent contract entry
         .limit(1);
 
@@ -42,11 +42,11 @@ const ContractDetails: React.FC = () => {
       bg="white"
     >
       <Flex direction="column" spacing={2}>
-        {/* Row 1: Début de période */}
+        {/* Row 1: Début de période de travail */}
         <Flex justifyContent="space-between">
-          <Text fontWeight="bold">Début de période</Text>
+          <Text fontWeight="bold">Début de période de travail</Text>
           <Text color="brown" fontStyle="italic">
-            {contractData.start_period || "ex: 01 octobre 2020"}
+            {contractData.start_period_travail || "ex: 01 octobre 2020"}  {/* Updated */}
           </Text>
         </Flex>
 
