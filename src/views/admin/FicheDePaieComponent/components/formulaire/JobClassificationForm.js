@@ -17,6 +17,7 @@ const JobClassificationForm: React.FC = () => {
     setIsSubmitting(true);
 
     // Insertion des données dans Supabase
+    // eslint-disable-next-line
     const { data, error } = await supabase
       .from('vianney_fiche_de_paye_employees')
       .insert([
