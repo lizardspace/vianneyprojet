@@ -6,6 +6,7 @@ import EmployeeForm from './components/formulaire/EmployeeForm';
 import CompanyInfoForm from './components/formulaire/CompanyInfoForm';
 import CompanyAndEmployerForm from './components/formulaire/CompanyAndEmployerForm';
 import ContractDetailsForm from './components/formulaire/ContractDetailsForm';
+import JobClassificationForm from './components/formulaire/JobClassificationForm';
 
 const Form = () => {
   return (
@@ -16,6 +17,7 @@ const Form = () => {
         <CompanyInfoForm/> 
         <CompanyAndEmployerForm/>  
         <ContractDetailsForm/>
+        <JobClassificationForm/>
       </Box>
     </Box>
   );
