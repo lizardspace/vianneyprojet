@@ -20,7 +20,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { FcPlus } from "react-icons/fc";
-import { FiTrash2, FiEdit } from "react-icons/fi"; 
+import { FiTrash2, FiEdit } from "react-icons/fi";
 import EditUserForm from './components/EditUserForm';
 import MiniStatistics from "components/card/MiniStatistics";
 import TeamStatistics from "components/card/TeamStatistics";
@@ -159,7 +159,7 @@ export default function UserReports() {
         <>
           {/* Button to reveal the password form */}
           {!showPasswordForm && (
-            <Button onClick={() => setShowPasswordForm(true)} colorScheme="white">      
+            <Button onClick={() => setShowPasswordForm(true)} colorScheme="white">
             </Button>
           )}
 
@@ -233,12 +233,16 @@ export default function UserReports() {
             {teams.map((team, index) => (
               <Box
                 key={index}
-                cursor="default" // Remove pointer cursor for the whole card
+                cursor="pointer" // Change le curseur pour indiquer que l'élément est cliquable
                 transition="background-color 0.2s"
                 _hover={{ backgroundColor: "gray.100" }}
                 p={4}
                 boxShadow="md"
                 borderRadius="md"
+                onClick={() => {
+                  setEditingTeam(team);
+                  setShowEditUserFormModal(true);
+                }} 
               >
                 <TeamStatistics
                   teamName={team.name_of_the_team}
@@ -255,8 +259,8 @@ export default function UserReports() {
                   }
                   teamMembersCount={team.team_members.length}
                 />
-                {/* Action Buttons for Edit and Delete */}
-                <Flex mt={4} justifyContent="space-between">
+                {/* Actions spécifiques (Édition/Suppression) */}
+                <Flex mt={4} justifyContent="space-between" onClick={(e) => e.stopPropagation()}>
                   <Button
                     size="sm"
                     colorScheme="blue"
@@ -311,7 +315,7 @@ export default function UserReports() {
             <ModalFooter>
               <Button colorScheme="red" onClick={() => deleteTeam(teamToDelete.id)}>Supprimer</Button>
               <Button variant="ghost" onClick={() => setShowDeleteTeamModal(false)}>Annuler</Button>
-              </ModalFooter>
+            </ModalFooter>
           </ModalContent>
         </Modal>
       )}
