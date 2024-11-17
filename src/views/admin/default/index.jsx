@@ -83,32 +83,52 @@ export default function UserReports() {
 
   const deleteTeam = async (teamId) => {
     try {
-      const { error } = await supabase
+      // Supprimez les dépendances dans vianney_actions
+      const { error: actionsError } = await supabase
+        .from('vianney_actions')
+        .delete()
+        .eq('team_to_which_its_attached', teamId); // Utilisez la bonne colonne ici
+  
+      if (actionsError) {
+        console.error('Erreur lors de la suppression des dépendances :', actionsError);
+        throw new Error('Impossible de supprimer les actions associées. Vérifiez les dépendances.');
+      }
+  
+      // Supprimez l'équipe dans vianney_teams
+      const { error: teamError } = await supabase
         .from('vianney_teams')
         .delete()
         .eq('id', teamId);
-      if (error) throw error;
+  
+      if (teamError) {
+        console.error('Erreur lors de la suppression de l\'équipe :', teamError);
+        throw new Error('Impossible de supprimer l\'équipe.');
+      }
+  
+      // Mettez à jour l'état local
       setTeams((prevTeams) => prevTeams.filter((team) => team.id !== teamId));
       setShowDeleteTeamModal(false);
       setTeamToDelete(null);
+  
+      // Affichez une notification de succès
       toast({
-        title: "Equipe supprimée",
-        description: "L'équipe a été supprimée avec succès.",
+        title: "Succès",
+        description: "L'équipe et ses dépendances ont été supprimées avec succès.",
         status: "success",
         duration: 3000,
         isClosable: true,
       });
     } catch (error) {
-      console.error('Error deleting team:', error);
+      console.error('Erreur lors de la suppression de l\'équipe :', error);
       toast({
         title: "Erreur",
-        description: "Impossible de supprimer l'équipe.",
+        description: error.message || "Impossible de supprimer l'équipe.",
         status: "error",
         duration: 3000,
         isClosable: true,
       });
     }
-  };
+  };  
 
   useEffect(() => {
     fetchEvents();

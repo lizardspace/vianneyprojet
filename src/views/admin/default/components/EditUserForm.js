@@ -291,22 +291,61 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
 
   const handleDeleteTeam = async () => {
     try {
-      const { error } = await supabase
+      // Vérifiez les dépendances dans 'vianney_actions'
+      const { data: actions, error: fetchError } = await supabase
+        .from('vianney_actions')
+        .select('*')
+        .eq('team_to_which_its_attached', teamData.id); // Utilisez la bonne colonne ici
+  
+      if (fetchError) {
+        console.error('Erreur lors de la vérification des dépendances :', fetchError);
+        return;
+      }
+  
+      // Supprimez les dépendances si elles existent
+      if (actions.length > 0) {
+        const { error: deleteActionsError } = await supabase
+          .from('vianney_actions')
+          .delete()
+          .eq('team_to_which_its_attached', teamData.id); // Utilisez la bonne colonne ici
+  
+        if (deleteActionsError) {
+          console.error('Erreur lors de la suppression des actions associées :', deleteActionsError);
+          return;
+        }
+      }
+  
+      // Supprimez l'équipe
+      const { error: deleteTeamError } = await supabase
         .from('vianney_teams')
         .delete()
         .eq('id', teamData.id);
-
-      if (error) {
-        console.error('Error deleting team:', error);
+  
+      if (deleteTeamError) {
+        console.error('Erreur lors de la suppression de l\'équipe :', deleteTeamError);
       } else {
         setShowDeleteSuccessAlert(true);
-        setShowDeleteModal(false); // Close the modal after successful deletion
-        onDelete();
+        setShowDeleteModal(false); // Fermez le modal après suppression réussie
+        onDelete(); // Appelez la fonction de rappel après suppression
+        toast({
+          title: "Succès",
+          description: "L'équipe et ses dépendances ont été supprimées avec succès.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
       }
     } catch (error) {
-      console.error('Error deleting team:', error);
+      console.error('Erreur lors de la suppression de l\'équipe :', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de la suppression.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
-  };
+  }; 
 
   const handleDeleteTeamMember = (index) => {
     const updatedTeamMembers = [...teamMembers];
