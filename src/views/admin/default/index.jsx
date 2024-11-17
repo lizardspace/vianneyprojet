@@ -15,10 +15,12 @@ import {
   ModalCloseButton,
   Badge,
   Input,
-  useToast
+  useToast,
+  Text,
 } from "@chakra-ui/react";
-import EditUserForm from './components/EditUserForm';
 import { FcPlus } from "react-icons/fc";
+import { FiTrash2 } from "react-icons/fi"; // Import Trash Icon
+import EditUserForm from './components/EditUserForm';
 import MiniStatistics from "components/card/MiniStatistics";
 import TeamStatistics from "components/card/TeamStatistics";
 import AddEventForm from "./components/AddEventForm";
@@ -26,26 +28,26 @@ import EditEventForm from "./components/EditEventForm";
 import TableTopCreators from "../carte/components/TableTopCreators";
 import tableDataTopCreators from "views/admin/carte/variables/tableDataTopCreators.json";
 import { tableColumnsTopCreators } from "views/admin/carte/variables/tableColumnsTopCreators";
-import { useEvent } from '../../../EventContext'; // Import the useEvent hook
+import { useEvent } from '../../../EventContext';
 import Userform from '../carte/components/UserForm.js';
 import { supabase } from './../../../supabaseClient';
 
 export default function UserReports() {
   const [showAddEventForm, setShowAddEventForm] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [showUserform] = useState(false); // State for showing Userform component
+  const [showUserform] = useState(false);
   const [showEditEventModal, setShowEditEventModal] = useState(false);
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
   const [editingTeam, setEditingTeam] = useState(null);
   const [showEditUserFormModal, setShowEditUserFormModal] = useState(false);
   const [events, setEvents] = useState([]);
-  const [teams, setTeams] = useState([]); // Define teams state
-  const { selectedEventId } = useEvent(); // Access the selectedEventId from the EventContext
+  const [teams, setTeams] = useState([]);
+  const [showDeleteTeamModal, setShowDeleteTeamModal] = useState(false);
+  const [teamToDelete, setTeamToDelete] = useState(null); // State to track the team being deleted
+  const { selectedEventId } = useEvent();
   const textColor = useColorModeValue("secondaryGray.900", "white");
-
-  // New state for showing/hiding events, password form, and handling password
   const [showEvents, setShowEvents] = useState(false);
-  const [showPasswordForm, setShowPasswordForm] = useState(false); // State to show password form
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [password, setPassword] = useState("");
   const toast = useToast();
 
@@ -57,7 +59,6 @@ export default function UserReports() {
     let { data: vianney_event, error } = await supabase
       .from('vianney_event')
       .select('*');
-
     if (error) console.log('error', error);
     else setEvents(vianney_event);
   };
@@ -78,6 +79,35 @@ export default function UserReports() {
       console.error('Error fetching teams for the event:', error);
     }
   }, [selectedEventId]);
+
+  const deleteTeam = async (teamId) => {
+    try {
+      const { error } = await supabase
+        .from('vianney_teams')
+        .delete()
+        .eq('id', teamId);
+      if (error) throw error;
+      setTeams((prevTeams) => prevTeams.filter((team) => team.id !== teamId));
+      setShowDeleteTeamModal(false);
+      setTeamToDelete(null);
+      toast({
+        title: "Equipe supprimée",
+        description: "L'équipe a été supprimée avec succès.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Error deleting team:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer l'équipe.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
 
   useEffect(() => {
     fetchEvents();
@@ -226,6 +256,18 @@ export default function UserReports() {
                   }
                   teamMembersCount={team.team_members.length}
                 />
+                <Button
+                  size="sm"
+                  colorScheme="red"
+                  leftIcon={<FiTrash2 />}
+                  onClick={() => {
+                    setTeamToDelete(team);
+                    setShowDeleteTeamModal(true);
+                  }}
+                  mt={2}
+                >
+                  Supprimer
+                </Button>
               </Box>
             ))}
             <Button
@@ -244,6 +286,23 @@ export default function UserReports() {
         </>
       )}
 
+      {/* Delete team modal */}
+      {showDeleteTeamModal && teamToDelete && (
+        <Modal isOpen={showDeleteTeamModal} onClose={() => setShowDeleteTeamModal(false)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Confirmer la suppression</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>Voulez-vous vraiment supprimer l'équipe "{teamToDelete.name_of_the_team}" ?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="red" onClick={() => deleteTeam(teamToDelete.id)}>Supprimer</Button>
+              <Button variant="ghost" onClick={() => setShowDeleteTeamModal(false)}>Annuler</Button>
+              </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
       {/* Add event modal */}
       {showAddEventForm && (
         <Modal isOpen={showAddEventForm} onClose={() => setShowAddEventForm(false)}>
