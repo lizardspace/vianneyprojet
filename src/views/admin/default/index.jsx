@@ -17,9 +17,10 @@ import {
   Input,
   useToast,
   Text,
+  Flex,
 } from "@chakra-ui/react";
 import { FcPlus } from "react-icons/fc";
-import { FiTrash2 } from "react-icons/fi"; // Import Trash Icon
+import { FiTrash2, FiEdit } from "react-icons/fi"; 
 import EditUserForm from './components/EditUserForm';
 import MiniStatistics from "components/card/MiniStatistics";
 import TeamStatistics from "components/card/TeamStatistics";
@@ -43,7 +44,7 @@ export default function UserReports() {
   const [events, setEvents] = useState([]);
   const [teams, setTeams] = useState([]);
   const [showDeleteTeamModal, setShowDeleteTeamModal] = useState(false);
-  const [teamToDelete, setTeamToDelete] = useState(null); // State to track the team being deleted
+  const [teamToDelete, setTeamToDelete] = useState(null);
   const { selectedEventId } = useEvent();
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [showEvents, setShowEvents] = useState(false);
@@ -126,10 +127,6 @@ export default function UserReports() {
     setShowEditEventModal(true);
   };
 
-  const handleEditTeam = (team) => {
-    setEditingTeam(team);
-    setShowEditUserFormModal(true);
-  };
 
   const toggleCreateTeamModal = () => setShowCreateTeamModal(!showCreateTeamModal);
 
@@ -236,10 +233,12 @@ export default function UserReports() {
             {teams.map((team, index) => (
               <Box
                 key={index}
-                cursor="pointer"
+                cursor="default" // Remove pointer cursor for the whole card
                 transition="background-color 0.2s"
                 _hover={{ backgroundColor: "gray.100" }}
-                onClick={() => handleEditTeam(team)}
+                p={4}
+                boxShadow="md"
+                borderRadius="md"
               >
                 <TeamStatistics
                   teamName={team.name_of_the_team}
@@ -256,17 +255,31 @@ export default function UserReports() {
                   }
                   teamMembersCount={team.team_members.length}
                 />
-                <Button
-                  size="sm"
-                  colorScheme="red"
-                  leftIcon={<FiTrash2 />}
-                  onClick={() => {
-                    setTeamToDelete(team);
-                    setShowDeleteTeamModal(true);
-                  }}
-                  mt={2}
-                />
-                  
+                {/* Action Buttons for Edit and Delete */}
+                <Flex mt={4} justifyContent="space-between">
+                  <Button
+                    size="sm"
+                    colorScheme="blue"
+                    leftIcon={<FiEdit />}
+                    onClick={() => {
+                      setEditingTeam(team);
+                      setShowEditUserFormModal(true);
+                    }}
+                  >
+                    
+                  </Button>
+                  <Button
+                    size="sm"
+                    colorScheme="red"
+                    leftIcon={<FiTrash2 />}
+                    onClick={() => {
+                      setTeamToDelete(team);
+                      setShowDeleteTeamModal(true);
+                    }}
+                  >
+                    
+                  </Button>
+                </Flex>
               </Box>
             ))}
             <Button
