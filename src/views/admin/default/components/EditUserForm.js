@@ -67,6 +67,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
   const [leaderName, setLeaderName] = useState({ firstname: '', familyname: '', phone: '', mail: '' });
   const [currentPassword, setCurrentPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const toast = useToast(); 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -299,6 +300,7 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
         console.error('Error deleting team:', error);
       } else {
         setShowDeleteSuccessAlert(true);
+        setShowDeleteModal(false); // Close the modal after successful deletion
         onDelete();
       }
     } catch (error) {
@@ -518,14 +520,59 @@ const EditUserForm = ({ teamData, onSave, onDelete, onClose }) => {
             </VStack>
             <Flex justifyContent="flex-end" mt={4}>
             <Button mr={2} colorScheme="green" onClick={handleModifyAndPushData}>Modifier</Button>
-            <Button mr={2} colorScheme="red" onClick={handleDeleteTeam}>Supprimer</Button>
-            <Button mr={2} colorScheme="blue" onClick={onClose}>Fermer</Button>
-            </Flex>
+            <Button
+              mr={2}
+              colorScheme="red"
+              onClick={() => setShowDeleteModal(true)} // Open delete confirmation modal
+            >
+              Supprimer
+            </Button>
+            <Button mr={2} colorScheme="blue" onClick={onClose}>
+              Fermer
+            </Button>
+          </Flex>
+
+          {/* Success Alert */}
+          {showDeleteSuccessAlert && (
+            <Alert status="success" mt={4}>
+              <AlertIcon />
+              Équipe supprimée avec succès. Rafraîchir manuellement la page.
+            </Alert>
+          )}
+
+          {/* Delete Confirmation Modal */}
+          <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
+            <ModalContent>
+              <ModalHeader>Confirmer la suppression</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Text>
+                  Êtes-vous sûr de vouloir supprimer cette équipe ? Cette action
+                  est irréversible. Penser à rafraîchir la page.
+                </Text>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  colorScheme="red"
+                  onClick={handleDeleteTeam} // Confirm delete
+                  mr={3}
+                >
+                  Confirmer
+                </Button>
+                <Button
+                  colorScheme="gray"
+                  onClick={() => setShowDeleteModal(false)} // Close modal
+                >
+                  Annuler
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
           </form>
           {showDeleteSuccessAlert && (
             <Alert status="success" mt={4}>
               <AlertIcon />
-              Equipe supprimée avec succès
+              Equipe supprimée avec succès. Penser à rafraîchir la page.
             </Alert>
           )}
         </ModalBody>
