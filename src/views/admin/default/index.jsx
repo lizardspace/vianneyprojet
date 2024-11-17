@@ -83,18 +83,29 @@ export default function UserReports() {
 
   const deleteTeam = async (teamId) => {
     try {
-      // Supprimez les dépendances dans vianney_actions
+      // Supprimer les dépendances dans vianney_sos_alerts
+      const { error: alertsError } = await supabase
+        .from('vianney_sos_alerts')
+        .delete()
+        .eq('team_id', teamId);
+  
+      if (alertsError) {
+        console.error('Erreur lors de la suppression des alertes associées :', alertsError);
+        throw new Error('Impossible de supprimer les alertes associées.');
+      }
+  
+      // Supprimer les dépendances dans vianney_actions
       const { error: actionsError } = await supabase
         .from('vianney_actions')
         .delete()
-        .eq('team_to_which_its_attached', teamId); // Utilisez la bonne colonne ici
+        .eq('team_to_which_its_attached', teamId);
   
       if (actionsError) {
-        console.error('Erreur lors de la suppression des dépendances :', actionsError);
+        console.error('Erreur lors de la suppression des actions associées :', actionsError);
         throw new Error('Impossible de supprimer les actions associées. Vérifiez les dépendances.');
       }
   
-      // Supprimez l'équipe dans vianney_teams
+      // Supprimer l'équipe dans vianney_teams
       const { error: teamError } = await supabase
         .from('vianney_teams')
         .delete()
@@ -105,12 +116,12 @@ export default function UserReports() {
         throw new Error('Impossible de supprimer l\'équipe.');
       }
   
-      // Mettez à jour l'état local
+      // Mettre à jour l'état local
       setTeams((prevTeams) => prevTeams.filter((team) => team.id !== teamId));
       setShowDeleteTeamModal(false);
       setTeamToDelete(null);
   
-      // Affichez une notification de succès
+      // Afficher une notification de succès
       toast({
         title: "Succès",
         description: "L'équipe et ses dépendances ont été supprimées avec succès.",
