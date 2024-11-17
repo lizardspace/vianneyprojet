@@ -265,9 +265,8 @@ export default function UserReports() {
                     setShowDeleteTeamModal(true);
                   }}
                   mt={2}
-                >
-                  Supprimer
-                </Button>
+                />
+                  
               </Box>
             ))}
             <Button
