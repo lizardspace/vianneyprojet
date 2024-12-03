@@ -135,48 +135,48 @@ const InvoiceForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Préparation des données pour l'insertion
-    const productDescriptions = invoiceData.productDetails.map(item => item.description);
-    const productQuantities = invoiceData.productDetails.map(item => item.quantity);
-    const productUnitPrices = invoiceData.productDetails.map(item => item.unitPrice);
-    const productVatRates = invoiceData.productDetails.map(item => item.vatRate);
+    const products = invoiceData.productDetails.map(item => ({
+      description: item.description || '',
+      quantity: parseFloat(item.quantity) || 0,
+      unitPrice: parseFloat(item.unitPrice) || 0,
+      vatRate: parseFloat(item.vatRate) || 0,
+    }));
+
+    const dataToInsert = {
+      invoice_date: invoiceData.invoiceDate || null,
+      invoice_number: invoiceData.invoiceNumber || null,
+      sale_date: invoiceData.saleDate || null,
+      seller_name: invoiceData.sellerName || null,
+      seller_address: invoiceData.sellerAddress || null,
+      seller_siren: invoiceData.sellerSiren || null,
+      seller_siret: invoiceData.sellerSiret || null,
+      seller_legal_form: invoiceData.sellerLegalForm || null,
+      seller_capital: invoiceData.sellerCapital ? parseFloat(invoiceData.sellerCapital) : null,
+      seller_rcs: invoiceData.sellerRCS || null,
+      seller_greffe: invoiceData.sellerGreffe || null,
+      seller_rm: invoiceData.sellerRM || null,
+      buyer_name: invoiceData.buyerName || null,
+      buyer_address: invoiceData.buyerAddress || null,
+      delivery_address: invoiceData.deliveryAddress || null,
+      billing_address: invoiceData.billingAddress || null,
+      order_number: invoiceData.orderNumber || null,
+      seller_vat_number: invoiceData.sellerVATNumber || null,
+      buyer_vat_number: invoiceData.buyerVATNumber || null,
+      products: products.length > 0 ? products : null,
+      discount: invoiceData.discount ? parseFloat(invoiceData.discount) : null,
+      total_ht: invoiceData.totalHT ? parseFloat(invoiceData.totalHT) : null,
+      total_ttc: invoiceData.totalTTC ? parseFloat(invoiceData.totalTTC) : null,
+      payment_due_date: invoiceData.paymentDueDate || null,
+      discount_conditions: invoiceData.discountConditions || null,
+      late_payment_penalties: invoiceData.latePaymentPenalties || null,
+      warranty_info: invoiceData.warrantyInfo || null,
+      special_mention: invoiceData.specialMention || null,
+      event_id: selectedEventId || null,
+    };
 
     const { error } = await supabase
       .from('vianney_factures')
-      .insert({
-        invoice_date: invoiceData.invoiceDate || null,
-        invoice_number: invoiceData.invoiceNumber || null,
-        sale_date: invoiceData.saleDate || null,
-        seller_name: invoiceData.sellerName || null,
-        seller_address: invoiceData.sellerAddress || null,
-        seller_siren: invoiceData.sellerSiren || null,
-        seller_siret: invoiceData.sellerSiret || null,
-        seller_legal_form: invoiceData.sellerLegalForm || null,
-        seller_capital: invoiceData.sellerCapital || null,
-        seller_rcs: invoiceData.sellerRCS || null,
-        seller_greffe: invoiceData.sellerGreffe || null,
-        seller_rm: invoiceData.sellerRM || null,
-        buyer_name: invoiceData.buyerName || null,
-        buyer_address: invoiceData.buyerAddress || null,
-        delivery_address: invoiceData.deliveryAddress || null,
-        billing_address: invoiceData.billingAddress || null,
-        order_number: invoiceData.orderNumber || null,
-        seller_vat_number: invoiceData.sellerVATNumber || null,
-        buyer_vat_number: invoiceData.buyerVATNumber || null,
-        product_descriptions: productDescriptions.length > 0 ? productDescriptions : null,
-        product_quantities: productQuantities.length > 0 ? productQuantities : null,
-        product_unit_prices: productUnitPrices.length > 0 ? productUnitPrices : null,
-        product_vat_rates: productVatRates.length > 0 ? productVatRates : null,
-        discount: invoiceData.discount || null,
-        total_ht: invoiceData.totalHT || null,
-        total_ttc: invoiceData.totalTTC || null,
-        payment_due_date: invoiceData.paymentDueDate || null,
-        discount_conditions: invoiceData.discountConditions || null,
-        late_payment_penalties: invoiceData.latePaymentPenalties || null,
-        warranty_info: invoiceData.warrantyInfo || null,
-        special_mention: invoiceData.specialMention || null,
-        event_id: selectedEventId || null, // Add event_id from context
-      });
+      .insert(dataToInsert);
 
     if (error) {
       console.error('Error inserting invoice:', error);
