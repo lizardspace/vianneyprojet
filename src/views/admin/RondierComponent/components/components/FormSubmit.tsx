@@ -1,24 +1,55 @@
 // src/components/FormSubmit.tsx
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { supabase } from './../../../../../supabaseClient';
-import { TextInput, Textarea, Checkbox, RadioGroup, Radio, Select, Slider, Button } from '@mantine/core';
+import { TextInput, Textarea, Checkbox, RadioGroup, Radio, Select, Slider, Button, Box } from '@mantine/core';
 import { Form, Question } from '../Types';
 
-const FormSubmit: React.FC = () => {
-  const { formId } = useParams<{ formId: string }>();
+interface FormSubmitProps {
+  formId: string;
+}
+
+const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
   const [form, setForm] = useState<Form | null>(null);
   const [responses, setResponses] = useState<Record<string, any>>({});
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  console.log('FormSubmit: Received formId:', formId); // Log pour vérifier formId
 
   useEffect(() => {
+    if (!formId) {
+      console.error('FormSubmit: formId est manquant');
+      return;
+    }
+
     const fetchForm = async () => {
-      const { data: formData, error } = await supabase.from('forms').select('*').eq('id', formId).single();
+      console.log('FormSubmit: Fetching form with id:', formId); // Log avant la requête
+
+      const { data: formData, error } = await supabase
+        .from('forms')
+        .select('*')
+        .eq('id', formId)
+        .single();
+
       if (error) {
-        console.error(error);
+        console.error('FormSubmit: Erreur lors de la récupération du formulaire:', error);
+        alert('Une erreur est survenue lors de la récupération du formulaire.');
         return;
       }
 
-      const { data: questionsData } = await supabase.from('questions').select('*').eq('form_id', formId);
+      console.log('FormSubmit: formData:', formData); // Log pour vérifier les données du formulaire
+
+      const { data: questionsData, error: questionsError } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('form_id', formId);
+
+      if (questionsError) {
+        console.error('FormSubmit: Erreur lors de la récupération des questions:', questionsError);
+        alert('Une erreur est survenue lors de la récupération des questions.');
+        return;
+      }
+
+      console.log('FormSubmit: questionsData:', questionsData); // Log pour vérifier les données des questions
 
       setForm({ ...formData, questions: questionsData });
     };
@@ -27,6 +58,10 @@ const FormSubmit: React.FC = () => {
   }, [formId]);
 
   const handleSubmit = async () => {
+    console.log('FormSubmit: Submitting responses:', responses); // Log pour vérifier les réponses
+
+    setIsSubmitting(true);
+
     const { error } = await supabase.from('responses').insert([
       {
         form_id: formId,
@@ -35,10 +70,15 @@ const FormSubmit: React.FC = () => {
     ]);
 
     if (error) {
-      console.error(error);
+      console.error('FormSubmit: Erreur lors de la soumission des réponses:', error);
+      alert('Une erreur est survenue lors de la soumission des réponses.');
     } else {
+      console.log('FormSubmit: Réponses soumises avec succès.');
       alert('Réponses soumises avec succès !');
+      setResponses({});
     }
+
+    setIsSubmitting(false);
   };
 
   if (!form) {
@@ -46,7 +86,7 @@ const FormSubmit: React.FC = () => {
   }
 
   return (
-    <div>
+    <Box>
       <h1>{form.title}</h1>
       <p>{form.description}</p>
       {form.questions.map((question: Question) => {
@@ -59,27 +99,30 @@ const FormSubmit: React.FC = () => {
             return (
               <TextInput
                 key={question.id}
-                label={question.questionText}
-                required={question.isRequired}
+                label={question.question_text}
+                required={question.is_required}
                 onChange={(e) => handleChange(e.currentTarget.value)}
+                mb="sm"
               />
             );
           case 'textarea':
             return (
               <Textarea
                 key={question.id}
-                label={question.questionText}
-                required={question.isRequired}
+                label={question.question_text}
+                required={question.is_required}
                 onChange={(e) => handleChange(e.currentTarget.value)}
+                mb="sm"
               />
             );
           case 'radio':
             return (
               <RadioGroup
                 key={question.id}
-                label={question.questionText}
-                required={question.isRequired}
+                label={question.question_text}
+                required={question.is_required}
                 onChange={handleChange}
+                mb="sm"
               >
                 {question.options?.map((option) => (
                   <Radio key={option.value} value={option.value} label={option.label} />
@@ -88,19 +131,20 @@ const FormSubmit: React.FC = () => {
             );
           case 'checkbox':
             return (
-              <div key={question.id}>
-                <p>{question.questionText}</p>
+              <div key={question.id} style={{ marginBottom: '1em' }}>
+                <p>{question.question_text}</p>
                 {question.options?.map((option) => (
                   <Checkbox
                     key={option.value}
                     label={option.label}
                     onChange={(e) => {
-                      const prevValues = responses[question.id] || [];
+                      const prevValues: string[] = responses[question.id] || [];
                       const newValues = e.currentTarget.checked
                         ? [...prevValues, option.value]
                         : prevValues.filter((val: string) => val !== option.value);
                       handleChange(newValues);
                     }}
+                    mb="sm"
                   />
                 ))}
               </div>
@@ -109,16 +153,17 @@ const FormSubmit: React.FC = () => {
             return (
               <Select
                 key={question.id}
-                label={question.questionText}
-                required={question.isRequired}
+                label={question.question_text}
+                required={question.is_required}
                 data={question.options?.map((option) => ({ value: option.value, label: option.label })) || []}
                 onChange={handleChange}
+                mb="sm"
               />
             );
           case 'slider':
             return (
-              <div key={question.id}>
-                <p>{question.questionText}</p>
+              <div key={question.id} style={{ marginBottom: '1em' }}>
+                <p>{question.question_text}</p>
                 <Slider onChange={handleChange} />
               </div>
             );
@@ -126,8 +171,10 @@ const FormSubmit: React.FC = () => {
             return null;
         }
       })}
-      <Button onClick={handleSubmit}>Soumettre</Button>
-    </div>
+      <Button onClick={handleSubmit} mt="md" loading={isSubmitting}>
+        Soumettre
+      </Button>
+    </Box>
   );
 };
 

@@ -1,6 +1,6 @@
 // src/components/QuestionEditor.tsx
 import React from 'react';
-import { TextInput, Select, Checkbox, Button } from '@mantine/core';
+import { TextInput, Select, Checkbox, Button, Box } from '@mantine/core';
 import { Question, Option } from '../Types';
 
 interface QuestionEditorProps {
@@ -38,33 +38,43 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onUpdate }) =
   };
 
   return (
-    <div style={{ border: '1px solid #ccc', padding: '1em', marginTop: '1em' }}>
+    <Box
+      sx={{
+        border: '1px solid #ccc',
+        padding: '1em',
+        marginTop: '1em',
+        borderRadius: '8px',
+      }}
+    >
       <Select
         label="Type de question"
         data={questionTypes}
         value={question.type}
         onChange={(value) => updateQuestion('type', value)}
         required
+        mb="sm"
       />
       <TextInput
         label="Texte de la question"
-        value={question.questionText}
-        onChange={(e) => updateQuestion('questionText', e.currentTarget.value)}
+        value={question.question_text}
+        onChange={(e) => updateQuestion('question_text', e.currentTarget.value)}
         required
+        mb="sm"
       />
       <Checkbox
         label="Réponse obligatoire"
-        checked={question.isRequired}
-        onChange={(e) => updateQuestion('isRequired', e.currentTarget.checked)}
+        checked={question.is_required}
+        onChange={(e) => updateQuestion('is_required', e.currentTarget.checked)}
+        mb="sm"
       />
 
       {(question.type === 'radio' ||
         question.type === 'checkbox' ||
         question.type === 'dropdown') && (
-        <div style={{ marginTop: '1em' }}>
+        <Box mt="sm">
           <h4>Options</h4>
           {question.options?.map((option, index) => (
-            <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5em' }}>
+            <Box key={index} sx={{ display: 'flex', alignItems: 'center', marginBottom: '0.5em' }}>
               <TextInput
                 placeholder="Label de l'option"
                 value={option.label}
@@ -75,16 +85,17 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onUpdate }) =
                 }}
                 style={{ flexGrow: 1, marginRight: '0.5em' }}
                 required
+                mb="sm"
               />
               <Button color="red" onClick={() => removeOption(index)}>
                 Supprimer
               </Button>
-            </div>
+            </Box>
           ))}
           <Button onClick={addOption}>Ajouter une option</Button>
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 
