@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from '@chakra-ui/react';
+import { Button, Tooltip } from '@chakra-ui/react'; // Import Tooltip
 import { utils, writeFile } from 'xlsx';
 import { supabase } from './../../../../supabaseClient';
 import { FcAddDatabase } from "react-icons/fc"; // Importing the icon
@@ -37,7 +37,7 @@ const VianneyPdfDocumentsTable = () => {
     const ws = utils.json_to_sheet(data);
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, 'Documents PDF de Vianney'); // Updated sheet name for French
-    
+
     try {
       writeFile(wb, 'documents_pdf_vianney.xlsx'); // Updated file name for French
     } catch (error) {
@@ -48,9 +48,18 @@ const VianneyPdfDocumentsTable = () => {
   return (
     <div>
       {error && <div>Erreur : {error}</div>} {/* Updated error message for French */}
-      <Button colorScheme="orange" onClick={handleExport}>
-        Exporter vers Excel les documents PDF <FcAddDatabase style={{ marginLeft: '8px' }} />
-      </Button>
+      <Tooltip
+        label="Ces documents PDF se trouvent dans Paramètres --> Documents --> Document mission."
+        fontSize="sm"
+        bg="gray.700"
+        color="white"
+        placement="top"
+        hasArrow
+      >
+        <Button colorScheme="orange" onClick={handleExport}>
+          Exporter vers Excel les documents PDF <FcAddDatabase style={{ marginLeft: '8px' }} />
+        </Button>
+      </Tooltip>
     </div>
   );
 };
