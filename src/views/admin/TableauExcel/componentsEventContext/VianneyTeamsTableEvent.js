@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Alert, AlertIcon, AlertDescription, CloseButton } from '@chakra-ui/react';
+import { Button, Alert, AlertIcon, AlertDescription, CloseButton, Tooltip } from '@chakra-ui/react'; // Import Tooltip
 import { utils, writeFile } from 'xlsx';
 import { supabase } from '../../../../supabaseClient';
 import { FcAddDatabase, FcRightUp2 } from "react-icons/fc";
@@ -45,28 +45,35 @@ const VianneyTeamsTableEvent = () => {
       setIsErrorVisible(true);
       return;
     }
-  
+
     // Remove unwanted columns (created_at and updated_at)
-    const filteredData = data.map(({created_at, updated_at, last_updated, event_id, id, image_url, ...rest }) => rest);
+    const filteredData = data.map(({ created_at, updated_at, last_updated, event_id, id, image_url, ...rest }) => rest);
     const ws = utils.json_to_sheet(filteredData);
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, 'Équipes de Vianney');
-  
+
     try {
       await writeFile(wb, 'equipes_vianney.xlsx');
     } catch (error) {
-            setError(`Erreur lors de l'exportation vers Excel : ${error.message}`);
-    } finally {
+      setError(`Erreur lors de l'exportation vers Excel : ${error.message}`);
       setIsErrorVisible(true);
     }
   };
-  
 
   return (
     <div>
-      <Button colorScheme="orange" onClick={handleExport}>
-         Exporter vers Excel les équipes <FcAddDatabase style={{ marginLeft: '8px' }} />
-      </Button>
+      <Tooltip
+        label="Ce fichier contient les informations des équipes associées à l'événement sélectionné."
+        fontSize="sm"
+        bg="gray.700"
+        color="white"
+        placement="top"
+        hasArrow
+      >
+        <Button colorScheme="orange" onClick={handleExport}>
+          Exporter vers Excel les équipes <FcAddDatabase style={{ marginLeft: '8px' }} />
+        </Button>
+      </Tooltip>
       {error && isErrorVisible && (
         <Alert status="info" mt="2" maxW="300px">
           <AlertDescription>{error}</AlertDescription>
@@ -75,7 +82,7 @@ const VianneyTeamsTableEvent = () => {
         </Alert>
       )}
     </div>
-  );  
+  );
 };
 
 export default VianneyTeamsTableEvent;
