@@ -1,7 +1,23 @@
 import React from "react";
 import { Icon } from "@chakra-ui/react";
-import { FcMindMap, FcLock, FcVideoCall, FcPlanner, FcSurvey, FcSettings, FcGrid, FcHighPriority, FcDiploma2, FcDocument, FcAbout, FcOpenedFolder, FcMoneyTransfer, FcNook } from "react-icons/fc";
-import { MdQrCodeScanner, MdOutlineSos } from "react-icons/md"; 
+import {
+  FcMindMap,
+  FcLock,
+  FcVideoCall,
+  FcPlanner,
+  FcSurvey,
+  FcSettings,
+  FcGrid,
+  FcHighPriority,
+  FcDiploma2,
+  FcDocument,
+  FcAbout,
+  FcOpenedFolder,
+  FcMoneyTransfer,
+  FcNook,
+  FcGlobe, // Added FcGlobe icon
+} from "react-icons/fc";
+import { MdQrCodeScanner, MdOutlineSos } from "react-icons/md";
 
 import MainDashboard from "views/admin/default";
 import NFTMarketplace from "views/admin/carte";
@@ -11,22 +27,23 @@ import AlerteEquipe from "views/admin/AlerteEquipe";
 import MaterialComponent from "views/admin/MaterialComponent";
 import ZoomedMapComponent from "views/admin/ZoomedMapComponent";
 import NoteDeFraisComponent from "views/admin/NoteDeFraisComponent";
-import AlerteJeSuisEnDanger from "views/admin/alertejesuisendanger"; 
+import AlerteJeSuisEnDanger from "views/admin/alertejesuisendanger";
 import Parameters from "views/admin/Parameters";
-import SOSComponent from "views/admin/SOSComponent"; 
-import ChatComponent from "views/admin/ChatComponent"; 
-import IncidentReportForm from "views/admin/IncidentReportForm"; 
-import VideoStreamAnalysisComponent from "views/admin/VideoStreamAnalysisComponent"; 
-import Factures from "views/admin/Factures"; 
+import SOSComponent from "views/admin/SOSComponent";
+import ChatComponent from "views/admin/ChatComponent";
+import IncidentReportForm from "views/admin/IncidentReportForm";
+import VideoStreamAnalysisComponent from "views/admin/VideoStreamAnalysisComponent";
+import Factures from "views/admin/Factures";
 import AddDocumentComponent from "views/admin/AddDocumentComponent";
-import Login from "views/auth/Login"; 
-import FicheDePaieComponent from "views/admin/FicheDePaieComponent"; 
+import Login from "views/auth/Login";
+import FicheDePaieComponent from "views/admin/FicheDePaieComponent";
+import RondierComponent from "views/admin/RondierComponent"; // Imported RondierComponent
 
 const routes = [
   {
     name: "Déconnexion",
     layout: "/auth",
-    path: "/login", // Add login route
+    path: "/login",
     icon: <Icon as={FcLock} width="20px" height="20px" color="inherit" />,
     component: Login,
   },
@@ -170,6 +187,13 @@ const routes = [
     path: "/fiche-de-paie",
     icon: <Icon as={FcNook} width="20px" height="20px" color="inherit" />,
     component: FicheDePaieComponent,
+  },
+  {
+    name: "Rondier",
+    layout: "/admin",
+    path: "/rondier",
+    icon: <Icon as={FcGlobe} width="20px" height="20px" color="inherit" />, // Added icon
+    component: RondierComponent, // Assigned component
   },
 ];
 
