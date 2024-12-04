@@ -1,11 +1,9 @@
 // src/App.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ChakraProvider,
   Button,
   Box,
-  List,
-  ListItem,
   Text,
   Flex,
   Spinner,
@@ -13,6 +11,18 @@ import {
   VStack,
   HStack,
   useToast,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
 } from '@chakra-ui/react';
 import FormBuilder from './components/FormBuilder.tsx';
 import FormSubmit from './components/FormSubmit.tsx';
@@ -28,6 +38,11 @@ const App: React.FC = () => {
   const [forms, setForms] = useState<Form[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
+
+  // Pour gérer la suppression des formulaires
+  const [isDeletingForm, setIsDeletingForm] = useState<boolean>(false);
+  const [formToDelete, setFormToDelete] = useState<Form | null>(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
 
   console.log('App: Current Form ID au démarrage:', currentFormId);
   console.log('App: Current View au démarrage:', currentView);
@@ -106,6 +121,72 @@ const App: React.FC = () => {
     setCurrentView('viewResponses');
   };
 
+  // Fonction pour initier la suppression d'un formulaire
+  const initiateDeleteForm = (form: Form) => {
+    setFormToDelete(form);
+  };
+
+  // Fonction pour confirmer la suppression d'un formulaire
+  const confirmDeleteForm = async () => {
+    if (!formToDelete) return;
+
+    setIsDeletingForm(true);
+    try {
+      // Supprimer toutes les réponses associées
+      const { error: deleteResponsesError } = await supabase
+        .from('responses')
+        .delete()
+        .eq('form_id', formToDelete.id);
+
+      if (deleteResponsesError) {
+        throw deleteResponsesError;
+      }
+
+      // Supprimer le formulaire
+      const { error: deleteFormError } = await supabase
+        .from('forms')
+        .delete()
+        .eq('id', formToDelete.id);
+
+      if (deleteFormError) {
+        throw deleteFormError;
+      }
+
+      console.log('App: Formulaire et réponses supprimés avec succès.');
+      toast({
+        title: 'Succès.',
+        description: 'Formulaire et réponses supprimés avec succès !',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+
+      // Mettre à jour l'état local des formulaires
+      setForms(forms.filter((f) => f.id !== formToDelete.id));
+
+      // Si le formulaire supprimé était en cours d'affichage, revenir à la liste
+      if (currentFormId === formToDelete.id) {
+        setCurrentView('list');
+        setCurrentFormId(null);
+      }
+    } catch (error) {
+      console.error('App: Erreur lors de la suppression du formulaire:', error);
+      toast({
+        title: 'Erreur de suppression.',
+        description: 'Une erreur est survenue lors de la suppression du formulaire.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+    setIsDeletingForm(false);
+    setFormToDelete(null);
+  };
+
+  const cancelDeleteForm = () => {
+    setFormToDelete(null);
+  };
+
   return (
     <ChakraProvider>
       <Box p={8}>
@@ -160,43 +241,86 @@ const App: React.FC = () => {
               ) : forms.length === 0 ? (
                 <Text>Aucun formulaire trouvé. Créez-en un nouveau!</Text>
               ) : (
-                <List spacing={3}>
-                  {forms.map((form) => (
-                    <ListItem key={form.id} p={4} borderWidth="1px" borderRadius="md" mb={2}>
-                      <Flex justify="space-between" align="center">
-                        <Box>
-                          <Text fontWeight="bold" fontSize="lg">
-                            {form.title}
-                          </Text>
-                          <Text fontSize="sm" color="gray.500">
-                            {form.description}
-                          </Text>
-                        </Box>
-                        <HStack spacing={2}>
-                          <Button
-                            onClick={() => handleSubmitResponses(form.id)}
-                            colorScheme="teal"
-                            size="sm"
-                          >
-                            Soumettre
-                          </Button>
-                          <Button
-                            onClick={() => handleViewResponses(form.id)}
-                            colorScheme="blue"
-                            size="sm"
-                          >
-                            Voir Réponses
-                          </Button>
-                        </HStack>
-                      </Flex>
-                    </ListItem>
-                  ))}
-                </List>
+                <Table variant="simple">
+                  <Thead>
+                    <Tr>
+                      <Th>Titre</Th>
+                      <Th>Description</Th>
+                      <Th>Actions</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {forms.map((form) => (
+                      <Tr key={form.id}>
+                        <Td>{form.title}</Td>
+                        <Td>{form.description}</Td>
+                        <Td>
+                          <HStack spacing={2}>
+                            <Button
+                              onClick={() => handleSubmitResponses(form.id)}
+                              colorScheme="teal"
+                              size="sm"
+                            >
+                              Soumettre
+                            </Button>
+                            <Button
+                              onClick={() => handleViewResponses(form.id)}
+                              colorScheme="blue"
+                              size="sm"
+                            >
+                              Voir Réponses
+                            </Button>
+                            <Button
+                              onClick={() => initiateDeleteForm(form)}
+                              colorScheme="red"
+                              size="sm"
+                            >
+                              Supprimer
+                            </Button>
+                          </HStack>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
               )}
             </>
           )}
         </VStack>
       </Box>
+
+      {/* AlertDialog pour confirmation de suppression de formulaire */}
+      <AlertDialog
+        isOpen={formToDelete !== null}
+        leastDestructiveRef={cancelRef}
+        onClose={cancelDeleteForm}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Supprimer le Formulaire
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Êtes-vous sûr de vouloir supprimer ce formulaire et toutes les réponses associées ? Cette action est irréversible.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={cancelDeleteForm}>
+                Annuler
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={confirmDeleteForm}
+                ml={3}
+                isLoading={isDeletingForm}
+              >
+                Supprimer
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </ChakraProvider>
   );
 };

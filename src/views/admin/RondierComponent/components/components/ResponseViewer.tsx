@@ -4,59 +4,46 @@ import { supabase } from './../../../../../supabaseClient';
 import {
   Box,
   Heading,
+  Text,
   Table,
   Thead,
   Tbody,
   Tr,
   Th,
   Td,
-  Spinner,
-  Text,
-  Flex,
   Button,
+  Spinner,
   useToast,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
 } from '@chakra-ui/react';
-import { CSVLink } from 'react-csv';
-
-interface ResponseData {
-  id: string;
-  form_id: string;
-  user_id: string;
-  response_data: Record<string, any>;
-  submitted_at: string; // Utilisation de 'submitted_at'
-}
+import { Response } from '../Types';
+import { useRef } from 'react';
 
 interface ResponseViewerProps {
   formId: string;
 }
 
 const ResponseViewer: React.FC<ResponseViewerProps> = ({ formId }) => {
-  const [responses, setResponses] = useState<ResponseData[]>([]);
+  const [responses, setResponses] = useState<Response[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [responseToDelete, setResponseToDelete] = useState<Response | null>(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (!formId) {
-      console.error('ResponseViewer: formId est manquant');
-      toast({
-        title: 'Formulaire non trouvé.',
-        description: 'L\'ID du formulaire est manquant.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
-
     const fetchResponses = async () => {
       setIsLoading(true);
-      console.log('ResponseViewer: Récupération des réponses pour formId:', formId);
-
       const { data, error } = await supabase
         .from('responses')
         .select('*')
         .eq('form_id', formId)
-        .order('submitted_at', { ascending: false }); // Utilisation de 'submitted_at'
+        .order('submitted_at', { ascending: false });
 
       if (error) {
         console.error('ResponseViewer: Erreur lors de la récupération des réponses:', error);
@@ -71,82 +58,126 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ formId }) => {
         console.log('ResponseViewer: Réponses récupérées:', data);
         setResponses(data);
       }
-
       setIsLoading(false);
     };
 
     fetchResponses();
   }, [formId, toast]);
 
-  // Extraire les clés des réponses pour générer les en-têtes de la table
-  const getTableHeaders = (): string[] => {
-    if (responses.length === 0) return [];
-    // Récupérer toutes les clés présentes dans les réponses
-    const keys = new Set<string>();
-    responses.forEach((response) => {
-      Object.keys(response.response_data).forEach((key) => keys.add(key));
-    });
-    return Array.from(keys);
+  const handleDelete = (response: Response) => {
+    setResponseToDelete(response);
   };
 
-  const headers = getTableHeaders();
+  const confirmDelete = async () => {
+    if (!responseToDelete) return;
 
-  // Préparer les données pour le téléchargement CSV
-  const csvData = responses.map((resp) => resp.response_data);
+    setIsDeleting(true);
+    const { error } = await supabase
+      .from('responses')
+      .delete()
+      .eq('id', responseToDelete.id);
+
+    if (error) {
+      console.error('ResponseViewer: Erreur lors de la suppression de la réponse:', error);
+      toast({
+        title: 'Erreur de suppression.',
+        description: 'Une erreur est survenue lors de la suppression de la réponse.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } else {
+      console.log('ResponseViewer: Réponse supprimée avec succès.');
+      toast({
+        title: 'Succès.',
+        description: 'Réponse supprimée avec succès !',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+      setResponses(responses.filter((r) => r.id !== responseToDelete.id));
+    }
+
+    setIsDeleting(false);
+    setResponseToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setResponseToDelete(null);
+  };
 
   return (
-    <Box p={6} borderWidth="1px" borderRadius="md" boxShadow="md">
-      <Flex justify="space-between" align="center" mb={4}>
-        <Heading as="h2" size="lg">
-          Réponses du Formulaire
-        </Heading>
-        {responses.length > 0 && (
-          <Button colorScheme="teal">
-            <CSVLink
-              data={csvData}
-              filename={`responses_form_${formId}.csv`}
-              style={{ color: 'white', textDecoration: 'none' }}
-            >
-              Télécharger CSV
-            </CSVLink>
-          </Button>
-        )}
-      </Flex>
+    <Box>
+      <Heading as="h3" size="md" mb={4}>
+        Réponses
+      </Heading>
       {isLoading ? (
-        <Flex justify="center" align="center">
-          <Spinner size="xl" />
-          <Text ml={4}>Chargement des réponses...</Text>
-        </Flex>
+        <Spinner size="xl" />
       ) : responses.length === 0 ? (
         <Text>Aucune réponse trouvée pour ce formulaire.</Text>
       ) : (
-        <Table variant="striped" colorScheme="gray" size="sm">
+        <Table variant="simple">
           <Thead>
             <Tr>
               <Th>ID</Th>
-              {headers.map((header) => (
-                <Th key={header}>{header}</Th>
-              ))}
+              <Th>Réponse</Th>
               <Th>Date de Soumission</Th>
+              <Th>Actions</Th>
             </Tr>
           </Thead>
           <Tbody>
             {responses.map((response) => (
               <Tr key={response.id}>
                 <Td>{response.id}</Td>
-                {headers.map((header) => (
-                  <Td key={header}>
-                    {typeof response.response_data[header] === 'object'
-                      ? JSON.stringify(response.response_data[header])
-                      : response.response_data[header]}
-                  </Td>
-                ))}
-                <Td>{new Date(response.submitted_at).toLocaleString()}</Td> {/* Utilisation de 'submitted_at' */}
+                <Td>{JSON.stringify(response.response_data)}</Td>
+                <Td>{new Date(response.submitted_at).toLocaleString()}</Td>
+                <Td>
+                  <Button
+                    colorScheme="red"
+                    size="sm"
+                    onClick={() => handleDelete(response)}
+                  >
+                    Supprimer
+                  </Button>
+                </Td>
               </Tr>
             ))}
           </Tbody>
         </Table>
       )}
+
+      {/* AlertDialog pour confirmation de suppression */}
+      <AlertDialog
+        isOpen={responseToDelete !== null}
+        leastDestructiveRef={cancelRef}
+        onClose={cancelDelete}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Supprimer la réponse
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Êtes-vous sûr de vouloir supprimer cette réponse ? Cette action est irréversible.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={cancelDelete}>
+                Annuler
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={confirmDelete}
+                ml={3}
+                isLoading={isDeleting}
+              >
+                Supprimer
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   );
 };
