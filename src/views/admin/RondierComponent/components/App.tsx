@@ -60,6 +60,7 @@ const App: React.FC = () => {
   // Utiliser useEffect pour récupérer les formulaires au montage du composant
   useEffect(() => {
     fetchForms();
+    // eslint-disable-next-line
   }, []);
 
   // Fonction de rappel lorsque le formulaire est sauvegardé

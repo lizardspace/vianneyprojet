@@ -9,7 +9,6 @@ import {
   FormControl,
   FormLabel,
   VStack,
-  HStack,
   Flex,
 } from '@chakra-ui/react';
 import { Question, Option } from '../Types';
