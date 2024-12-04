@@ -98,6 +98,54 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
 
     setIsSubmitting(true);
 
+    // Validation des réponses obligatoires
+    let hasEmptyRequired = false;
+    for (const question of form?.questions || []) {
+      if (question.is_required) {
+        const response = responses[question.id];
+        if (
+          response === undefined ||
+          response === null ||
+          (typeof response === 'string' && response.trim() === '') ||
+          (Array.isArray(response) && response.length === 0)
+        ) {
+          hasEmptyRequired = true;
+          toast({
+            title: 'Réponse manquante.',
+            description: `La question "${question.question_text}" est requise.`,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+          break;
+        }
+      }
+    }
+
+    if (hasEmptyRequired) {
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Vérifier que les 'value's des options sont corrects
+    for (const question of form?.questions || []) {
+      if (
+        ['radio', 'checkbox', 'dropdown'].includes(question.type) &&
+        question.options &&
+        question.options.some((option) => !option.value.trim())
+      ) {
+        toast({
+          title: 'Valeurs d\'options invalides.',
+          description: `La question "${question.question_text}" contient des options avec des valeurs invalides.`,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
     const { error } = await supabase.from('responses').insert([
       {
         form_id: formId,

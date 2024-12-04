@@ -28,6 +28,11 @@ const questionTypes = [
   { value: 'file', label: 'Téléchargement de fichier' },
 ];
 
+// Fonction pour générer un 'value' basé sur le 'label'
+const generateValueFromLabel = (label: string) => {
+  return label.trim().toLowerCase().replace(/\s+/g, '_');
+};
+
 const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onUpdate }) => {
   const updateQuestion = (key: keyof Question, value: any) => {
     onUpdate({ ...question, [key]: value });
@@ -45,6 +50,23 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onUpdate }) =
       options.splice(index, 1);
       updateQuestion('options', options);
     }
+  };
+
+  // Gestion des changements de label et auto-génération du value si vide
+  const handleOptionLabelChange = (index: number, newLabel: string) => {
+    const options = [...(question.options || [])];
+    options[index] = { ...options[index], label: newLabel };
+    // Auto-générer le 'value' si vide
+    if (!options[index].value.trim()) {
+      options[index].value = generateValueFromLabel(newLabel);
+    }
+    updateQuestion('options', options);
+  };
+
+  const handleOptionValueChange = (index: number, newValue: string) => {
+    const options = [...(question.options || [])];
+    options[index] = { ...options[index], value: newValue };
+    updateQuestion('options', options);
   };
 
   return (
@@ -93,20 +115,23 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onUpdate }) =
             <FormLabel>Options</FormLabel>
             {question.options?.map((option, index) => (
               <Flex key={index} mb={2} align="center">
-                <Input
-                  placeholder="Label de l'option"
-                  value={option.label}
-                  onChange={(e) => {
-                    const options = [...(question.options || [])];
-                    options[index] = { ...options[index], label: e.target.value };
-                    updateQuestion('options', options);
-                  }}
-                  mr={2}
-                />
+                <VStack spacing={2} align="stretch" flex="1">
+                  <Input
+                    placeholder="Label de l'option"
+                    value={option.label}
+                    onChange={(e) => handleOptionLabelChange(index, e.target.value)}
+                  />
+                  <Input
+                    placeholder="Valeur de l'option"
+                    value={option.value}
+                    onChange={(e) => handleOptionValueChange(index, e.target.value)}
+                  />
+                </VStack>
                 <Button
                   colorScheme="red"
                   size="sm"
                   onClick={() => removeOption(index)}
+                  ml={2}
                 >
                   Supprimer
                 </Button>

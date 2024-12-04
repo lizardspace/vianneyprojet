@@ -54,6 +54,38 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
       return;
     }
 
+    // Vérifier que toutes les options des questions de type radio, checkbox, dropdown ont des 'value's non vides
+    for (const question of form.questions) {
+      if (
+        ['radio', 'checkbox', 'dropdown'].includes(question.type) &&
+        (!question.options || question.options.length === 0)
+      ) {
+        toast({
+          title: 'Options manquantes.',
+          description: `La question "${question.question_text}" doit avoir au moins une option.`,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      if (
+        ['radio', 'checkbox', 'dropdown'].includes(question.type) &&
+        question.options &&
+        question.options.some((option) => !option.value.trim())
+      ) {
+        toast({
+          title: 'Valeurs d\'options manquantes.',
+          description: `Toutes les options de la question "${question.question_text}" doivent avoir une valeur.`,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+    }
+
     try {
       // Générer un ID unique
       const formId = uuidv4();
