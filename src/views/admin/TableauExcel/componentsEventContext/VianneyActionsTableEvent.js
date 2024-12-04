@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Alert, AlertIcon, AlertDescription, CloseButton } from '@chakra-ui/react';
+import { Button, Alert, AlertIcon, AlertDescription, CloseButton, Tooltip } from '@chakra-ui/react'; // Import Tooltip
 import { utils, writeFile } from 'xlsx';
 import { supabase } from './../../../../supabaseClient';
 import { FcAddDatabase, FcRightUp2 } from "react-icons/fc";
@@ -46,28 +46,37 @@ const VianneyActionsTableEvent = () => {
       setIsErrorVisible(true);
       return;
     }
-  
+
     // Remove unwanted columns (created_at and updated_at)
     const filteredData = data.map(({ created_at, updated_at, last_updated, event_id, id, ...rest }) => rest);
-  
+
     const ws = utils.json_to_sheet(filteredData);
     const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, 'Actions de Vianney');
-  
+    utils.book_append_sheet(wb, ws, 'Actions prévues pour l\'événement sélectionné');
+
     try {
-      await writeFile(wb, 'actions_vianney.xlsx');
+      await writeFile(wb, 'actions_evenement_vianney.xlsx');
     } catch (error) {
       setError('Erreur lors de l\'exportation vers Excel : ' + error.message);
     } finally {
       setIsErrorVisible(true);
     }
   };
-  
+
   return (
     <div>
-      <Button colorScheme="orange" onClick={handleExport}>
-        Exporter vers Excel les actions <FcAddDatabase style={{ marginLeft: '8px' }} />
-      </Button>
+      <Tooltip
+        label="Ce tableau contient les actions dans le calendrier prévues pour l'événement sélectionné."
+        fontSize="sm"
+        bg="gray.700"
+        color="white"
+        placement="top"
+        hasArrow
+      >
+        <Button colorScheme="orange" onClick={handleExport}>
+          Exporter les actions dans le calendrier de l'événement <FcAddDatabase style={{ marginLeft: '8px' }} />
+        </Button>
+      </Tooltip>
       {error && isErrorVisible && (
         <Alert status="info" mt="2" maxW="300px">
           <AlertDescription>{error}</AlertDescription>

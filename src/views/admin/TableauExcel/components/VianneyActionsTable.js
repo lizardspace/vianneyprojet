@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from '@chakra-ui/react';
+import { Button, Tooltip } from '@chakra-ui/react'; // Import Tooltip
 import { utils, writeFile } from 'xlsx';
 import { supabase } from './../../../../supabaseClient';
 import { FcAddDatabase } from "react-icons/fc"; // Importing the icon
@@ -36,10 +36,10 @@ const VianneyActionsTable = () => {
 
     const ws = utils.json_to_sheet(data);
     const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, 'Actions de Vianney'); // Updated sheet name for French
-    
+    utils.book_append_sheet(wb, ws, 'Actions prévues dans le calendrier'); // Updated sheet name for French
+
     try {
-      writeFile(wb, 'actions_vianney.xlsx'); // Updated file name for French
+      writeFile(wb, 'actions_calendrier_vianney.xlsx'); // Updated file name for French
     } catch (error) {
       setError('Erreur lors de l\'exportation vers Excel : ' + error.message); // Updated error message for French
     }
@@ -48,9 +48,18 @@ const VianneyActionsTable = () => {
   return (
     <div>
       {error && <div>Erreur : {error}</div>} {/* Updated error message for French */}
-      <Button colorScheme="orange" onClick={handleExport}>
-         Exporter vers Excel les actions <FcAddDatabase style={{ marginLeft: '8px' }} />
-      </Button>
+      <Tooltip
+        label="Ce tableau Excel extrait toutes les actions prévues dans le calendrier."
+        fontSize="sm"
+        bg="gray.700"
+        color="white"
+        placement="top"
+        hasArrow
+      >
+        <Button colorScheme="orange" onClick={handleExport}>
+          Exporter les actions dans le calendrier <FcAddDatabase style={{ marginLeft: '8px' }} />
+        </Button>
+      </Tooltip>
     </div>
   );
 };
