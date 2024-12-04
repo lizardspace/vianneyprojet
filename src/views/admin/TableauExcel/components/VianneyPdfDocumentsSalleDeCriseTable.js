@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from '@chakra-ui/react';
+import { Button, Tooltip } from '@chakra-ui/react'; // Import Tooltip
 import { utils, writeFile } from 'xlsx';
 import { supabase } from './../../../../supabaseClient';
 import { FcAddDatabase } from "react-icons/fc"; // Importing the icon
@@ -49,9 +49,18 @@ const VianneyPdfDocumentsSalleDeCriseTable = () => {
   return (
     <div>
       {error && <div>Erreur : {error}</div>} {/* Updated error message for French */}
-      <Button colorScheme="orange" onClick={handleExport}>
-        Exporter vers Excel les documents PDF salle de crise <FcAddDatabase style={{ marginLeft: '8px' }} />
-      </Button>
+      <Tooltip
+        label="Ces documents PDF sont disponibles dans Paramètres --> Salle de crise. Ils contiennent des informations spécifiques pour gérer les événements."
+        fontSize="sm"
+        bg="gray.700"
+        color="white"
+        placement="top"
+        hasArrow
+      >
+        <Button colorScheme="orange" onClick={handleExport}>
+          Exporter vers Excel les documents PDF salle de crise <FcAddDatabase style={{ marginLeft: '8px' }} />
+        </Button>
+      </Tooltip>
     </div>
   );
 };
