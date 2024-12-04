@@ -21,8 +21,9 @@ import { CSVLink } from 'react-csv';
 interface ResponseData {
   id: string;
   form_id: string;
+  user_id: string;
   response_data: Record<string, any>;
-  created_at: string;
+  submitted_at: string; // Utilisation de 'submitted_at'
 }
 
 interface ResponseViewerProps {
@@ -55,7 +56,7 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ formId }) => {
         .from('responses')
         .select('*')
         .eq('form_id', formId)
-        .order('created_at', { ascending: false });
+        .order('submitted_at', { ascending: false }); // Utilisation de 'submitted_at'
 
       if (error) {
         console.error('ResponseViewer: Erreur lors de la récupération des réponses:', error);
@@ -140,7 +141,7 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ formId }) => {
                       : response.response_data[header]}
                   </Td>
                 ))}
-                <Td>{new Date(response.created_at).toLocaleString()}</Td>
+                <Td>{new Date(response.submitted_at).toLocaleString()}</Td> {/* Utilisation de 'submitted_at' */}
               </Tr>
             ))}
           </Tbody>
