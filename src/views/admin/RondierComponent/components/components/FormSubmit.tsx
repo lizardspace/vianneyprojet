@@ -1,7 +1,22 @@
 // src/components/FormSubmit.tsx
 import React, { useEffect, useState } from 'react';
 import { supabase } from './../../../../../supabaseClient';
-import { TextInput, Textarea, Checkbox, RadioGroup, Radio, Select, Slider, Button, Box } from '@mantine/core';
+import {
+  Box,
+  Heading,
+  Text,
+  Input,
+  Textarea,
+  Checkbox,
+  RadioGroup,
+  Radio,
+  Select,
+  Slider,
+  Button,
+  VStack,
+  FormControl,
+  FormLabel,
+} from '@chakra-ui/react';
 import { Form, Question } from '../Types';
 
 interface FormSubmitProps {
@@ -82,98 +97,123 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
   };
 
   if (!form) {
-    return <div>Chargement...</div>;
+    return (
+      <Box p={4} borderWidth="1px" borderRadius="md">
+        <Text>Chargement...</Text>
+      </Box>
+    );
   }
 
   return (
-    <Box>
-      <h1>{form.title}</h1>
-      <p>{form.description}</p>
-      {form.questions.map((question: Question) => {
-        const handleChange = (value: any) => {
-          setResponses({ ...responses, [question.id]: value });
-        };
+    <Box p={4} borderWidth="1px" borderRadius="md">
+      <Heading as="h2" size="lg" mb={4}>
+        {form.title}
+      </Heading>
+      <Text mb={6}>{form.description}</Text>
+      <VStack spacing={4} align="stretch">
+        {form.questions.map((question: Question) => {
+          const handleChange = (value: any) => {
+            setResponses({ ...responses, [question.id]: value });
+          };
 
-        switch (question.type) {
-          case 'text':
-            return (
-              <TextInput
-                key={question.id}
-                label={question.question_text}
-                required={question.is_required}
-                onChange={(e) => handleChange(e.currentTarget.value)}
-                mb="sm"
-              />
-            );
-          case 'textarea':
-            return (
-              <Textarea
-                key={question.id}
-                label={question.question_text}
-                required={question.is_required}
-                onChange={(e) => handleChange(e.currentTarget.value)}
-                mb="sm"
-              />
-            );
-          case 'radio':
-            return (
-              <RadioGroup
-                key={question.id}
-                label={question.question_text}
-                required={question.is_required}
-                onChange={handleChange}
-                mb="sm"
-              >
-                {question.options?.map((option) => (
-                  <Radio key={option.value} value={option.value} label={option.label} />
-                ))}
-              </RadioGroup>
-            );
-          case 'checkbox':
-            return (
-              <div key={question.id} style={{ marginBottom: '1em' }}>
-                <p>{question.question_text}</p>
-                {question.options?.map((option) => (
-                  <Checkbox
-                    key={option.value}
-                    label={option.label}
-                    onChange={(e) => {
-                      const prevValues: string[] = responses[question.id] || [];
-                      const newValues = e.currentTarget.checked
-                        ? [...prevValues, option.value]
-                        : prevValues.filter((val: string) => val !== option.value);
-                      handleChange(newValues);
-                    }}
-                    mb="sm"
+          switch (question.type) {
+            case 'text':
+              return (
+                <FormControl key={question.id} isRequired={question.is_required}>
+                  <FormLabel>{question.question_text}</FormLabel>
+                  <Input
+                    placeholder="Votre réponse"
+                    value={responses[question.id] || ''}
+                    onChange={(e) => handleChange(e.target.value)}
                   />
-                ))}
-              </div>
-            );
-          case 'dropdown':
-            return (
-              <Select
-                key={question.id}
-                label={question.question_text}
-                required={question.is_required}
-                data={question.options?.map((option) => ({ value: option.value, label: option.label })) || []}
-                onChange={handleChange}
-                mb="sm"
-              />
-            );
-          case 'slider':
-            return (
-              <div key={question.id} style={{ marginBottom: '1em' }}>
-                <p>{question.question_text}</p>
-                <Slider onChange={handleChange} />
-              </div>
-            );
-          default:
-            return null;
-        }
-      })}
-      <Button onClick={handleSubmit} mt="md" loading={isSubmitting}>
-        Soumettre
-      </Button>
+                </FormControl>
+              );
+            case 'textarea':
+              return (
+                <FormControl key={question.id} isRequired={question.is_required}>
+                  <FormLabel>{question.question_text}</FormLabel>
+                  <Textarea
+                    placeholder="Votre réponse"
+                    value={responses[question.id] || ''}
+                    onChange={(e) => handleChange(e.target.value)}
+                  />
+                </FormControl>
+              );
+            case 'radio':
+              return (
+                <FormControl key={question.id} isRequired={question.is_required}>
+                  <FormLabel>{question.question_text}</FormLabel>
+                  <RadioGroup
+                    onChange={handleChange}
+                    value={responses[question.id] || ''}
+                  >
+                    {question.options?.map((option) => (
+                      <Radio key={option.value} value={option.value}>
+                        {option.label}
+                      </Radio>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+              );
+            case 'checkbox':
+              return (
+                <FormControl key={question.id}>
+                  <FormLabel>{question.question_text}</FormLabel>
+                  {question.options?.map((option) => (
+                    <Checkbox
+                      key={option.value}
+                      isChecked={responses[question.id]?.includes(option.value) || false}
+                      onChange={(e) => {
+                        const prevValues: string[] = responses[question.id] || [];
+                        const newValues = e.target.checked
+                          ? [...prevValues, option.value]
+                          : prevValues.filter((val: string) => val !== option.value);
+                        handleChange(newValues);
+                      }}
+                      mb={2}
+                    >
+                      {option.label}
+                    </Checkbox>
+                  ))}
+                </FormControl>
+              );
+            case 'dropdown':
+              return (
+                <FormControl key={question.id} isRequired={question.is_required}>
+                  <FormLabel>{question.question_text}</FormLabel>
+                  <Select
+                    placeholder="Sélectionnez une option"
+                    value={responses[question.id] || ''}
+                    onChange={(e) => handleChange(e.target.value)}
+                  >
+                    {question.options?.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Select>
+                </FormControl>
+              );
+            case 'slider':
+              return (
+                <FormControl key={question.id}>
+                  <FormLabel>{question.question_text}</FormLabel>
+                  <Slider
+                    defaultValue={0}
+                    min={0}
+                    max={100}
+                    onChange={(val) => handleChange(val)}
+                  />
+                </FormControl>
+              );
+            default:
+              return null;
+          }
+        })}
+        <Button onClick={handleSubmit} colorScheme="teal" isLoading={isSubmitting}>
+          Soumettre
+        </Button>
+      </VStack>
     </Box>
   );
 };

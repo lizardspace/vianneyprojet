@@ -1,7 +1,17 @@
 // src/components/FormBuilder.tsx
 import React, { useState } from 'react';
 import { supabase } from './../../../../../supabaseClient';
-import { Button, TextInput, Textarea, Box } from '@mantine/core';
+import {
+  Button,
+  Input,
+  Textarea,
+  Box,
+  Heading,
+  VStack,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+} from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
 import QuestionEditor from './QuestionEditor.tsx';
 import { Form, Question } from '../Types';
@@ -106,38 +116,45 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
   };
 
   return (
-    <Box>
-      <h1>Créer un nouveau formulaire</h1>
-      <TextInput
-        label="Titre du formulaire"
-        value={form.title}
-        onChange={(e) => setForm({ ...form, title: e.currentTarget.value })}
-        required
-        mb="sm"
-      />
-      <Textarea
-        label="Description du formulaire"
-        value={form.description}
-        onChange={(e) => setForm({ ...form, description: e.currentTarget.value })}
-        mb="sm"
-      />
-      <Button onClick={addQuestion} mb="sm">
-        Ajouter une question
-      </Button>
-      {form.questions.map((question, index) => (
-        <QuestionEditor
-          key={question.id}
-          question={question}
-          onUpdate={(updatedQuestion) => {
-            const updatedQuestions = [...form.questions];
-            updatedQuestions[index] = updatedQuestion;
-            setForm({ ...form, questions: updatedQuestions });
-          }}
-        />
-      ))}
-      <Button onClick={saveForm} mt="md">
-        Sauvegarder le formulaire
-      </Button>
+    <Box p={4} borderWidth="1px" borderRadius="md">
+      <Heading as="h2" size="lg" mb={4}>
+        Créer un nouveau formulaire
+      </Heading>
+      <VStack spacing={4} align="stretch">
+        <FormControl isRequired>
+          <FormLabel>Titre du formulaire</FormLabel>
+          <Input
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            placeholder="Titre du formulaire"
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Description du formulaire</FormLabel>
+          <Textarea
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            placeholder="Description du formulaire"
+          />
+        </FormControl>
+        <Button onClick={addQuestion} colorScheme="teal">
+          Ajouter une question
+        </Button>
+        {form.questions.map((question, index) => (
+          <QuestionEditor
+            key={question.id}
+            question={question}
+            onUpdate={(updatedQuestion) => {
+              const updatedQuestions = [...form.questions];
+              updatedQuestions[index] = updatedQuestion;
+              setForm({ ...form, questions: updatedQuestions });
+            }}
+          />
+        ))}
+        <Button onClick={saveForm} colorScheme="teal" mt={4}>
+          Sauvegarder le formulaire
+        </Button>
+      </VStack>
     </Box>
   );
 };

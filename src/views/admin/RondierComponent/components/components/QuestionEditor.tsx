@@ -1,6 +1,16 @@
 // src/components/QuestionEditor.tsx
 import React from 'react';
-import { TextInput, Select, Checkbox, Button, Box } from '@mantine/core';
+import {
+  Box,
+  Button,
+  Input,
+  Select,
+  Checkbox,
+  FormControl,
+  FormLabel,
+  VStack,
+  Flex,
+} from '@chakra-ui/react';
 import { Question, Option } from '../Types';
 
 interface QuestionEditorProps {
@@ -39,62 +49,74 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onUpdate }) =
 
   return (
     <Box
-      sx={{
-        border: '1px solid #ccc',
-        padding: '1em',
-        marginTop: '1em',
-        borderRadius: '8px',
-      }}
+      p={4}
+      borderWidth="1px"
+      borderRadius="md"
+      mt={4}
+      bg="gray.50"
     >
-      <Select
-        label="Type de question"
-        data={questionTypes}
-        value={question.type}
-        onChange={(value) => updateQuestion('type', value)}
-        required
-        mb="sm"
-      />
-      <TextInput
-        label="Texte de la question"
-        value={question.question_text}
-        onChange={(e) => updateQuestion('question_text', e.currentTarget.value)}
-        required
-        mb="sm"
-      />
-      <Checkbox
-        label="Réponse obligatoire"
-        checked={question.is_required}
-        onChange={(e) => updateQuestion('is_required', e.currentTarget.checked)}
-        mb="sm"
-      />
+      <VStack spacing={4} align="stretch">
+        <FormControl isRequired>
+          <FormLabel>Type de question</FormLabel>
+          <Select
+            placeholder="Sélectionnez un type"
+            value={question.type}
+            onChange={(e) => updateQuestion('type', e.target.value)}
+          >
+            {questionTypes.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl isRequired>
+          <FormLabel>Texte de la question</FormLabel>
+          <Input
+            placeholder="Texte de la question"
+            value={question.question_text}
+            onChange={(e) => updateQuestion('question_text', e.target.value)}
+          />
+        </FormControl>
+        <Checkbox
+          isChecked={question.is_required}
+          onChange={(e) => updateQuestion('is_required', e.target.checked)}
+        >
+          Réponse obligatoire
+        </Checkbox>
 
-      {(question.type === 'radio' ||
-        question.type === 'checkbox' ||
-        question.type === 'dropdown') && (
-        <Box mt="sm">
-          <h4>Options</h4>
-          {question.options?.map((option, index) => (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'center', marginBottom: '0.5em' }}>
-              <TextInput
-                placeholder="Label de l'option"
-                value={option.label}
-                onChange={(e) => {
-                  const options = [...(question.options || [])];
-                  options[index] = { ...options[index], label: e.currentTarget.value };
-                  updateQuestion('options', options);
-                }}
-                style={{ flexGrow: 1, marginRight: '0.5em' }}
-                required
-                mb="sm"
-              />
-              <Button color="red" onClick={() => removeOption(index)}>
-                Supprimer
-              </Button>
-            </Box>
-          ))}
-          <Button onClick={addOption}>Ajouter une option</Button>
-        </Box>
-      )}
+        {(question.type === 'radio' ||
+          question.type === 'checkbox' ||
+          question.type === 'dropdown') && (
+          <Box>
+            <FormLabel>Options</FormLabel>
+            {question.options?.map((option, index) => (
+              <Flex key={index} mb={2} align="center">
+                <Input
+                  placeholder="Label de l'option"
+                  value={option.label}
+                  onChange={(e) => {
+                    const options = [...(question.options || [])];
+                    options[index] = { ...options[index], label: e.target.value };
+                    updateQuestion('options', options);
+                  }}
+                  mr={2}
+                />
+                <Button
+                  colorScheme="red"
+                  size="sm"
+                  onClick={() => removeOption(index)}
+                >
+                  Supprimer
+                </Button>
+              </Flex>
+            ))}
+            <Button onClick={addOption} size="sm" colorScheme="teal">
+              Ajouter une option
+            </Button>
+          </Box>
+        )}
+      </VStack>
     </Box>
   );
 };

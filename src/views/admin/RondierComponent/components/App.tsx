@@ -1,6 +1,16 @@
 // src/App.tsx
 import React, { useState, useEffect } from 'react';
-import { MantineProvider, Button, Box, List, Text, Group } from '@mantine/core';
+import {
+  ChakraProvider,
+  Button,
+  Box,
+  List,
+  ListItem,
+  Text,
+  Flex,
+  Spinner,
+  Heading,
+} from '@chakra-ui/react';
 import FormBuilder from './components/FormBuilder.tsx';
 import FormSubmit from './components/FormSubmit.tsx';
 import { supabase } from './../../../../supabaseClient';
@@ -61,56 +71,66 @@ const App: React.FC = () => {
   };
 
   return (
-    <MantineProvider withGlobalStyles withNormalizeCSS>
-      <Box style={{ padding: '2em' }}>
+    <ChakraProvider>
+      <Box p={8}>
         {isCreatingForm ? (
           <>
             <FormBuilder onFormSaved={handleFormSaved} />
-            <Button mt="md" onClick={handleBackToForms}>
+            <Button mt={4} onClick={handleBackToForms} colorScheme="teal">
               Retour à la liste des formulaires
             </Button>
           </>
         ) : currentFormId ? (
           <>
-            <h2>Soumettre des Réponses</h2>
+            <Heading as="h2" size="lg" mb={4}>
+              Soumettre des Réponses
+            </Heading>
             <FormSubmit formId={currentFormId} />
-            <Button mt="md" onClick={() => setCurrentFormId(null)}>
+            <Button mt={4} onClick={handleBackToForms} colorScheme="teal">
               Retour à la liste des formulaires
             </Button>
           </>
         ) : (
           <>
-            <Group position="apart" mb="md">
-              <Text size="xl" weight={700}>
+            <Flex justify="space-between" align="center" mb={4}>
+              <Heading as="h1" size="xl">
                 Liste des Formulaires
-              </Text>
-              <Button onClick={handleCreateNewForm}>Créer un Nouveau Formulaire</Button>
-            </Group>
+              </Heading>
+              <Button onClick={handleCreateNewForm} colorScheme="teal">
+                Créer un Nouveau Formulaire
+              </Button>
+            </Flex>
             {isLoading ? (
-              <Text>Chargement des formulaires...</Text>
+              <Flex justify="center" align="center">
+                <Spinner size="xl" />
+              </Flex>
             ) : forms.length === 0 ? (
               <Text>Aucun formulaire trouvé. Créez-en un nouveau!</Text>
             ) : (
-              <List spacing="sm" size="sm" center>
+              <List spacing={3}>
                 {forms.map((form) => (
-                  <List.Item key={form.id}>
-                    <Group position="apart">
+                  <ListItem key={form.id} p={4} borderWidth="1px" borderRadius="md" mb={2}>
+                    <Flex justify="space-between" align="center">
                       <Box>
-                        <Text weight={500}>{form.title}</Text>
-                        <Text size="sm" color="dimmed">
+                        <Text fontWeight="bold" fontSize="lg">
+                          {form.title}
+                        </Text>
+                        <Text fontSize="sm" color="gray.500">
                           {form.description}
                         </Text>
                       </Box>
-                      <Button onClick={() => setCurrentFormId(form.id)}>Soumettre</Button>
-                    </Group>
-                  </List.Item>
+                      <Button onClick={() => setCurrentFormId(form.id)} colorScheme="teal">
+                        Soumettre
+                      </Button>
+                    </Flex>
+                  </ListItem>
                 ))}
               </List>
             )}
           </>
         )}
       </Box>
-    </MantineProvider>
+    </ChakraProvider>
   );
 };
 
