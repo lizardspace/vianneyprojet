@@ -1,5 +1,5 @@
 // src/components/ResponseViewer.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from './../../../../../supabaseClient';
 import {
   Box,
@@ -22,7 +22,7 @@ import {
   AlertDialogFooter,
 } from '@chakra-ui/react';
 import { Response } from '../Types';
-import { useRef } from 'react';
+import { useEvent } from './../../../../../EventContext'; // Mettez le bon chemin
 
 interface ResponseViewerProps {
   formId: string;
@@ -35,14 +35,28 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ formId }) => {
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [responseToDelete, setResponseToDelete] = useState<Response | null>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const { selectedEventId } = useEvent();
 
   useEffect(() => {
+    if (!selectedEventId) {
+      console.error('ResponseViewer: event_id est manquant');
+      toast({
+        title: 'Événement non sélectionné.',
+        description: 'Veuillez sélectionner un événement.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
     const fetchResponses = async () => {
       setIsLoading(true);
       const { data, error } = await supabase
         .from('responses')
         .select('*')
         .eq('form_id', formId)
+        .eq('event_id', selectedEventId) // Filtrer par event_id
         .order('submitted_at', { ascending: false });
 
       if (error) {
@@ -55,14 +69,13 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ formId }) => {
           isClosable: true,
         });
       } else {
-        console.log('ResponseViewer: Réponses récupérées:', data);
         setResponses(data);
       }
       setIsLoading(false);
     };
 
     fetchResponses();
-  }, [formId, toast]);
+  }, [formId, selectedEventId, toast]);
 
   const handleDelete = (response: Response) => {
     setResponseToDelete(response);
@@ -75,7 +88,8 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ formId }) => {
     const { error } = await supabase
       .from('responses')
       .delete()
-      .eq('id', responseToDelete.id);
+      .eq('id', responseToDelete.id)
+      .eq('event_id', selectedEventId); // Filtrer par event_id
 
     if (error) {
       console.error('ResponseViewer: Erreur lors de la suppression de la réponse:', error);
@@ -87,7 +101,6 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ formId }) => {
         isClosable: true,
       });
     } else {
-      console.log('ResponseViewer: Réponse supprimée avec succès.');
       toast({
         title: 'Succès.',
         description: 'Réponse supprimée avec succès !',

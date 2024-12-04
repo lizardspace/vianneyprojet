@@ -15,6 +15,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import QuestionEditor from './QuestionEditor.tsx';
 import { Form, Question } from '../Types';
+import { useEvent } from './../../../../../EventContext'; // Mettez le bon chemin
 
 interface FormBuilderProps {
   onFormSaved: (formId: string) => void;
@@ -22,25 +23,40 @@ interface FormBuilderProps {
 
 const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
   const [form, setForm] = useState<Form>({
+    id: '',
     title: '',
     description: '',
     questions: [],
+    created_at: '',
+    event_id: '',
   });
   const toast = useToast();
+  const { selectedEventId } = useEvent();
 
   const addQuestion = () => {
     const newQuestion: Question = {
       id: uuidv4(),
+      form_id: '',
       type: 'text',
       question_text: '',
       is_required: false,
+      event_id: '',
     };
-    setForm({ ...form, questions: [...form.questions, newQuestion] });
+    setForm({ ...form, questions: [...(form.questions || []), newQuestion] });
   };
 
   const saveForm = async () => {
-    console.log('--- FormBuilder: Sauvegarde du formulaire ---');
-    console.log('État actuel du formulaire avant sauvegarde:', form);
+    // Vérifiez que l'événement est sélectionné
+    if (!selectedEventId) {
+      toast({
+        title: 'Événement non sélectionné.',
+        description: 'Veuillez sélectionner un événement avant de créer un formulaire.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
 
     // Vérifiez que le titre n'est pas vide
     if (form.title.trim() === '') {
@@ -55,7 +71,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
     }
 
     // Vérifier que toutes les options des questions de type radio, checkbox, dropdown ont des 'value's non vides
-    for (const question of form.questions) {
+    for (const question of form.questions || []) {
       if (
         ['radio', 'checkbox', 'dropdown'].includes(question.type) &&
         (!question.options || question.options.length === 0)
@@ -89,17 +105,16 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
     try {
       // Générer un ID unique
       const formId = uuidv4();
-      console.log('FormBuilder: Form ID généré:', formId);
 
-      // Insérer le formulaire avec l'ID généré
+      // Insérer le formulaire avec l'ID généré et l'event_id
       const { data: formData, error: formError } = await supabase
         .from('forms')
         .insert([
           {
-            id: formId, // Assurez-vous que l'ID est fourni
+            id: formId,
             title: form.title,
             description: form.description,
-            // created_by est omis si nullable
+            event_id: selectedEventId, // Ajouter event_id
           },
         ])
         .select('*')
@@ -132,16 +147,15 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
       }
 
       // Préparer les données des questions
-      const questionsData = form.questions.map((q) => ({
+      const questionsData = (form.questions || []).map((q) => ({
         id: q.id,
-        form_id: formData.id, // Utiliser l'ID du formulaire inséré
+        form_id: formData.id,
         type: q.type,
         question_text: q.question_text,
         options: q.options,
         is_required: q.is_required,
+        event_id: selectedEventId, // Ajouter event_id
       }));
-
-      console.log('FormBuilder: Données des questions préparées:', questionsData);
 
       // Insérer les questions
       const { error: questionsError } = await supabase.from('questions').insert(questionsData);
@@ -156,7 +170,6 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
           isClosable: true,
         });
       } else {
-        console.log('FormBuilder: Questions insérées avec succès.');
         toast({
           title: 'Succès.',
           description: 'Formulaire sauvegardé avec succès !',
@@ -167,9 +180,12 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
         onFormSaved(formData.id); // Passer le formId au parent
         // Réinitialiser le formulaire
         setForm({
+          id: '',
           title: '',
           description: '',
           questions: [],
+          created_at: '',
+          event_id: '',
         });
       }
     } catch (error) {
@@ -209,12 +225,12 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
         <Button onClick={addQuestion} colorScheme="teal" variant="outline">
           Ajouter une Question
         </Button>
-        {form.questions.map((question, index) => (
+        {(form.questions || []).map((question, index) => (
           <QuestionEditor
             key={question.id}
             question={question}
             onUpdate={(updatedQuestion) => {
-              const updatedQuestions = [...form.questions];
+              const updatedQuestions = [...(form.questions || [])];
               updatedQuestions[index] = updatedQuestion;
               setForm({ ...form, questions: updatedQuestions });
             }}

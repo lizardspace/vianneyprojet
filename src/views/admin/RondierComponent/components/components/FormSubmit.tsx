@@ -19,6 +19,8 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Form, Question } from '../Types';
+import { useEvent } from './../../../../../EventContext'; // Mettez le bon chemin
+import { useTeam } from './../../../../../TeamContext'; // Mettez le bon chemin
 
 interface FormSubmitProps {
   formId: string;
@@ -29,10 +31,22 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
   const [responses, setResponses] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const toast = useToast();
-
-  console.log('FormSubmit: Received formId:', formId); // Log pour vérifier formId
+  const { selectedEventId } = useEvent();
+  const { teamUUID } = useTeam();
 
   useEffect(() => {
+    if (!selectedEventId) {
+      console.error('FormSubmit: event_id est manquant');
+      toast({
+        title: 'Événement non sélectionné.',
+        description: 'Veuillez sélectionner un événement.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
     if (!formId) {
       console.error('FormSubmit: formId est manquant');
       toast({
@@ -46,15 +60,15 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
     }
 
     const fetchForm = async () => {
-      console.log('FormSubmit: Fetching form with id:', formId); // Log avant la requête
-
+      // Récupérer le formulaire
       const { data: formData, error } = await supabase
         .from('forms')
         .select('*')
         .eq('id', formId)
+        .eq('event_id', selectedEventId)
         .single();
 
-      if (error) {
+      if (error || !formData) {
         console.error('FormSubmit: Erreur lors de la récupération du formulaire:', error);
         toast({
           title: 'Erreur de récupération.',
@@ -66,12 +80,12 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
         return;
       }
 
-      console.log('FormSubmit: formData:', formData); // Log pour vérifier les données du formulaire
-
+      // Récupérer les questions
       const { data: questionsData, error: questionsError } = await supabase
         .from('questions')
         .select('*')
-        .eq('form_id', formId);
+        .eq('form_id', formId)
+        .eq('event_id', selectedEventId);
 
       if (questionsError) {
         console.error('FormSubmit: Erreur lors de la récupération des questions:', questionsError);
@@ -85,16 +99,23 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
         return;
       }
 
-      console.log('FormSubmit: questionsData:', questionsData); // Log pour vérifier les données des questions
-
       setForm({ ...formData, questions: questionsData });
     };
 
     fetchForm();
-  }, [formId, toast]);
+  }, [formId, selectedEventId, toast]);
 
   const handleSubmit = async () => {
-    console.log('FormSubmit: Submitting responses:', responses); // Log pour vérifier les réponses
+    if (!selectedEventId) {
+      toast({
+        title: 'Événement non sélectionné.',
+        description: 'Veuillez sélectionner un événement avant de soumettre le formulaire.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -150,6 +171,8 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
       {
         form_id: formId,
         response_data: responses,
+        event_id: selectedEventId, // Ajouter event_id
+        team_id: teamUUID || null, // Ajouter team_id si disponible
       },
     ]);
 
@@ -163,7 +186,6 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
         isClosable: true,
       });
     } else {
-      console.log('FormSubmit: Réponses soumises avec succès.');
       toast({
         title: 'Succès.',
         description: 'Réponses soumises avec succès !',
@@ -238,7 +260,7 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
               );
             case 'checkbox':
               return (
-                <FormControl key={question.id}>
+                <FormControl key={question.id} isRequired={question.is_required}>
                   <FormLabel>{question.question_text}</FormLabel>
                   {question.options?.map((option) => (
                     <Checkbox

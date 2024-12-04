@@ -29,6 +29,7 @@ import FormSubmit from './components/FormSubmit.tsx';
 import ResponseViewer from './components/ResponseViewer.tsx';
 import { supabase } from './../../../../supabaseClient';
 import { Form } from './Types';
+import { useEvent } from './../../../../EventContext'; // Mettez le bon chemin
 
 type ViewMode = 'list' | 'create' | 'submit' | 'viewResponses';
 
@@ -38,23 +39,32 @@ const App: React.FC = () => {
   const [forms, setForms] = useState<Form[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
+  const { selectedEventId } = useEvent();
 
   // Pour gérer la suppression des formulaires
   const [isDeletingForm, setIsDeletingForm] = useState<boolean>(false);
   const [formToDelete, setFormToDelete] = useState<Form | null>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
 
-  console.log('App: Current Form ID au démarrage:', currentFormId);
-  console.log('App: Current View au démarrage:', currentView);
-
   // Fonction pour récupérer tous les formulaires depuis Supabase
   const fetchForms = async () => {
+    if (!selectedEventId) {
+      toast({
+        title: 'Événement non sélectionné.',
+        description: 'Veuillez sélectionner un événement.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
     setIsLoading(true);
-    console.log('App: Récupération des formulaires depuis Supabase...');
     const { data, error } = await supabase
       .from('forms')
       .select('*')
-      .order('created_at', { ascending: false }); // Assurez-vous que 'created_at' existe
+      .eq('event_id', selectedEventId) // Filtrer par event_id
+      .order('created_at', { ascending: false });
 
     if (error) {
       console.error('App: Erreur lors de la récupération des formulaires:', error);
@@ -66,7 +76,6 @@ const App: React.FC = () => {
         isClosable: true,
       });
     } else {
-      console.log('App: Formulaires récupérés:', data);
       setForms(data);
     }
     setIsLoading(false);
@@ -76,11 +85,10 @@ const App: React.FC = () => {
   useEffect(() => {
     fetchForms();
     // eslint-disable-next-line
-  }, []);
+  }, [selectedEventId]);
 
   // Fonction de rappel lorsque le formulaire est sauvegardé
   const handleFormSaved = (formId: string) => {
-    console.log('App: Formulaire sauvegardé avec ID:', formId);
     setCurrentFormId(formId);
     setCurrentView('submit');
     toast({
@@ -95,28 +103,24 @@ const App: React.FC = () => {
 
   // Fonction pour créer un nouveau formulaire
   const handleCreateNewForm = () => {
-    console.log('App: Ouverture du FormBuilder pour créer un nouveau formulaire.');
     setCurrentView('create');
     setCurrentFormId(null);
   };
 
   // Fonction pour revenir à la liste des formulaires
   const handleBackToList = () => {
-    console.log('App: Retour à la liste des formulaires.');
     setCurrentView('list');
     setCurrentFormId(null);
   };
 
   // Fonction pour soumettre des réponses
   const handleSubmitResponses = (formId: string) => {
-    console.log('App: Soumettre des réponses pour formId:', formId);
     setCurrentFormId(formId);
     setCurrentView('submit');
   };
 
   // Fonction pour voir les réponses
   const handleViewResponses = (formId: string) => {
-    console.log('App: Voir les réponses pour formId:', formId);
     setCurrentFormId(formId);
     setCurrentView('viewResponses');
   };
@@ -128,7 +132,7 @@ const App: React.FC = () => {
 
   // Fonction pour confirmer la suppression d'un formulaire
   const confirmDeleteForm = async () => {
-    if (!formToDelete) return;
+    if (!formToDelete || !selectedEventId) return;
 
     setIsDeletingForm(true);
     try {
@@ -136,7 +140,8 @@ const App: React.FC = () => {
       const { error: deleteResponsesError } = await supabase
         .from('responses')
         .delete()
-        .eq('form_id', formToDelete.id);
+        .eq('form_id', formToDelete.id)
+        .eq('event_id', selectedEventId);
 
       if (deleteResponsesError) {
         throw deleteResponsesError;
@@ -146,13 +151,13 @@ const App: React.FC = () => {
       const { error: deleteFormError } = await supabase
         .from('forms')
         .delete()
-        .eq('id', formToDelete.id);
+        .eq('id', formToDelete.id)
+        .eq('event_id', selectedEventId);
 
       if (deleteFormError) {
         throw deleteFormError;
       }
 
-      console.log('App: Formulaire et réponses supprimés avec succès.');
       toast({
         title: 'Succès.',
         description: 'Formulaire et réponses supprimés avec succès !',
