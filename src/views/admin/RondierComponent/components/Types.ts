@@ -1,4 +1,4 @@
-// Types.ts
+// src/Types.ts
 export type QuestionType = 'text' | 'textarea' | 'radio' | 'checkbox' | 'dropdown' | 'slider' | 'file';
 
 export interface Option {

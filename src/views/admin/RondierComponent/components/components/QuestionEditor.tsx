@@ -29,6 +29,14 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onUpdate }) =
     updateQuestion('options', options);
   };
 
+  const removeOption = (index: number) => {
+    if (question.options) {
+      const options = [...question.options];
+      options.splice(index, 1);
+      updateQuestion('options', options);
+    }
+  };
+
   return (
     <div style={{ border: '1px solid #ccc', padding: '1em', marginTop: '1em' }}>
       <Select
@@ -36,22 +44,27 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onUpdate }) =
         data={questionTypes}
         value={question.type}
         onChange={(value) => updateQuestion('type', value)}
+        required
       />
       <TextInput
         label="Texte de la question"
         value={question.questionText}
         onChange={(e) => updateQuestion('questionText', e.currentTarget.value)}
+        required
       />
       <Checkbox
         label="Réponse obligatoire"
         checked={question.isRequired}
         onChange={(e) => updateQuestion('isRequired', e.currentTarget.checked)}
       />
-      {(question.type === 'radio' || question.type === 'checkbox' || question.type === 'dropdown') && (
-        <div>
+
+      {(question.type === 'radio' ||
+        question.type === 'checkbox' ||
+        question.type === 'dropdown') && (
+        <div style={{ marginTop: '1em' }}>
           <h4>Options</h4>
           {question.options?.map((option, index) => (
-            <div key={index}>
+            <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5em' }}>
               <TextInput
                 placeholder="Label de l'option"
                 value={option.label}
@@ -60,7 +73,12 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onUpdate }) =
                   options[index] = { ...options[index], label: e.currentTarget.value };
                   updateQuestion('options', options);
                 }}
+                style={{ flexGrow: 1, marginRight: '0.5em' }}
+                required
               />
+              <Button color="red" onClick={() => removeOption(index)}>
+                Supprimer
+              </Button>
             </div>
           ))}
           <Button onClick={addOption}>Ajouter une option</Button>
