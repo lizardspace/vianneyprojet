@@ -16,6 +16,7 @@ import {
   VStack,
   FormControl,
   FormLabel,
+  useToast,
 } from '@chakra-ui/react';
 import { Form, Question } from '../Types';
 
@@ -27,12 +28,20 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
   const [form, setForm] = useState<Form | null>(null);
   const [responses, setResponses] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const toast = useToast();
 
   console.log('FormSubmit: Received formId:', formId); // Log pour vérifier formId
 
   useEffect(() => {
     if (!formId) {
       console.error('FormSubmit: formId est manquant');
+      toast({
+        title: 'Formulaire non trouvé.',
+        description: 'L\'ID du formulaire est manquant.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
       return;
     }
 
@@ -47,7 +56,13 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
 
       if (error) {
         console.error('FormSubmit: Erreur lors de la récupération du formulaire:', error);
-        alert('Une erreur est survenue lors de la récupération du formulaire.');
+        toast({
+          title: 'Erreur de récupération.',
+          description: 'Une erreur est survenue lors de la récupération du formulaire.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
         return;
       }
 
@@ -60,7 +75,13 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
 
       if (questionsError) {
         console.error('FormSubmit: Erreur lors de la récupération des questions:', questionsError);
-        alert('Une erreur est survenue lors de la récupération des questions.');
+        toast({
+          title: 'Erreur de récupération.',
+          description: 'Une erreur est survenue lors de la récupération des questions.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
         return;
       }
 
@@ -70,7 +91,7 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
     };
 
     fetchForm();
-  }, [formId]);
+  }, [formId, toast]);
 
   const handleSubmit = async () => {
     console.log('FormSubmit: Submitting responses:', responses); // Log pour vérifier les réponses
@@ -86,10 +107,22 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
 
     if (error) {
       console.error('FormSubmit: Erreur lors de la soumission des réponses:', error);
-      alert('Une erreur est survenue lors de la soumission des réponses.');
+      toast({
+        title: 'Erreur de soumission.',
+        description: 'Une erreur est survenue lors de la soumission des réponses.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     } else {
       console.log('FormSubmit: Réponses soumises avec succès.');
-      alert('Réponses soumises avec succès !');
+      toast({
+        title: 'Succès.',
+        description: 'Réponses soumises avec succès !',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
       setResponses({});
     }
 
@@ -98,14 +131,14 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
 
   if (!form) {
     return (
-      <Box p={4} borderWidth="1px" borderRadius="md">
+      <Box p={6} borderWidth="1px" borderRadius="md" boxShadow="md">
         <Text>Chargement...</Text>
       </Box>
     );
   }
 
   return (
-    <Box p={4} borderWidth="1px" borderRadius="md">
+    <Box p={6} borderWidth="1px" borderRadius="md" boxShadow="md">
       <Heading as="h2" size="lg" mb={4}>
         {form.title}
       </Heading>
@@ -148,7 +181,7 @@ const FormSubmit: React.FC<FormSubmitProps> = ({ formId }) => {
                     value={responses[question.id] || ''}
                   >
                     {question.options?.map((option) => (
-                      <Radio key={option.value} value={option.value}>
+                      <Radio key={option.value} value={option.value} mb={2}>
                         {option.label}
                       </Radio>
                     ))}

@@ -10,7 +10,7 @@ import {
   VStack,
   FormControl,
   FormLabel,
-  FormErrorMessage,
+  useToast,
 } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
 import QuestionEditor from './QuestionEditor.tsx';
@@ -26,6 +26,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
     description: '',
     questions: [],
   });
+  const toast = useToast();
 
   const addQuestion = () => {
     const newQuestion: Question = {
@@ -43,7 +44,13 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
 
     // Vérifiez que le titre n'est pas vide
     if (form.title.trim() === '') {
-      alert('Le titre du formulaire est requis.');
+      toast({
+        title: 'Titre manquant.',
+        description: 'Le titre du formulaire est requis.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
       return;
     }
 
@@ -68,7 +75,13 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
 
       if (formError) {
         console.error('FormBuilder: Erreur lors de l\'insertion du formulaire:', formError);
-        alert('Une erreur est survenue lors de la sauvegarde du formulaire.');
+        toast({
+          title: 'Erreur de sauvegarde.',
+          description: 'Une erreur est survenue lors de la sauvegarde du formulaire.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
         return;
       }
 
@@ -76,7 +89,13 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
 
       if (!formData || !formData.id) {
         console.error('FormBuilder: formData est nul ou ne contient pas d\'id');
-        alert('Une erreur est survenue lors de la sauvegarde du formulaire.');
+        toast({
+          title: 'Erreur de sauvegarde.',
+          description: 'Une erreur est survenue lors de la sauvegarde du formulaire.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
         return;
       }
 
@@ -97,10 +116,22 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
 
       if (questionsError) {
         console.error('FormBuilder: Erreur lors de l\'insertion des questions:', questionsError);
-        alert('Une erreur est survenue lors de la sauvegarde des questions.');
+        toast({
+          title: 'Erreur de sauvegarde.',
+          description: 'Une erreur est survenue lors de la sauvegarde des questions.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
       } else {
         console.log('FormBuilder: Questions insérées avec succès.');
-        alert('Formulaire sauvegardé avec succès !');
+        toast({
+          title: 'Succès.',
+          description: 'Formulaire sauvegardé avec succès !',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
         onFormSaved(formData.id); // Passer le formId au parent
         // Réinitialiser le formulaire
         setForm({
@@ -111,34 +142,40 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
       }
     } catch (error) {
       console.error('FormBuilder: Erreur inattendue lors de la sauvegarde du formulaire:', error);
-      alert('Une erreur inattendue est survenue.');
+      toast({
+        title: 'Erreur inattendue.',
+        description: 'Une erreur inattendue est survenue.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
   return (
-    <Box p={4} borderWidth="1px" borderRadius="md">
+    <Box p={6} borderWidth="1px" borderRadius="md" boxShadow="md">
       <Heading as="h2" size="lg" mb={4}>
-        Créer un nouveau formulaire
+        Créer un Nouveau Formulaire
       </Heading>
       <VStack spacing={4} align="stretch">
         <FormControl isRequired>
-          <FormLabel>Titre du formulaire</FormLabel>
+          <FormLabel>Titre du Formulaire</FormLabel>
           <Input
+            placeholder="Titre du formulaire"
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
-            placeholder="Titre du formulaire"
           />
         </FormControl>
         <FormControl>
-          <FormLabel>Description du formulaire</FormLabel>
+          <FormLabel>Description du Formulaire</FormLabel>
           <Textarea
+            placeholder="Description du formulaire"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
-            placeholder="Description du formulaire"
           />
         </FormControl>
-        <Button onClick={addQuestion} colorScheme="teal">
-          Ajouter une question
+        <Button onClick={addQuestion} colorScheme="teal" variant="outline">
+          Ajouter une Question
         </Button>
         {form.questions.map((question, index) => (
           <QuestionEditor
@@ -152,7 +189,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ onFormSaved }) => {
           />
         ))}
         <Button onClick={saveForm} colorScheme="teal" mt={4}>
-          Sauvegarder le formulaire
+          Sauvegarder le Formulaire
         </Button>
       </VStack>
     </Box>

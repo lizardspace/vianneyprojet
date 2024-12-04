@@ -9,6 +9,7 @@ import {
   FormControl,
   FormLabel,
   VStack,
+  HStack,
   Flex,
 } from '@chakra-ui/react';
 import { Question, Option } from '../Types';
@@ -54,6 +55,7 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onUpdate }) =
       borderRadius="md"
       mt={4}
       bg="gray.50"
+      boxShadow="sm"
     >
       <VStack spacing={4} align="stretch">
         <FormControl isRequired>
@@ -111,7 +113,7 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onUpdate }) =
                 </Button>
               </Flex>
             ))}
-            <Button onClick={addOption} size="sm" colorScheme="teal">
+            <Button onClick={addOption} size="sm" colorScheme="teal" mt={2}>
               Ajouter une option
             </Button>
           </Box>
