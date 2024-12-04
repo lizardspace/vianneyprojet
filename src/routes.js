@@ -3,7 +3,7 @@ import { Icon } from "@chakra-ui/react";
 import {
   FcMindMap,
   FcLock,
-  FcVideoCall,
+//  FcVideoCall,
   FcPlanner,
   FcSurvey,
   FcSettings,
@@ -32,7 +32,7 @@ import Parameters from "views/admin/Parameters";
 import SOSComponent from "views/admin/SOSComponent";
 import ChatComponent from "views/admin/ChatComponent";
 import IncidentReportForm from "views/admin/IncidentReportForm";
-import VideoStreamAnalysisComponent from "views/admin/VideoStreamAnalysisComponent";
+//import VideoStreamAnalysisComponent from "views/admin/VideoStreamAnalysisComponent";
 import Factures from "views/admin/Factures";
 import AddDocumentComponent from "views/admin/AddDocumentComponent";
 import Login from "views/auth/Login";
@@ -153,13 +153,13 @@ const routes = [
     icon: <Icon as={FcDocument} width="20px" height="20px" color="inherit" />,
     component: IncidentReportForm,
   },
-  {
-    name: "Analyse flux vidéo",
-    layout: "/admin",
-    path: "/video-stream-analysis",
-    icon: <Icon as={FcVideoCall} width="20px" height="20px" color="inherit" />,
-    component: VideoStreamAnalysisComponent,
-  },
+  //{
+  //  name: "Analyse flux vidéo",
+  //  layout: "/admin",
+  //  path: "/video-stream-analysis",
+  //  icon: <Icon as={FcVideoCall} width="20px" height="20px" color="inherit" />,
+  //  component: VideoStreamAnalysisComponent,
+  //},
   {
     name: "Alerte à une équipe",
     layout: "/admin",
