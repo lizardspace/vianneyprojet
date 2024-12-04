@@ -33,7 +33,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer';
 import { v4 as uuidv4 } from 'uuid';
 import supabase from './../../../../supabaseClient';
 import ExpenseSummaryPDF from './ExpenseSummaryPDF';
-import { useTeam } from './../../../../views/admin/InterfaceEquipe/TeamContext';
+import { useTeam } from '../../../../TeamContext';
 import { useEvent } from './../../../../EventContext';
 import { FaFilePdf } from "react-icons/fa6";
 

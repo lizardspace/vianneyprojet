@@ -5,7 +5,7 @@ import { GrSend } from "react-icons/gr";
 import { AiOutlinePlus } from "react-icons/ai";
 import Card from "components/card/Card";
 import { useEvent } from '../../../../EventContext';
-import { useTeam } from './../../InterfaceEquipe/TeamContext';
+import { useTeam } from '../../../../TeamContext';
 
 import { supabase, supabaseUrl } from './../../../../supabaseClient';
 

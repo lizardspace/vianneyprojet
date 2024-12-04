@@ -5,7 +5,7 @@ import { FcOk, FcDeleteDatabase, FcInfo } from "react-icons/fc";
 import Card from "components/card/Card";
 import Menu from "components/menu/MainMenuVianneyAlertChat";
 import { useEvent } from '../../../../EventContext';
-import { useTeam } from './../../InterfaceEquipe/TeamContext';
+import { useTeam } from '../../../../TeamContext';
 
 import { supabase, supabaseUrl } from './../../../../supabaseClient';
 

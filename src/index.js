@@ -11,7 +11,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 import theme from 'theme/theme';
 import { ThemeEditorProvider } from '@hypertheme-editor/chakra-ui';
 import { EventProvider } from './EventContext';
-import { TeamProvider } from './views/admin/InterfaceEquipe/TeamContext';
+import { TeamProvider } from './TeamContext';
 import GpsPositionSimplified from './views/admin/InterfaceEquipe/components/GpsPositionSimplified';
 import { RealtimeProvider } from './RealtimeContext';
 import ProtectedRoute from './ProtectedRoute';

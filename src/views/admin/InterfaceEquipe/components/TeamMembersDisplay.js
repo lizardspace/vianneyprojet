@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useTeam } from './../TeamContext';
+import { useTeam } from '../../../../TeamContext';
 import { Box, Text, VStack, HStack, Button } from '@chakra-ui/react';
 
 const TeamMembersDisplay = () => {

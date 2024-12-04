@@ -23,7 +23,7 @@ import {
 } from '@chakra-ui/react';
 import { PhoneIcon, CheckIcon } from '@chakra-ui/icons';
 import { supabase } from './../../../../supabaseClient'; // Adjust the import according to your project structure
-import { useTeam } from './../../InterfaceEquipe/TeamContext'; // Import the useTeam hook
+import { useTeam } from '../../../../TeamContext'; // Import the useTeam hook
 import { useEvent } from './../../../../EventContext'; // Import the useEvent hook
 import VideoRecorder from './VideoRecorder'; // Adjust the import according to your project structure
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useTeam } from './TeamContext';
+import { useTeam } from '../../../TeamContext';
 import { useEvent } from '../../../EventContext'; // Import useEvent context
 import {
   Box,

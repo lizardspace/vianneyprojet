@@ -13,7 +13,7 @@ import AddActionForm from './AddActionForm';
 import { useEvent } from '../../../../EventContext'; // Import useEvent hook
 
 import { supabase } from '../../../../supabaseClient';
-import { useTeam } from '../../InterfaceEquipe/TeamContext'; // Import useTeam hook
+import { useTeam } from '../../../../TeamContext'; // Import useTeam hook
 
 // Set moment to French locale
 moment.locale('fr');

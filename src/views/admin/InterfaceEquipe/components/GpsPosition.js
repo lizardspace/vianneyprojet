@@ -6,7 +6,7 @@ import { MdPlace } from 'react-icons/md';
 import { FcCollect } from 'react-icons/fc'; // Import the FcCollect icon
 import ReactDOMServer from 'react-dom/server';
 import { useGPSPosition } from './../../../../GPSPositionContext'; // Import the custom hook
-import { useTeam } from './../TeamContext'; // Import the useTeam hook
+import { useTeam } from '../../../../TeamContext'; // Import the useTeam hook
 import { supabase } from './../../../../supabaseClient'; // Import Supabase client
 
 const GpsPosition = () => {

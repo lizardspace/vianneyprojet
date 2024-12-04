@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, VStack, Text, Image, Link, Badge, Stack, Alert, AlertIcon, Button } from '@chakra-ui/react';
-import { useTeam } from '../TeamContext';
+import { useTeam } from '../../../../TeamContext';
 import { supabase } from '../../../../supabaseClient';
 
 const DocumentsViewer = () => {

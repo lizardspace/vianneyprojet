@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { supabase } from './../../../../supabaseClient';
 import { useEvent } from '../../../../EventContext';
-import { useTeam } from './../TeamContext';
+import { useTeam } from '../../../../TeamContext';
 
 const UrgentAlerts = () => {
   const [urgentAlerts, setUrgentAlerts] = useState([]);

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Alert, AlertIcon, Text } from '@chakra-ui/react';
 import { useGPSPosition } from './../../../../GPSPositionContext'; // Import the custom hook
-import { useTeam } from './../TeamContext'; // Import the useTeam hook
+import { useTeam } from '../../../../TeamContext'; // Import the useTeam hook
 import { supabase } from './../../../../supabaseClient'; // Import Supabase client
 
 const GpsPositionSimplified = () => {
