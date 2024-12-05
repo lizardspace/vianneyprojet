@@ -5,6 +5,7 @@ import InvoiceList from './components/InvoiceList';
 import InvoicePage from './components/InvoicePage';
 import DocumentTabs from './components/DocumentTabs';
 import SellerInfoForm from './components/SellerInfoForm';
+import InformationAlert from './components/InformationAlert';
 
 const Index = () => {
   const [showSellerInfo, setShowSellerInfo] = useState(false);
@@ -13,6 +14,7 @@ const Index = () => {
   return (
     <Box pt={{ base: "180px", md: "80px", xl: "80px" }}>
       <DocumentTabs />
+      <InformationAlert/>
       <InvoiceForm />
 
       {/* Toggle Buttons */}
