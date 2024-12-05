@@ -56,8 +56,8 @@ const InvoiceForm = () => {
     buyerVATNumber: '',
     productDetails: [{ description: '', quantity: '', unitPrice: '', vatRate: '' }],
     discount: '',
-    totalHT: 0,
-    totalTTC: 0,
+    totalHT: '0.00',
+    totalTTC: '0.00',
     paymentDueDate: '',
     discountConditions: '',
     latePaymentPenalties: '',
@@ -188,28 +188,46 @@ const InvoiceForm = () => {
   // Calcul automatique de Total HT et Total TTC
   useEffect(() => {
     const calculateTotals = () => {
-      // Calcul du Total HT
-      const totalHT = invoiceData.productDetails.reduce((acc, product) => {
+      // Calcul du Total HT (avant remise)
+      const baseHT = invoiceData.productDetails.reduce((acc, product) => {
         const quantity = parseFloat(product.quantity) || 0;
         const unitPrice = parseFloat(product.unitPrice) || 0;
         return acc + (quantity * unitPrice);
       }, 0);
 
-      // Calcul de la TVA totale
-      const vatTotal = invoiceData.productDetails.reduce((acc, product) => {
-        const quantity = parseFloat(product.quantity) || 0;
-        const unitPrice = parseFloat(product.unitPrice) || 0;
+      // Récupérer la remise
+      const discount = parseFloat(invoiceData.discount) || 0;
+
+      // Assurer que la remise ne dépasse pas le Total HT
+      const validDiscount = discount > baseHT ? baseHT : discount;
+
+      // Calcul de la remise proportionnelle pour chaque produit
+      const discountedProducts = invoiceData.productDetails.map(product => {
+        const productHT = (parseFloat(product.quantity) * parseFloat(product.unitPrice)) || 0;
+        const productShare = baseHT > 0 ? productHT / baseHT : 0;
+        const productDiscount = validDiscount * productShare;
+        const discountedHT = productHT - productDiscount;
         const vatRate = parseFloat(product.vatRate) || 0;
-        return acc + (quantity * unitPrice * (vatRate / 100));
-      }, 0);
+        const vatAmount = discountedHT * (vatRate / 100);
+        return {
+          ...product,
+          discountedHT,
+          vatAmount,
+        };
+      });
+
+      // Calcul de la TVA totale
+      const vatTotal = discountedProducts.reduce((acc, product) => acc + product.vatAmount, 0);
+
+      // Calcul du Total HT après remise
+      const totalHTAfterDiscount = baseHT - validDiscount;
 
       // Calcul du Total TTC
-      const discount = parseFloat(invoiceData.discount) || 0;
-      const totalTTC = totalHT + vatTotal - discount;
+      const totalTTC = totalHTAfterDiscount + vatTotal;
 
       setInvoiceData((prevData) => ({
         ...prevData,
-        totalHT: totalHT.toFixed(2),
+        totalHT: totalHTAfterDiscount.toFixed(2),
         totalTTC: totalTTC.toFixed(2),
       }));
     };
@@ -281,11 +299,12 @@ const InvoiceForm = () => {
 
     const invoiceNumber = invoiceNumberData;
 
-    const products = invoiceData.productDetails.map(item => ({
-      description: item.description || '',
-      quantity: parseFloat(item.quantity) || 0,
-      unitPrice: parseFloat(item.unitPrice) || 0,
-      vatRate: parseFloat(item.vatRate) || 0,
+    // Préparer les produits sans remises et TVA, car elles sont déjà appliquées
+    const products = invoiceData.productDetails.map(product => ({
+      description: product.description || '',
+      quantity: parseFloat(product.quantity) || 0,
+      unitPrice: parseFloat(product.unitPrice) || 0,
+      vatRate: parseFloat(product.vatRate) || 0,
     }));
 
     const dataToInsert = {
@@ -310,8 +329,8 @@ const InvoiceForm = () => {
       buyer_vat_number: invoiceData.buyerVATNumber || null,
       products: products.length > 0 ? products : null,
       discount: invoiceData.discount ? parseFloat(invoiceData.discount) : null,
-      total_ht: invoiceData.totalHT ? parseFloat(invoiceData.totalHT) : null,
-      total_ttc: invoiceData.totalTTC ? parseFloat(invoiceData.totalTTC) : null,
+      total_ht: parseFloat(invoiceData.totalHT) || null,
+      total_ttc: parseFloat(invoiceData.totalTTC) || null,
       payment_due_date: invoiceData.paymentDueDate || null,
       discount_conditions: invoiceData.discountConditions || null,
       late_payment_penalties: invoiceData.latePaymentPenalties || null,
@@ -368,8 +387,8 @@ const InvoiceForm = () => {
         buyerVATNumber: '',
         productDetails: [{ description: '', quantity: '', unitPrice: '', vatRate: '' }],
         discount: '',
-        totalHT: 0,
-        totalTTC: 0,
+        totalHT: '0.00',
+        totalTTC: '0.00',
         paymentDueDate: '',
         discountConditions: '',
         latePaymentPenalties: '',
