@@ -68,6 +68,7 @@ const InvoiceList = () => {
 
   useEffect(() => {
     fetchInvoices();
+    // eslint-disable-next-line
   }, [selectedEventId]);
 
   const handleDeleteClick = (invoice) => {
