@@ -31,7 +31,9 @@ const SellerInfoForm = () => {
     sellerVATNumber: '',
     codeAPE: '',
     sellerVatIntracommunityNumber: '',
+    logoUrl: '',
   });
+  const [logoFile, setLogoFile] = useState(null);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -57,6 +59,7 @@ const SellerInfoForm = () => {
           sellerVATNumber: data.seller_vat_number || '',
           codeAPE: data.code_ape || '',
           sellerVatIntracommunityNumber: data.seller_vat_intracommunity_number || '',
+          logoUrl: data.logo_url || '',
         });
       } else if (error && error.code !== 'PGRST116') {
         // Ignorer l'erreur 'No rows found'
@@ -108,8 +111,56 @@ const SellerInfoForm = () => {
     setSellerData({ ...sellerData, [name]: value });
   };
 
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setLogoFile(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    let logoUrl = sellerData.logoUrl; // Conserver l'URL actuelle si aucune modification
+
+    // Télécharger le logo si un nouveau fichier est sélectionné
+    if (logoFile) {
+      const fileExt = logoFile.name.split('.').pop();
+      const fileName = `${selectedEventId}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      let { error: uploadError } = await supabase.storage
+        .from('seller-logos')
+        .upload(filePath, logoFile);
+
+      if (uploadError) {
+        toast({
+          title: 'Erreur',
+          description: 'Erreur lors du téléchargement du logo.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      // Obtenir l'URL publique du logo
+      const { data: publicURLData, error: urlError } = supabase.storage
+        .from('seller-logos')
+        .getPublicUrl(filePath);
+
+      if (urlError) {
+        toast({
+          title: 'Erreur',
+          description: 'Erreur lors de la récupération de l\'URL du logo.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      logoUrl = publicURLData.publicUrl;
+    }
 
     // Préparer les données à insérer ou à mettre à jour
     const dataToSave = {
@@ -125,6 +176,7 @@ const SellerInfoForm = () => {
       seller_vat_number: sellerData.sellerVATNumber,
       code_ape: sellerData.codeAPE,
       seller_vat_intracommunity_number: sellerData.sellerVatIntracommunityNumber,
+      logo_url: logoUrl, // Ajouter l'URL du logo
       event_id: selectedEventId,
     };
 
@@ -169,6 +221,8 @@ const SellerInfoForm = () => {
         duration: 5000,
         isClosable: true,
       });
+      // Réinitialiser le fichier logo
+      setLogoFile(null);
     }
   };
 
@@ -198,6 +252,24 @@ const SellerInfoForm = () => {
               name="sellerAddress"
               value={sellerData.sellerAddress}
               onChange={handleChange}
+            />
+          </FormControl>
+
+          {/* Afficher le logo actuel */}
+          {sellerData.logoUrl && (
+            <Box>
+              <FormLabel>Logo Actuel</FormLabel>
+              <img src={sellerData.logoUrl} alt="Logo du vendeur" style={{ maxWidth: '200px' }} />
+            </Box>
+          )}
+
+          {/* Champ pour télécharger un nouveau logo */}
+          <FormControl id="logo">
+            <FormLabel>Logo</FormLabel>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
             />
           </FormControl>
 

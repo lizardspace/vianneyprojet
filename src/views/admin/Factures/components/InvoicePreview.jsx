@@ -96,19 +96,54 @@ const InvoicePreview = ({ invoiceNumber }) => {
     fetchInvoice();
   }, [invoiceNumber]);
 
-  const downloadPdf = () => {
+  const downloadPdf = async () => {
     if (!invoice) return;
 
     const doc = new jsPDF('p', 'pt', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
 
+    let logoDataUrl = null;
+
+    if (invoice.logo_url) {
+      try {
+        const response = await fetch(invoice.logo_url, { mode: 'cors' });
+        const blob = await response.blob();
+
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = function () {
+          logoDataUrl = reader.result;
+          generatePdfContent(doc, pageWidth, logoDataUrl);
+          doc.save(`Facture_${invoice.invoice_number}.pdf`);
+        };
+      } catch (error) {
+        console.error('Erreur lors du chargement du logo.', error);
+        generatePdfContent(doc, pageWidth, null);
+        doc.save(`Facture_${invoice.invoice_number}.pdf`);
+      }
+    } else {
+      generatePdfContent(doc, pageWidth, null);
+      doc.save(`Facture_${invoice.invoice_number}.pdf`);
+    }
+  };
+
+  const generatePdfContent = (doc, pageWidth, logoDataUrl) => {
+    let yPosition = 40;
+
+    if (logoDataUrl) {
+      doc.addImage(logoDataUrl, 'PNG', 40, 40, 100, 50);
+      yPosition = 100;
+    }
+
     // Ajouter le titre
     doc.setFontSize(20);
+    doc.text('Facture', pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 40;
+
     doc.text('Facture', pageWidth / 2, 40, { align: 'center' });
 
     // Ajouter les informations du vendeur
     doc.setFontSize(12);
-    let yPosition = 80;
     doc.text(`Nom de la société: ${invoice.seller_name}`, 40, yPosition);
     yPosition += 20;
     doc.text(`Adresse: ${invoice.seller_address}`, 40, yPosition);
@@ -257,7 +292,14 @@ const InvoicePreview = ({ invoiceNumber }) => {
       borderRadius={8}
       boxShadow="lg"
     >
-      <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+      {/* Afficher le logo si disponible */}
+      {invoice.logo_url && (
+        <Box textAlign="center" mb={6}>
+          <img src={invoice.logo_url} alt="Logo du vendeur" style={{ maxWidth: '200px' }} />
+        </Box>
+      )}
+
+<Grid templateColumns="repeat(2, 1fr)" gap={6}>
         <GridItem>
           <Heading color="blue.500">{invoice.seller_name}</Heading>
           <Text mt={4}>{invoice.seller_address}</Text>

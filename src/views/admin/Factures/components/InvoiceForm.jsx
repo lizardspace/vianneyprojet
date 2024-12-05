@@ -15,6 +15,7 @@ import {
   FormErrorMessage,
   Tooltip,
   Select,
+  Image,
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import { FcMoneyTransfer } from 'react-icons/fc';
@@ -46,6 +47,7 @@ const InvoiceForm = () => {
     sellerGreffe: '',
     sellerRM: '',
     sellerVATNumber: '',
+    logoUrl: '', 
     buyerName: '',
     buyerAddress: '',
     deliveryAddress: '',
@@ -62,6 +64,8 @@ const InvoiceForm = () => {
     warrantyInfo: '',
     specialMention: '',
   });
+
+  const [logoFile, setLogoFile] = useState(null); // État pour le fichier logo
 
   useEffect(() => {
     // Récupérer les informations du vendeur
@@ -85,6 +89,9 @@ const InvoiceForm = () => {
           sellerGreffe: data.seller_greffe || '',
           sellerRM: data.seller_rm || '',
           sellerVATNumber: data.seller_vat_number || '',
+          codeAPE: data.code_ape || '',
+          sellerVatIntracommunityNumber: data.seller_vat_intracommunity_number || '',
+          logoUrl: data.logo_url || '',
         }));
       } else if (error && error.code !== 'PGRST116') {
         console.error('Erreur lors de la récupération des informations du vendeur:', error);
@@ -96,6 +103,7 @@ const InvoiceForm = () => {
     }
   }, [selectedEventId]);
 
+  // Fonction handleChange pour gérer les changements des champs généraux
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -125,6 +133,7 @@ const InvoiceForm = () => {
     setInvoiceData({ ...invoiceData, [name]: value });
   };
 
+  // Fonction pour gérer les changements des produits/services
   const handleProductChange = (index, e) => {
     const { name, value } = e.target;
     const updatedProducts = [...invoiceData.productDetails];
@@ -155,6 +164,7 @@ const InvoiceForm = () => {
     setInvoiceData({ ...invoiceData, productDetails: updatedProducts });
   };
 
+  // Fonction pour ajouter un produit/service
   const addProduct = () => {
     setInvoiceData({
       ...invoiceData,
@@ -162,18 +172,69 @@ const InvoiceForm = () => {
     });
   };
 
+  // Fonction pour supprimer un produit/service
   const removeProduct = (index) => {
     const updatedProducts = invoiceData.productDetails.filter((_, i) => i !== index);
     setInvoiceData({ ...invoiceData, productDetails: updatedProducts });
   };
 
+  // Fonction pour gérer le changement du fichier logo
+  const handleLogoChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setLogoFile(e.target.files[0]);
+    }
+  };
+
+  // Fonction pour gérer la soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
+    let logoUrl = invoiceData.logoUrl; // Conserver l'URL actuelle si aucune modification
+
+    // Télécharger le logo si un nouveau fichier est sélectionné
+    if (logoFile) {
+      const fileExt = logoFile.name.split('.').pop();
+      const fileName = `${selectedEventId}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      let { error: uploadError } = await supabase.storage
+        .from('seller-logos')
+        .upload(filePath, logoFile);
+
+      if (uploadError) {
+        toast({
+          title: 'Erreur',
+          description: 'Erreur lors du téléchargement du logo.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      // Obtenir l'URL publique du logo
+      const { data: publicURLData, error: urlError } = supabase.storage
+        .from('seller-logos')
+        .getPublicUrl(filePath);
+
+      if (urlError) {
+        toast({
+          title: 'Erreur',
+          description: 'Erreur lors de la récupération de l\'URL du logo.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      logoUrl = publicURLData.publicUrl;
+    }
+
     // Générer le prochain numéro de facture en appelant la fonction stockée
     const { data: invoiceNumberData, error: invoiceNumberError } = await supabase
       .rpc('generate_invoice_number', { event_uuid: selectedEventId });
-  
+
     if (invoiceNumberError) {
       console.error('Erreur lors de la génération du numéro de facture:', invoiceNumberError);
       toast({
@@ -185,16 +246,16 @@ const InvoiceForm = () => {
       });
       return;
     }
-  
+
     const invoiceNumber = invoiceNumberData;
-  
+
     const products = invoiceData.productDetails.map(item => ({
       description: item.description || '',
       quantity: parseFloat(item.quantity) || 0,
       unitPrice: parseFloat(item.unitPrice) || 0,
       vatRate: parseFloat(item.vatRate) || 0,
     }));
-  
+
     const dataToInsert = {
       invoice_date: invoiceData.invoiceDate || null,
       invoice_number: invoiceNumber, // Utiliser le numéro de facture généré
@@ -224,13 +285,14 @@ const InvoiceForm = () => {
       late_payment_penalties: invoiceData.latePaymentPenalties || null,
       warranty_info: invoiceData.warrantyInfo || null,
       special_mention: invoiceData.specialMention || null,
+      logo_url: logoUrl || null, // Ajouter l'URL du logo
       event_id: selectedEventId || null,
     };
-  
+
     const { error } = await supabase
       .from('vianney_factures')
       .insert(dataToInsert);
-  
+
     if (error) {
       console.error('Erreur lors de l\'insertion de la facture:', error);
       toast({
@@ -265,6 +327,7 @@ const InvoiceForm = () => {
         sellerGreffe: invoiceData.sellerGreffe,
         sellerRM: invoiceData.sellerRM,
         sellerVATNumber: invoiceData.sellerVATNumber,
+        logoUrl: invoiceData.logoUrl, // Conserver l'URL du logo
         buyerName: '',
         buyerAddress: '',
         deliveryAddress: '',
@@ -281,9 +344,10 @@ const InvoiceForm = () => {
         warrantyInfo: '',
         specialMention: '',
       });
+      setLogoFile(null);
       setErrors({});
     }
-  };  
+  };
 
   return (
     <Box maxW="800px" mx="auto" p={6} borderWidth={1} borderRadius={8} boxShadow="lg">
@@ -320,7 +384,23 @@ const InvoiceForm = () => {
 
           <Heading as="h3" size="md">Informations sur le vendeur</Heading>
 
-          {/* Les champs du vendeur sont en lecture seule */}
+          {/* Afficher le logo actuel */}
+          {invoiceData.logoUrl && (
+            <Box>
+              <FormLabel>Logo Actuel</FormLabel>
+              <Image src={invoiceData.logoUrl} alt="Logo du vendeur" maxW="200px" />
+            </Box>
+          )}
+
+          {/* Champ pour télécharger un nouveau logo */}
+          <FormControl id="logo">
+            <FormLabel>Logo</FormLabel>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={handleLogoChange}
+            />
+          </FormControl>
 
           {/* Nom du vendeur */}
           <FormControl id="sellerName">
