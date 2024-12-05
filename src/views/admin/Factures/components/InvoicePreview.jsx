@@ -64,28 +64,44 @@ const InvoicePreview = ({ invoiceNumber }) => {
 
     // Add Seller Information
     doc.setFontSize(12);
-    doc.text(`Nom de la société: ${invoice.seller_name}`, 40, 80);
-    doc.text(`Adresse: ${invoice.seller_address}`, 40, 100);
-    doc.text(`SIREN: ${invoice.seller_siren || 'N/A'}`, 40, 120);
-    doc.text(`SIRET: ${invoice.seller_siret || 'N/A'}`, 40, 140);
-    doc.text(`Code APE: ${invoice.code_ape || 'N/A'}`, 40, 160);
-    doc.text(`Numéro TVA Intracommunautaire: ${invoice.seller_vat_intracommunity_number || 'N/A'}`, 40, 180);
+    let yPosition = 80;
+    doc.text(`Nom de la société: ${invoice.seller_name}`, 40, yPosition);
+    yPosition += 20;
+    doc.text(`Adresse: ${invoice.seller_address}`, 40, yPosition);
+    yPosition += 20;
+    doc.text(`SIREN: ${invoice.seller_siren || 'N/A'}`, 40, yPosition);
+    yPosition += 20;
+    doc.text(`SIRET: ${invoice.seller_siret || 'N/A'}`, 40, yPosition);
+    yPosition += 20;
+    doc.text(`Code APE: ${invoice.code_ape || 'N/A'}`, 40, yPosition);
+    yPosition += 20;
+    doc.text(`Numéro TVA Intracommunautaire: ${invoice.seller_vat_intracommunity_number || 'N/A'}`, 40, yPosition);
+    yPosition += 20;
+    doc.text(`Forme juridique: ${invoice.seller_legal_form || 'N/A'}`, 40, yPosition);
+    yPosition += 20;
+    doc.text(`Capital: ${invoice.seller_capital ? `${invoice.seller_capital.toFixed(2)} €` : 'N/A'}`, 40, yPosition);
+    yPosition += 20;
+    doc.text(`RCS: ${invoice.seller_rcs || 'N/A'}`, 40, yPosition);
+    yPosition += 20;
+    doc.text(`Greffe: ${invoice.seller_greffe || 'N/A'}`, 40, yPosition);
+    yPosition += 20;
+    doc.text(`RM: ${invoice.seller_rm || 'N/A'}`, 40, yPosition);
 
     // Add Buyer Information
     doc.text(`Facturer à: ${invoice.buyer_name}`, 400, 80);
     doc.text(`Adresse: ${invoice.buyer_address}`, 400, 100);
 
     // Add Invoice Information
-    doc.text(`Numéro de Facture: ${invoice.invoice_number}`, 40, 220);
+    doc.text(`Numéro de Facture: ${invoice.invoice_number}`, 40, yPosition + 40);
     doc.text(
-      `Date de Facture: ${new Date(invoice.invoice_date).toLocaleDateString()}`,
+      `Date de Facture: ${invoice.invoice_date ? new Date(invoice.invoice_date).toLocaleDateString() : 'N/A'}`,
       40,
-      240
+      yPosition + 60
     );
     doc.text(
-      `Date d'Échéance: ${new Date(invoice.payment_due_date).toLocaleDateString()}`,
+      `Date d'Échéance: ${invoice.payment_due_date ? new Date(invoice.payment_due_date).toLocaleDateString() : 'N/A'}`,
       40,
-      260
+      yPosition + 80
     );
 
     // Add Table for Products/Services
@@ -97,25 +113,26 @@ const InvoicePreview = ({ invoiceNumber }) => {
     ]);
 
     doc.autoTable({
-      startY: 300,
+      startY: yPosition + 100,
       head: [['Description', 'Quantité', 'Prix unitaire HT', 'Prix total HT']],
       body: products,
-      margin: { top: 300 },
+      margin: { top: yPosition + 100 },
     });
 
-    // Add Totals
-    const vatRate =
-      invoice.products && invoice.products.length > 0
-        ? `${invoice.products[0].vatRate}%`
-        : 'N/A';
+    // Calculate VAT total
+    const vatTotal = invoice.products.reduce((acc, product) => {
+      const vatAmount = (product.unitPrice * product.quantity * product.vatRate) / 100;
+      return acc + vatAmount;
+    }, 0);
 
+    // Add Totals
     doc.text(
       `Sous-Total: ${invoice.total_ht?.toFixed(2)} €`,
       pageWidth - 200,
       doc.lastAutoTable.finalY + 20
     );
     doc.text(
-      `TVA (${vatRate}): ${((invoice.total_ht * (invoice.products[0]?.vatRate || 0)) / 100).toFixed(2)} €`,
+      `TVA: ${vatTotal.toFixed(2)} €`,
       pageWidth - 200,
       doc.lastAutoTable.finalY + 40
     );
@@ -131,6 +148,14 @@ const InvoicePreview = ({ invoiceNumber }) => {
       'Nous apprécions votre clientèle.',
       pageWidth / 2,
       doc.internal.pageSize.getHeight() - 50,
+      { align: 'center' }
+    );
+
+    // Footer with seller details
+    doc.text(
+      `Numéro SIRET : ${invoice.seller_siret || 'N/A'} | Code APE : ${invoice.code_ape || 'N/A'} | Numéro TVA Intracommunautaire : ${invoice.seller_vat_intracommunity_number || 'N/A'}`,
+      pageWidth / 2,
+      doc.internal.pageSize.getHeight() - 30,
       { align: 'center' }
     );
 
@@ -212,7 +237,9 @@ const InvoicePreview = ({ invoiceNumber }) => {
           </Text>
           <Text>
             Date de facture :{' '}
-            {new Date(invoice.invoice_date).toLocaleDateString()}
+            {invoice.invoice_date
+              ? new Date(invoice.invoice_date).toLocaleDateString()
+              : 'N/A'}
           </Text>
           <Text>
             Date de vente/prestation :{' '}
@@ -222,7 +249,9 @@ const InvoicePreview = ({ invoiceNumber }) => {
           </Text>
           <Text>
             Échéance de paiement :{' '}
-            {new Date(invoice.payment_due_date).toLocaleDateString()}
+            {invoice.payment_due_date
+              ? new Date(invoice.payment_due_date).toLocaleDateString()
+              : 'N/A'}
           </Text>
         </GridItem>
       </Grid>
@@ -295,10 +324,7 @@ const InvoicePreview = ({ invoiceNumber }) => {
               {(invoice.total_ht - (invoice.discount || 0)).toFixed(2)} €
             </Text>
             <Text>
-              <strong>TAUX DE TVA :</strong>{' '}
-              {invoice.products && invoice.products.length > 0
-                ? `${invoice.products[0].vatRate}%`
-                : 'N/A'}
+              <strong>TVA :</strong> {vatTotal.toFixed(2)} €
             </Text>
             <Text>
               <strong>TOTAL TTC :</strong> {invoice.total_ttc?.toFixed(2)} €
@@ -319,7 +345,7 @@ const InvoicePreview = ({ invoiceNumber }) => {
           "Nous apprécions votre clientèle. Si vous avez des questions sur cette facture, n'hésitez pas à nous contacter."}
       </Text>
       <Text textAlign="center" mt={6} fontSize="sm">
-        Numéro SIRET | Code APE | Numéro TVA Intracommunautaire
+        Numéro SIRET : {invoice.seller_siret || 'N/A'} | Code APE : {invoice.code_ape || 'N/A'} | Numéro TVA Intracommunautaire : {invoice.seller_vat_intracommunity_number || 'N/A'}
       </Text>
 
       <Button
