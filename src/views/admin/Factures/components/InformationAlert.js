@@ -1,7 +1,11 @@
-import React from 'react';
-import { Alert, AlertIcon, AlertTitle, AlertDescription, Box } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Alert, AlertIcon, AlertTitle, AlertDescription, Box, CloseButton } from '@chakra-ui/react';
 
 const InformationAlert = () => {
+  const [isVisible, setIsVisible] = useState(true);
+
+  if (!isVisible) return null;
+
   return (
     <Box m={2} p={2}>
       <Alert
@@ -19,6 +23,13 @@ const InformationAlert = () => {
             Vous pourrez consulter et imprimer vos factures en bas dans <strong>"Détails des factures"</strong>.
           </AlertDescription>
         </Box>
+        <CloseButton
+          alignSelf="flex-start"
+          position="relative"
+          right={-2}
+          top={-2}
+          onClick={() => setIsVisible(false)}
+        />
       </Alert>
     </Box>
   );
