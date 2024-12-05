@@ -47,7 +47,7 @@ const InvoiceForm = () => {
     sellerGreffe: '',
     sellerRM: '',
     sellerVATNumber: '',
-    logoUrl: '', 
+    logoUrl: '',
     buyerName: '',
     buyerAddress: '',
     deliveryAddress: '',
@@ -432,148 +432,149 @@ const InvoiceForm = () => {
           </FormControl>
 
           <Divider my={6} />
+          <Box display="none" >
+            <Heading as="h3" size="md">Informations sur le vendeur</Heading>
 
-          <Heading as="h3" size="md">Informations sur le vendeur</Heading>
+            {/* Afficher le logo actuel */}
+            {invoiceData.logoUrl && (
+              <Box>
+                <FormLabel>Logo Actuel</FormLabel>
+                <Image src={invoiceData.logoUrl} alt="Logo du vendeur" maxW="200px" />
+              </Box>
+            )}
 
-          {/* Afficher le logo actuel */}
-          {invoiceData.logoUrl && (
-            <Box>
-              <FormLabel>Logo Actuel</FormLabel>
-              <Image src={invoiceData.logoUrl} alt="Logo du vendeur" maxW="200px" />
-            </Box>
-          )}
+            {/* Champ pour télécharger un nouveau logo */}
+            <FormControl id="logo">
+              <FormLabel>Logo</FormLabel>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleLogoChange}
+              />
+            </FormControl>
 
-          {/* Champ pour télécharger un nouveau logo */}
-          <FormControl id="logo">
-            <FormLabel>Logo</FormLabel>
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={handleLogoChange}
-            />
-          </FormControl>
+            {/* Nom du vendeur */}
+            <FormControl id="sellerName">
+              <FormLabel>Nom du vendeur</FormLabel>
+              <Input
+                type="text"
+                name="sellerName"
+                value={invoiceData.sellerName}
+                isReadOnly
+              />
+            </FormControl>
 
-          {/* Nom du vendeur */}
-          <FormControl id="sellerName">
-            <FormLabel>Nom du vendeur</FormLabel>
-            <Input
-              type="text"
-              name="sellerName"
-              value={invoiceData.sellerName}
-              isReadOnly
-            />
-          </FormControl>
+            {/* Adresse du vendeur */}
+            <FormControl id="sellerAddress">
+              <FormLabel>Adresse du vendeur</FormLabel>
+              <Input
+                type="text"
+                name="sellerAddress"
+                value={invoiceData.sellerAddress}
+                isReadOnly
+              />
+            </FormControl>
 
-          {/* Adresse du vendeur */}
-          <FormControl id="sellerAddress">
-            <FormLabel>Adresse du vendeur</FormLabel>
-            <Input
-              type="text"
-              name="sellerAddress"
-              value={invoiceData.sellerAddress}
-              isReadOnly
-            />
-          </FormControl>
+            {/* SIREN */}
+            <FormControl id="sellerSiren">
+              <Tooltip label="SIREN: Système d'Identification du Répertoire des Entreprises" placement="top">
+                <FormLabel>SIREN</FormLabel>
+              </Tooltip>
+              <Input
+                type="text"
+                name="sellerSiren"
+                value={invoiceData.sellerSiren}
+                isReadOnly
+              />
+            </FormControl>
 
-          {/* SIREN */}
-          <FormControl id="sellerSiren">
-            <Tooltip label="SIREN: Système d'Identification du Répertoire des Entreprises" placement="top">
-              <FormLabel>SIREN</FormLabel>
-            </Tooltip>
-            <Input
-              type="text"
-              name="sellerSiren"
-              value={invoiceData.sellerSiren}
-              isReadOnly
-            />
-          </FormControl>
+            {/* SIRET */}
+            <FormControl id="sellerSiret">
+              <Tooltip label="SIRET: Système d'Identification du Répertoire des Etablissements" placement="top">
+                <FormLabel>SIRET</FormLabel>
+              </Tooltip>
+              <Input
+                type="text"
+                name="sellerSiret"
+                value={invoiceData.sellerSiret}
+                isReadOnly
+              />
+            </FormControl>
 
-          {/* SIRET */}
-          <FormControl id="sellerSiret">
-            <Tooltip label="SIRET: Système d'Identification du Répertoire des Etablissements" placement="top">
-              <FormLabel>SIRET</FormLabel>
-            </Tooltip>
-            <Input
-              type="text"
-              name="sellerSiret"
-              value={invoiceData.sellerSiret}
-              isReadOnly
-            />
-          </FormControl>
+            {/* Forme juridique */}
+            <FormControl id="sellerLegalForm">
+              <FormLabel>Forme juridique</FormLabel>
+              <Input
+                type="text"
+                name="sellerLegalForm"
+                value={invoiceData.sellerLegalForm}
+                isReadOnly
+              />
+            </FormControl>
 
-          {/* Forme juridique */}
-          <FormControl id="sellerLegalForm">
-            <FormLabel>Forme juridique</FormLabel>
-            <Input
-              type="text"
-              name="sellerLegalForm"
-              value={invoiceData.sellerLegalForm}
-              isReadOnly
-            />
-          </FormControl>
+            {/* Capital */}
+            <FormControl id="sellerCapital">
+              <Tooltip label="Capital social de l'entreprise" placement="top">
+                <FormLabel>Capital</FormLabel>
+              </Tooltip>
+              <Input
+                type="number"
+                name="sellerCapital"
+                value={invoiceData.sellerCapital}
+                isReadOnly
+              />
+            </FormControl>
 
-          {/* Capital */}
-          <FormControl id="sellerCapital">
-            <Tooltip label="Capital social de l'entreprise" placement="top">
-              <FormLabel>Capital</FormLabel>
-            </Tooltip>
-            <Input
-              type="number"
-              name="sellerCapital"
-              value={invoiceData.sellerCapital}
-              isReadOnly
-            />
-          </FormControl>
+            {/* Numéro RCS */}
+            <FormControl id="sellerRCS">
+              <Tooltip label="RCS: Registre du Commerce et des Sociétés" placement="top">
+                <FormLabel>Numéro RCS</FormLabel>
+              </Tooltip>
+              <Input
+                type="text"
+                name="sellerRCS"
+                value={invoiceData.sellerRCS}
+                isReadOnly
+              />
+            </FormControl>
 
-          {/* Numéro RCS */}
-          <FormControl id="sellerRCS">
-            <Tooltip label="RCS: Registre du Commerce et des Sociétés" placement="top">
-              <FormLabel>Numéro RCS</FormLabel>
-            </Tooltip>
-            <Input
-              type="text"
-              name="sellerRCS"
-              value={invoiceData.sellerRCS}
-              isReadOnly
-            />
-          </FormControl>
+            {/* Greffe */}
+            <FormControl id="sellerGreffe">
+              <Tooltip label="Greffe: Bureau où sont déposés les actes juridiques" placement="top">
+                <FormLabel>Greffe</FormLabel>
+              </Tooltip>
+              <Input
+                type="text"
+                name="sellerGreffe"
+                value={invoiceData.sellerGreffe}
+                isReadOnly
+              />
+            </FormControl>
 
-          {/* Greffe */}
-          <FormControl id="sellerGreffe">
-            <Tooltip label="Greffe: Bureau où sont déposés les actes juridiques" placement="top">
-              <FormLabel>Greffe</FormLabel>
-            </Tooltip>
-            <Input
-              type="text"
-              name="sellerGreffe"
-              value={invoiceData.sellerGreffe}
-              isReadOnly
-            />
-          </FormControl>
+            {/* Numéro RM */}
+            <FormControl id="sellerRM">
+              <Tooltip label="RM: Répertoire des Métiers" placement="top">
+                <FormLabel>Numéro RM</FormLabel>
+              </Tooltip>
+              <Input
+                type="text"
+                name="sellerRM"
+                value={invoiceData.sellerRM}
+                isReadOnly
+              />
+            </FormControl>
 
-          {/* Numéro RM */}
-          <FormControl id="sellerRM">
-            <Tooltip label="RM: Répertoire des Métiers" placement="top">
-              <FormLabel>Numéro RM</FormLabel>
-            </Tooltip>
-            <Input
-              type="text"
-              name="sellerRM"
-              value={invoiceData.sellerRM}
-              isReadOnly
-            />
-          </FormControl>
-
-          {/* Numéro de TVA du vendeur */}
-          <FormControl id="sellerVATNumber">
-            <FormLabel>Numéro de TVA du vendeur</FormLabel>
-            <Input
-              type="text"
-              name="sellerVATNumber"
-              value={invoiceData.sellerVATNumber}
-              isReadOnly
-            />
-          </FormControl>
+            {/* Numéro de TVA du vendeur */}
+            <FormControl id="sellerVATNumber">
+              <FormLabel>Numéro de TVA du vendeur</FormLabel>
+              <Input
+                type="text"
+                name="sellerVATNumber"
+                value={invoiceData.sellerVATNumber}
+                isReadOnly
+              />
+            </FormControl>
+          </Box>
 
           <Divider my={6} />
 
