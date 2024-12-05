@@ -29,6 +29,8 @@ const SellerInfoForm = () => {
     sellerGreffe: '',
     sellerRM: '',
     sellerVATNumber: '',
+    codeAPE: '',
+    sellerVatIntracommunityNumber: '',
   });
   const [errors, setErrors] = useState({});
 
@@ -53,6 +55,8 @@ const SellerInfoForm = () => {
           sellerGreffe: data.seller_greffe || '',
           sellerRM: data.seller_rm || '',
           sellerVATNumber: data.seller_vat_number || '',
+          codeAPE: data.code_ape || '',
+          sellerVatIntracommunityNumber: data.seller_vat_intracommunity_number || '',
         });
       } else if (error && error.code !== 'PGRST116') {
         // Ignorer l'erreur 'No rows found'
@@ -69,7 +73,17 @@ const SellerInfoForm = () => {
     const { name, value } = e.target;
 
     // Validation pour les champs numériques
-    if (['sellerSiren', 'sellerSiret', 'sellerCapital', 'sellerRCS', 'sellerRM', 'sellerVATNumber'].includes(name)) {
+    const numericFields = [
+      'sellerSiren',
+      'sellerSiret',
+      'sellerCapital',
+      'sellerRCS',
+      'sellerRM',
+      'sellerVATNumber',
+      'sellerVatIntracommunityNumber',
+    ];
+
+    if (numericFields.includes(name)) {
       if (value && !/^\d*\.?\d*$/.test(value)) {
         setErrors((prevErrors) => ({
           ...prevErrors,
@@ -109,10 +123,12 @@ const SellerInfoForm = () => {
       seller_greffe: sellerData.sellerGreffe,
       seller_rm: sellerData.sellerRM,
       seller_vat_number: sellerData.sellerVATNumber,
+      code_ape: sellerData.codeAPE,
+      seller_vat_intracommunity_number: sellerData.sellerVatIntracommunityNumber,
       event_id: selectedEventId,
     };
 
-    // eslint-disable-next-line 
+    // eslint-disable-next-line
     const { data: existingData, error: fetchError } = await supabase
       .from('vianney_seller_info')
       .select('*')
@@ -283,14 +299,25 @@ const SellerInfoForm = () => {
 
           {/* Numéro de TVA du vendeur */}
           <FormControl id="sellerVATNumber" isInvalid={errors.sellerVATNumber}>
-            <FormLabel>Numéro de TVA du vendeur</FormLabel>
+            <FormLabel>Numéro de TVA Intracommunautaire</FormLabel>
             <Input
               type="text"
-              name="sellerVATNumber"
-              value={sellerData.sellerVATNumber}
+              name="sellerVatIntracommunityNumber"
+              value={sellerData.sellerVatIntracommunityNumber}
               onChange={handleChange}
             />
             {errors.sellerVATNumber && <FormErrorMessage>{errors.sellerVATNumber}</FormErrorMessage>}
+          </FormControl>
+
+          {/* Code APE */}
+          <FormControl id="codeAPE">
+            <FormLabel>Code APE</FormLabel>
+            <Input
+              type="text"
+              name="codeAPE"
+              value={sellerData.codeAPE}
+              onChange={handleChange}
+            />
           </FormControl>
 
           {/* Bouton de soumission */}

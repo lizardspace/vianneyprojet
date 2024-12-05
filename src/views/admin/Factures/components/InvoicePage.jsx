@@ -1,10 +1,11 @@
+// InvoicePage.js
 import React from 'react';
 import InvoicePreview from './InvoicePreview';
 
-const InvoicePage = ({ invoice }) => {
+const InvoicePage = ({ invoiceNumber }) => {
   return (
     <div>
-      <InvoicePreview invoice={invoice} />
+      <InvoicePreview invoiceNumber={invoiceNumber} />
     </div>
   );
 };

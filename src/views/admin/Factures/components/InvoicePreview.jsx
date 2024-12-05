@@ -68,22 +68,24 @@ const InvoicePreview = ({ invoiceNumber }) => {
     doc.text(`Adresse: ${invoice.seller_address}`, 40, 100);
     doc.text(`SIREN: ${invoice.seller_siren || 'N/A'}`, 40, 120);
     doc.text(`SIRET: ${invoice.seller_siret || 'N/A'}`, 40, 140);
+    doc.text(`Code APE: ${invoice.code_ape || 'N/A'}`, 40, 160);
+    doc.text(`Numéro TVA Intracommunautaire: ${invoice.seller_vat_intracommunity_number || 'N/A'}`, 40, 180);
 
     // Add Buyer Information
     doc.text(`Facturer à: ${invoice.buyer_name}`, 400, 80);
     doc.text(`Adresse: ${invoice.buyer_address}`, 400, 100);
 
     // Add Invoice Information
-    doc.text(`Numéro de Facture: ${invoice.invoice_number}`, 40, 180);
+    doc.text(`Numéro de Facture: ${invoice.invoice_number}`, 40, 220);
     doc.text(
       `Date de Facture: ${new Date(invoice.invoice_date).toLocaleDateString()}`,
       40,
-      200
+      240
     );
     doc.text(
       `Date d'Échéance: ${new Date(invoice.payment_due_date).toLocaleDateString()}`,
       40,
-      220
+      260
     );
 
     // Add Table for Products/Services
@@ -95,31 +97,31 @@ const InvoicePreview = ({ invoiceNumber }) => {
     ]);
 
     doc.autoTable({
-      startY: 260,
+      startY: 300,
       head: [['Description', 'Quantité', 'Prix unitaire HT', 'Prix total HT']],
       body: products,
-      margin: { top: 260 },
+      margin: { top: 300 },
     });
 
     // Add Totals
     const vatRate =
       invoice.products && invoice.products.length > 0
-        ? invoice.products[0].vatRate
+        ? `${invoice.products[0].vatRate}%`
         : 'N/A';
 
     doc.text(
       `Sous-Total: ${invoice.total_ht?.toFixed(2)} €`,
-      pageWidth - 150,
+      pageWidth - 200,
       doc.lastAutoTable.finalY + 20
     );
     doc.text(
-      `TVA: ${vatRate}%`,
-      pageWidth - 150,
+      `TVA (${vatRate}): ${((invoice.total_ht * (invoice.products[0]?.vatRate || 0)) / 100).toFixed(2)} €`,
+      pageWidth - 200,
       doc.lastAutoTable.finalY + 40
     );
     doc.text(
       `Total TTC: ${invoice.total_ttc?.toFixed(2)} €`,
-      pageWidth - 150,
+      pageWidth - 200,
       doc.lastAutoTable.finalY + 60
     );
 
@@ -185,6 +187,11 @@ const InvoicePreview = ({ invoiceNumber }) => {
           <Text mt={4}>{invoice.seller_address}</Text>
           <Text>SIREN: {invoice.seller_siren || 'N/A'}</Text>
           <Text>SIRET: {invoice.seller_siret || 'N/A'}</Text>
+          <Text>Code APE: {invoice.code_ape || 'N/A'}</Text>
+          <Text>
+            Numéro TVA Intracommunautaire:{' '}
+            {invoice.seller_vat_intracommunity_number || 'N/A'}
+          </Text>
           <Text>
             Forme juridique: {invoice.seller_legal_form || 'N/A'}
           </Text>
@@ -211,12 +218,6 @@ const InvoicePreview = ({ invoiceNumber }) => {
             Date de vente/prestation :{' '}
             {invoice.sale_date
               ? new Date(invoice.sale_date).toLocaleDateString()
-              : 'N/A'}
-          </Text>
-          <Text>
-            Date de livraison :{' '}
-            {invoice.delivery_address
-              ? new Date(invoice.delivery_address).toLocaleDateString()
               : 'N/A'}
           </Text>
           <Text>
@@ -284,19 +285,14 @@ const InvoicePreview = ({ invoiceNumber }) => {
         <GridItem>
           <Stack spacing={2} textAlign="right">
             <Text>
-              <strong>SOUS-TOTAL :</strong>{' '}
-              {invoice.total_ht?.toFixed(2)} €
+              <strong>SOUS-TOTAL :</strong> {invoice.total_ht?.toFixed(2)} €
             </Text>
             <Text>
-              <strong>REMISE :</strong>{' '}
-              {invoice.discount?.toFixed(2) || '0.00'} €
+              <strong>REMISE :</strong> {invoice.discount?.toFixed(2) || '0.00'} €
             </Text>
             <Text>
               <strong>SOUS-TOTAL MOINS LES REMISES :</strong>{' '}
-              {(
-                invoice.total_ht - (invoice.discount || 0)
-              ).toFixed(2)}{' '}
-              €
+              {(invoice.total_ht - (invoice.discount || 0)).toFixed(2)} €
             </Text>
             <Text>
               <strong>TAUX DE TVA :</strong>{' '}
@@ -305,15 +301,13 @@ const InvoicePreview = ({ invoiceNumber }) => {
                 : 'N/A'}
             </Text>
             <Text>
-              <strong>TOTAL TTC :</strong>{' '}
-              {invoice.total_ttc?.toFixed(2)} €
+              <strong>TOTAL TTC :</strong> {invoice.total_ttc?.toFixed(2)} €
             </Text>
             <Text>
               <strong>EXPÉDITION ET MANUTENTION :</strong> 0,00 €
             </Text>
             <Text>
-              <strong>SOMME FINALE À PAYER :</strong>{' '}
-              {invoice.total_ttc?.toFixed(2)} €
+              <strong>SOMME FINALE À PAYER :</strong> {invoice.total_ttc?.toFixed(2)} €
             </Text>
           </Stack>
         </GridItem>
