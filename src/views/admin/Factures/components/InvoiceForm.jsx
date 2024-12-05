@@ -169,17 +169,35 @@ const InvoiceForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Générer le prochain numéro de facture en appelant la fonction stockée
+    const { data: invoiceNumberData, error: invoiceNumberError } = await supabase
+      .rpc('generate_invoice_number', { event_uuid: selectedEventId });
+  
+    if (invoiceNumberError) {
+      console.error('Erreur lors de la génération du numéro de facture:', invoiceNumberError);
+      toast({
+        title: 'Erreur',
+        description: 'Erreur lors de la génération du numéro de facture.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+  
+    const invoiceNumber = invoiceNumberData;
+  
     const products = invoiceData.productDetails.map(item => ({
       description: item.description || '',
       quantity: parseFloat(item.quantity) || 0,
       unitPrice: parseFloat(item.unitPrice) || 0,
       vatRate: parseFloat(item.vatRate) || 0,
     }));
-
+  
     const dataToInsert = {
       invoice_date: invoiceData.invoiceDate || null,
-      invoice_number: invoiceData.invoiceNumber || null,
+      invoice_number: invoiceNumber, // Utiliser le numéro de facture généré
       sale_date: invoiceData.saleDate || null,
       seller_name: invoiceData.sellerName || null,
       seller_address: invoiceData.sellerAddress || null,
@@ -208,11 +226,11 @@ const InvoiceForm = () => {
       special_mention: invoiceData.specialMention || null,
       event_id: selectedEventId || null,
     };
-
+  
     const { error } = await supabase
       .from('vianney_factures')
       .insert(dataToInsert);
-
+  
     if (error) {
       console.error('Erreur lors de l\'insertion de la facture:', error);
       toast({
@@ -226,7 +244,7 @@ const InvoiceForm = () => {
       console.log('Facture soumise avec succès');
       toast({
         title: 'Succès',
-        description: 'Facture soumise avec succès.',
+        description: `Facture ${invoiceNumber} soumise avec succès.`,
         status: 'success',
         duration: 5000,
         isClosable: true,
@@ -265,7 +283,7 @@ const InvoiceForm = () => {
       });
       setErrors({});
     }
-  };
+  };  
 
   return (
     <Box maxW="800px" mx="auto" p={6} borderWidth={1} borderRadius={8} boxShadow="lg">
@@ -283,17 +301,6 @@ const InvoiceForm = () => {
               type="date"
               name="invoiceDate"
               value={invoiceData.invoiceDate}
-              onChange={handleChange}
-            />
-          </FormControl>
-
-          {/* Numéro de la facture */}
-          <FormControl id="invoiceNumber">
-            <FormLabel>Numéro de la facture</FormLabel>
-            <Input
-              type="text"
-              name="invoiceNumber"
-              value={invoiceData.invoiceNumber}
               onChange={handleChange}
             />
           </FormControl>
