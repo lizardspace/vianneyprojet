@@ -25,6 +25,7 @@ import 'jspdf-autotable';
 
 const InvoicePreview = ({ invoiceNumber }) => {
   const [invoice, setInvoice] = useState(null);
+  const [vatTotal, setVatTotal] = useState(0); // Nouvel état pour le total de la TVA
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -42,6 +43,19 @@ const InvoicePreview = ({ invoiceNumber }) => {
         }
 
         setInvoice(data);
+
+        // Calculer vatTotal ici
+        if (data.products && data.products.length > 0) {
+          const vatTotalCalculated = data.products.reduce((acc, product) => {
+            const vatAmount = (product.unitPrice * product.quantity * product.vatRate) / 100;
+            return acc + vatAmount;
+          }, 0);
+
+          setVatTotal(vatTotalCalculated);
+        } else {
+          setVatTotal(0);
+        }
+
       } catch (error) {
         setError(error.message);
       } finally {
@@ -58,11 +72,11 @@ const InvoicePreview = ({ invoiceNumber }) => {
     const doc = new jsPDF('p', 'pt', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    // Add Title
+    // Ajouter le titre
     doc.setFontSize(20);
     doc.text('Facture', pageWidth / 2, 40, { align: 'center' });
 
-    // Add Seller Information
+    // Ajouter les informations du vendeur
     doc.setFontSize(12);
     let yPosition = 80;
     doc.text(`Nom de la société: ${invoice.seller_name}`, 40, yPosition);
@@ -87,24 +101,27 @@ const InvoicePreview = ({ invoiceNumber }) => {
     yPosition += 20;
     doc.text(`RM: ${invoice.seller_rm || 'N/A'}`, 40, yPosition);
 
-    // Add Buyer Information
+    // Ajouter les informations de l'acheteur
     doc.text(`Facturer à: ${invoice.buyer_name}`, 400, 80);
     doc.text(`Adresse: ${invoice.buyer_address}`, 400, 100);
 
-    // Add Invoice Information
-    doc.text(`Numéro de Facture: ${invoice.invoice_number}`, 40, yPosition + 40);
+    // Ajouter les informations de la facture
+    yPosition += 40;
+    doc.text(`Numéro de Facture: ${invoice.invoice_number}`, 40, yPosition);
+    yPosition += 20;
     doc.text(
       `Date de Facture: ${invoice.invoice_date ? new Date(invoice.invoice_date).toLocaleDateString() : 'N/A'}`,
       40,
-      yPosition + 60
+      yPosition
     );
+    yPosition += 20;
     doc.text(
       `Date d'Échéance: ${invoice.payment_due_date ? new Date(invoice.payment_due_date).toLocaleDateString() : 'N/A'}`,
       40,
-      yPosition + 80
+      yPosition
     );
 
-    // Add Table for Products/Services
+    // Ajouter le tableau des produits/services
     const products = (invoice.products || []).map((product) => [
       product.description,
       product.quantity,
@@ -113,10 +130,10 @@ const InvoicePreview = ({ invoiceNumber }) => {
     ]);
 
     doc.autoTable({
-      startY: yPosition + 100,
+      startY: yPosition + 20,
       head: [['Description', 'Quantité', 'Prix unitaire HT', 'Prix total HT']],
       body: products,
-      margin: { top: yPosition + 100 },
+      margin: { top: yPosition + 20 },
     });
 
     // Calculate VAT total
@@ -132,7 +149,7 @@ const InvoicePreview = ({ invoiceNumber }) => {
       doc.lastAutoTable.finalY + 20
     );
     doc.text(
-      `TVA: ${vatTotal.toFixed(2)} €`,
+      `TVA: ${vatTotal ? vatTotal.toFixed(2) : '0.00'} €`,
       pageWidth - 200,
       doc.lastAutoTable.finalY + 40
     );
@@ -142,7 +159,7 @@ const InvoicePreview = ({ invoiceNumber }) => {
       doc.lastAutoTable.finalY + 60
     );
 
-    // Add Footer
+    // Ajouter le pied de page
     doc.setFontSize(10);
     doc.text(
       'Nous apprécions votre clientèle.',
@@ -151,7 +168,7 @@ const InvoicePreview = ({ invoiceNumber }) => {
       { align: 'center' }
     );
 
-    // Footer with seller details
+    // Pied de page avec les détails du vendeur
     doc.text(
       `Numéro SIRET : ${invoice.seller_siret || 'N/A'} | Code APE : ${invoice.code_ape || 'N/A'} | Numéro TVA Intracommunautaire : ${invoice.seller_vat_intracommunity_number || 'N/A'}`,
       pageWidth / 2,
