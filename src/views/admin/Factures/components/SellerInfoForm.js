@@ -10,12 +10,14 @@ import {
   Button,
   Heading,
   useToast,
+  FormErrorMessage,
+  Tooltip,
 } from '@chakra-ui/react';
-import { useEvent } from '../../../../EventContext';
+import { useEvent } from '../../../../EventContext'; // Import du contexte d'événement
 
 const SellerInfoForm = () => {
   const toast = useToast();
-  const { selectedEventId } = useEvent();
+  const { selectedEventId } = useEvent(); // Récupère l'ID de l'événement sélectionné
   const [sellerData, setSellerData] = useState({
     sellerName: '',
     sellerAddress: '',
@@ -28,61 +30,114 @@ const SellerInfoForm = () => {
     sellerRM: '',
     sellerVATNumber: '',
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     // Récupérer les informations du vendeur si elles existent
     const fetchSellerInfo = async () => {
       const { data, error } = await supabase
-        .from('seller_info')
+        .from('vianney_seller_info')
         .select('*')
         .eq('event_id', selectedEventId)
         .single();
 
       if (data) {
-        setSellerData(data);
+        setSellerData({
+          sellerName: data.seller_name || '',
+          sellerAddress: data.seller_address || '',
+          sellerSiren: data.seller_siren || '',
+          sellerSiret: data.seller_siret || '',
+          sellerLegalForm: data.seller_legal_form || '',
+          sellerCapital: data.seller_capital || '',
+          sellerRCS: data.seller_rcs || '',
+          sellerGreffe: data.seller_greffe || '',
+          sellerRM: data.seller_rm || '',
+          sellerVATNumber: data.seller_vat_number || '',
+        });
       } else if (error && error.code !== 'PGRST116') {
-        // Ignorer l'erreur 'PGRST116' qui signifie 'No rows found'
-        console.error('Error fetching seller info:', error);
+        // Ignorer l'erreur 'No rows found'
+        console.error('Erreur lors de la récupération des informations du vendeur:', error);
       }
     };
 
-    fetchSellerInfo();
+    if (selectedEventId) {
+      fetchSellerInfo();
+    }
   }, [selectedEventId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Validation pour les champs numériques
+    if (['sellerSiren', 'sellerSiret', 'sellerCapital', 'sellerRCS', 'sellerRM', 'sellerVATNumber'].includes(name)) {
+      if (value && !/^\d*\.?\d*$/.test(value)) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: 'Ce champ doit contenir uniquement des chiffres.',
+        }));
+
+        toast({
+          title: 'Erreur de saisie',
+          description: 'Ce champ doit contenir uniquement des chiffres.',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: null,
+        }));
+      }
+    }
+
     setSellerData({ ...sellerData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Vérifier si les informations du vendeur existent déjà
+    // Préparer les données à insérer ou à mettre à jour
+    const dataToSave = {
+      seller_name: sellerData.sellerName,
+      seller_address: sellerData.sellerAddress,
+      seller_siren: sellerData.sellerSiren,
+      seller_siret: sellerData.sellerSiret,
+      seller_legal_form: sellerData.sellerLegalForm,
+      seller_capital: sellerData.sellerCapital ? parseFloat(sellerData.sellerCapital) : null,
+      seller_rcs: sellerData.sellerRCS,
+      seller_greffe: sellerData.sellerGreffe,
+      seller_rm: sellerData.sellerRM,
+      seller_vat_number: sellerData.sellerVATNumber,
+      event_id: selectedEventId,
+    };
+
+    // eslint-disable-next-line 
     const { data: existingData, error: fetchError } = await supabase
-      .from('seller_info')
+      .from('vianney_seller_info')
       .select('*')
       .eq('event_id', selectedEventId)
       .single();
 
-    let response;
+    let responseError;
 
     if (existingData) {
       // Mettre à jour les informations existantes
       const { error } = await supabase
-        .from('seller_info')
-        .update(sellerData)
+        .from('vianney_seller_info')
+        .update(dataToSave)
         .eq('event_id', selectedEventId);
-      response = error;
+      responseError = error;
     } else {
       // Insérer de nouvelles informations
       const { error } = await supabase
-        .from('seller_info')
-        .insert({ ...sellerData, event_id: selectedEventId });
-      response = error;
+        .from('vianney_seller_info')
+        .insert(dataToSave);
+      responseError = error;
     }
 
-    if (response) {
-      console.error('Error saving seller info:', response);
+    if (responseError) {
+      console.error('Erreur lors de la sauvegarde des informations du vendeur:', responseError);
       toast({
         title: 'Erreur',
         description: 'Erreur lors de la sauvegarde des informations du vendeur.',
@@ -119,9 +174,126 @@ const SellerInfoForm = () => {
             />
           </FormControl>
 
-          {/* Autres champs similaires pour les informations du vendeur */}
-          {/* ... */}
+          {/* Adresse du vendeur */}
+          <FormControl id="sellerAddress" isRequired>
+            <FormLabel>Adresse du vendeur</FormLabel>
+            <Input
+              type="text"
+              name="sellerAddress"
+              value={sellerData.sellerAddress}
+              onChange={handleChange}
+            />
+          </FormControl>
 
+          {/* SIREN */}
+          <FormControl id="sellerSiren" isInvalid={errors.sellerSiren}>
+            <Tooltip label="SIREN: Système d'Identification du Répertoire des Entreprises" placement="top">
+              <FormLabel>SIREN</FormLabel>
+            </Tooltip>
+            <Input
+              type="text"
+              name="sellerSiren"
+              value={sellerData.sellerSiren}
+              onChange={handleChange}
+            />
+            {errors.sellerSiren && <FormErrorMessage>{errors.sellerSiren}</FormErrorMessage>}
+          </FormControl>
+
+          {/* SIRET */}
+          <FormControl id="sellerSiret" isInvalid={errors.sellerSiret}>
+            <Tooltip label="SIRET: Système d'Identification du Répertoire des Etablissements" placement="top">
+              <FormLabel>SIRET</FormLabel>
+            </Tooltip>
+            <Input
+              type="text"
+              name="sellerSiret"
+              value={sellerData.sellerSiret}
+              onChange={handleChange}
+            />
+            {errors.sellerSiret && <FormErrorMessage>{errors.sellerSiret}</FormErrorMessage>}
+          </FormControl>
+
+          {/* Forme juridique */}
+          <FormControl id="sellerLegalForm">
+            <FormLabel>Forme juridique</FormLabel>
+            <Input
+              type="text"
+              name="sellerLegalForm"
+              value={sellerData.sellerLegalForm}
+              onChange={handleChange}
+            />
+          </FormControl>
+
+          {/* Capital */}
+          <FormControl id="sellerCapital" isInvalid={errors.sellerCapital}>
+            <Tooltip label="Capital social de l'entreprise" placement="top">
+              <FormLabel>Capital</FormLabel>
+            </Tooltip>
+            <Input
+              type="number"
+              name="sellerCapital"
+              value={sellerData.sellerCapital}
+              onChange={handleChange}
+              min="0"
+              step="0.01"
+            />
+            {errors.sellerCapital && <FormErrorMessage>{errors.sellerCapital}</FormErrorMessage>}
+          </FormControl>
+
+          {/* Numéro RCS */}
+          <FormControl id="sellerRCS" isInvalid={errors.sellerRCS}>
+            <Tooltip label="RCS: Registre du Commerce et des Sociétés" placement="top">
+              <FormLabel>Numéro RCS</FormLabel>
+            </Tooltip>
+            <Input
+              type="text"
+              name="sellerRCS"
+              value={sellerData.sellerRCS}
+              onChange={handleChange}
+            />
+            {errors.sellerRCS && <FormErrorMessage>{errors.sellerRCS}</FormErrorMessage>}
+          </FormControl>
+
+          {/* Greffe */}
+          <FormControl id="sellerGreffe">
+            <Tooltip label="Greffe: Bureau où sont déposés les actes juridiques" placement="top">
+              <FormLabel>Greffe</FormLabel>
+            </Tooltip>
+            <Input
+              type="text"
+              name="sellerGreffe"
+              value={sellerData.sellerGreffe}
+              onChange={handleChange}
+            />
+          </FormControl>
+
+          {/* Numéro RM */}
+          <FormControl id="sellerRM" isInvalid={errors.sellerRM}>
+            <Tooltip label="RM: Répertoire des Métiers" placement="top">
+              <FormLabel>Numéro RM</FormLabel>
+            </Tooltip>
+            <Input
+              type="text"
+              name="sellerRM"
+              value={sellerData.sellerRM}
+              onChange={handleChange}
+            />
+            {errors.sellerRM && <FormErrorMessage>{errors.sellerRM}</FormErrorMessage>}
+          </FormControl>
+
+          {/* Numéro de TVA du vendeur */}
+          <FormControl id="sellerVATNumber" isInvalid={errors.sellerVATNumber}>
+            <FormLabel>Numéro de TVA du vendeur</FormLabel>
+            <Input
+              type="text"
+              name="sellerVATNumber"
+              value={sellerData.sellerVATNumber}
+              onChange={handleChange}
+            />
+            {errors.sellerVATNumber && <FormErrorMessage>{errors.sellerVATNumber}</FormErrorMessage>}
+          </FormControl>
+
+          {/* Bouton de soumission */}
           <Button type="submit" colorScheme="teal" size="lg" mt={6}>
             Sauvegarder les Informations du Vendeur
           </Button>

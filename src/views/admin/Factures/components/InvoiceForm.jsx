@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// InvoiceForm.js
+import React, { useState, useEffect } from 'react';
 import { supabase } from './../../../../supabaseClient';
 import {
   Box,
@@ -17,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import { FcMoneyTransfer } from 'react-icons/fc';
-import { useEvent } from '../../../../EventContext'; // Import the EventContext
+import { useEvent } from '../../../../EventContext'; // Import du contexte d'événement
 
 const VAT_RATES = [
   { label: '20% (Standard)', value: 20 },
@@ -28,12 +29,13 @@ const VAT_RATES = [
 
 const InvoiceForm = () => {
   const toast = useToast();
-  const { selectedEventId } = useEvent(); // Get the selectedEventId from context
+  const { selectedEventId } = useEvent(); // Récupère l'ID de l'événement sélectionné
   const [errors, setErrors] = useState({});
   const [invoiceData, setInvoiceData] = useState({
     invoiceDate: '',
     invoiceNumber: '',
     saleDate: '',
+    // Les informations du vendeur seront pré-remplies
     sellerName: '',
     sellerAddress: '',
     sellerSiren: '',
@@ -43,12 +45,12 @@ const InvoiceForm = () => {
     sellerRCS: '',
     sellerGreffe: '',
     sellerRM: '',
+    sellerVATNumber: '',
     buyerName: '',
     buyerAddress: '',
     deliveryAddress: '',
     billingAddress: '',
     orderNumber: '',
-    sellerVATNumber: '',
     buyerVATNumber: '',
     productDetails: [{ description: '', quantity: '', unitPrice: '', vatRate: '' }],
     discount: '',
@@ -58,14 +60,47 @@ const InvoiceForm = () => {
     discountConditions: '',
     latePaymentPenalties: '',
     warrantyInfo: '',
-    specialMention: ''
+    specialMention: '',
   });
+
+  useEffect(() => {
+    // Récupérer les informations du vendeur
+    const fetchSellerInfo = async () => {
+      const { data, error } = await supabase
+        .from('vianney_seller_info')
+        .select('*')
+        .eq('event_id', selectedEventId)
+        .single();
+
+      if (data) {
+        setInvoiceData((prevData) => ({
+          ...prevData,
+          sellerName: data.seller_name || '',
+          sellerAddress: data.seller_address || '',
+          sellerSiren: data.seller_siren || '',
+          sellerSiret: data.seller_siret || '',
+          sellerLegalForm: data.seller_legal_form || '',
+          sellerCapital: data.seller_capital || '',
+          sellerRCS: data.seller_rcs || '',
+          sellerGreffe: data.seller_greffe || '',
+          sellerRM: data.seller_rm || '',
+          sellerVATNumber: data.seller_vat_number || '',
+        }));
+      } else if (error && error.code !== 'PGRST116') {
+        console.error('Erreur lors de la récupération des informations du vendeur:', error);
+      }
+    };
+
+    if (selectedEventId) {
+      fetchSellerInfo();
+    }
+  }, [selectedEventId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     // Validation pour les champs numériques
-    if (['sellerSiren', 'sellerSiret', 'sellerCapital', 'sellerRCS', 'sellerGreffe', 'sellerRM', 'sellerVATNumber', 'buyerVATNumber', 'discount', 'totalHT', 'totalTTC'].includes(name)) {
+    if (['buyerVATNumber', 'discount', 'totalHT', 'totalTTC'].includes(name)) {
       if (value && !/^\d*\.?\d*$/.test(value)) {
         setErrors((prevErrors) => ({
           ...prevErrors,
@@ -155,12 +190,12 @@ const InvoiceForm = () => {
       seller_rcs: invoiceData.sellerRCS || null,
       seller_greffe: invoiceData.sellerGreffe || null,
       seller_rm: invoiceData.sellerRM || null,
+      seller_vat_number: invoiceData.sellerVATNumber || null,
       buyer_name: invoiceData.buyerName || null,
       buyer_address: invoiceData.buyerAddress || null,
       delivery_address: invoiceData.deliveryAddress || null,
       billing_address: invoiceData.billingAddress || null,
       order_number: invoiceData.orderNumber || null,
-      seller_vat_number: invoiceData.sellerVATNumber || null,
       buyer_vat_number: invoiceData.buyerVATNumber || null,
       products: products.length > 0 ? products : null,
       discount: invoiceData.discount ? parseFloat(invoiceData.discount) : null,
@@ -179,7 +214,7 @@ const InvoiceForm = () => {
       .insert(dataToInsert);
 
     if (error) {
-      console.error('Error inserting invoice:', error);
+      console.error('Erreur lors de l\'insertion de la facture:', error);
       toast({
         title: 'Erreur',
         description: 'Erreur lors de la soumission de la facture. Veuillez vérifier les champs et réessayer.',
@@ -188,7 +223,7 @@ const InvoiceForm = () => {
         isClosable: true,
       });
     } else {
-      console.log('Invoice submitted successfully');
+      console.log('Facture soumise avec succès');
       toast({
         title: 'Succès',
         description: 'Facture soumise avec succès.',
@@ -201,21 +236,22 @@ const InvoiceForm = () => {
         invoiceDate: '',
         invoiceNumber: '',
         saleDate: '',
-        sellerName: '',
-        sellerAddress: '',
-        sellerSiren: '',
-        sellerSiret: '',
-        sellerLegalForm: '',
-        sellerCapital: '',
-        sellerRCS: '',
-        sellerGreffe: '',
-        sellerRM: '',
+        // Les informations du vendeur restent pré-remplies
+        sellerName: invoiceData.sellerName,
+        sellerAddress: invoiceData.sellerAddress,
+        sellerSiren: invoiceData.sellerSiren,
+        sellerSiret: invoiceData.sellerSiret,
+        sellerLegalForm: invoiceData.sellerLegalForm,
+        sellerCapital: invoiceData.sellerCapital,
+        sellerRCS: invoiceData.sellerRCS,
+        sellerGreffe: invoiceData.sellerGreffe,
+        sellerRM: invoiceData.sellerRM,
+        sellerVATNumber: invoiceData.sellerVATNumber,
         buyerName: '',
         buyerAddress: '',
         deliveryAddress: '',
         billingAddress: '',
         orderNumber: '',
-        sellerVATNumber: '',
         buyerVATNumber: '',
         productDetails: [{ description: '', quantity: '', unitPrice: '', vatRate: '' }],
         discount: '',
@@ -225,7 +261,7 @@ const InvoiceForm = () => {
         discountConditions: '',
         latePaymentPenalties: '',
         warrantyInfo: '',
-        specialMention: ''
+        specialMention: '',
       });
       setErrors({});
     }
@@ -277,6 +313,8 @@ const InvoiceForm = () => {
 
           <Heading as="h3" size="md">Informations sur le vendeur</Heading>
 
+          {/* Les champs du vendeur sont en lecture seule */}
+
           {/* Nom du vendeur */}
           <FormControl id="sellerName">
             <FormLabel>Nom du vendeur</FormLabel>
@@ -284,7 +322,7 @@ const InvoiceForm = () => {
               type="text"
               name="sellerName"
               value={invoiceData.sellerName}
-              onChange={handleChange}
+              isReadOnly
             />
           </FormControl>
 
@@ -295,39 +333,35 @@ const InvoiceForm = () => {
               type="text"
               name="sellerAddress"
               value={invoiceData.sellerAddress}
-              onChange={handleChange}
+              isReadOnly
             />
           </FormControl>
 
-          <Stack direction="row" spacing={4}>
-            {/* SIREN */}
-            <FormControl id="sellerSiren" isInvalid={errors.sellerSiren}>
-              <Tooltip label="SIREN: Système d'Identification du Répertoire des Entreprises" placement="top">
-                <FormLabel>SIREN</FormLabel>
-              </Tooltip>
-              <Input
-                type="text"
-                name="sellerSiren"
-                value={invoiceData.sellerSiren}
-                onChange={handleChange}
-              />
-              {errors.sellerSiren && <FormErrorMessage>{errors.sellerSiren}</FormErrorMessage>}
-            </FormControl>
+          {/* SIREN */}
+          <FormControl id="sellerSiren">
+            <Tooltip label="SIREN: Système d'Identification du Répertoire des Entreprises" placement="top">
+              <FormLabel>SIREN</FormLabel>
+            </Tooltip>
+            <Input
+              type="text"
+              name="sellerSiren"
+              value={invoiceData.sellerSiren}
+              isReadOnly
+            />
+          </FormControl>
 
-            {/* SIRET */}
-            <FormControl id="sellerSiret" isInvalid={errors.sellerSiret}>
-              <Tooltip label="SIRET: Système d'Identification du Répertoire des Etablissements" placement="top">
-                <FormLabel>SIRET</FormLabel>
-              </Tooltip>
-              <Input
-                type="text"
-                name="sellerSiret"
-                value={invoiceData.sellerSiret}
-                onChange={handleChange}
-              />
-              {errors.sellerSiret && <FormErrorMessage>{errors.sellerSiret}</FormErrorMessage>}
-            </FormControl>
-          </Stack>
+          {/* SIRET */}
+          <FormControl id="sellerSiret">
+            <Tooltip label="SIRET: Système d'Identification du Répertoire des Etablissements" placement="top">
+              <FormLabel>SIRET</FormLabel>
+            </Tooltip>
+            <Input
+              type="text"
+              name="sellerSiret"
+              value={invoiceData.sellerSiret}
+              isReadOnly
+            />
+          </FormControl>
 
           {/* Forme juridique */}
           <FormControl id="sellerLegalForm">
@@ -336,71 +370,72 @@ const InvoiceForm = () => {
               type="text"
               name="sellerLegalForm"
               value={invoiceData.sellerLegalForm}
-              onChange={handleChange}
+              isReadOnly
             />
           </FormControl>
 
-          <Stack direction="row" spacing={4}>
-            {/* Capital */}
-            <FormControl id="sellerCapital" isInvalid={errors.sellerCapital}>
-              <Tooltip label="Capital social de l'entreprise" placement="top">
-                <FormLabel>Capital</FormLabel>
-              </Tooltip>
-              <Input
-                type="number"
-                name="sellerCapital"
-                value={invoiceData.sellerCapital}
-                onChange={handleChange}
-                min="0"
-                step="0.01"
-              />
-              {errors.sellerCapital && <FormErrorMessage>{errors.sellerCapital}</FormErrorMessage>}
-            </FormControl>
+          {/* Capital */}
+          <FormControl id="sellerCapital">
+            <Tooltip label="Capital social de l'entreprise" placement="top">
+              <FormLabel>Capital</FormLabel>
+            </Tooltip>
+            <Input
+              type="number"
+              name="sellerCapital"
+              value={invoiceData.sellerCapital}
+              isReadOnly
+            />
+          </FormControl>
 
-            {/* Numéro RCS */}
-            <FormControl id="sellerRCS" isInvalid={errors.sellerRCS}>
-              <Tooltip label="RCS: Registre du Commerce et des Sociétés" placement="top">
-                <FormLabel>Numéro RCS</FormLabel>
-              </Tooltip>
-              <Input
-                type="text"
-                name="sellerRCS"
-                value={invoiceData.sellerRCS}
-                onChange={handleChange}
-              />
-              {errors.sellerRCS && <FormErrorMessage>{errors.sellerRCS}</FormErrorMessage>}
-            </FormControl>
-          </Stack>
+          {/* Numéro RCS */}
+          <FormControl id="sellerRCS">
+            <Tooltip label="RCS: Registre du Commerce et des Sociétés" placement="top">
+              <FormLabel>Numéro RCS</FormLabel>
+            </Tooltip>
+            <Input
+              type="text"
+              name="sellerRCS"
+              value={invoiceData.sellerRCS}
+              isReadOnly
+            />
+          </FormControl>
 
-          <Stack direction="row" spacing={4}>
-            {/* Greffe */}
-            <FormControl id="sellerGreffe" isInvalid={errors.sellerGreffe}>
-              <Tooltip label="Greffe: Bureau où sont déposés les actes juridiques" placement="top">
-                <FormLabel>Greffe</FormLabel>
-              </Tooltip>
-              <Input
-                type="text"
-                name="sellerGreffe"
-                value={invoiceData.sellerGreffe}
-                onChange={handleChange}
-              />
-              {errors.sellerGreffe && <FormErrorMessage>{errors.sellerGreffe}</FormErrorMessage>}
-            </FormControl>
+          {/* Greffe */}
+          <FormControl id="sellerGreffe">
+            <Tooltip label="Greffe: Bureau où sont déposés les actes juridiques" placement="top">
+              <FormLabel>Greffe</FormLabel>
+            </Tooltip>
+            <Input
+              type="text"
+              name="sellerGreffe"
+              value={invoiceData.sellerGreffe}
+              isReadOnly
+            />
+          </FormControl>
 
-            {/* Numéro RM */}
-            <FormControl id="sellerRM" isInvalid={errors.sellerRM}>
-              <Tooltip label="RM: Répertoire des Métiers" placement="top">
-                <FormLabel>Numéro RM</FormLabel>
-              </Tooltip>
-              <Input
-                type="text"
-                name="sellerRM"
-                value={invoiceData.sellerRM}
-                onChange={handleChange}
-              />
-              {errors.sellerRM && <FormErrorMessage>{errors.sellerRM}</FormErrorMessage>}
-            </FormControl>
-          </Stack>
+          {/* Numéro RM */}
+          <FormControl id="sellerRM">
+            <Tooltip label="RM: Répertoire des Métiers" placement="top">
+              <FormLabel>Numéro RM</FormLabel>
+            </Tooltip>
+            <Input
+              type="text"
+              name="sellerRM"
+              value={invoiceData.sellerRM}
+              isReadOnly
+            />
+          </FormControl>
+
+          {/* Numéro de TVA du vendeur */}
+          <FormControl id="sellerVATNumber">
+            <FormLabel>Numéro de TVA du vendeur</FormLabel>
+            <Input
+              type="text"
+              name="sellerVATNumber"
+              value={invoiceData.sellerVATNumber}
+              isReadOnly
+            />
+          </FormControl>
 
           <Divider my={6} />
 
