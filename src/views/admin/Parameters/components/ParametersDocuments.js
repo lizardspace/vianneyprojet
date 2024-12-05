@@ -1,12 +1,13 @@
 // src/views/admin/Parameters/components/ParametersDocuments.js
 import React, { useState } from 'react';
 import { Box, Text, Button, useColorModeValue, ModalCloseButton, ModalHeader, Modal, ModalBody, ModalOverlay, ModalContent, } from '@chakra-ui/react';
-import { FcAdvertising, FcGlobe, FcBusinessman, FcDepartment, FcCalendar, FcList } from "react-icons/fc";
+import { FcAdvertising, FcGlobe, FcBusinessman, FcDepartment, FcCalendar, FcList, FcFinePrint } from "react-icons/fc";
 import MapComponent from "views/admin/carte/components/MapComponent";
 import TableTopCreators from 'views/admin/carte/components/TableTopCreators';
 import TeamScheduleByMySelf from '../../TableauDeBord/components/TeamScheduleMadeMySelf'
 import SalleDeCrise from '../modal/SalleDeCrise';
 import NotepadComponent from '../modal/NotepadComponent';
+import SellerInfoForm from 'views/admin/Factures/components/SellerInfoForm';
 
 const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
   const brandColor = useColorModeValue("brand.500", "white");
@@ -17,6 +18,10 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
   const [showCrisisModal, setShowCrisisModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showEventNeedsModal, setShowEventNeedsModal] = useState(false);
+  const [showSellerInfoModal, setShowSellerInfoModal] = useState(false);
+
+const openSellerInfoModal = () => setShowSellerInfoModal(true);
+const closeSellerInfoModal = () => setShowSellerInfoModal(false);
 
   const openGeoModal = () => setShowGeoModal(true);
   const closeGeoModal = () => setShowGeoModal(false);
@@ -101,6 +106,28 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
       >
         Besoins
       </Button>
+      <Button
+        leftIcon={<FcFinePrint size='32px' color={brandColor} />} // Exemple d'icône, modifiez si nécessaire
+        bg={buttonBg}
+        color={buttonTextColor}
+        h='100px'
+        m={4}
+        onClick={openSellerInfoModal}
+      >
+        Informations sur la société
+      </Button>
+
+      <Modal isOpen={showSellerInfoModal} onClose={closeSellerInfoModal} size="full">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Informations sur le vendeur</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <SellerInfoForm/>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
 
       {/* Modals */}
       <Modal isOpen={showGeoModal} onClose={closeGeoModal} size="full">
@@ -152,7 +179,7 @@ const ParametersDocuments = ({ onEventAndCharacteristicsClick }) => {
           <ModalHeader>Besoins Modal</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <NotepadComponent/>
+            <NotepadComponent />
           </ModalBody>
         </ModalContent>
       </Modal>
