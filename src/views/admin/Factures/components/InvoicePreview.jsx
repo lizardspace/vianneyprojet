@@ -18,6 +18,7 @@ import {
   Alert,
   AlertIcon,
   Button,
+  Image,
 } from '@chakra-ui/react';
 import { supabase } from './../../../../supabaseClient';
 import jsPDF from 'jspdf';
@@ -50,34 +51,37 @@ const InvoicePreview = ({ invoiceNumber }) => {
         // Calculate totals
         if (data.products && data.products.length > 0) {
           // Total HT (before discount)
-          const totalHTCalculated = data.products.reduce((acc, product) => {
+          const baseHT = data.products.reduce((acc, product) => {
             return acc + product.unitPrice * product.quantity;
           }, 0);
 
           // Discount
           const discountValue = data.discount ? parseFloat(data.discount) : 0;
 
-          // Subtotal after discount
-          const subtotalAfterDiscount = totalHTCalculated - discountValue;
+          // Ensure discount does not exceed baseHT
+          const validDiscount = discountValue > baseHT ? baseHT : discountValue;
 
           // Calculate VAT total
           let vatTotalCalculated = 0;
-          if (totalHTCalculated > 0) {
+          if (baseHT > 0) {
             data.products.forEach((product) => {
               const productTotal = product.unitPrice * product.quantity;
-              const productDiscount = (productTotal / totalHTCalculated) * discountValue;
+              const productDiscount = (productTotal / baseHT) * validDiscount;
               const taxableAmount = productTotal - productDiscount;
               const vatAmount = (taxableAmount * product.vatRate) / 100;
               vatTotalCalculated += vatAmount;
             });
           }
 
+          // Total HT after discount
+          const totalHTAfterDiscount = baseHT - validDiscount;
+
           // Total TTC
-          const totalTTCCalculated = subtotalAfterDiscount + vatTotalCalculated;
+          const totalTTCCalculated = totalHTAfterDiscount + vatTotalCalculated;
 
           // Update states
-          setTotalHT(totalHTCalculated);
-          setDiscount(discountValue);
+          setTotalHT(totalHTAfterDiscount);
+          setDiscount(validDiscount);
           setVatTotal(vatTotalCalculated);
           setTotalTTC(totalTTCCalculated);
         } else {
@@ -128,62 +132,49 @@ const InvoicePreview = ({ invoiceNumber }) => {
   };
 
   const generatePdfContent = (doc, pageWidth, logoDataUrl) => {
-    let yPosition = 40;
-
+    // Ajouter le logo à droite
     if (logoDataUrl) {
-      doc.addImage(logoDataUrl, 'PNG', 40, 40, 100, 50);
-      yPosition = 100;
+      const imgWidth = 100;
+      const imgHeight = 50;
+      doc.addImage(logoDataUrl, 'PNG', pageWidth - imgWidth - 40, 40, imgWidth, imgHeight);
     }
 
-    // Ajouter le titre
+    // Ajouter le titre "Facture" centré
     doc.setFontSize(20);
-    doc.text('Facture', pageWidth / 2, yPosition, { align: 'center' });
-    yPosition += 40;
+    doc.text('Facture', pageWidth / 2, 100, { align: 'center' });
 
-    doc.text('Facture', pageWidth / 2, 40, { align: 'center' });
-
-    // Ajouter les informations du vendeur
+    // Ajouter les informations du vendeur à gauche
     doc.setFontSize(12);
-    doc.text(`Nom de la société: ${invoice.seller_name}`, 40, yPosition);
-    yPosition += 20;
-    doc.text(`Adresse: ${invoice.seller_address}`, 40, yPosition);
-    yPosition += 20;
-    doc.text(`SIREN: ${invoice.seller_siren || 'N/A'}`, 40, yPosition);
-    yPosition += 20;
-    doc.text(`SIRET: ${invoice.seller_siret || 'N/A'}`, 40, yPosition);
-    yPosition += 20;
-    doc.text(`Code APE: ${invoice.code_ape || 'N/A'}`, 40, yPosition);
-    yPosition += 20;
-    doc.text(`Numéro TVA Intracommunautaire: ${invoice.seller_vat_intracommunity_number || 'N/A'}`, 40, yPosition);
-    yPosition += 20;
-    doc.text(`Forme juridique: ${invoice.seller_legal_form || 'N/A'}`, 40, yPosition);
-    yPosition += 20;
-    doc.text(`Capital: ${invoice.seller_capital ? `${invoice.seller_capital.toFixed(2)} €` : 'N/A'}`, 40, yPosition);
-    yPosition += 20;
-    doc.text(`RCS: ${invoice.seller_rcs || 'N/A'}`, 40, yPosition);
-    yPosition += 20;
-    doc.text(`Greffe: ${invoice.seller_greffe || 'N/A'}`, 40, yPosition);
-    yPosition += 20;
-    doc.text(`RM: ${invoice.seller_rm || 'N/A'}`, 40, yPosition);
+    doc.text(`Nom de la société: ${invoice.seller_name}`, 40, 140);
+    doc.text(`Adresse: ${invoice.seller_address}`, 40, 160);
+    doc.text(`SIREN: ${invoice.seller_siren || 'N/A'}`, 40, 180);
+    doc.text(`SIRET: ${invoice.seller_siret || 'N/A'}`, 40, 200);
+    doc.text(`Code APE: ${invoice.code_ape || 'N/A'}`, 40, 220);
+    doc.text(`Numéro TVA Intracommunautaire: ${invoice.seller_vat_intracommunity_number || 'N/A'}`, 40, 240);
+    doc.text(`Forme juridique: ${invoice.seller_legal_form || 'N/A'}`, 40, 260);
+    doc.text(`Capital: ${invoice.seller_capital ? `${invoice.seller_capital.toFixed(2)} €` : 'N/A'}`, 40, 280);
+    doc.text(`RCS: ${invoice.seller_rcs || 'N/A'}`, 40, 300);
+    doc.text(`Greffe: ${invoice.seller_greffe || 'N/A'}`, 40, 320);
+    doc.text(`RM: ${invoice.seller_rm || 'N/A'}`, 40, 340);
 
-    // Ajouter les informations de l'acheteur
-    doc.text(`Facturer à: ${invoice.buyer_name}`, 400, 80);
-    doc.text(`Adresse: ${invoice.buyer_address}`, 400, 100);
-
-    // Ajouter les informations de la facture
-    yPosition += 40;
-    doc.text(`Numéro de Facture: ${invoice.invoice_number}`, 40, yPosition);
-    yPosition += 20;
+    // Ajouter les informations de l'acheteur et de la facture à droite
+    doc.text(`Facturer à: ${invoice.buyer_name}`, pageWidth - 300, 140);
+    doc.text(`Adresse: ${invoice.buyer_address}`, pageWidth - 300, 160);
+    doc.text(`Numéro de Facture: ${invoice.invoice_number}`, pageWidth - 300, 200);
     doc.text(
       `Date de Facture: ${invoice.invoice_date ? new Date(invoice.invoice_date).toLocaleDateString() : 'N/A'}`,
-      40,
-      yPosition
+      pageWidth - 300,
+      220
     );
-    yPosition += 20;
     doc.text(
-      `Date d'Échéance: ${invoice.payment_due_date ? new Date(invoice.payment_due_date).toLocaleDateString() : 'N/A'}`,
-      40,
-      yPosition
+      `Date de vente/prestation: ${invoice.sale_date ? new Date(invoice.sale_date).toLocaleDateString() : 'N/A'}`,
+      pageWidth - 300,
+      240
+    );
+    doc.text(
+      `Échéance de paiement: ${invoice.payment_due_date ? new Date(invoice.payment_due_date).toLocaleDateString() : 'N/A'}`,
+      pageWidth - 300,
+      260
     );
 
     // Ajouter le tableau des produits/services
@@ -195,38 +186,37 @@ const InvoicePreview = ({ invoiceNumber }) => {
     ]);
 
     doc.autoTable({
-      startY: yPosition + 20,
+      startY: 360,
       head: [['Description', 'Quantité', 'Prix unitaire HT', 'Prix total HT']],
       body: products,
-      margin: { top: yPosition + 20 },
+      margin: { left: 40, right: 40 },
+      styles: { halign: 'left' },
+      headStyles: { fillColor: [54, 162, 235] }, // Bleu pour l'en-tête
     });
 
-    // Ajouter les totaux
-    doc.text(
-      `Sous-Total: ${totalHT.toFixed(2)} €`,
-      pageWidth - 200,
-      doc.lastAutoTable.finalY + 20
-    );
-    doc.text(
-      `REMISE: ${discount.toFixed(2)} €`,
-      pageWidth - 200,
-      doc.lastAutoTable.finalY + 40
-    );
-    doc.text(
-      `Sous-Total après Remise: ${(totalHT - discount).toFixed(2)} €`,
-      pageWidth - 200,
-      doc.lastAutoTable.finalY + 60
-    );
-    doc.text(
-      `TVA: ${vatTotal.toFixed(2)} €`,
-      pageWidth - 200,
-      doc.lastAutoTable.finalY + 80
-    );
-    doc.text(
-      `Total TTC: ${totalTTC.toFixed(2)} €`,
-      pageWidth - 200,
-      doc.lastAutoTable.finalY + 100
-    );
+    // Ajouter les totaux dans un tableau pour un meilleur alignement
+    const finalY = doc.lastAutoTable.finalY + 20;
+
+    doc.autoTable({
+      startY: finalY,
+      head: [['', '']],
+      body: [
+        ['SOUS-TOTAL :', `${totalHT.toFixed(2)} €`],
+        ['REMISE :', `${discount.toFixed(2)} €`],
+        ['SOUS-TOTAL APRES REMISE :', `${totalHT.toFixed(2)} €`],
+        ['TVA :', `${vatTotal.toFixed(2)} €`],
+        ['TOTAL TTC :', `${totalTTC.toFixed(2)} €`],
+        ['TOTAL HT :', `${totalHT.toFixed(2)} €`], // Ajout du Total HT
+      ],
+      columnStyles: {
+        0: { halign: 'left' },
+        1: { halign: 'right' },
+      },
+      margin: { left: 300 }, // Positionner le tableau des totaux plus au centre
+      tableWidth: 'auto',
+      showHeader: false,
+      styles: {align: 'right', fontSize: 12 },
+    });
 
     // Ajouter le pied de page
     doc.setFontSize(10);
@@ -244,8 +234,6 @@ const InvoicePreview = ({ invoiceNumber }) => {
       doc.internal.pageSize.getHeight() - 30,
       { align: 'center' }
     );
-
-    doc.save(`Facture_${invoice.invoice_number}.pdf`);
   };
 
   if (loading) {
@@ -291,18 +279,25 @@ const InvoicePreview = ({ invoiceNumber }) => {
       borderWidth={1}
       borderRadius={8}
       boxShadow="lg"
+      bg="white"
     >
       {/* Afficher le logo si disponible */}
       {invoice.logo_url && (
-        <Box textAlign="center" mb={6}>
-          <img src={invoice.logo_url} alt="Logo du vendeur" style={{ maxWidth: '200px' }} />
+        <Box textAlign="right" mb={6}>
+          <Image
+            src={invoice.logo_url}
+            alt="Logo du vendeur"
+            boxSize="100px"
+            objectFit="contain"
+            marginLeft="auto"
+          />
         </Box>
       )}
 
-<Grid templateColumns="repeat(2, 1fr)" gap={6}>
+      <Grid templateColumns="repeat(2, 1fr)" gap={6}>
         <GridItem>
-          <Heading color="blue.500">{invoice.seller_name}</Heading>
-          <Text mt={4}>{invoice.seller_address}</Text>
+          <Heading color="blue.500" size="md">{invoice.seller_name}</Heading>
+          <Text mt={2}>{invoice.seller_address}</Text>
           <Text>SIREN: {invoice.seller_siren || 'N/A'}</Text>
           <Text>SIRET: {invoice.seller_siret || 'N/A'}</Text>
           <Text>Code APE: {invoice.code_ape || 'N/A'}</Text>
@@ -324,24 +319,24 @@ const InvoicePreview = ({ invoiceNumber }) => {
           <Text>RM: {invoice.seller_rm || 'N/A'}</Text>
         </GridItem>
         <GridItem textAlign="right">
-          <Heading color="blue.500">Facture</Heading>
+          <Heading color="blue.500" size="lg">Facture</Heading>
           <Text mt={4}>
-            Numéro de facture : {invoice.invoice_number}
+            <strong>Numéro de Facture :</strong> {invoice.invoice_number}
           </Text>
           <Text>
-            Date de facture :{' '}
+            <strong>Date de Facture :</strong>{' '}
             {invoice.invoice_date
               ? new Date(invoice.invoice_date).toLocaleDateString()
               : 'N/A'}
           </Text>
           <Text>
-            Date de vente/prestation :{' '}
+            <strong>Date de Vente/Prestation :</strong>{' '}
             {invoice.sale_date
               ? new Date(invoice.sale_date).toLocaleDateString()
               : 'N/A'}
           </Text>
           <Text>
-            Échéance de paiement :{' '}
+            <strong>Échéance de Paiement :</strong>{' '}
             {invoice.payment_due_date
               ? new Date(invoice.payment_due_date).toLocaleDateString()
               : 'N/A'}
@@ -393,13 +388,13 @@ const InvoicePreview = ({ invoiceNumber }) => {
       <Grid templateColumns="repeat(2, 1fr)" gap={6} mt={6}>
         <GridItem>
           <Text bg="blue.500" color="white" p={2} borderRadius={4}>
-            Remarques et instructions de paiement :
+            Remarques et Instructions de Paiement :
           </Text>
           <Text mt={2}>
             {invoice.discount_conditions ||
               'Aucune condition de remise spécifiée.'}
           </Text>
-          <Text>
+          <Text mt={2}>
             {invoice.late_payment_penalties ||
               'Aucune pénalité de retard spécifiée.'}
           </Text>
@@ -413,8 +408,7 @@ const InvoicePreview = ({ invoiceNumber }) => {
               <strong>REMISE :</strong> {discount.toFixed(2)} €
             </Text>
             <Text>
-              <strong>SOUS-TOTAL MOINS LES REMISES :</strong>{' '}
-              {(totalHT - discount).toFixed(2)} €
+              <strong>SOUS-TOTAL APRES REMISE :</strong> {totalHT.toFixed(2)} €
             </Text>
             <Text>
               <strong>TVA :</strong> {vatTotal.toFixed(2)} €
@@ -423,11 +417,9 @@ const InvoicePreview = ({ invoiceNumber }) => {
               <strong>TOTAL TTC :</strong> {totalTTC.toFixed(2)} €
             </Text>
             <Text>
-              <strong>EXPÉDITION ET MANUTENTION :</strong> 0,00 €
+              <strong>TOTAL HT :</strong> {totalHT.toFixed(2)} €
             </Text>
-            <Text>
-              <strong>SOMME FINALE À PAYER :</strong> {totalTTC.toFixed(2)} €
-            </Text>
+            {/* Vous pouvez ajouter d'autres totaux si nécessaire */}
           </Stack>
         </GridItem>
       </Grid>
