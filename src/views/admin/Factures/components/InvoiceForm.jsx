@@ -56,8 +56,8 @@ const InvoiceForm = () => {
     buyerVATNumber: '',
     productDetails: [{ description: '', quantity: '', unitPrice: '', vatRate: '' }],
     discount: '',
-    totalHT: '',
-    totalTTC: '',
+    totalHT: 0,
+    totalTTC: 0,
     paymentDueDate: '',
     discountConditions: '',
     latePaymentPenalties: '',
@@ -108,7 +108,7 @@ const InvoiceForm = () => {
     const { name, value } = e.target;
 
     // Validation pour les champs numériques
-    if (['buyerVATNumber', 'discount', 'totalHT', 'totalTTC'].includes(name)) {
+    if (['buyerVATNumber', 'discount'].includes(name)) {
       if (value && !/^\d*\.?\d*$/.test(value)) {
         setErrors((prevErrors) => ({
           ...prevErrors,
@@ -184,6 +184,38 @@ const InvoiceForm = () => {
       setLogoFile(e.target.files[0]);
     }
   };
+
+  // Calcul automatique de Total HT et Total TTC
+  useEffect(() => {
+    const calculateTotals = () => {
+      // Calcul du Total HT
+      const totalHT = invoiceData.productDetails.reduce((acc, product) => {
+        const quantity = parseFloat(product.quantity) || 0;
+        const unitPrice = parseFloat(product.unitPrice) || 0;
+        return acc + (quantity * unitPrice);
+      }, 0);
+
+      // Calcul de la TVA totale
+      const vatTotal = invoiceData.productDetails.reduce((acc, product) => {
+        const quantity = parseFloat(product.quantity) || 0;
+        const unitPrice = parseFloat(product.unitPrice) || 0;
+        const vatRate = parseFloat(product.vatRate) || 0;
+        return acc + (quantity * unitPrice * (vatRate / 100));
+      }, 0);
+
+      // Calcul du Total TTC
+      const discount = parseFloat(invoiceData.discount) || 0;
+      const totalTTC = totalHT + vatTotal - discount;
+
+      setInvoiceData((prevData) => ({
+        ...prevData,
+        totalHT: totalHT.toFixed(2),
+        totalTTC: totalTTC.toFixed(2),
+      }));
+    };
+
+    calculateTotals();
+  }, [invoiceData.productDetails, invoiceData.discount]);
 
   // Fonction pour gérer la soumission du formulaire
   const handleSubmit = async (e) => {
@@ -336,8 +368,8 @@ const InvoiceForm = () => {
         buyerVATNumber: '',
         productDetails: [{ description: '', quantity: '', unitPrice: '', vatRate: '' }],
         discount: '',
-        totalHT: '',
-        totalTTC: '',
+        totalHT: 0,
+        totalTTC: 0,
         paymentDueDate: '',
         discountConditions: '',
         latePaymentPenalties: '',
@@ -683,35 +715,31 @@ const InvoiceForm = () => {
           </FormControl>
 
           {/* Total HT */}
-          <FormControl id="totalHT" isInvalid={errors.totalHT}>
-            <Tooltip label="Total HT: Montant total hors taxes" placement="top">
+          <FormControl id="totalHT">
+            <Tooltip label="Total HT est calculé automatiquement. À titre indicatif et à vérifier." placement="top">
               <FormLabel>Total HT</FormLabel>
             </Tooltip>
             <Input
               type="number"
               name="totalHT"
               value={invoiceData.totalHT}
-              onChange={handleChange}
-              min="0"
-              step="0.01"
+              isReadOnly
+              placeholder="Calculé automatiquement"
             />
-            {errors.totalHT && <FormErrorMessage>{errors.totalHT}</FormErrorMessage>}
           </FormControl>
 
           {/* Total TTC */}
-          <FormControl id="totalTTC" isInvalid={errors.totalTTC}>
-            <Tooltip label="Total TTC: Montant total toutes taxes comprises" placement="top">
+          <FormControl id="totalTTC">
+            <Tooltip label="Total TTC est calculé automatiquement. À titre indicatif et à vérifier." placement="top">
               <FormLabel>Total TTC</FormLabel>
             </Tooltip>
             <Input
               type="number"
               name="totalTTC"
               value={invoiceData.totalTTC}
-              onChange={handleChange}
-              min="0"
-              step="0.01"
+              isReadOnly
+              placeholder="Calculé automatiquement"
             />
-            {errors.totalTTC && <FormErrorMessage>{errors.totalTTC}</FormErrorMessage>}
           </FormControl>
 
           <Divider my={6} />
