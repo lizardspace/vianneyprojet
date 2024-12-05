@@ -19,13 +19,16 @@ import {
   AlertIcon,
   Button,
 } from '@chakra-ui/react';
-import { supabase } from './../../../../supabaseClient'; // Assurez-vous que c'est le bon chemin vers votre client Supabase
+import { supabase } from './../../../../supabaseClient';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
 const InvoicePreview = ({ invoiceNumber }) => {
   const [invoice, setInvoice] = useState(null);
-  const [vatTotal, setVatTotal] = useState(0); // Nouvel état pour le total de la TVA
+  const [totalHT, setTotalHT] = useState(0);
+  const [totalTTC, setTotalTTC] = useState(0);
+  const [vatTotal, setVatTotal] = useState(0);
+  const [discount, setDiscount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -44,18 +47,45 @@ const InvoicePreview = ({ invoiceNumber }) => {
 
         setInvoice(data);
 
-        // Calculer vatTotal ici
+        // Calculate totals
         if (data.products && data.products.length > 0) {
-          const vatTotalCalculated = data.products.reduce((acc, product) => {
-            const vatAmount = (product.unitPrice * product.quantity * product.vatRate) / 100;
-            return acc + vatAmount;
+          // Total HT (before discount)
+          const totalHTCalculated = data.products.reduce((acc, product) => {
+            return acc + product.unitPrice * product.quantity;
           }, 0);
 
-          setVatTotal(vatTotalCalculated);
-        } else {
-          setVatTotal(0);
-        }
+          // Discount
+          const discountValue = data.discount ? parseFloat(data.discount) : 0;
 
+          // Subtotal after discount
+          const subtotalAfterDiscount = totalHTCalculated - discountValue;
+
+          // Calculate VAT total
+          let vatTotalCalculated = 0;
+          if (totalHTCalculated > 0) {
+            data.products.forEach((product) => {
+              const productTotal = product.unitPrice * product.quantity;
+              const productDiscount = (productTotal / totalHTCalculated) * discountValue;
+              const taxableAmount = productTotal - productDiscount;
+              const vatAmount = (taxableAmount * product.vatRate) / 100;
+              vatTotalCalculated += vatAmount;
+            });
+          }
+
+          // Total TTC
+          const totalTTCCalculated = subtotalAfterDiscount + vatTotalCalculated;
+
+          // Update states
+          setTotalHT(totalHTCalculated);
+          setDiscount(discountValue);
+          setVatTotal(vatTotalCalculated);
+          setTotalTTC(totalTTCCalculated);
+        } else {
+          setTotalHT(0);
+          setDiscount(0);
+          setVatTotal(0);
+          setTotalTTC(0);
+        }
       } catch (error) {
         setError(error.message);
       } finally {
@@ -136,27 +166,31 @@ const InvoicePreview = ({ invoiceNumber }) => {
       margin: { top: yPosition + 20 },
     });
 
-    // Calculate VAT total
-    const vatTotal = invoice.products.reduce((acc, product) => {
-      const vatAmount = (product.unitPrice * product.quantity * product.vatRate) / 100;
-      return acc + vatAmount;
-    }, 0);
-
-    // Add Totals
+    // Ajouter les totaux
     doc.text(
-      `Sous-Total: ${invoice.total_ht?.toFixed(2)} €`,
+      `Sous-Total: ${totalHT.toFixed(2)} €`,
       pageWidth - 200,
       doc.lastAutoTable.finalY + 20
     );
     doc.text(
-      `TVA: ${vatTotal ? vatTotal.toFixed(2) : '0.00'} €`,
+      `REMISE: ${discount.toFixed(2)} €`,
       pageWidth - 200,
       doc.lastAutoTable.finalY + 40
     );
     doc.text(
-      `Total TTC: ${invoice.total_ttc?.toFixed(2)} €`,
+      `Sous-Total après Remise: ${(totalHT - discount).toFixed(2)} €`,
       pageWidth - 200,
       doc.lastAutoTable.finalY + 60
+    );
+    doc.text(
+      `TVA: ${vatTotal.toFixed(2)} €`,
+      pageWidth - 200,
+      doc.lastAutoTable.finalY + 80
+    );
+    doc.text(
+      `Total TTC: ${totalTTC.toFixed(2)} €`,
+      pageWidth - 200,
+      doc.lastAutoTable.finalY + 100
     );
 
     // Ajouter le pied de page
@@ -331,26 +365,26 @@ const InvoicePreview = ({ invoiceNumber }) => {
         <GridItem>
           <Stack spacing={2} textAlign="right">
             <Text>
-              <strong>SOUS-TOTAL :</strong> {invoice.total_ht?.toFixed(2)} €
+              <strong>SOUS-TOTAL :</strong> {totalHT.toFixed(2)} €
             </Text>
             <Text>
-              <strong>REMISE :</strong> {invoice.discount?.toFixed(2) || '0.00'} €
+              <strong>REMISE :</strong> {discount.toFixed(2)} €
             </Text>
             <Text>
               <strong>SOUS-TOTAL MOINS LES REMISES :</strong>{' '}
-              {(invoice.total_ht - (invoice.discount || 0)).toFixed(2)} €
+              {(totalHT - discount).toFixed(2)} €
             </Text>
             <Text>
               <strong>TVA :</strong> {vatTotal.toFixed(2)} €
             </Text>
             <Text>
-              <strong>TOTAL TTC :</strong> {invoice.total_ttc?.toFixed(2)} €
+              <strong>TOTAL TTC :</strong> {totalTTC.toFixed(2)} €
             </Text>
             <Text>
               <strong>EXPÉDITION ET MANUTENTION :</strong> 0,00 €
             </Text>
             <Text>
-              <strong>SOMME FINALE À PAYER :</strong> {invoice.total_ttc?.toFixed(2)} €
+              <strong>SOMME FINALE À PAYER :</strong> {totalTTC.toFixed(2)} €
             </Text>
           </Stack>
         </GridItem>

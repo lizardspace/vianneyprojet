@@ -22,17 +22,17 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
 } from '@chakra-ui/react';
-import { supabase } from './../../../../supabaseClient'; // Assurez-vous que c'est le bon chemin vers votre client Supabase
+import { supabase } from './../../../../supabaseClient';
 import { ViewIcon, DeleteIcon } from '@chakra-ui/icons';
-import InvoicePreview from './InvoicePreview'; // Import du composant InvoicePreview
-import { useEvent } from '../../../../EventContext'; // Import du contexte EventContext
+import InvoicePreview from './InvoicePreview';
+import { useEvent } from '../../../../EventContext';
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
-  const { selectedEventId } = useEvent(); // Récupère l'ID de l'événement sélectionné
+  const { selectedEventId } = useEvent();
   const [invoiceToDelete, setInvoiceToDelete] = useState(null);
 
   // Contrôles du modal Chakra UI
@@ -58,7 +58,46 @@ const InvoiceList = () => {
         throw error;
       }
 
-      setInvoices(data);
+      // Process invoices to calculate Total TTC
+      const processedInvoices = data.map((invoice) => {
+        // Initialize totals
+        let totalHT = 0;
+        let discountValue = invoice.discount ? parseFloat(invoice.discount) : 0;
+        let vatTotal = 0;
+        let totalTTC = 0;
+
+        if (invoice.products && invoice.products.length > 0) {
+          // Calculate total HT
+          totalHT = invoice.products.reduce((acc, product) => {
+            return acc + product.unitPrice * product.quantity;
+          }, 0);
+
+          // Subtotal after discount
+          const subtotalAfterDiscount = totalHT - discountValue;
+
+          // Calculate VAT total
+          if (totalHT > 0) {
+            invoice.products.forEach((product) => {
+              const productTotal = product.unitPrice * product.quantity;
+              const productDiscount = (productTotal / totalHT) * discountValue;
+              const taxableAmount = productTotal - productDiscount;
+              const vatAmount = (taxableAmount * product.vatRate) / 100;
+              vatTotal += vatAmount;
+            });
+          }
+
+          // Total TTC
+          totalTTC = subtotalAfterDiscount + vatTotal;
+        }
+
+        // Return invoice with calculated totalTTC
+        return {
+          ...invoice,
+          calculatedTotalTTC: totalTTC,
+        };
+      });
+
+      setInvoices(processedInvoices);
     } catch (error) {
       setError(error.message);
     } finally {
@@ -162,11 +201,19 @@ const InvoiceList = () => {
               {invoices.map((invoice) => (
                 <Tr key={invoice.id}>
                   <Td>{invoice.invoice_number}</Td>
-                  <Td>{new Date(invoice.invoice_date).toLocaleDateString()}</Td>
+                  <Td>
+                    {invoice.invoice_date
+                      ? new Date(invoice.invoice_date).toLocaleDateString()
+                      : 'N/A'}
+                  </Td>
                   <Td>{invoice.seller_name}</Td>
                   <Td>{invoice.buyer_name}</Td>
-                  <Td>{invoice.total_ttc?.toFixed(2)} €</Td>
-                  <Td>{new Date(invoice.payment_due_date).toLocaleDateString()}</Td>
+                  <Td>{invoice.calculatedTotalTTC.toFixed(2)} €</Td>
+                  <Td>
+                    {invoice.payment_due_date
+                      ? new Date(invoice.payment_due_date).toLocaleDateString()
+                      : 'N/A'}
+                  </Td>
                   <Td>
                     <IconButton
                       icon={<ViewIcon />}
@@ -202,14 +249,20 @@ const InvoiceList = () => {
                 </AlertDialogHeader>
 
                 <AlertDialogBody>
-                  Êtes-vous sûr de vouloir supprimer cette facture ? Cette action est définitive et ne peut pas être annulée.
+                  Êtes-vous sûr de vouloir supprimer cette facture ? Cette action
+                  est définitive et ne peut pas être annulée.
                 </AlertDialogBody>
 
                 <AlertDialogFooter>
                   <Button ref={cancelRef} onClick={onClose}>
                     Annuler
                   </Button>
-                  <Button colorScheme="red" onClick={handleDeleteConfirm} ml={3} isLoading={deleting}>
+                  <Button
+                    colorScheme="red"
+                    onClick={handleDeleteConfirm}
+                    ml={3}
+                    isLoading={deleting}
+                  >
                     Supprimer
                   </Button>
                 </AlertDialogFooter>
