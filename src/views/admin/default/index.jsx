@@ -52,8 +52,43 @@ export default function UserReports() {
   const [password, setPassword] = useState("");
   const toast = useToast();
 
-  const handleSaveTeam = (updatedTeamData) => {
-    setEditingTeam(null);
+  const handleSaveTeam = async (updatedTeamData) => {
+    try {
+      // Mettre à jour l'équipe dans la base de données
+      const { error } = await supabase
+        .from('vianney_teams')
+        .update(updatedTeamData)
+        .eq('id', updatedTeamData.id);
+
+      if (error) {
+        throw new Error('Erreur lors de la mise à jour de l\'équipe.');
+      }
+
+      // Rafraîchir la liste des équipes
+      await fetchTeamsForEvent();
+
+      // Fermer le modal
+      setEditingTeam(null);
+      setShowEditUserFormModal(false);
+
+      // Afficher une notification de succès
+      toast({
+        title: "Succès",
+        description: "L'équipe a été mise à jour avec succès.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de l\'équipe :', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de mettre à jour l'équipe.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   const fetchEvents = async () => {
@@ -88,39 +123,39 @@ export default function UserReports() {
         .from('vianney_sos_alerts')
         .delete()
         .eq('team_id', teamId);
-  
+
       if (alertsError) {
         console.error('Erreur lors de la suppression des alertes associées :', alertsError);
         throw new Error('Impossible de supprimer les alertes associées.');
       }
-  
+
       // Supprimer les dépendances dans vianney_actions
       const { error: actionsError } = await supabase
         .from('vianney_actions')
         .delete()
         .eq('team_to_which_its_attached', teamId);
-  
+
       if (actionsError) {
         console.error('Erreur lors de la suppression des actions associées :', actionsError);
         throw new Error('Impossible de supprimer les actions associées. Vérifiez les dépendances.');
       }
-  
+
       // Supprimer l'équipe dans vianney_teams
       const { error: teamError } = await supabase
         .from('vianney_teams')
         .delete()
         .eq('id', teamId);
-  
+
       if (teamError) {
         console.error('Erreur lors de la suppression de l\'équipe :', teamError);
         throw new Error('Impossible de supprimer l\'équipe.');
       }
-  
+
       // Mettre à jour l'état local
       setTeams((prevTeams) => prevTeams.filter((team) => team.id !== teamId));
       setShowDeleteTeamModal(false);
       setTeamToDelete(null);
-  
+
       // Afficher une notification de succès
       toast({
         title: "Succès",
@@ -139,7 +174,7 @@ export default function UserReports() {
         isClosable: true,
       });
     }
-  };  
+  };
 
   useEffect(() => {
     fetchEvents();
@@ -157,7 +192,6 @@ export default function UserReports() {
     setSelectedEvent(event);
     setShowEditEventModal(true);
   };
-
 
   const toggleCreateTeamModal = () => setShowCreateTeamModal(!showCreateTeamModal);
 
@@ -182,6 +216,13 @@ export default function UserReports() {
       });
     }
   };
+
+  // Trier les équipes par ordre alphabétique
+  const sortedTeams = teams.sort((a, b) => {
+    if (a.name_of_the_team < b.name_of_the_team) return -1;
+    if (a.name_of_the_team > b.name_of_the_team) return 1;
+    return 0;
+  });
 
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
@@ -261,10 +302,10 @@ export default function UserReports() {
             Equipes
           </Heading>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }} gap='20px' mb='20px'>
-            {teams.map((team, index) => (
+            {sortedTeams.map((team, index) => (
               <Box
                 key={index}
-                cursor="pointer" // Change le curseur pour indiquer que l'élément est cliquable
+                cursor="pointer"
                 transition="background-color 0.2s"
                 _hover={{ backgroundColor: "gray.100" }}
                 p={4}
@@ -273,7 +314,7 @@ export default function UserReports() {
                 onClick={() => {
                   setEditingTeam(team);
                   setShowEditUserFormModal(true);
-                }} 
+                }}
               >
                 <TeamStatistics
                   teamName={team.name_of_the_team}
@@ -350,6 +391,7 @@ export default function UserReports() {
           </ModalContent>
         </Modal>
       )}
+
       {/* Add event modal */}
       {showAddEventForm && (
         <Modal isOpen={showAddEventForm} onClose={() => setShowAddEventForm(false)}>
@@ -408,6 +450,7 @@ export default function UserReports() {
           <EditUserForm teamData={editingTeam} onSave={handleSaveTeam} onClose={() => setShowEditUserFormModal(false)} />
         </Modal>
       )}
+
       <TableTopCreators
         tableData={tableDataTopCreators}
         columnsData={tableColumnsTopCreators}
