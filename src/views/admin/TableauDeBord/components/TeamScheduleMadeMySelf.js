@@ -52,7 +52,6 @@ const TeamScheduleByMySelf = () => {
     setUpdatedEventName(event.titel);
     setUpdatedEventStart(moment(event.start).format('YYYY-MM-DDTHH:mm'));
     setUpdatedEventEnd(moment(event.end).format('YYYY-MM-DDTHH:mm'));
-    // Don't set isUpdateMode here; let the user choose
   };
 
   const deleteEvent = async () => {
@@ -95,15 +94,15 @@ const TeamScheduleByMySelf = () => {
     }
     onClose();
   };
+
   const updateEvent = async () => {
-    // Validation can be added here for updated event details
     const { error } = await supabase
       .from('vianney_actions')
       .update({
         action_name: updatedEventName,
         starting_date: updatedEventStart,
         ending_date: updatedEventEnd,
-        last_updated: new Date() // update the last updated time
+        last_updated: new Date(),
       })
       .match({ id: selectedEvent.id });
 
@@ -130,27 +129,58 @@ const TeamScheduleByMySelf = () => {
     }
     onClose();
   };
+
+  const customSort = (a, b) => {
+    // Utiliser une expression régulière pour séparer la partie texte et la partie numérique
+    const regex = /(\D+)(\d+)/;
+    const matchA = a.titel.match(regex);
+    const matchB = b.titel.match(regex);
+  
+    if (matchA && matchB) {
+      const textA = matchA[1].toLowerCase(); // Partie texte de A
+      const textB = matchB[1].toLowerCase(); // Partie texte de B
+      const numA = parseInt(matchA[2], 10);  // Partie numérique de A
+      const numB = parseInt(matchB[2], 10);  // Partie numérique de B
+  
+      // Comparer d'abord les parties texte
+      if (textA < textB) return -1;
+      if (textA > textB) return 1;
+  
+      // Si les parties texte sont identiques, comparer les parties numériques
+      return numA - numB;
+    }
+  
+    // Si le format n'est pas respecté, utiliser un tri alphabétique standard
+    return a.titel.localeCompare(b.titel);
+  };
+
   const fetchTeams = useCallback(async () => {
     const { data, error } = await supabase
       .from('vianney_teams')
       .select('*')
-      .eq('event_id', selectedEventId); // This assumes selectedEventId is a dependency that might change
+      .eq('event_id', selectedEventId);
+  
     if (error) {
       console.error('Error fetching teams:', error);
       return [];
     }
-    return data.map(team => ({
-      id: team.id,
-      titel: team.name_of_the_team,
-      color: team.color,
-    }));
-  }, [selectedEventId]); // Add dependencies here, if any
+  
+    // Trier les équipes avec la fonction personnalisée
+    const sortedTeams = data
+      .map(team => ({
+        id: team.id,
+        titel: team.name_of_the_team,
+        color: team.color,
+      }))
+      .sort(customSort); // Utiliser la fonction de tri personnalisée
+  
+    return sortedTeams;
+  }, [selectedEventId]);
 
   useEffect(() => {
     const fetchData = async () => {
       const teamsData = await fetchTeams();
-      const sortedTeams = teamsData.sort((a, b) => a.titel.localeCompare(b.titel));
-      setTeams(sortedTeams);
+      setTeams(teamsData); // Les équipes sont déjà triées ici
   
       const { data: eventsData, error } = await supabase
         .from('team_action_view_rendering')
@@ -165,40 +195,35 @@ const TeamScheduleByMySelf = () => {
           const start = new Date(action.starting_date);
           const end = new Date(action.ending_date);
   
-          // Check if the event spans across multiple days
           if (moment(start).isSame(end, 'day')) {
-            // If the event is on the same day, just add it as it is
             formattedEvents.push({
               id: action.action_id,
               titel: action.action_name,
               start: start,
               end: end,
               resourceId: action.team_id,
-              color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
+              color: teamsData.find(t => t.id === action.team_id)?.color || 'lightgrey',
             });
           } else {
-            // If the event spans multiple days, split it into two events
             const endOfDay = moment(start).endOf('day');
             const startOfNextDay = moment(endOfDay).add(1, 'second');
   
-            // First event: from the start time to 23:59:59 on the start date
             formattedEvents.push({
               id: action.action_id,
               titel: action.action_name,
               start: start,
               end: endOfDay.toDate(),
               resourceId: action.team_id,
-              color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
+              color: teamsData.find(t => t.id === action.team_id)?.color || 'lightgrey',
             });
   
-            // Second event: from 00:00:01 on the end date to the original end time
             formattedEvents.push({
               id: action.action_id,
               titel: action.action_name,
               start: startOfNextDay.toDate(),
               end: end,
               resourceId: action.team_id,
-              color: sortedTeams.find(t => t.id === action.team_id)?.color || 'lightgrey'
+              color: teamsData.find(t => t.id === action.team_id)?.color || 'lightgrey',
             });
           }
         });
@@ -208,7 +233,7 @@ const TeamScheduleByMySelf = () => {
     };
   
     fetchData();
-  }, [fetchTeams]); 
+  }, [fetchTeams]);
 
   function adjustBrightness(col, amount) {
     let usePound = false;
@@ -239,15 +264,15 @@ const TeamScheduleByMySelf = () => {
 
   const eventStyleGetter = (event) => {
     const baseColor = event.color || 'lightgrey';
-    const gradientColor = adjustBrightness(baseColor, -35); // Darken the base color by 30
+    const gradientColor = adjustBrightness(baseColor, -35);
     return {
       style: {
         backgroundImage: `linear-gradient(to right, ${baseColor}, ${gradientColor})`,
-        color: 'black', // Set text color to white for better readability
-        textAlign: 'left', // Center align the text
-        display: 'flex', // Use flexbox for alignment
-        alignItems: 'left', // Align items vertically center
-        justifyContent: 'flex-start', 
+        color: 'black',
+        textAlign: 'left',
+        display: 'flex',
+        alignItems: 'left',
+        justifyContent: 'flex-start',
         fontSize: '14px',
         fontWeight: 'bold',
       },
@@ -283,13 +308,12 @@ const TeamScheduleByMySelf = () => {
 
 
   const formats = {
-    dayFormat: 'DD/MM', // Format for day view
-    weekdayFormat: 'dddd', // Format for week view
-    monthHeaderFormat: 'MMMM YYYY', // Format for month header
-    dayHeaderFormat: 'dddd, MMMM DD', // Format for day header
-    agendaDateFormat: 'dddd, MMMM DD', // Format for agenda view date
-    agendaTimeFormat: 'HH:mm', // Format for agenda view time
-    // ... (add more formats as needed)
+    dayFormat: 'DD/MM',
+    weekdayFormat: 'dddd',
+    monthHeaderFormat: 'MMMM YYYY',
+    dayHeaderFormat: 'dddd, MMMM DD',
+    agendaDateFormat: 'dddd, MMMM DD',
+    agendaTimeFormat: 'HH:mm',
   };
 
   const CustomEvent = ({ event }) => (
@@ -297,8 +321,8 @@ const TeamScheduleByMySelf = () => {
       label={`${event.titel} - ${moment(event.start).format('HH:mm')} à ${moment(event.end).format('HH:mm')}`}
       aria-label="Event Tooltip"
       hasArrow
-      overflowWrap="anywhere" // Ensure text wraps within the tooltip
-      whiteSpace="pre-line"   // Allow for line breaks
+      overflowWrap="anywhere"
+      whiteSpace="pre-line"
     >
       <div style={eventStyleGetter(event).style}>
         <div style={{ color: 'black', fontWeight: 'bold', fontSize: '10px' }}>
@@ -307,9 +331,8 @@ const TeamScheduleByMySelf = () => {
       </div>
     </Tooltip>
   );
-  
-  
-    const [isAddActionModalOpen, setIsAddActionModalOpen] = useState(false);
+
+  const [isAddActionModalOpen, setIsAddActionModalOpen] = useState(false);
   const onOpenAddActionModal = () => setIsAddActionModalOpen(true);
   const onCloseAddActionModal = () => setIsAddActionModalOpen(false);
 
@@ -328,7 +351,6 @@ const TeamScheduleByMySelf = () => {
   const handleToday = () => {
     setCurrentDate(new Date());
   };
-
 
   return (
     <Card
@@ -387,10 +409,10 @@ const TeamScheduleByMySelf = () => {
               endAccessor="end"
               eventPropGetter={eventStyleGetter}
               messages={messages}
-              style={{  color: 'black' }} //height: 500,
+              style={{ color: 'black' }}
               onSelectEvent={handleEventSelect}
               components={{
-                event: CustomEvent, // Use Custom Event Component
+                event: CustomEvent,
               }}
               toolbar={false}
             />
