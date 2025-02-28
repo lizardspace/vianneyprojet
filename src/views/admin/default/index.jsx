@@ -52,6 +52,26 @@ export default function UserReports() {
   const [password, setPassword] = useState("");
   const toast = useToast();
 
+  // Fonction de tri personnalisée
+  const customSort = (a, b) => {
+    const regex = /(\D+)(\d+)/;
+    const matchA = a.name_of_the_team.match(regex);
+    const matchB = b.name_of_the_team.match(regex);
+
+    if (matchA && matchB) {
+      const textA = matchA[1].toLowerCase();
+      const textB = matchB[1].toLowerCase();
+      const numA = parseInt(matchA[2], 10);
+      const numB = parseInt(matchB[2], 10);
+
+      if (textA < textB) return -1;
+      if (textA > textB) return 1;
+      return numA - numB;
+    }
+
+    return a.name_of_the_team.localeCompare(b.name_of_the_team);
+  };
+
   const handleSaveTeam = async (updatedTeamData) => {
     try {
       // Mettre à jour l'équipe dans la base de données
@@ -109,7 +129,9 @@ export default function UserReports() {
       if (error) {
         console.error('Error fetching teams for the event:', error);
       } else {
-        setTeams(teamsForEvent);
+        // Trier les équipes avec la fonction personnalisée
+        const sortedTeams = teamsForEvent.sort(customSort);
+        setTeams(sortedTeams);
       }
     } catch (error) {
       console.error('Error fetching teams for the event:', error);
@@ -217,13 +239,6 @@ export default function UserReports() {
     }
   };
 
-  // Trier les équipes par ordre alphabétique
-  const sortedTeams = teams.sort((a, b) => {
-    if (a.name_of_the_team < b.name_of_the_team) return -1;
-    if (a.name_of_the_team > b.name_of_the_team) return 1;
-    return 0;
-  });
-
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       {/* If events are not shown yet, show password prompt */}
@@ -302,7 +317,7 @@ export default function UserReports() {
             Equipes
           </Heading>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }} gap='20px' mb='20px'>
-            {sortedTeams.map((team, index) => (
+            {teams.map((team, index) => (
               <Box
                 key={index}
                 cursor="pointer"
