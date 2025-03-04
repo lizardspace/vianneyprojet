@@ -53,7 +53,13 @@ const InventoryDisplay = () => {
                     return item.event_id === selectedEventId || item.associated_team_id == null;
                 });
 
-                setInventoryItems(filteredData);
+                // Fonction de tri alphanumérique
+                const alphanumericSort = (a, b) => {
+                    return a.nom.localeCompare(b.nom, 'fr', { numeric: true, sensitivity: 'base' });
+                };
+
+                const sortedData = filteredData.sort(alphanumericSort);
+                setInventoryItems(sortedData);
             }
             setLoading(false);
         };
