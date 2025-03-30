@@ -18,13 +18,20 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  useDisclosure
+  useDisclosure,
+  Badge,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td
 } from '@chakra-ui/react';
 import supabase from './../../../../supabaseClient';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import ExpenseSummaryPDF from './ExpenseSummaryPDF';
 import { useEvent } from './../../../../EventContext';
-import { FaFilePdf, FaDownload, FaExpand } from "react-icons/fa6";
+import { FaFilePdf, FaDownload, FaExpand, FaFile, FaEuroSign } from "react-icons/fa6";
 
 const ExpenseList = () => {
   const [expenses, setExpenses] = useState([]);
@@ -103,6 +110,136 @@ const ExpenseList = () => {
     onOpen();
   };
 
+  const renderFilePreview = (filename, label, isExpense = false, compact = false) => {
+    const fileUrl = getFileUrl(filename);
+    if (!fileUrl) return null;
+
+    const isImage = filename.match(/\.(jpeg|jpg|gif|png|webp)$/i);
+    const isPDF = filename.match(/\.pdf$/i);
+    const fileExtension = filename.split('.').pop().toUpperCase();
+
+    if (compact) {
+      return (
+        <HStack spacing={2}>
+          <Button
+            size="sm"
+            onClick={() => fileUrl && openImageModal(fileUrl)}
+            leftIcon={<FaFile />}
+            variant="outline"
+          >
+            Voir
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => downloadFile(filename)}
+            leftIcon={<FaDownload />}
+            colorScheme="blue"
+            variant="outline"
+          >
+            Télécharger
+          </Button>
+        </HStack>
+      );
+    }
+
+    return (
+      <VStack align="start" spacing={2} mb={4} p={3} borderWidth="1px" borderRadius="md" bg="gray.50">
+        <HStack justifyContent="space-between" w="100%">
+          <Text fontWeight="bold">{label}</Text>
+          {isExpense && (
+            <Badge colorScheme="green" fontSize="0.8em">
+              Justificatif de dépense
+            </Badge>
+          )}
+        </HStack>
+        
+        {isImage ? (
+          <Box position="relative">
+            <Image
+              src={fileUrl}
+              alt={label}
+              boxSize="200px"
+              objectFit="cover"
+              borderRadius="md"
+              cursor="pointer"
+              onClick={() => openImageModal(fileUrl)}
+            />
+            <Icon
+              as={FaExpand}
+              position="absolute"
+              top={2}
+              right={2}
+              color="white"
+              bg="rgba(0,0,0,0.5)"
+              p={1}
+              borderRadius="md"
+              cursor="pointer"
+              onClick={() => openImageModal(fileUrl)}
+            />
+          </Box>
+        ) : (
+          <HStack spacing={3} p={2} bg="white" borderRadius="md" borderWidth="1px">
+            <Icon as={isPDF ? FaFilePdf : FaFile} color="red.500" />
+            <Text>Fichier {fileExtension}</Text>
+          </HStack>
+        )}
+        
+        <Button
+          leftIcon={<FaDownload />}
+          size="sm"
+          onClick={() => downloadFile(filename)}
+          colorScheme="blue"
+          variant="outline"
+        >
+          Télécharger
+        </Button>
+      </VStack>
+    );
+  };
+
+  const renderExpenseAttachments = (expense) => {
+    if (!expense.expenses) return null;
+    
+    const expensesData = JSON.parse(expense.expenses);
+    if (!expensesData || expensesData.length === 0) return null;
+
+    return (
+      <GridItem colSpan={2}>
+        <Text fontWeight="bold" mb="4" fontSize="lg">Dépenses et justificatifs:</Text>
+        
+        <Table variant="striped" mb={4}>
+          <Thead bg="blue.500">
+            <Tr>
+              <Th color="white">Dépense</Th>
+              <Th color="white" isNumeric>Montant</Th>
+              <Th color="white">Justificatif</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {expensesData.map((exp, index) => (
+              <Tr key={`expense-${index}`}>
+                <Td>{exp.name}</Td>
+                <Td isNumeric>
+                  <HStack justify="flex-end">
+                    <Icon as={FaEuroSign} color="green.500" />
+                    <Text fontWeight="bold">{exp.cost?.toFixed(2) || '0.00'}</Text>
+                  </HStack>
+                </Td>
+                <Td>
+                  {exp.file || exp.fileName ? (
+                    renderFilePreview(exp.file || exp.fileName, ``, true, true)
+                  ) : (
+                    <Text color="gray.500" fontStyle="italic">Aucun justificatif</Text>
+                  )}
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </GridItem>
+    );
+  };
+
   if (loading) {
     return (
       <Flex justifyContent="center" alignItems="center" height="100vh">
@@ -111,80 +248,12 @@ const ExpenseList = () => {
     );
   }
 
-  const renderFilePreview = (filename, label) => {
-    const fileUrl = getFileUrl(filename);
-    if (!fileUrl) return null;
-
-    const isImage = filename.match(/\.(jpeg|jpg|gif|png)$/i);
-    const isPDF = filename.match(/\.pdf$/i);
-
-    return (
-      <GridItem colSpan={2}>
-        <Text fontWeight="bold">{label}:</Text>
-        <VStack align="start" mt={2}>
-          {isImage && (
-            <Box position="relative">
-              <Image
-                src={fileUrl}
-                alt={label}
-                boxSize="200px"
-                objectFit="cover"
-                borderRadius="md"
-                cursor="pointer"
-                onClick={() => openImageModal(fileUrl)}
-              />
-              <Icon
-                as={FaExpand}
-                position="absolute"
-                top={2}
-                right={2}
-                color="white"
-                bg="rgba(0,0,0,0.5)"
-                p={1}
-                borderRadius="md"
-                cursor="pointer"
-                onClick={() => openImageModal(fileUrl)}
-              />
-            </Box>
-          )}
-          {isPDF && (
-            <Box p={4} borderWidth="1px" borderRadius="md">
-              <Text>Fichier PDF: {filename}</Text>
-            </Box>
-          )}
-          <Button
-            leftIcon={<FaDownload />}
-            size="sm"
-            onClick={() => downloadFile(filename)}
-            mt={2}
-          >
-            Télécharger
-          </Button>
-        </VStack>
-      </GridItem>
-    );
-  };
-
-  const renderExpenseFiles = (expense) => {
-    if (!expense.expenses) return null;
-
-    return JSON.parse(expense.expenses).map((exp, index) => {
-      if (!exp.file) return null;
-      return (
-        <Box key={index} mb="4">
-          <Text>{exp.name} - {exp.cost ? exp.cost.toFixed(2) : 'N/A'} €</Text>
-          {renderFilePreview(exp.file, `Justificatif pour ${exp.name}`)}
-        </Box>
-      );
-    });
-  };
-
   return (
     <Box p="6">
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Prévisualisation</ModalHeader>
+          <ModalHeader>Prévisualisation du justificatif</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {selectedImage && (
@@ -212,6 +281,7 @@ const ExpenseList = () => {
             bg="white"
           >
             <Grid templateColumns="repeat(2, 1fr)" gap="4">
+              {/* Informations de base */}
               <GridItem>
                 <Text fontWeight="bold">Nom:</Text>
                 <Text>{expense.volunteer_last_name}</Text>
@@ -245,22 +315,24 @@ const ExpenseList = () => {
               {renderFilePreview(expense.rib, "RIB")}
               {renderFilePreview(expense.departure_odometer, "Compteur de kilomètres départ")}
               {renderFilePreview(expense.return_odometer, "Compteur de kilomètres retour")}
-              {renderFilePreview(expense.carte_grise, "Photo de la carte grise")}
+              {renderFilePreview(expense.carte_grise, "Carte grise")}
 
+              {/* Trajets */}
               <GridItem colSpan={2}>
-                <Text fontWeight="bold">Trajets:</Text>
+                <Text fontWeight="bold" mb="2">Trajets:</Text>
                 {expense.trips && JSON.parse(expense.trips).map((trip, index) => (
-                  <Box key={index} mb="4">
-                    <Text>{trip.name} - {trip.distance} KM</Text>
+                  <Box key={`trip-${index}`} mb="2" pl="4" borderLeft="2px solid" borderColor="gray.200">
+                    <Text>
+                      <Text as="span" fontWeight="semibold">{trip.name}:</Text> {trip.distance} KM
+                    </Text>
                   </Box>
                 ))}
               </GridItem>
 
-              <GridItem colSpan={2}>
-                <Text fontWeight="bold">Dépenses:</Text>
-                {renderExpenseFiles(expense)}
-              </GridItem>
+              {/* Justificatifs de dépenses */}
+              {renderExpenseAttachments(expense)}
 
+              {/* Bouton de téléchargement du PDF */}
               <GridItem colSpan={2}>
                 <HStack justifyContent="flex-end" spacing={4}>
                   <PDFDownloadLink
@@ -273,6 +345,7 @@ const ExpenseList = () => {
                         colorScheme="red"
                         variant="solid"
                         isLoading={loading}
+                        size="lg"
                       >
                         Télécharger le PDF récapitulatif
                       </Button>
