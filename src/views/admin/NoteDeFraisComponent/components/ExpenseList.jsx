@@ -8,26 +8,39 @@ import {
   Image,
   Spinner,
   useToast,
+  Button,
+  HStack
 } from '@chakra-ui/react';
 import supabase from './../../../../supabaseClient';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import ExpenseSummaryPDF from './ExpenseSummaryPDF';
+import { useEvent } from './../../../../EventContext';
+import { FaFilePdf } from "react-icons/fa6";
 
 const ExpenseList = () => {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
+  const { selectedEventId } = useEvent();
 
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        let { data, error } = await supabase
+        let query = supabase
           .from('vianney_expenses_reimbursement')
           .select('*');
+
+        if (selectedEventId) {
+          query = query.eq('event_id', selectedEventId);
+        }
+
+        let { data, error } = await query;
 
         if (error) {
           throw error;
         }
 
-        setExpenses(data);
+        setExpenses(data || []);
       } catch (error) {
         toast({
           title: 'Erreur de chargement',
@@ -42,7 +55,7 @@ const ExpenseList = () => {
     };
 
     fetchExpenses();
-  }, [toast]);
+  }, [toast, selectedEventId]);
 
   if (loading) {
     return (
@@ -166,6 +179,25 @@ const ExpenseList = () => {
                     )}
                   </Box>
                 ))}
+              </GridItem>
+              <GridItem colSpan={2}>
+                <HStack justifyContent="flex-end">
+                  <PDFDownloadLink
+                    document={<ExpenseSummaryPDF data={expense} trips={JSON.parse(expense.trips)} expenses={JSON.parse(expense.expenses)} />}
+                    fileName={`note_de_frais_${expense.volunteer_last_name}_${expense.volunteer_first_name}.pdf`}
+                  >
+                    {({ loading }) => (
+                      <Button
+                        leftIcon={<FaFilePdf />}
+                        colorScheme="red"
+                        variant="solid"
+                        isLoading={loading}
+                      >
+                        Télécharger le PDF
+                      </Button>
+                    )}
+                  </PDFDownloadLink>
+                </HStack>
               </GridItem>
             </Grid>
           </Box>
