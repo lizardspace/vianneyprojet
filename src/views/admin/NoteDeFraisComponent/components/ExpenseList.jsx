@@ -9,19 +9,30 @@ import {
   Spinner,
   useToast,
   Button,
-  HStack
+  HStack,
+  VStack,
+  Icon,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  useDisclosure
 } from '@chakra-ui/react';
 import supabase from './../../../../supabaseClient';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import ExpenseSummaryPDF from './ExpenseSummaryPDF';
 import { useEvent } from './../../../../EventContext';
-import { FaFilePdf } from "react-icons/fa6";
+import { FaFilePdf, FaDownload, FaExpand } from "react-icons/fa6";
 
 const ExpenseList = () => {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
   const toast = useToast();
   const { selectedEventId } = useEvent();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -57,6 +68,41 @@ const ExpenseList = () => {
     fetchExpenses();
   }, [toast, selectedEventId]);
 
+  const getFileUrl = (filename) => {
+    if (!filename) return null;
+    return `https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${filename}`;
+  };
+
+  const downloadFile = async (filename) => {
+    const url = getFileUrl(filename);
+    if (!url) return;
+
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      toast({
+        title: 'Erreur de téléchargement',
+        description: `Impossible de télécharger le fichier: ${error.message}`,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const openImageModal = (url) => {
+    setSelectedImage(url);
+    onOpen();
+  };
+
   if (loading) {
     return (
       <Flex justifyContent="center" alignItems="center" height="100vh">
@@ -65,8 +111,95 @@ const ExpenseList = () => {
     );
   }
 
+  const renderFilePreview = (filename, label) => {
+    const fileUrl = getFileUrl(filename);
+    if (!fileUrl) return null;
+
+    const isImage = filename.match(/\.(jpeg|jpg|gif|png)$/i);
+    const isPDF = filename.match(/\.pdf$/i);
+
+    return (
+      <GridItem colSpan={2}>
+        <Text fontWeight="bold">{label}:</Text>
+        <VStack align="start" mt={2}>
+          {isImage && (
+            <Box position="relative">
+              <Image
+                src={fileUrl}
+                alt={label}
+                boxSize="200px"
+                objectFit="cover"
+                borderRadius="md"
+                cursor="pointer"
+                onClick={() => openImageModal(fileUrl)}
+              />
+              <Icon
+                as={FaExpand}
+                position="absolute"
+                top={2}
+                right={2}
+                color="white"
+                bg="rgba(0,0,0,0.5)"
+                p={1}
+                borderRadius="md"
+                cursor="pointer"
+                onClick={() => openImageModal(fileUrl)}
+              />
+            </Box>
+          )}
+          {isPDF && (
+            <Box p={4} borderWidth="1px" borderRadius="md">
+              <Text>Fichier PDF: {filename}</Text>
+            </Box>
+          )}
+          <Button
+            leftIcon={<FaDownload />}
+            size="sm"
+            onClick={() => downloadFile(filename)}
+            mt={2}
+          >
+            Télécharger
+          </Button>
+        </VStack>
+      </GridItem>
+    );
+  };
+
+  const renderExpenseFiles = (expense) => {
+    if (!expense.expenses) return null;
+
+    return JSON.parse(expense.expenses).map((exp, index) => {
+      if (!exp.file) return null;
+      return (
+        <Box key={index} mb="4">
+          <Text>{exp.name} - {exp.cost ? exp.cost.toFixed(2) : 'N/A'} €</Text>
+          {renderFilePreview(exp.file, `Justificatif pour ${exp.name}`)}
+        </Box>
+      );
+    });
+  };
+
   return (
     <Box p="6">
+      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Prévisualisation</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {selectedImage && (
+              <Image
+                src={selectedImage}
+                alt="Prévisualisation"
+                maxW="100%"
+                maxH="80vh"
+                objectFit="contain"
+              />
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
       <Grid templateColumns="repeat(1, 1fr)" gap="6">
         {expenses.map((expense) => (
           <Box
@@ -107,54 +240,13 @@ const ExpenseList = () => {
                 <Text fontWeight="bold">Option de donation:</Text>
                 <Text>{expense.donation_option}</Text>
               </GridItem>
-              {expense.rib && (
-                <GridItem colSpan={2}>
-                  <Text fontWeight="bold">RIB:</Text>
-                  <Image
-                    src={`https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${expense.rib}`}
-                    alt="RIB Preview"
-                    boxSize="200px"
-                    objectFit="cover"
-                    borderRadius="md"
-                  />
-                </GridItem>
-              )}
-              {expense.departure_odometer && (
-                <GridItem colSpan={2}>
-                  <Text fontWeight="bold">Compteur de kilomètres départ:</Text>
-                  <Image
-                    src={`https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${expense.departure_odometer}`}
-                    alt="Departure Odometer Preview"
-                    boxSize="200px"
-                    objectFit="cover"
-                    borderRadius="md"
-                  />
-                </GridItem>
-              )}
-              {expense.return_odometer && (
-                <GridItem colSpan={2}>
-                  <Text fontWeight="bold">Compteur de kilomètres retour:</Text>
-                  <Image
-                    src={`https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${expense.return_odometer}`}
-                    alt="Return Odometer Preview"
-                    boxSize="200px"
-                    objectFit="cover"
-                    borderRadius="md"
-                  />
-                </GridItem>
-              )}
-              {expense.carte_grise && (
-                <GridItem colSpan={2}>
-                  <Text fontWeight="bold">Photo de la carte grise:</Text>
-                  <Image
-                    src={`https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${expense.carte_grise}`}
-                    alt="Carte Grise Preview"
-                    boxSize="200px"
-                    objectFit="cover"
-                    borderRadius="md"
-                  />
-                </GridItem>
-              )}
+
+              {/* Pièces jointes principales */}
+              {renderFilePreview(expense.rib, "RIB")}
+              {renderFilePreview(expense.departure_odometer, "Compteur de kilomètres départ")}
+              {renderFilePreview(expense.return_odometer, "Compteur de kilomètres retour")}
+              {renderFilePreview(expense.carte_grise, "Photo de la carte grise")}
+
               <GridItem colSpan={2}>
                 <Text fontWeight="bold">Trajets:</Text>
                 {expense.trips && JSON.parse(expense.trips).map((trip, index) => (
@@ -163,25 +255,14 @@ const ExpenseList = () => {
                   </Box>
                 ))}
               </GridItem>
+
               <GridItem colSpan={2}>
                 <Text fontWeight="bold">Dépenses:</Text>
-                {expense.expenses && JSON.parse(expense.expenses).map((exp, index) => (
-                  <Box key={index} mb="4">
-                    <Text>{exp.name} - {exp.cost ? exp.cost.toFixed(2) : 'N/A'} €</Text>
-                    {exp.file && (
-                      <Image
-                        src={`https://hvjzemvfstwwhhahecwu.supabase.co/storage/v1/object/public/notedefrais/${exp.file}`}
-                        alt="Expense File Preview"
-                        boxSize="200px"
-                        objectFit="cover"
-                        borderRadius="md"
-                      />
-                    )}
-                  </Box>
-                ))}
+                {renderExpenseFiles(expense)}
               </GridItem>
+
               <GridItem colSpan={2}>
-                <HStack justifyContent="flex-end">
+                <HStack justifyContent="flex-end" spacing={4}>
                   <PDFDownloadLink
                     document={<ExpenseSummaryPDF data={expense} trips={JSON.parse(expense.trips)} expenses={JSON.parse(expense.expenses)} />}
                     fileName={`note_de_frais_${expense.volunteer_last_name}_${expense.volunteer_first_name}.pdf`}
@@ -193,7 +274,7 @@ const ExpenseList = () => {
                         variant="solid"
                         isLoading={loading}
                       >
-                        Télécharger le PDF
+                        Télécharger le PDF récapitulatif
                       </Button>
                     )}
                   </PDFDownloadLink>
